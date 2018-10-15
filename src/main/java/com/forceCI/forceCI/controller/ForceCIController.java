@@ -13,10 +13,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.core.MediaType;
 
 @RestController
 public class ForceCIController {
-    @RequestMapping(value = "/auth", method = RequestMethod.GET, params = {"code", "state"}, headers = "Accept=application/json")
+    @RequestMapping(value = "/auth", method = RequestMethod.GET, params = {"code", "state"})
+    @Consumes({MediaType.APPLICATION_JSON})
     public void auth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
