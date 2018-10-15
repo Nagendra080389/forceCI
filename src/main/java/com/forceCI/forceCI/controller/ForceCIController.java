@@ -31,6 +31,7 @@ public class ForceCIController {
         post.addParameter("redirect_uri", "https://forceci.herokuapp.com/auth");
         post.addParameter("client_id", "0b5a2cb25fa55a0d2b76");
         post.addParameter("client_secret", "27e2145693b538a466e8264735259dafdaf783e7");
+        post.addParameter("state", state);
 
         httpClient.executeMethod(post);
         String responseBody = post.getResponseBodyAsString();
