@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class ForceCIController {
-    @RequestMapping(value = "/auth", method = RequestMethod.GET, params = {"code", "state"})
+    @RequestMapping(value = "/auth", method = RequestMethod.GET, params = {"code", "state"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public void auth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
