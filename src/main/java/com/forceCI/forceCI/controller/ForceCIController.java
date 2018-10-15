@@ -38,16 +38,8 @@ public class ForceCIController {
         String responseBody = post.getResponseBodyAsString();
 
         String accessToken = null;
-        String issuedAt = null;
-        String signature = null;
-        String id_token = null;
-        String instance_url = null;
-        String useridURL = null;
-        String username = null;
-        String display_name = null;
-        String email = null;
+        String token_type = null;
         JsonParser parser = new JsonParser();
-        System.out.println("responseBody -> "+responseBody);
 
         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
         System.out.println("jsonObject is now "+jsonObject);
@@ -55,12 +47,7 @@ public class ForceCIController {
         try {
 
             accessToken = jsonObject.get("access_token").getAsString();
-            issuedAt = jsonObject.get("issued_at").getAsString();
-            signature = jsonObject.get("signature").getAsString();
-            id_token = jsonObject.get("id_token").getAsString();
-            instance_url = jsonObject.get("instance_url").getAsString();
-            useridURL = jsonObject.get("id").getAsString();
-
+            token_type = jsonObject.get("token_type").getAsString();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -69,18 +56,12 @@ public class ForceCIController {
 
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
-        Cookie session2 = new Cookie("INSTANCE_URL", instance_url);
-        Cookie session3 = new Cookie("ID_TOKEN", id_token);
-        Cookie session4 = new Cookie("USERIDURL", useridURL);
+        Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
         session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
         session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-        session3.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-        session4.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
         httpResponse.addCookie(session1);
         httpResponse.addCookie(session2);
-        httpResponse.addCookie(session3);
-        httpResponse.addCookie(session4);
-        httpResponse.sendRedirect(null);
+        httpResponse.sendRedirect("/html/dashboard.html");
 
     }
 
