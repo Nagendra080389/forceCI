@@ -28,9 +28,9 @@ public class ForceCIController {
         PostMethod post = new PostMethod(environment);
         post.addParameter("code", code);
         post.addParameter("grant_type", "authorization_code");
-        post.addParameter("redirect_uri", "https://f6278d41.ngrok.io/auth");
-        post.addParameter("client_id", "3MVG9d8..z.hDcPLDlm9QqJ3hRa..IRUJdGRp4Shjuu01GT.H5KRjos_xlbZEtYGy55M6SzOOELg7sfD4T6Pl");
-        post.addParameter("client_secret", "1846517738759045110");
+        post.addParameter("redirect_uri", "https://forceci.herokuapp.com/auth");
+        post.addParameter("client_id", "0b5a2cb25fa55a0d2b76");
+        post.addParameter("client_secret", "27e2145693b538a466e8264735259dafdaf783e7");
 
         httpClient.executeMethod(post);
         String responseBody = post.getResponseBodyAsString();
@@ -93,9 +93,9 @@ public class ForceCIController {
         PostMethod post = new PostMethod(environment);
         post.addParameter("code", code);
         post.addParameter("grant_type", "authorization_code");
-        post.addParameter("redirect_uri", "https://f6278d41.ngrok.io/auth");
-        post.addParameter("client_id", "3MVG9d8..z.hDcPLDlm9QqJ3hRa..IRUJdGRp4Shjuu01GT.H5KRjos_xlbZEtYGy55M6SzOOELg7sfD4T6Pl");
-        post.addParameter("client_secret", "1846517738759045110");
+        post.addParameter("redirect_uri", "https://forceci.herokuapp.com/auth");
+        post.addParameter("client_id", "Iv1.cf5c48ba09a79e4a");
+        post.addParameter("client_secret", "be7c5020e0ce4090edfbaec20bc27a9a6d72fc77");
 
         httpClient.executeMethod(post);
         String responseBody = post.getResponseBodyAsString();
