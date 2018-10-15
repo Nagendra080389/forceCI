@@ -47,6 +47,7 @@ public class ForceCIController {
         String display_name = null;
         String email = null;
         JsonParser parser = new JsonParser();
+        System.out.println("responseBody -> "+responseBody);
 
         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
         System.out.println("jsonObject is now "+jsonObject);
