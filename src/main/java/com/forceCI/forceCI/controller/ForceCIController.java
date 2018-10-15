@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class ForceCIController {
-    @RequestMapping(value = "/auth", method = RequestMethod.GET, params = {"code", "state"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/auth", method = RequestMethod.GET, params = {"code", "state"}, consumes = MediaType.APPLICATION_JSON_VALUE)
     public void auth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
