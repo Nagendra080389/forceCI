@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<title>Force CI</title>
+
+</head>
+<!--&lt;!&ndash; Global site tag (gtag.js) - Google Analytics &ndash;&gt;
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-123660266-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-123660266-1');
+</script>-->
+
+<body id="page-top">
+
+
+<!-- Portfolio Grid Section -->
+<div class="btn-group">
+	<button type="button" class="btn btn-primary" onclick=redirectJS()>SignUp with Github</button>
+</div>
+
+
+<script>
+
+function redirectJS(orgType) {
+    window.open('https://github.com/login/oauth/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRa..IRUJdGRp4Shjuu01GT.H5KRjos_xlbZEtYGy55M6SzOOELg7sfD4T6Pl&redirect_uri=https://f6278d41.ngrok.io/auth&state=' + (orgType === 'test' ? 'a' : 'b'), '_self');
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
