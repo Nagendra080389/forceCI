@@ -18,19 +18,16 @@ import javax.ws.rs.core.MediaType;
 
 @RestController
 public class ForceCIController {
+
     @RequestMapping(value = "/auth", method = RequestMethod.GET, params = {"code", "state"})
-    @Consumes({MediaType.APPLICATION_JSON})
     public void auth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
         String environment = "https://github.com/login/oauth/access_token";
-
-        System.out.println("environment -> " + environment);
-        System.out.println("code -> " + code);
-        System.out.println("state -> " + state);
         HttpClient httpClient = new HttpClient();
 
         PostMethod post = new PostMethod(environment);
+        post.setRequestHeader("Accept",MediaType.APPLICATION_JSON);
         post.addParameter("code", code);
         post.addParameter("redirect_uri", "https://forceci.herokuapp.com/auth");
         post.addParameter("client_id", "0b5a2cb25fa55a0d2b76");
