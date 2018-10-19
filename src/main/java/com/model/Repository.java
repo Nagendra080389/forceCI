@@ -1,4 +1,4 @@
-package com.forceCI.forceCI.model;
+package com.model;
 
 import java.io.Serializable;
 

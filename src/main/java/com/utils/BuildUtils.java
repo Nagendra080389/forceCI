@@ -1,4 +1,4 @@
-package com.forceCI.forceCI.utils;
+package com.utils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
