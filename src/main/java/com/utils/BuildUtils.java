@@ -1,5 +1,8 @@
 package com.utils;
 
+import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.Job;
+import com.offbytwo.jenkins.model.JobWithDetails;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.BuildException;
@@ -8,18 +11,33 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class BuildUtils {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BuildUtils.class);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException, JAXBException {
+
+        JenkinsServer jenkins = new JenkinsServer(new URI("http://localhost:8080/"), "nagesingh", "Developer!8");
+        Map<String, Job> jobs = jenkins.getJobs();
+
+
+        ClassLoader classLoader1 = Thread.currentThread().getContextClassLoader();
+        InputStream resourceAsStream1 = classLoader1.getResourceAsStream("config.xml");
+        String xmlNew = IOUtils.toString(resourceAsStream1);
+        ConvertXmlToObjects convertXmlToObjects = new ConvertXmlToObjects();
+        convertXmlToObjects.convertToObjects(xmlNew);
+        jenkins.createJob("JobFromJava", xmlNew, true);
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         InputStream resourceAsStream = classLoader.getResourceAsStream("build/build.xml");
@@ -111,7 +129,7 @@ public class BuildUtils {
         return consoleLogger;
     }
 
-    private static File stream2file(InputStream in) throws IOException {
+    protected static File stream2file(InputStream in) throws IOException {
         final File tempFile = File.createTempFile("build", ".xml");
         tempFile.deleteOnExit();
         try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {

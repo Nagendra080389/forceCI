@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb ">
+  <xs:element name="project" type="projectType"/>
+  <xs:complexType name="com.coravy.hudson.plugins.github.GithubProjectPropertyType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="projectUrl"/>
+      <xs:element type="xs:string" name="displayName"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="plugin"/>
+  </xs:complexType>
+  <xs:complexType name="buildWrappersType">
+    <xs:sequence>
+      <xs:element type="hudson.plugins.ws__cleanup.PreBuildCleanupType" name="hudson.plugins.ws__cleanup.PreBuildCleanup"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="hudson.tasks.AntType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="targets"/>
+      <xs:element type="xs:string" name="antName"/>
+      <xs:element type="xs:string" name="buildFile"/>
+      <xs:element type="xs:string" name="properties"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="plugin"/>
+  </xs:complexType>
+  <xs:complexType name="hudson.plugins.git.UserRemoteConfigType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="refspec"/>
+      <xs:element type="xs:string" name="url"/>
+      <xs:element type="xs:string" name="credentialsId"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="blackListTargetBranchesType">
+    <xs:sequence>
+      <xs:element type="org.jenkinsci.plugins.ghprb.GhprbBranchType" name="org.jenkinsci.plugins.ghprb.GhprbBranch"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="org.jenkinsci.plugins.ghprb.GhprbBranchType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="branch"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="triggersType">
+    <xs:sequence>
+      <xs:element type="org.jenkinsci.plugins.ghprb.GhprbTriggerType" name="org.jenkinsci.plugins.ghprb.GhprbTrigger"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="buildersType">
+    <xs:sequence>
+      <xs:element type="hudson.tasks.AntType" name="hudson.tasks.Ant"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="org.jenkinsci.plugins.ghprb.GhprbTriggerType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="spec"/>
+      <xs:element type="xs:string" name="configVersion"/>
+      <xs:element type="xs:string" name="adminlist"/>
+      <xs:element type="xs:string" name="allowMembersOfWhitelistedOrgsAsAdmin"/>
+      <xs:element type="xs:string" name="orgslist"/>
+      <xs:element type="xs:string" name="cron"/>
+      <xs:element type="xs:string" name="buildDescTemplate"/>
+      <xs:element type="xs:string" name="onlyTriggerPhrase"/>
+      <xs:element type="xs:string" name="useGitHubHooks"/>
+      <xs:element type="xs:string" name="permitAll"/>
+      <xs:element type="xs:string" name="whitelist"/>
+      <xs:element type="xs:string" name="autoCloseFailedPullRequests"/>
+      <xs:element type="xs:string" name="displayBuildErrorsOnDownstreamBuilds"/>
+      <xs:element type="whiteListTargetBranchesType" name="whiteListTargetBranches"/>
+      <xs:element type="blackListTargetBranchesType" name="blackListTargetBranches"/>
+      <xs:element type="xs:string" name="gitHubAuthId"/>
+      <xs:element type="xs:string" name="triggerPhrase"/>
+      <xs:element type="xs:string" name="skipBuildPhrase"/>
+      <xs:element type="xs:string" name="blackListCommitAuthor"/>
+      <xs:element type="xs:string" name="blackListLabels"/>
+      <xs:element type="xs:string" name="whiteListLabels"/>
+      <xs:element type="xs:string" name="includedRegions"/>
+      <xs:element type="xs:string" name="excludedRegions"/>
+      <xs:element type="extensionsType" name="extensions"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="plugin"/>
+  </xs:complexType>
+  <xs:complexType name="projectType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="actions"/>
+      <xs:element type="xs:string" name="description"/>
+      <xs:element type="xs:string" name="keepDependencies"/>
+      <xs:element type="propertiesType" name="properties"/>
+      <xs:element type="scmType" name="scm"/>
+      <xs:element type="xs:string" name="canRoam"/>
+      <xs:element type="xs:string" name="disabled"/>
+      <xs:element type="xs:string" name="blockBuildWhenDownstreamBuilding"/>
+      <xs:element type="xs:string" name="blockBuildWhenUpstreamBuilding"/>
+      <xs:element type="triggersType" name="triggers"/>
+      <xs:element type="xs:string" name="concurrentBuild"/>
+      <xs:element type="buildersType" name="builders"/>
+      <xs:element type="xs:string" name="publishers"/>
+      <xs:element type="buildWrappersType" name="buildWrappers"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="hudson.plugins.git.BranchSpecType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="name"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="branchesType">
+    <xs:sequence>
+      <xs:element type="hudson.plugins.git.BranchSpecType" name="hudson.plugins.git.BranchSpec"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="whiteListTargetBranchesType">
+    <xs:sequence>
+      <xs:element type="org.jenkinsci.plugins.ghprb.GhprbBranchType" name="org.jenkinsci.plugins.ghprb.GhprbBranch"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatusType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="commitStatusContext"/>
+      <xs:element type="xs:string" name="triggeredStatus"/>
+      <xs:element type="xs:string" name="startedStatus"/>
+      <xs:element type="xs:string" name="statusUrl"/>
+      <xs:element type="xs:string" name="addTestResults"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="scmType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="configVersion"/>
+      <xs:element type="userRemoteConfigsType" name="userRemoteConfigs"/>
+      <xs:element type="branchesType" name="branches"/>
+      <xs:element type="xs:string" name="doGenerateSubmoduleConfigurations"/>
+      <xs:element type="submoduleCfgType" name="submoduleCfg"/>
+      <xs:element type="xs:string" name="extensions"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="class"/>
+    <xs:attribute type="xs:string" name="plugin"/>
+  </xs:complexType>
+  <xs:complexType name="userRemoteConfigsType">
+    <xs:sequence>
+      <xs:element type="hudson.plugins.git.UserRemoteConfigType" name="hudson.plugins.git.UserRemoteConfig"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="submoduleCfgType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="class"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="propertiesType">
+    <xs:sequence>
+      <xs:element type="com.coravy.hudson.plugins.github.GithubProjectPropertyType" name="com.coravy.hudson.plugins.github.GithubProjectProperty"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="extensionsType">
+    <xs:sequence>
+      <xs:element type="org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatusType" name="org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="hudson.plugins.ws__cleanup.PreBuildCleanupType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="deleteDirs"/>
+      <xs:element type="xs:string" name="cleanupParameter"/>
+      <xs:element type="xs:string" name="externalDelete"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="plugin"/>
+  </xs:complexType>
+</xs:schema>
