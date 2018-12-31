@@ -14,7 +14,7 @@ app.controller('orderFromController', function($scope, $http) {
 
     function listRepositoryErrorCallback(error) {}
     $scope.change = function(enabled, repositoryName){
-        console.log(enabled);
+        $http.post("/modifyRepository", enabled, repositoryName).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
     }
 
 });

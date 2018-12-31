@@ -9,10 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.kohsuke.github.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import spark.Request;
 
 import javax.servlet.ServletRequest;
@@ -156,8 +153,17 @@ public class ForceCIController {
         return repositoryList;
     }
 
+    @RequestMapping(value = "/modifyRepository", method = RequestMethod.POST)
+    public Boolean createFile(@RequestBody String enabled, @RequestBody String repositoryName, HttpServletResponse response, HttpServletRequest
+            request) {
+        System.out.println("enabled ---> "+enabled);
+        System.out.println("repositoryName ---> "+repositoryName);
+        return true;
+    }
 
-    private static void start_deployment(JsonObject jsonObject) throws IOException {
+
+
+    private static void start_deployment(JsonObject jsonObject) {
         String user = jsonObject.get("user").getAsJsonObject().get("login").getAsString();
         Map<String, String> map = new HashMap<>();
         map.put("environment", "QA");
