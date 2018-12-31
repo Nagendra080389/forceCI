@@ -21,9 +21,12 @@
 
 <script>
 	$( document ).ready(function() {
-		$('#repositorySlider').change(function() {
+		$('#activeRepositorySlider').change(function() {
 			  console.log($(this).prop('checked'));
-		})
+		});
+		$('#inactiveRepositorySlider').change(function() {
+			  console.log($(this).prop('checked'));
+		});
 	});
 
 </script>
@@ -49,8 +52,8 @@
 							<td>{{eachData.repositoryName}}</td>
 							<td>
 								<label class="switch">
-									<input id="repositorySlider" ng-if="eachData.active == true" type="checkbox" checked ng-model="eachData.active">
-									<input ng-if="eachData.active == false" type="checkbox" ng-model="eachData.active">
+									<input id="activeRepositorySlider" ng-if="eachData.active == true" type="checkbox" checked ng-model="eachData.active">
+									<input id="inactiveRepositorySlider" ng-if="eachData.active == false" type="checkbox" ng-model="eachData.active">
 									<span class="slider round"></span>
 								</label>
 							</td>
