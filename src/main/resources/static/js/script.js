@@ -13,10 +13,8 @@ app.controller('orderFromController', function($scope, $http) {
     }
 
     function listRepositoryErrorCallback(error) {}
-    $('#activeRepositorySlider').change(function() {
-        console.log($(this).prop('checked'));
-    });
-    $('#inactiveRepositorySlider').change(function() {
-        console.log($(this).prop('checked'));
-    });
+    $scope.change = function(event){
+        console.log(event);
+    }
+
 });
