@@ -13,8 +13,42 @@ app.controller('orderFromController', function($scope, $http) {
     }
 
     function listRepositoryErrorCallback(error) {}
-    $scope.change = function(enabled, repositoryName){
-        $http.post("/modifyRepository", enabled, repositoryName).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
+    $scope.change = function(enabled, repositoryName) {
+        iziToast.question({
+            timeout: false,
+            pauseOnHover: true,
+            close: false,
+            overlay: true,
+            toastOnce: true,
+            backgroundColor: 'rgb(136, 160, 185)',
+            id: 'question',
+            zindex: 999,
+            title: 'Hey',
+            message: 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?',
+            position: 'center',
+            buttons: [
+                ['<button><b>YES</b></button>', function(instance, toast) {
+                    instance.hide({
+                        transitionOut: 'fadeOut'
+                    }, toast, 'button');
+                    $http.post("/modifyRepository", enabled, repositoryName).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
+                },
+                true],
+                ['<button>NO</button>', function(instance, toast) {
+                    instance.hide({
+                        transitionOut: 'fadeOut'
+                    }, toast, 'button');
+                }], ],
+            onClosing: function(instance, toast, closedBy) {
+                console.info('Closing | closedBy: ' + closedBy);
+            },
+            onClosed: function(instance, toast, closedBy) {
+                console.info('Closed | closedBy: ' + closedBy);
+            }
+        });
     }
 
+    function modifyRepositoryCallback(response) {}
+
+    function modifyRepositoryErrorCallback(error) {}
 });
