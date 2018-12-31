@@ -20,10 +20,12 @@
 </head>
 
 <script>
+	$( document ).ready(function() {
+		$('#repositorySlider').change(function() {
+			  console.log($(this).prop('checked'));
+		})
+	});
 
-	$('#repositorySlider').change(function() {
-	  console.log($(this).prop('checked'));
-	})
 </script>
 <body ng-app="forceCIApp" ng-controller="orderFromController">
 
