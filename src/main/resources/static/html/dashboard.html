@@ -18,6 +18,13 @@
 	<script src="../js/script.js"></script>
 
 </head>
+
+<script>
+
+	$('#repositorySlider').change(function() {
+	  console.log($(this).prop('checked'));
+	})
+</script>
 <body ng-app="forceCIApp" ng-controller="orderFromController">
 
 <div id="repositoryRule">
@@ -30,7 +37,7 @@
 						<thead>
 						<tr>
 							<th>SL No.</th>
-							<th>Repository Name</th>
+								<th>Repository Name</th>
 							<th>Active</th>
 						</tr>
 						</thead>
@@ -40,10 +47,9 @@
 							<td>{{eachData.repositoryName}}</td>
 							<td>
 								<label class="switch">
-									<input ng-if="eachData.active == true" type="checkbox" checked
-									       ng-model="eachData.active">
+									<input ng-if="eachData.active == true" type="checkbox" checked ng-model="eachData.active">
 									<input ng-if="eachData.active == false" type="checkbox" ng-model="eachData.active">
-									<span class="slider round"></span>
+									<span id="repositorySlider" class="slider round"></span>
 								</label>
 							</td>
 
