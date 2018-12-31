@@ -42,8 +42,8 @@
 							<td>
 								<label class="switch">
 									<input id="activeRepositorySlider" ng-if="eachData.active == true" type="checkbox" checked ng-model="eachData.active"
-									       ng-click='change($event)'>
-									<input id="inactiveRepositorySlider" ng-if="eachData.active == false" type="checkbox" ng-model="eachData.active" ng-click='change($event)'>
+									       ng-change='change(eachData.active)'>
+									<input id="inactiveRepositorySlider" ng-if="eachData.active == false" type="checkbox" ng-model="eachData.active" ng-change='change(eachData.active)'>
 									<span class="slider round"></span>
 								</label>
 							</td>
