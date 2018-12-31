@@ -13,7 +13,7 @@ app.controller('orderFromController', function($scope, $http) {
     }
 
     function listRepositoryErrorCallback(error) {}
-    $scope.change = function(obj,$event){
+    $scope.change = function($event){
         console.log($event);
     }
 
