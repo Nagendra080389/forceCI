@@ -28,9 +28,6 @@ public class CreateWebhookPayload {
     private List<String> events = null;
     @JsonProperty("config")
     private Config config;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
     @JsonProperty("name")
     public String getName() {
         return name;
@@ -69,16 +66,6 @@ public class CreateWebhookPayload {
     @JsonProperty("config")
     public void setConfig(Config config) {
         this.config = config;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
     }
 
 }
