@@ -206,6 +206,7 @@ public class ForceCIController {
             httpClient.executeMethod(createWebHook);
             JsonParser jsonParser = new JsonParser();
             JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
+            System.out.println(" parse---> "+parse);
         }
 
         return true;
