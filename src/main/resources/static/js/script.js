@@ -14,6 +14,12 @@ app.controller('orderFromController', function($scope, $http) {
 
     function listRepositoryErrorCallback(error) {}
     $scope.change = function(enabled, repositoryName) {
+        var popMessage = '';
+        if (enabled) {
+            popMessage = 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?',
+        } else {
+            popMessage = 'Disabling this will delete the WEBHOOK from this repository. Do you want to continue?',
+        }
         iziToast.question({
             timeout: false,
             pauseOnHover: true,
@@ -24,11 +30,7 @@ app.controller('orderFromController', function($scope, $http) {
             id: 'question',
             zindex: 999,
             title: 'Hey',
-            if (enabled) {
-                message: 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?',
-            } else {
-                message: 'Disabling this will delete the WEBHOOK from this repository. Do you want to continue?',
-            }
+            message: popMessage,
             position: 'center',
             buttons: [
                 ['<button><b>YES</b></button>', function(instance, toast) {
