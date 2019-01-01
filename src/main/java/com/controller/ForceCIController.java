@@ -197,6 +197,7 @@ public class ForceCIController {
             config.setUrl("http://example.com/webhook");
             createWebhookPayload.setConfig(config);
             Gson gson = new Gson();
+            System.out.println("gson.toJson(createWebhookPayload) -> "+gson.toJson(createWebhookPayload));
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
             httpClient.executeMethod(createWebHook);
