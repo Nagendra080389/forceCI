@@ -194,7 +194,7 @@ public class ForceCIController {
             createWebhookPayload.setEvents(events);
             Config config = new Config();
             config.setContentType("json");
-            config.setUrl("http://example.com/webhook");
+            config.setUrl("https://forceci.herokuapp.com/"+repository.getRepositoryName());
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
             Gson gson = new Gson();
