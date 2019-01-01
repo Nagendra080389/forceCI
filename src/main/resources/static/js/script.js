@@ -32,7 +32,8 @@ app.controller('orderFromController', function($scope, $http) {
                     instance.hide({
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
-                    $http.post("/modifyRepository", enabled, repositoryName).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
+                    var data = {active:enabled, repositoryName:repositoryName};
+                    $http.post("/modifyRepository", data).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
                 },
                 true],
                 ['<button>NO</button>', function(instance, toast) {

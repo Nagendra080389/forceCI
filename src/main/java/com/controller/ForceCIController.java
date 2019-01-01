@@ -154,10 +154,10 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/modifyRepository", method = RequestMethod.POST)
-    public Boolean createFile(@RequestBody Boolean enabled, @RequestBody String repositoryName, HttpServletResponse response, HttpServletRequest
+    public Boolean createFile(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
             request) {
-        System.out.println("enabled ---> "+enabled);
-        System.out.println("repositoryName ---> "+repositoryName);
+        System.out.println("enabled ---> "+repository.getActive());
+        System.out.println("repositoryName ---> "+repository.getRepositoryName());
         return true;
     }
 
