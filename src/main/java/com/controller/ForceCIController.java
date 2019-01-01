@@ -196,7 +196,7 @@ public class ForceCIController {
             config.setContentType("json");
             config.setUrl("http://example.com/webhook");
             createWebhookPayload.setConfig(config);
-            createWebhookPayload.setName("Test123");
+            createWebhookPayload.setName("web");
             Gson gson = new Gson();
             System.out.println("gson.toJson(createWebhookPayload) -> "+gson.toJson(createWebhookPayload));
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
@@ -204,7 +204,7 @@ public class ForceCIController {
             httpClient.executeMethod(createWebHook);
             JsonParser jsonParser = new JsonParser();
             JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
-            System.out.println("createWebHook -> "+createWebHook);
+            System.out.println("createWebHook -> "+createWebHook.getRequestEntity().getContentType());
             System.out.println(" parse---> "+parse);
         }
 
