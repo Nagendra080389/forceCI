@@ -14,7 +14,6 @@ app.controller('orderFromController', function($scope, $http) {
 
     function listRepositoryErrorCallback(error) {}
     $scope.change = function(enabled, repositoryName) {
-
         iziToast.question({
             timeout: false,
             pauseOnHover: true,
@@ -25,14 +24,21 @@ app.controller('orderFromController', function($scope, $http) {
             id: 'question',
             zindex: 999,
             title: 'Hey',
-            message: 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?',
+            if (enabled) {
+                message: 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?',
+            } else {
+                message: 'Disabling this will delete the WEBHOOK from this repository. Do you want to continue?',
+            }
             position: 'center',
             buttons: [
                 ['<button><b>YES</b></button>', function(instance, toast) {
                     instance.hide({
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
-                    var data = {active:enabled, repositoryName:repositoryName};
+                    var data = {
+                        active: enabled,
+                        repositoryName: repositoryName
+                    };
                     $http.post("/modifyRepository", data).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
                 },
                 true],
