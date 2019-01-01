@@ -183,8 +183,7 @@ public class ForceCIController {
 
         System.out.println("accessToken --> "+accessToken);
         if(accessToken != null){
-            System.out.println("url formed - > "+GITHUB_API + "/repos/" + repository.getOwner()+"/"+repository.getRepositoryName()+ "/hooks");
-            PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner()+"/"+repository.getRepositoryName()+ "/repos");
+            PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner()+"/"+repository.getRepositoryName()+ "/hooks");
             createWebHook.setRequestHeader("Authorization", "token " + accessToken);
             createWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             CreateWebhookPayload createWebhookPayload = new CreateWebhookPayload();
@@ -205,6 +204,7 @@ public class ForceCIController {
             httpClient.executeMethod(createWebHook);
             JsonParser jsonParser = new JsonParser();
             JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
+            System.out.println("createWebHook -> "+createWebHook);
             System.out.println(" parse---> "+parse);
         }
 
