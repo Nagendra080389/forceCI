@@ -183,6 +183,7 @@ public class ForceCIController {
         if(accessToken != null){
             PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner()+"/"+repository.getRepositoryName()+ "/repos");
             createWebHook.setRequestHeader("Authorization", "token " + accessToken);
+            createWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             List<NameValuePair> nameValuePairs = new ArrayList<>();
             NameValuePair nameValuePair = new NameValuePair();
             nameValuePair.setName("name");
@@ -198,6 +199,7 @@ public class ForceCIController {
             configValue.setName("content_type");
             configValue.setValue("json");
             nameValuePair.setValue(configValue.toString());
+            System.out.println("nameValuePair -> "+nameValuePair);
             nameValuePairs.add(nameValuePair);
             NameValuePair[] arrayNameValuePair = new NameValuePair[nameValuePairs.size()];
             arrayNameValuePair = nameValuePairs.toArray(arrayNameValuePair);
