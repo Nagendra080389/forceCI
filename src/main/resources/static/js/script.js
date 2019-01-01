@@ -14,13 +14,14 @@ app.controller('orderFromController', function($scope, $http) {
 
     function listRepositoryErrorCallback(error) {}
     $scope.change = function(enabled, repositoryName) {
+
         iziToast.question({
             timeout: false,
             pauseOnHover: true,
             close: false,
             overlay: true,
             toastOnce: true,
-            backgroundColor: 'rgb(136, 160, 185)',
+            backgroundColor: '#009edb',
             id: 'question',
             zindex: 999,
             title: 'Hey',
