@@ -2,7 +2,9 @@ package com.controller;
 
 import com.model.Repository;
 import com.google.gson.*;
+import com.model.RepositoryWrapper;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.json.JSONException;
@@ -20,10 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
 import static org.kohsuke.github.GHDeploymentState.SUCCESS;
@@ -113,30 +112,32 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/listRepository", method = RequestMethod.GET)
-    public List<Repository> getRepositoryList(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+    public RepositoryWrapper getRepositoryList(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
         List<Repository> repositoryList = new ArrayList<>();
+        RepositoryWrapper repositoryWrapper = null;
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("ACCESS_TOKEN")) {
                 String accessToken = cookie.getValue();
-                GetMethod getUserMethod = new GetMethod(GITHUB_API+"/user");
-                getUserMethod.setRequestHeader("Authorization", "token "+accessToken);
+                GetMethod getUserMethod = new GetMethod(GITHUB_API + "/user");
+                getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
                 HttpClient httpClient = new HttpClient();
                 httpClient.executeMethod(getUserMethod);
                 List<JSONObject> jsonObjects = new ArrayList<>();
                 JSONObject jsonResponse = new JSONObject(new JSONTokener(new InputStreamReader(getUserMethod.getResponseBodyAsStream())));
-                if(jsonResponse.has("login")){
+                if (jsonResponse.has("login")) {
                     String loginId = (String) jsonResponse.get("login");
-                    GetMethod getUserRepository = new GetMethod(GITHUB_API+"/users/"+loginId+"/repos");
-                    getUserRepository.setRequestHeader("Authorization", "token "+accessToken);
+                    GetMethod getUserRepository = new GetMethod(GITHUB_API + "/users/" + loginId + "/repos");
+                    getUserRepository.setRequestHeader("Authorization", "token " + accessToken);
                     httpClient = new HttpClient();
                     httpClient.executeMethod(getUserRepository);
                     JsonParser jsonParser = new JsonParser();
                     JsonElement parse = jsonParser.parse(new InputStreamReader(getUserRepository.getResponseBodyAsStream()));
-                    if(parse.isJsonArray()){
+                    if (parse.isJsonArray()) {
+                        repositoryWrapper = new RepositoryWrapper();
                         JsonArray asJsonArray = parse.getAsJsonArray();
                         for (JsonElement jsonElement : asJsonArray) {
-                            if(jsonElement.isJsonObject()){
+                            if (jsonElement.isJsonObject()) {
                                 String name = jsonElement.getAsJsonObject().get("name").getAsString();
                                 String htmlUrl = jsonElement.getAsJsonObject().get("html_url").getAsString();
                                 Repository repository = new Repository();
@@ -147,20 +148,67 @@ public class ForceCIController {
                             }
                         }
                     }
+                    if(repositoryWrapper != null) {
+                        repositoryWrapper.setLstRepositories(repositoryList);
+                        repositoryWrapper.setOwnerId(loginId);
+                    }
                 }
             }
         }
-        return repositoryList;
+        return repositoryWrapper;
     }
 
     @RequestMapping(value = "/modifyRepository", method = RequestMethod.POST)
-    public Boolean createFile(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
+    public Repository createFile(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
             request) {
-        System.out.println("enabled ---> "+repository.getActive());
-        System.out.println("repositoryName ---> "+repository.getRepositoryName());
-        return true;
+        System.out.println("enabled ---> " + repository.getActive());
+        System.out.println("repositoryName ---> " + repository.getRepositoryName());
+        return repository;
     }
 
+    @RequestMapping(value = "/createWebHook", method = RequestMethod.POST)
+    public Boolean createWebHook(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        Cookie[] cookies = request.getCookies();
+        String accessToken = null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("ACCESS_TOKEN")) {
+                accessToken = cookie.getValue();
+                break;
+            }
+        }
+
+        if(accessToken != null){
+            PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner()+"/"+repository.getRepositoryName()+ "/repos");
+            createWebHook.setRequestHeader("Authorization", "token " + accessToken);
+            List<NameValuePair> nameValuePairs = new ArrayList<>();
+            NameValuePair nameValuePair = new NameValuePair();
+            nameValuePair.setName("name");
+            nameValuePair.setValue("Test1");
+            nameValuePair.setName("active");
+            nameValuePair.setValue("true");
+            nameValuePair.setName("events");
+            nameValuePair.setValue("[\"push\",\"pull_request\"]");
+            nameValuePair.setName("config");
+            NameValuePair configValue = new NameValuePair();
+            configValue.setName("url");
+            configValue.setValue("http://example.com/webhook");
+            configValue.setName("content_type");
+            configValue.setValue("json");
+            nameValuePair.setValue(configValue.toString());
+            nameValuePairs.add(nameValuePair);
+            NameValuePair[] arrayNameValuePair = new NameValuePair[nameValuePairs.size()];
+            arrayNameValuePair = nameValuePairs.toArray(arrayNameValuePair);
+            createWebHook.setRequestBody(arrayNameValuePair);
+            HttpClient httpClient = new HttpClient();
+            httpClient.executeMethod(createWebHook);
+            JsonParser jsonParser = new JsonParser();
+            JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
+        }
+
+        return true;
+    }
 
 
     private static void start_deployment(JsonObject jsonObject) {

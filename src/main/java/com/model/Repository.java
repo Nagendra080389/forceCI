@@ -6,6 +6,7 @@ public class Repository implements Serializable {
     private String repositoryName;
     private String repositoryUrl;
     private Boolean active;
+    private String owner;
 
     public String getRepositoryName() {
         return repositoryName;
@@ -29,5 +30,13 @@ public class Repository implements Serializable {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

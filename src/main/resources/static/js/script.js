@@ -5,10 +5,11 @@ app.controller('orderFromController', function($scope, $http) {
     function listRepositoryCallback(response) {
         var foundRepository = [];
         if (response.data) {
-            for (var index = 0; index < response.data.length; ++index) {
-                foundRepository.push(response.data[index]);
+            for (var index = 0; index < response.data.lstRepositories.length; ++index) {
+                foundRepository.push(response.data.lstRepositories[index]);
             }
             $scope.lstRepositoryData = foundRepository;
+            localStorage.setItem('githubOwner', response.data.ownerId);
         }
     }
 
@@ -39,7 +40,8 @@ app.controller('orderFromController', function($scope, $http) {
                     }, toast, 'button');
                     var data = {
                         active: enabled,
-                        repositoryName: repositoryName
+                        repositoryName: repositoryName,
+                        owner: localStorage.getItem('githubOwner')
                     };
                     $http.post("/modifyRepository", data).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
                 },
@@ -58,7 +60,16 @@ app.controller('orderFromController', function($scope, $http) {
         });
     }
 
-    function modifyRepositoryCallback(response) {}
+    function modifyRepositoryCallback(response) {
+        if (response.status === 200) {
+            $http.post("/createWebHook", response.data).then(createWebHookCallback, createWebHookErrorCallback);
+        }
+    }
 
     function modifyRepositoryErrorCallback(error) {}
+
+    function createWebHookCallback (response){}
+    function createWebHookErrorCallback (error){}
+
+
 });
