@@ -50,13 +50,7 @@ app.controller('orderFromController', function($scope, $http) {
                     instance.hide({
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
-                }], ],
-            onClosing: function(instance, toast, closedBy) {
-                console.info('Closing | closedBy: ' + closedBy);
-            },
-            onClosed: function(instance, toast, closedBy) {
-                console.info('Closed | closedBy: ' + closedBy);
-            }
+                }], ]
         });
     }
 

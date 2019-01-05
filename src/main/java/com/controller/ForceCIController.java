@@ -187,7 +187,7 @@ public class ForceCIController {
             createWebHook.setRequestHeader("Authorization", "token " + accessToken);
             createWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             CreateWebhookPayload createWebhookPayload = new CreateWebhookPayload();
-            createWebhookPayload.setActive(true);
+            createWebhookPayload.setActive(repository.getActive());
             List<String> events = new ArrayList<>();
             events.add("push");
             events.add("pull_request");
