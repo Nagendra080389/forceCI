@@ -169,8 +169,11 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/createWebHook", method = RequestMethod.POST)
-    public Boolean createWebHook(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
+    public String createWebHook(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
 
         Cookie[] cookies = request.getCookies();
         String accessToken = null;
@@ -197,7 +200,6 @@ public class ForceCIController {
             config.setUrl("https://forceci.herokuapp.com/"+repository.getRepositoryName());
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
-            Gson gson = new Gson();
             System.out.println("gson.toJson(createWebhookPayload) -> "+gson.toJson(createWebhookPayload));
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
@@ -206,9 +208,10 @@ public class ForceCIController {
             JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
             System.out.println("createWebHook -> "+createWebHook.getRequestEntity().getContentType());
             System.out.println(" parse---> "+parse);
+            returnResponse = gson.toJson(parse);
         }
 
-        return true;
+        return returnResponse;
     }
 
 

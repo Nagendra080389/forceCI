@@ -62,8 +62,12 @@ app.controller('orderFromController', function($scope, $http) {
 
     function modifyRepositoryErrorCallback(error) {}
 
-    function createWebHookCallback (response){}
-    function createWebHookErrorCallback (error){}
+    function createWebHookCallback (response){
+        console.log(response);
+    }
+    function createWebHookErrorCallback (error){
+        console.log(error);
+    }
 
 
 });
