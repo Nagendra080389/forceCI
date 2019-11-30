@@ -17,8 +17,8 @@ app.controller('orderFromController', function ($scope, $http) {
     function listRepositoryErrorCallback(error) {
     }
 
-    $scope.change = function (enabled, repositoryName, event) {
-        mouseEvent = event;
+    $scope.change = function (enabled, repositoryName, $event) {
+        mouseEvent = $event;
         var popMessage = '';
         if (enabled) {
             popMessage = 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?'
