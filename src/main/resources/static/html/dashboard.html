@@ -49,9 +49,9 @@
 							<td>
 								<label class="switch">
 									<input id="activeRepositorySlider" ng-if="eachData.active == true" type="checkbox" checked ng-model="eachData.active"
-									       ng-change='change(eachData.active,"{{eachData.repositoryName}}")' ng-click="setDataValues($event)">
+									       ng-change='change(eachData.active,"{{eachData.repositoryName}}")' dataid="{{dataid}}" dataurl="{{dataurl}}">
 									<input id="inactiveRepositorySlider" ng-if="eachData.active == false" type="checkbox" ng-model="eachData.active"
-									       ng-change='change(eachData.active, "{{eachData.repositoryName}}")' ng-click="setDataValues($event)">
+									       ng-change='change(eachData.active, "{{eachData.repositoryName}}")' dataid="{{dataid}}" dataurl="{{dataurl}}">
 									<span class="slider round"></span>
 								</label>
 							</td>

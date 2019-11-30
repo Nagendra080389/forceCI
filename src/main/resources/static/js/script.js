@@ -1,5 +1,4 @@
 var app = angular.module('forceCIApp', []);
-var mouseEvent = null;
 app.controller('orderFromController', function ($scope, $http) {
     $http.get("/listRepository").then(listRepositoryCallback, listRepositoryErrorCallback);
 
@@ -17,13 +16,7 @@ app.controller('orderFromController', function ($scope, $http) {
     function listRepositoryErrorCallback(error) {
     }
 
-    $scope.setDataValues = function($event){
-        let currentTarget = $($event.target);
-        console.log('test');
-    };
-
-    $scope.change = function (enabled, repositoryName, $event) {
-        mouseEvent = $event;
+    $scope.change = function (enabled, repositoryName) {
         var popMessage = '';
         if (enabled) {
             popMessage = 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?'
@@ -61,7 +54,7 @@ app.controller('orderFromController', function ($scope, $http) {
                     }, toast, 'button');
                 }],]
         });
-    }
+    };
 
     function modifyRepositoryCallback(response) {
         if (response.status === 200) {
@@ -73,12 +66,12 @@ app.controller('orderFromController', function ($scope, $http) {
     }
 
     function createWebHookCallback(response) {
-        mouseEvent;
+        $scope.dataid = response.data.id;
+        $scope.dataurl = response.data.url;
         console.log(response);
     }
 
     function createWebHookErrorCallback(error) {
-        mouseEvent;
         console.log(error);
     }
 
