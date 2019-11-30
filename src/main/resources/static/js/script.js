@@ -17,6 +17,11 @@ app.controller('orderFromController', function ($scope, $http) {
     function listRepositoryErrorCallback(error) {
     }
 
+    $scope.setDataValues = function($event){
+        let currentTarget = $($event.target);
+        console.log('test');
+    };
+
     $scope.change = function (enabled, repositoryName, $event) {
         mouseEvent = $event;
         var popMessage = '';
