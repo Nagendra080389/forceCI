@@ -1,5 +1,6 @@
 var app = angular.module('forceCIApp', []);
-app.controller('orderFromController', function($scope, $http) {
+var mouseEvent = null;
+app.controller('orderFromController', function ($scope, $http) {
     $http.get("/listRepository").then(listRepositoryCallback, listRepositoryErrorCallback);
 
     function listRepositoryCallback(response) {
@@ -13,8 +14,11 @@ app.controller('orderFromController', function($scope, $http) {
         }
     }
 
-    function listRepositoryErrorCallback(error) {}
-    $scope.change = function(enabled, repositoryName) {
+    function listRepositoryErrorCallback(error) {
+    }
+
+    $scope.change = function (enabled, repositoryName, event) {
+        mouseEvent = event;
         var popMessage = '';
         if (enabled) {
             popMessage = 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?'
@@ -34,7 +38,7 @@ app.controller('orderFromController', function($scope, $http) {
             message: popMessage,
             position: 'center',
             buttons: [
-                ['<button><b>YES</b></button>', function(instance, toast) {
+                ['<button><b>YES</b></button>', function (instance, toast) {
                     instance.hide({
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
@@ -45,12 +49,12 @@ app.controller('orderFromController', function($scope, $http) {
                     };
                     $http.post("/modifyRepository", data).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
                 },
-                true],
-                ['<button>NO</button>', function(instance, toast) {
+                    true],
+                ['<button>NO</button>', function (instance, toast) {
                     instance.hide({
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
-                }], ]
+                }],]
         });
     }
 
@@ -60,12 +64,16 @@ app.controller('orderFromController', function($scope, $http) {
         }
     }
 
-    function modifyRepositoryErrorCallback(error) {}
+    function modifyRepositoryErrorCallback(error) {
+    }
 
-    function createWebHookCallback (response){
+    function createWebHookCallback(response) {
+        mouseEvent;
         console.log(response);
     }
-    function createWebHookErrorCallback (error){
+
+    function createWebHookErrorCallback(error) {
+        mouseEvent;
         console.log(error);
     }
 
