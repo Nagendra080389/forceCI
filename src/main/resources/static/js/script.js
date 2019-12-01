@@ -57,11 +57,13 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         }
                     }, function (error) {
                     });
-                },
-                    true],
+                },true],
                 ['<button>NO</button>', function (instance, toast) {
                     instance.hide({
-                        transitionOut: 'fadeOut'
+                        transitionOut: 'fadeOut',
+                        onClosing: function (instance, toast, closedBy) {
+                            iziToast.destroy();
+                        }
                     }, toast, 'button');
                     eachData.active = !eachData.active;
                     $scope.$apply();
