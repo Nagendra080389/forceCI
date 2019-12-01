@@ -48,8 +48,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     $http.post("/modifyRepository", data).then(function (response) {
                         if (response.status === 200) {
                             $http.post("/createWebHook", response.data).then(function (response) {
-                                    eachData.webHookId = response.id;
-                                    eachData.webHookUrl = response.url;
+                                    eachData.webHookId = response.data.id;
+                                    eachData.webHookUrl = response.data.url;
                                 }, function (error) {
                                     console.log(error);
                                 }
