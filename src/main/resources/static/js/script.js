@@ -64,6 +64,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
                     eachData.active = !eachData.active;
+                    $scope.$apply();
                 }],]
         });
     };
