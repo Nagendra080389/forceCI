@@ -138,10 +138,17 @@ public class ForceCIController {
                     if (parse.isJsonArray()) {
                         repositoryWrapper = new RepositoryWrapper();
                         JsonArray asJsonArray = parse.getAsJsonArray();
+                        System.out.println("asJsonArray -> "+asJsonArray);
                         for (JsonElement jsonElement : asJsonArray) {
                             if (jsonElement.isJsonObject()) {
                                 String name = jsonElement.getAsJsonObject().get("name").getAsString();
                                 String htmlUrl = jsonElement.getAsJsonObject().get("html_url").getAsString();
+                                GetMethod getWebHook = new GetMethod(GITHUB_API + "/repos/" + loginId + "/"+ name + "/hooks");
+                                getWebHook.setRequestHeader("Authorization", "token " + accessToken);
+                                httpClient = new HttpClient();
+                                httpClient.executeMethod(getWebHook);
+                                JsonElement getWebHookDetails = jsonParser.parse(new InputStreamReader(getWebHook.getResponseBodyAsStream()));
+                                System.out.println("getWebHookDetails -> "+getWebHookDetails);
                                 Repository repository = new Repository();
                                 repository.setRepositoryName(name);
                                 repository.setRepositoryUrl(htmlUrl);
@@ -163,6 +170,8 @@ public class ForceCIController {
     @RequestMapping(value = "/modifyRepository", method = RequestMethod.POST)
     public Repository createFile(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
             request) {
+        String accessToken = fetchCookies(request);
+
         System.out.println("enabled ---> " + repository.getActive());
         System.out.println("repositoryName ---> " + repository.getRepositoryName());
         return repository;
@@ -175,14 +184,7 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
 
-        Cookie[] cookies = request.getCookies();
-        String accessToken = null;
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("ACCESS_TOKEN")) {
-                accessToken = cookie.getValue();
-                break;
-            }
-        }
+        String accessToken = fetchCookies(request);
 
         System.out.println("accessToken --> "+accessToken);
         if(accessToken != null){
@@ -270,5 +272,19 @@ public class ForceCIController {
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
                 " is " + jsonObject.get("deployment_status").getAsJsonObject().get("state").getAsString());
+    }
+
+    private static String fetchCookies(HttpServletRequest request){
+        String returnResponse = null;
+
+        Cookie[] cookies = request.getCookies();
+        String accessToken = null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("ACCESS_TOKEN")) {
+                accessToken = cookie.getValue();
+                break;
+            }
+        }
+        return accessToken;
     }
 }
