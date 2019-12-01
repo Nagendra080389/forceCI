@@ -7,6 +7,8 @@ public class Repository implements Serializable {
     private String repositoryUrl;
     private Boolean active;
     private String owner;
+    private String webHookId;
+    private String webHookUrl;
 
     public String getRepositoryName() {
         return repositoryName;
@@ -38,5 +40,21 @@ public class Repository implements Serializable {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getWebHookId() {
+        return webHookId;
+    }
+
+    public void setWebHookId(String webHookId) {
+        this.webHookId = webHookId;
+    }
+
+    public String getWebHookUrl() {
+        return webHookUrl;
+    }
+
+    public void setWebHookUrl(String webHookUrl) {
+        this.webHookUrl = webHookUrl;
     }
 }

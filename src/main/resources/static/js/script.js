@@ -1,5 +1,5 @@
 var app = angular.module('forceCIApp', []);
-app.controller('orderFromController', function ($scope, $http) {
+app.controller('orderFromController', function ($scope, $http, $attrs) {
     $http.get("/listRepository").then(listRepositoryCallback, listRepositoryErrorCallback);
 
     function listRepositoryCallback(response) {
@@ -16,9 +16,9 @@ app.controller('orderFromController', function ($scope, $http) {
     function listRepositoryErrorCallback(error) {
     }
 
-    $scope.change = function (enabled, repositoryName) {
+    $scope.change = function (eachData) {
         var popMessage = '';
-        if (enabled) {
+        if (eachData.active) {
             popMessage = 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?'
         } else {
             popMessage = 'Disabling this will delete the WEBHOOK from this repository. Do you want to continue?'
@@ -41,39 +41,30 @@ app.controller('orderFromController', function ($scope, $http) {
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
                     var data = {
-                        active: enabled,
-                        repositoryName: repositoryName,
+                        active: eachData.active,
+                        repositoryName: eachData.repositoryName,
                         owner: localStorage.getItem('githubOwner')
                     };
-                    $http.post("/modifyRepository", data).then(modifyRepositoryCallback, modifyRepositoryErrorCallback);
+                    $http.post("/modifyRepository", data).then(function (response) {
+                        if (response.status === 200) {
+                            $http.post("/createWebHook", response.data).then(function (response) {
+                                    eachData.webHookId = response.id;
+                                    eachData.webHookUrl = response.url;
+                                }, function (error) {
+                                    console.log(error);
+                                }
+                            );
+                        }
+                    }, function (error) {
+                    });
                 },
                     true],
                 ['<button>NO</button>', function (instance, toast) {
                     instance.hide({
                         transitionOut: 'fadeOut'
                     }, toast, 'button');
+                    eachData.active = !eachData.active;
                 }],]
         });
     };
-
-    function modifyRepositoryCallback(response) {
-        if (response.status === 200) {
-            $http.post("/createWebHook", response.data).then(createWebHookCallback, createWebHookErrorCallback);
-        }
-    }
-
-    function modifyRepositoryErrorCallback(error) {
-    }
-
-    function createWebHookCallback(response) {
-        $scope.dataid = response.data.id;
-        $scope.dataurl = response.data.url;
-        console.log(response);
-    }
-
-    function createWebHookErrorCallback(error) {
-        console.log(error);
-    }
-
-
 });
