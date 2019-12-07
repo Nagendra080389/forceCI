@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for buildWrappersType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="buildWrappersType">
  *   &lt;complexContent>
@@ -30,12 +30,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "buildWrappersType", propOrder = {
-    "hudsonPluginsWsCleanupPreBuildCleanup"
+        "hudsonPluginsWsCleanupPreBuildCleanup"
 })
 public class BuildWrappersType {
 
@@ -44,11 +42,9 @@ public class BuildWrappersType {
 
     /**
      * Gets the value of the hudsonPluginsWsCleanupPreBuildCleanup property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link HudsonPluginsWsCleanupPreBuildCleanupType }
-     *     
+     *
+     * @return possible object is
+     * {@link HudsonPluginsWsCleanupPreBuildCleanupType }
      */
     public HudsonPluginsWsCleanupPreBuildCleanupType getHudsonPluginsWsCleanupPreBuildCleanup() {
         return hudsonPluginsWsCleanupPreBuildCleanup;
@@ -56,11 +52,9 @@ public class BuildWrappersType {
 
     /**
      * Sets the value of the hudsonPluginsWsCleanupPreBuildCleanup property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link HudsonPluginsWsCleanupPreBuildCleanupType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link HudsonPluginsWsCleanupPreBuildCleanupType }
      */
     public void setHudsonPluginsWsCleanupPreBuildCleanup(HudsonPluginsWsCleanupPreBuildCleanupType value) {
         this.hudsonPluginsWsCleanupPreBuildCleanup = value;

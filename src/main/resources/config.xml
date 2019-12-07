@@ -1,107 +1,109 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <project>
-  <actions/>
-  <description></description>
-  <keepDependencies>false</keepDependencies>
-  <properties>
-    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.2">
-      <projectUrl>https://github.com/Nagendra080389/trailheadOrgNew/</projectUrl>
-      <displayName></displayName>
-    </com.coravy.hudson.plugins.github.GithubProjectProperty>
-  </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <refspec>+refs/pull/*:refs/remotes/origin/pr/*</refspec>
-        <url>https://github.com/Nagendra080389/trailheadOrgNew.git</url>
-        <credentialsId>Github Connect</credentialsId>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>${sha1}</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <submoduleCfg class="list"/>
-    <extensions/>
-  </scm>
-  <canRoam>true</canRoam>
-  <disabled>false</disabled>
-  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers>
-    <org.jenkinsci.plugins.ghprb.GhprbTrigger plugin="ghprb@1.42.0">
-      <spec>* * * * *</spec>
-      <configVersion>3</configVersion>
-      <adminlist>nagendra080389
-nagesingh</adminlist>
-      <allowMembersOfWhitelistedOrgsAsAdmin>false</allowMembersOfWhitelistedOrgsAsAdmin>
-      <orgslist></orgslist>
-      <cron>* * * * *</cron>
-      <buildDescTemplate></buildDescTemplate>
-      <onlyTriggerPhrase>false</onlyTriggerPhrase>
-      <useGitHubHooks>false</useGitHubHooks>
-      <permitAll>false</permitAll>
-      <whitelist></whitelist>
-      <autoCloseFailedPullRequests>false</autoCloseFailedPullRequests>
-      <displayBuildErrorsOnDownstreamBuilds>false</displayBuildErrorsOnDownstreamBuilds>
-      <whiteListTargetBranches>
-        <org.jenkinsci.plugins.ghprb.GhprbBranch>
-          <branch></branch>
-        </org.jenkinsci.plugins.ghprb.GhprbBranch>
-      </whiteListTargetBranches>
-      <blackListTargetBranches>
-        <org.jenkinsci.plugins.ghprb.GhprbBranch>
-          <branch></branch>
-        </org.jenkinsci.plugins.ghprb.GhprbBranch>
-      </blackListTargetBranches>
-      <gitHubAuthId>06339361-d867-4e1f-b629-7daefaa15b58</gitHubAuthId>
-      <triggerPhrase>test this please</triggerPhrase>
-      <skipBuildPhrase>.*\[skip\W+ci\].*</skipBuildPhrase>
-      <blackListCommitAuthor></blackListCommitAuthor>
-      <blackListLabels></blackListLabels>
-      <whiteListLabels></whiteListLabels>
-      <includedRegions></includedRegions>
-      <excludedRegions></excludedRegions>
-      <extensions>
-        <org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
-          <commitStatusContext></commitStatusContext>
-          <triggeredStatus></triggeredStatus>
-          <startedStatus></startedStatus>
-          <statusUrl></statusUrl>
-          <addTestResults>false</addTestResults>
-        </org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
-      </extensions>
-    </org.jenkinsci.plugins.ghprb.GhprbTrigger>
-  </triggers>
-  <concurrentBuild>false</concurrentBuild>
-  <builders>
-    <hudson.tasks.Ant plugin="ant@1.8">
-      <targets>sf_build</targets>
-      <antName>AntHome</antName>
-      <buildFile>${WORKSPACE}\build\build.xml</buildFile>
-      <properties>diffDir=./deploy
-scriptName=get_diff_branches
-sf.deploy.serverurl=https://login.salesforce.com
-sf.deploy.username=nagendra@deloitte.com
-sf.checkOnly=true
-sf.pollWaitMillis=100000
-sf.runAllTests=false
-target=${GIT_BRANCH}
-sf.maxPoll=100
-sf.deploy.password=Developer!8avamXFF2ITmouamfJ64lsRWY
-sf.logType=None
-targetName=master</properties>
-    </hudson.tasks.Ant>
-  </builders>
-  <publishers/>
-  <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
-      <deleteDirs>false</deleteDirs>
-      <cleanupParameter></cleanupParameter>
-      <externalDelete></externalDelete>
-    </hudson.plugins.ws__cleanup.PreBuildCleanup>
-  </buildWrappers>
+    <actions/>
+    <description></description>
+    <keepDependencies>false</keepDependencies>
+    <properties>
+        <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.29.2">
+            <projectUrl>https://github.com/Nagendra080389/trailheadOrgNew/</projectUrl>
+            <displayName></displayName>
+        </com.coravy.hudson.plugins.github.GithubProjectProperty>
+    </properties>
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
+        <configVersion>2</configVersion>
+        <userRemoteConfigs>
+            <hudson.plugins.git.UserRemoteConfig>
+                <refspec>+refs/pull/*:refs/remotes/origin/pr/*</refspec>
+                <url>https://github.com/Nagendra080389/trailheadOrgNew.git</url>
+                <credentialsId>Github Connect</credentialsId>
+            </hudson.plugins.git.UserRemoteConfig>
+        </userRemoteConfigs>
+        <branches>
+            <hudson.plugins.git.BranchSpec>
+                <name>${sha1}</name>
+            </hudson.plugins.git.BranchSpec>
+        </branches>
+        <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+        <submoduleCfg class="list"/>
+        <extensions/>
+    </scm>
+    <canRoam>true</canRoam>
+    <disabled>false</disabled>
+    <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+    <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+    <triggers>
+        <org.jenkinsci.plugins.ghprb.GhprbTrigger plugin="ghprb@1.42.0">
+            <spec>* * * * *</spec>
+            <configVersion>3</configVersion>
+            <adminlist>nagendra080389
+                nagesingh
+            </adminlist>
+            <allowMembersOfWhitelistedOrgsAsAdmin>false</allowMembersOfWhitelistedOrgsAsAdmin>
+            <orgslist></orgslist>
+            <cron>* * * * *</cron>
+            <buildDescTemplate></buildDescTemplate>
+            <onlyTriggerPhrase>false</onlyTriggerPhrase>
+            <useGitHubHooks>false</useGitHubHooks>
+            <permitAll>false</permitAll>
+            <whitelist></whitelist>
+            <autoCloseFailedPullRequests>false</autoCloseFailedPullRequests>
+            <displayBuildErrorsOnDownstreamBuilds>false</displayBuildErrorsOnDownstreamBuilds>
+            <whiteListTargetBranches>
+                <org.jenkinsci.plugins.ghprb.GhprbBranch>
+                    <branch></branch>
+                </org.jenkinsci.plugins.ghprb.GhprbBranch>
+            </whiteListTargetBranches>
+            <blackListTargetBranches>
+                <org.jenkinsci.plugins.ghprb.GhprbBranch>
+                    <branch></branch>
+                </org.jenkinsci.plugins.ghprb.GhprbBranch>
+            </blackListTargetBranches>
+            <gitHubAuthId>06339361-d867-4e1f-b629-7daefaa15b58</gitHubAuthId>
+            <triggerPhrase>test this please</triggerPhrase>
+            <skipBuildPhrase>.*\[skip\W+ci\].*</skipBuildPhrase>
+            <blackListCommitAuthor></blackListCommitAuthor>
+            <blackListLabels></blackListLabels>
+            <whiteListLabels></whiteListLabels>
+            <includedRegions></includedRegions>
+            <excludedRegions></excludedRegions>
+            <extensions>
+                <org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
+                    <commitStatusContext></commitStatusContext>
+                    <triggeredStatus></triggeredStatus>
+                    <startedStatus></startedStatus>
+                    <statusUrl></statusUrl>
+                    <addTestResults>false</addTestResults>
+                </org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatus>
+            </extensions>
+        </org.jenkinsci.plugins.ghprb.GhprbTrigger>
+    </triggers>
+    <concurrentBuild>false</concurrentBuild>
+    <builders>
+        <hudson.tasks.Ant plugin="ant@1.8">
+            <targets>sf_build</targets>
+            <antName>AntHome</antName>
+            <buildFile>${WORKSPACE}\build\build.xml</buildFile>
+            <properties>diffDir=./deploy
+                scriptName=get_diff_branches
+                sf.deploy.serverurl=https://login.salesforce.com
+                sf.deploy.username=nagendra@deloitte.com
+                sf.checkOnly=true
+                sf.pollWaitMillis=100000
+                sf.runAllTests=false
+                target=${GIT_BRANCH}
+                sf.maxPoll=100
+                sf.deploy.password=Developer!8avamXFF2ITmouamfJ64lsRWY
+                sf.logType=None
+                targetName=master
+            </properties>
+        </hudson.tasks.Ant>
+    </builders>
+    <publishers/>
+    <buildWrappers>
+        <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
+            <deleteDirs>false</deleteDirs>
+            <cleanupParameter></cleanupParameter>
+            <externalDelete></externalDelete>
+        </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    </buildWrappers>
 </project>

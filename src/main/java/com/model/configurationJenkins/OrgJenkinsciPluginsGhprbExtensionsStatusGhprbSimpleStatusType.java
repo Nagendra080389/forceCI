@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatusType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatusType">
  *   &lt;complexContent>
@@ -34,16 +34,14 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "org.jenkinsci.plugins.ghprb.extensions.status.GhprbSimpleStatusType", propOrder = {
-    "commitStatusContext",
-    "triggeredStatus",
-    "startedStatus",
-    "statusUrl",
-    "addTestResults"
+        "commitStatusContext",
+        "triggeredStatus",
+        "startedStatus",
+        "statusUrl",
+        "addTestResults"
 })
 public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
@@ -60,11 +58,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Gets the value of the commitStatusContext property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCommitStatusContext() {
         return commitStatusContext;
@@ -72,11 +68,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Sets the value of the commitStatusContext property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCommitStatusContext(String value) {
         this.commitStatusContext = value;
@@ -84,11 +78,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Gets the value of the triggeredStatus property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getTriggeredStatus() {
         return triggeredStatus;
@@ -96,11 +88,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Sets the value of the triggeredStatus property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setTriggeredStatus(String value) {
         this.triggeredStatus = value;
@@ -108,11 +98,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Gets the value of the startedStatus property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getStartedStatus() {
         return startedStatus;
@@ -120,11 +108,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Sets the value of the startedStatus property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setStartedStatus(String value) {
         this.startedStatus = value;
@@ -132,11 +118,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Gets the value of the statusUrl property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getStatusUrl() {
         return statusUrl;
@@ -144,11 +128,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Sets the value of the statusUrl property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setStatusUrl(String value) {
         this.statusUrl = value;
@@ -156,11 +138,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Gets the value of the addTestResults property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getAddTestResults() {
         return addTestResults;
@@ -168,11 +148,9 @@ public class OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType {
 
     /**
      * Sets the value of the addTestResults property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAddTestResults(String value) {
         this.addTestResults = value;

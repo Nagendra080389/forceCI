@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for hudson.plugins.git.UserRemoteConfigType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="hudson.plugins.git.UserRemoteConfigType">
  *   &lt;complexContent>
@@ -32,14 +32,12 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "hudson.plugins.git.UserRemoteConfigType", propOrder = {
-    "refspec",
-    "url",
-    "credentialsId"
+        "refspec",
+        "url",
+        "credentialsId"
 })
 public class HudsonPluginsGitUserRemoteConfigType {
 
@@ -52,11 +50,9 @@ public class HudsonPluginsGitUserRemoteConfigType {
 
     /**
      * Gets the value of the refspec property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getRefspec() {
         return refspec;
@@ -64,11 +60,9 @@ public class HudsonPluginsGitUserRemoteConfigType {
 
     /**
      * Sets the value of the refspec property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setRefspec(String value) {
         this.refspec = value;
@@ -76,11 +70,9 @@ public class HudsonPluginsGitUserRemoteConfigType {
 
     /**
      * Gets the value of the url property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getUrl() {
         return url;
@@ -88,11 +80,9 @@ public class HudsonPluginsGitUserRemoteConfigType {
 
     /**
      * Sets the value of the url property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setUrl(String value) {
         this.url = value;
@@ -100,11 +90,9 @@ public class HudsonPluginsGitUserRemoteConfigType {
 
     /**
      * Gets the value of the credentialsId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCredentialsId() {
         return credentialsId;
@@ -112,11 +100,9 @@ public class HudsonPluginsGitUserRemoteConfigType {
 
     /**
      * Sets the value of the credentialsId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCredentialsId(String value) {
         this.credentialsId = value;

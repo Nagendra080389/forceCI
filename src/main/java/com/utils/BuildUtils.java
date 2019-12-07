@@ -105,7 +105,7 @@ public class BuildUtils {
             projectHelper.parse(project, buildFile);
             // If no target specified then default target will be executed.
             String targetToExecute = (target != null && target.trim().length() > 0) ? target.trim() : project.getDefaultTarget();
-            project.setProperty("diffDir",".\\deploy");
+            project.setProperty("diffDir", ".\\deploy");
             project.executeTarget(targetToExecute);
             project.fireBuildFinished(null);
             success = true;

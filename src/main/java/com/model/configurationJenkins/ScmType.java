@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for scmType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="scmType">
  *   &lt;complexContent>
@@ -38,17 +38,15 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "scmType", propOrder = {
-    "configVersion",
-    "userRemoteConfigs",
-    "branches",
-    "doGenerateSubmoduleConfigurations",
-    "submoduleCfg",
-    "extensions"
+        "configVersion",
+        "userRemoteConfigs",
+        "branches",
+        "doGenerateSubmoduleConfigurations",
+        "submoduleCfg",
+        "extensions"
 })
 public class ScmType {
 
@@ -71,11 +69,9 @@ public class ScmType {
 
     /**
      * Gets the value of the configVersion property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getConfigVersion() {
         return configVersion;
@@ -83,11 +79,9 @@ public class ScmType {
 
     /**
      * Sets the value of the configVersion property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setConfigVersion(String value) {
         this.configVersion = value;
@@ -95,11 +89,9 @@ public class ScmType {
 
     /**
      * Gets the value of the userRemoteConfigs property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link UserRemoteConfigsType }
-     *     
+     *
+     * @return possible object is
+     * {@link UserRemoteConfigsType }
      */
     public UserRemoteConfigsType getUserRemoteConfigs() {
         return userRemoteConfigs;
@@ -107,11 +99,9 @@ public class ScmType {
 
     /**
      * Sets the value of the userRemoteConfigs property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link UserRemoteConfigsType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link UserRemoteConfigsType }
      */
     public void setUserRemoteConfigs(UserRemoteConfigsType value) {
         this.userRemoteConfigs = value;
@@ -119,11 +109,9 @@ public class ScmType {
 
     /**
      * Gets the value of the branches property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BranchesType }
-     *     
+     *
+     * @return possible object is
+     * {@link BranchesType }
      */
     public BranchesType getBranches() {
         return branches;
@@ -131,11 +119,9 @@ public class ScmType {
 
     /**
      * Sets the value of the branches property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BranchesType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BranchesType }
      */
     public void setBranches(BranchesType value) {
         this.branches = value;
@@ -143,11 +129,9 @@ public class ScmType {
 
     /**
      * Gets the value of the doGenerateSubmoduleConfigurations property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDoGenerateSubmoduleConfigurations() {
         return doGenerateSubmoduleConfigurations;
@@ -155,11 +139,9 @@ public class ScmType {
 
     /**
      * Sets the value of the doGenerateSubmoduleConfigurations property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDoGenerateSubmoduleConfigurations(String value) {
         this.doGenerateSubmoduleConfigurations = value;
@@ -167,11 +149,9 @@ public class ScmType {
 
     /**
      * Gets the value of the submoduleCfg property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SubmoduleCfgType }
-     *     
+     *
+     * @return possible object is
+     * {@link SubmoduleCfgType }
      */
     public SubmoduleCfgType getSubmoduleCfg() {
         return submoduleCfg;
@@ -179,11 +159,9 @@ public class ScmType {
 
     /**
      * Sets the value of the submoduleCfg property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SubmoduleCfgType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link SubmoduleCfgType }
      */
     public void setSubmoduleCfg(SubmoduleCfgType value) {
         this.submoduleCfg = value;
@@ -191,11 +169,9 @@ public class ScmType {
 
     /**
      * Gets the value of the extensions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getExtensions() {
         return extensions;
@@ -203,11 +179,9 @@ public class ScmType {
 
     /**
      * Sets the value of the extensions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setExtensions(String value) {
         this.extensions = value;
@@ -215,11 +189,9 @@ public class ScmType {
 
     /**
      * Gets the value of the clazz property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getClazz() {
         return clazz;
@@ -227,11 +199,9 @@ public class ScmType {
 
     /**
      * Sets the value of the clazz property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setClazz(String value) {
         this.clazz = value;
@@ -239,11 +209,9 @@ public class ScmType {
 
     /**
      * Gets the value of the plugin property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPlugin() {
         return plugin;
@@ -251,11 +219,9 @@ public class ScmType {
 
     /**
      * Sets the value of the plugin property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPlugin(String value) {
         this.plugin = value;

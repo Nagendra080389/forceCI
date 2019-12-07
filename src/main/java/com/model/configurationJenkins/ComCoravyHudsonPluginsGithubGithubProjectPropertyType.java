@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for com.coravy.hudson.plugins.github.GithubProjectPropertyType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="com.coravy.hudson.plugins.github.GithubProjectPropertyType">
  *   &lt;complexContent>
@@ -33,13 +33,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "com.coravy.hudson.plugins.github.GithubProjectPropertyType", propOrder = {
-    "projectUrl",
-    "displayName"
+        "projectUrl",
+        "displayName"
 })
 public class ComCoravyHudsonPluginsGithubGithubProjectPropertyType {
 
@@ -52,11 +50,9 @@ public class ComCoravyHudsonPluginsGithubGithubProjectPropertyType {
 
     /**
      * Gets the value of the projectUrl property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getProjectUrl() {
         return projectUrl;
@@ -64,11 +60,9 @@ public class ComCoravyHudsonPluginsGithubGithubProjectPropertyType {
 
     /**
      * Sets the value of the projectUrl property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setProjectUrl(String value) {
         this.projectUrl = value;
@@ -76,11 +70,9 @@ public class ComCoravyHudsonPluginsGithubGithubProjectPropertyType {
 
     /**
      * Gets the value of the displayName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDisplayName() {
         return displayName;
@@ -88,11 +80,9 @@ public class ComCoravyHudsonPluginsGithubGithubProjectPropertyType {
 
     /**
      * Sets the value of the displayName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDisplayName(String value) {
         this.displayName = value;
@@ -100,11 +90,9 @@ public class ComCoravyHudsonPluginsGithubGithubProjectPropertyType {
 
     /**
      * Gets the value of the plugin property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPlugin() {
         return plugin;
@@ -112,11 +100,9 @@ public class ComCoravyHudsonPluginsGithubGithubProjectPropertyType {
 
     /**
      * Sets the value of the plugin property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPlugin(String value) {
         this.plugin = value;

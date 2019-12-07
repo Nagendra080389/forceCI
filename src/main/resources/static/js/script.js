@@ -57,7 +57,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         }
                     }, function (error) {
                     });
-                },true],
+                }, true],
                 ['<button>NO</button>', function (instance, toast) {
                     instance.hide({
                         transitionOut: 'fadeOut',

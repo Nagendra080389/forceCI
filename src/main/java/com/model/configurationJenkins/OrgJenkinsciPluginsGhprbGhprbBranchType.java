@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for org.jenkinsci.plugins.ghprb.GhprbBranchType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="org.jenkinsci.plugins.ghprb.GhprbBranchType">
  *   &lt;complexContent>
@@ -30,12 +30,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "org.jenkinsci.plugins.ghprb.GhprbBranchType", propOrder = {
-    "branch"
+        "branch"
 })
 public class OrgJenkinsciPluginsGhprbGhprbBranchType {
 
@@ -44,11 +42,9 @@ public class OrgJenkinsciPluginsGhprbGhprbBranchType {
 
     /**
      * Gets the value of the branch property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getBranch() {
         return branch;
@@ -56,11 +52,9 @@ public class OrgJenkinsciPluginsGhprbGhprbBranchType {
 
     /**
      * Sets the value of the branch property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBranch(String value) {
         this.branch = value;

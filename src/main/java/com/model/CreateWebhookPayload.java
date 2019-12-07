@@ -4,6 +4,7 @@ package com.model;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,10 +14,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "name",
-    "active",
-    "events",
-    "config"
+        "name",
+        "active",
+        "events",
+        "config"
 })
 public class CreateWebhookPayload {
 
@@ -28,6 +29,7 @@ public class CreateWebhookPayload {
     private List<String> events = null;
     @JsonProperty("config")
     private Config config;
+
     @JsonProperty("name")
     public String getName() {
         return name;

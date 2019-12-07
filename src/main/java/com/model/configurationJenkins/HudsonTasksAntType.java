@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for hudson.tasks.AntType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="hudson.tasks.AntType">
  *   &lt;complexContent>
@@ -35,15 +35,13 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "hudson.tasks.AntType", propOrder = {
-    "targets",
-    "antName",
-    "buildFile",
-    "properties"
+        "targets",
+        "antName",
+        "buildFile",
+        "properties"
 })
 public class HudsonTasksAntType {
 
@@ -60,11 +58,9 @@ public class HudsonTasksAntType {
 
     /**
      * Gets the value of the targets property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getTargets() {
         return targets;
@@ -72,11 +68,9 @@ public class HudsonTasksAntType {
 
     /**
      * Sets the value of the targets property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setTargets(String value) {
         this.targets = value;
@@ -84,11 +78,9 @@ public class HudsonTasksAntType {
 
     /**
      * Gets the value of the antName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getAntName() {
         return antName;
@@ -96,11 +88,9 @@ public class HudsonTasksAntType {
 
     /**
      * Sets the value of the antName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAntName(String value) {
         this.antName = value;
@@ -108,11 +98,9 @@ public class HudsonTasksAntType {
 
     /**
      * Gets the value of the buildFile property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getBuildFile() {
         return buildFile;
@@ -120,11 +108,9 @@ public class HudsonTasksAntType {
 
     /**
      * Sets the value of the buildFile property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBuildFile(String value) {
         this.buildFile = value;
@@ -132,11 +118,9 @@ public class HudsonTasksAntType {
 
     /**
      * Gets the value of the properties property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getProperties() {
         return properties;
@@ -144,11 +128,9 @@ public class HudsonTasksAntType {
 
     /**
      * Sets the value of the properties property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setProperties(String value) {
         this.properties = value;
@@ -156,11 +138,9 @@ public class HudsonTasksAntType {
 
     /**
      * Gets the value of the plugin property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPlugin() {
         return plugin;
@@ -168,11 +148,9 @@ public class HudsonTasksAntType {
 
     /**
      * Sets the value of the plugin property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPlugin(String value) {
         this.plugin = value;

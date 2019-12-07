@@ -15,18 +15,17 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the com.src package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
+ * generated in the com.src package.
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -35,14 +34,12 @@ public class ObjectFactory {
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.src
-     * 
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link ProjectType }
-     * 
      */
     public ProjectType createProjectType() {
         return new ProjectType();
@@ -50,7 +47,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ComCoravyHudsonPluginsGithubGithubProjectPropertyType }
-     * 
      */
     public ComCoravyHudsonPluginsGithubGithubProjectPropertyType createComCoravyHudsonPluginsGithubGithubProjectPropertyType() {
         return new ComCoravyHudsonPluginsGithubGithubProjectPropertyType();
@@ -58,7 +54,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link BuildWrappersType }
-     * 
      */
     public BuildWrappersType createBuildWrappersType() {
         return new BuildWrappersType();
@@ -66,7 +61,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link HudsonTasksAntType }
-     * 
      */
     public HudsonTasksAntType createHudsonTasksAntType() {
         return new HudsonTasksAntType();
@@ -74,7 +68,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link HudsonPluginsGitUserRemoteConfigType }
-     * 
      */
     public HudsonPluginsGitUserRemoteConfigType createHudsonPluginsGitUserRemoteConfigType() {
         return new HudsonPluginsGitUserRemoteConfigType();
@@ -82,7 +75,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link BlackListTargetBranchesType }
-     * 
      */
     public BlackListTargetBranchesType createBlackListTargetBranchesType() {
         return new BlackListTargetBranchesType();
@@ -90,7 +82,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link OrgJenkinsciPluginsGhprbGhprbBranchType }
-     * 
      */
     public OrgJenkinsciPluginsGhprbGhprbBranchType createOrgJenkinsciPluginsGhprbGhprbBranchType() {
         return new OrgJenkinsciPluginsGhprbGhprbBranchType();
@@ -98,7 +89,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link TriggersType }
-     * 
      */
     public TriggersType createTriggersType() {
         return new TriggersType();
@@ -106,7 +96,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link BuildersType }
-     * 
      */
     public BuildersType createBuildersType() {
         return new BuildersType();
@@ -114,7 +103,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link OrgJenkinsciPluginsGhprbGhprbTriggerType }
-     * 
      */
     public OrgJenkinsciPluginsGhprbGhprbTriggerType createOrgJenkinsciPluginsGhprbGhprbTriggerType() {
         return new OrgJenkinsciPluginsGhprbGhprbTriggerType();
@@ -122,7 +110,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link HudsonPluginsGitBranchSpecType }
-     * 
      */
     public HudsonPluginsGitBranchSpecType createHudsonPluginsGitBranchSpecType() {
         return new HudsonPluginsGitBranchSpecType();
@@ -130,7 +117,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link BranchesType }
-     * 
      */
     public BranchesType createBranchesType() {
         return new BranchesType();
@@ -138,7 +124,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link WhiteListTargetBranchesType }
-     * 
      */
     public WhiteListTargetBranchesType createWhiteListTargetBranchesType() {
         return new WhiteListTargetBranchesType();
@@ -146,7 +131,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType }
-     * 
      */
     public OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType createOrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType() {
         return new OrgJenkinsciPluginsGhprbExtensionsStatusGhprbSimpleStatusType();
@@ -154,7 +138,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ScmType }
-     * 
      */
     public ScmType createScmType() {
         return new ScmType();
@@ -162,7 +145,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link UserRemoteConfigsType }
-     * 
      */
     public UserRemoteConfigsType createUserRemoteConfigsType() {
         return new UserRemoteConfigsType();
@@ -170,7 +152,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link SubmoduleCfgType }
-     * 
      */
     public SubmoduleCfgType createSubmoduleCfgType() {
         return new SubmoduleCfgType();
@@ -178,7 +159,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link PropertiesType }
-     * 
      */
     public PropertiesType createPropertiesType() {
         return new PropertiesType();
@@ -186,7 +166,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ExtensionsType }
-     * 
      */
     public ExtensionsType createExtensionsType() {
         return new ExtensionsType();
@@ -194,7 +173,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link HudsonPluginsWsCleanupPreBuildCleanupType }
-     * 
      */
     public HudsonPluginsWsCleanupPreBuildCleanupType createHudsonPluginsWsCleanupPreBuildCleanupType() {
         return new HudsonPluginsWsCleanupPreBuildCleanupType();
@@ -202,7 +180,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ProjectType }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "project")
     public JAXBElement<ProjectType> createProject(ProjectType value) {

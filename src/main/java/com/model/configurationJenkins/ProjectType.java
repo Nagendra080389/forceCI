@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for projectType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="projectType">
  *   &lt;complexContent>
@@ -43,25 +43,23 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "projectType", propOrder = {
-    "actions",
-    "description",
-    "keepDependencies",
-    "properties",
-    "scm",
-    "canRoam",
-    "disabled",
-    "blockBuildWhenDownstreamBuilding",
-    "blockBuildWhenUpstreamBuilding",
-    "triggers",
-    "concurrentBuild",
-    "builders",
-    "publishers",
-    "buildWrappers"
+        "actions",
+        "description",
+        "keepDependencies",
+        "properties",
+        "scm",
+        "canRoam",
+        "disabled",
+        "blockBuildWhenDownstreamBuilding",
+        "blockBuildWhenUpstreamBuilding",
+        "triggers",
+        "concurrentBuild",
+        "builders",
+        "publishers",
+        "buildWrappers"
 })
 public class ProjectType {
 
@@ -96,11 +94,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the actions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getActions() {
         return actions;
@@ -108,11 +104,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the actions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setActions(String value) {
         this.actions = value;
@@ -120,11 +114,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the description property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDescription() {
         return description;
@@ -132,11 +124,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the description property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDescription(String value) {
         this.description = value;
@@ -144,11 +134,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the keepDependencies property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getKeepDependencies() {
         return keepDependencies;
@@ -156,11 +144,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the keepDependencies property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setKeepDependencies(String value) {
         this.keepDependencies = value;
@@ -168,11 +154,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the properties property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link PropertiesType }
-     *     
+     *
+     * @return possible object is
+     * {@link PropertiesType }
      */
     public PropertiesType getProperties() {
         return properties;
@@ -180,11 +164,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the properties property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link PropertiesType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link PropertiesType }
      */
     public void setProperties(PropertiesType value) {
         this.properties = value;
@@ -192,11 +174,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the scm property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ScmType }
-     *     
+     *
+     * @return possible object is
+     * {@link ScmType }
      */
     public ScmType getScm() {
         return scm;
@@ -204,11 +184,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the scm property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ScmType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link ScmType }
      */
     public void setScm(ScmType value) {
         this.scm = value;
@@ -216,11 +194,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the canRoam property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCanRoam() {
         return canRoam;
@@ -228,11 +204,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the canRoam property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCanRoam(String value) {
         this.canRoam = value;
@@ -240,11 +214,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the disabled property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDisabled() {
         return disabled;
@@ -252,11 +224,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the disabled property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDisabled(String value) {
         this.disabled = value;
@@ -264,11 +234,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the blockBuildWhenDownstreamBuilding property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getBlockBuildWhenDownstreamBuilding() {
         return blockBuildWhenDownstreamBuilding;
@@ -276,11 +244,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the blockBuildWhenDownstreamBuilding property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBlockBuildWhenDownstreamBuilding(String value) {
         this.blockBuildWhenDownstreamBuilding = value;
@@ -288,11 +254,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the blockBuildWhenUpstreamBuilding property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getBlockBuildWhenUpstreamBuilding() {
         return blockBuildWhenUpstreamBuilding;
@@ -300,11 +264,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the blockBuildWhenUpstreamBuilding property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBlockBuildWhenUpstreamBuilding(String value) {
         this.blockBuildWhenUpstreamBuilding = value;
@@ -312,11 +274,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the triggers property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link TriggersType }
-     *     
+     *
+     * @return possible object is
+     * {@link TriggersType }
      */
     public TriggersType getTriggers() {
         return triggers;
@@ -324,11 +284,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the triggers property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link TriggersType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link TriggersType }
      */
     public void setTriggers(TriggersType value) {
         this.triggers = value;
@@ -336,11 +294,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the concurrentBuild property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getConcurrentBuild() {
         return concurrentBuild;
@@ -348,11 +304,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the concurrentBuild property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setConcurrentBuild(String value) {
         this.concurrentBuild = value;
@@ -360,11 +314,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the builders property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BuildersType }
-     *     
+     *
+     * @return possible object is
+     * {@link BuildersType }
      */
     public BuildersType getBuilders() {
         return builders;
@@ -372,11 +324,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the builders property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BuildersType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BuildersType }
      */
     public void setBuilders(BuildersType value) {
         this.builders = value;
@@ -384,11 +334,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the publishers property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPublishers() {
         return publishers;
@@ -396,11 +344,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the publishers property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPublishers(String value) {
         this.publishers = value;
@@ -408,11 +354,9 @@ public class ProjectType {
 
     /**
      * Gets the value of the buildWrappers property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BuildWrappersType }
-     *     
+     *
+     * @return possible object is
+     * {@link BuildWrappersType }
      */
     public BuildWrappersType getBuildWrappers() {
         return buildWrappers;
@@ -420,11 +364,9 @@ public class ProjectType {
 
     /**
      * Sets the value of the buildWrappers property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BuildWrappersType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BuildWrappersType }
      */
     public void setBuildWrappers(BuildWrappersType value) {
         this.buildWrappers = value;

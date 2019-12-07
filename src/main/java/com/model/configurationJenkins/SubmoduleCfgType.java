@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlValue;
 
 /**
  * <p>Java class for submoduleCfgType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="submoduleCfgType">
  *   &lt;simpleContent>
@@ -29,12 +29,10 @@ import javax.xml.bind.annotation.XmlValue;
  *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "submoduleCfgType", propOrder = {
-    "value"
+        "value"
 })
 public class SubmoduleCfgType {
 
@@ -45,11 +43,9 @@ public class SubmoduleCfgType {
 
     /**
      * Gets the value of the value property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getValue() {
         return value;
@@ -57,11 +53,9 @@ public class SubmoduleCfgType {
 
     /**
      * Sets the value of the value property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setValue(String value) {
         this.value = value;
@@ -69,11 +63,9 @@ public class SubmoduleCfgType {
 
     /**
      * Gets the value of the clazz property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getClazz() {
         return clazz;
@@ -81,11 +73,9 @@ public class SubmoduleCfgType {
 
     /**
      * Sets the value of the clazz property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setClazz(String value) {
         this.clazz = value;

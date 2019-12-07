@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for org.jenkinsci.plugins.ghprb.GhprbTriggerType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="org.jenkinsci.plugins.ghprb.GhprbTriggerType">
  *   &lt;complexContent>
@@ -55,35 +55,33 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "org.jenkinsci.plugins.ghprb.GhprbTriggerType", propOrder = {
-    "spec",
-    "configVersion",
-    "adminlist",
-    "allowMembersOfWhitelistedOrgsAsAdmin",
-    "orgslist",
-    "cron",
-    "buildDescTemplate",
-    "onlyTriggerPhrase",
-    "useGitHubHooks",
-    "permitAll",
-    "whitelist",
-    "autoCloseFailedPullRequests",
-    "displayBuildErrorsOnDownstreamBuilds",
-    "whiteListTargetBranches",
-    "blackListTargetBranches",
-    "gitHubAuthId",
-    "triggerPhrase",
-    "skipBuildPhrase",
-    "blackListCommitAuthor",
-    "blackListLabels",
-    "whiteListLabels",
-    "includedRegions",
-    "excludedRegions",
-    "extensions"
+        "spec",
+        "configVersion",
+        "adminlist",
+        "allowMembersOfWhitelistedOrgsAsAdmin",
+        "orgslist",
+        "cron",
+        "buildDescTemplate",
+        "onlyTriggerPhrase",
+        "useGitHubHooks",
+        "permitAll",
+        "whitelist",
+        "autoCloseFailedPullRequests",
+        "displayBuildErrorsOnDownstreamBuilds",
+        "whiteListTargetBranches",
+        "blackListTargetBranches",
+        "gitHubAuthId",
+        "triggerPhrase",
+        "skipBuildPhrase",
+        "blackListCommitAuthor",
+        "blackListLabels",
+        "whiteListLabels",
+        "includedRegions",
+        "excludedRegions",
+        "extensions"
 })
 public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
@@ -140,11 +138,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the spec property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getSpec() {
         return spec;
@@ -152,11 +148,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the spec property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setSpec(String value) {
         this.spec = value;
@@ -164,11 +158,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the configVersion property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getConfigVersion() {
         return configVersion;
@@ -176,11 +168,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the configVersion property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setConfigVersion(String value) {
         this.configVersion = value;
@@ -188,11 +178,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the adminlist property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getAdminlist() {
         return adminlist;
@@ -200,11 +188,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the adminlist property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAdminlist(String value) {
         this.adminlist = value;
@@ -212,11 +198,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the allowMembersOfWhitelistedOrgsAsAdmin property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getAllowMembersOfWhitelistedOrgsAsAdmin() {
         return allowMembersOfWhitelistedOrgsAsAdmin;
@@ -224,11 +208,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the allowMembersOfWhitelistedOrgsAsAdmin property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAllowMembersOfWhitelistedOrgsAsAdmin(String value) {
         this.allowMembersOfWhitelistedOrgsAsAdmin = value;
@@ -236,11 +218,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the orgslist property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getOrgslist() {
         return orgslist;
@@ -248,11 +228,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the orgslist property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setOrgslist(String value) {
         this.orgslist = value;
@@ -260,11 +238,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the cron property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCron() {
         return cron;
@@ -272,11 +248,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the cron property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCron(String value) {
         this.cron = value;
@@ -284,11 +258,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the buildDescTemplate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getBuildDescTemplate() {
         return buildDescTemplate;
@@ -296,11 +268,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the buildDescTemplate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBuildDescTemplate(String value) {
         this.buildDescTemplate = value;
@@ -308,11 +278,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the onlyTriggerPhrase property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getOnlyTriggerPhrase() {
         return onlyTriggerPhrase;
@@ -320,11 +288,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the onlyTriggerPhrase property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setOnlyTriggerPhrase(String value) {
         this.onlyTriggerPhrase = value;
@@ -332,11 +298,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the useGitHubHooks property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getUseGitHubHooks() {
         return useGitHubHooks;
@@ -344,11 +308,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the useGitHubHooks property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setUseGitHubHooks(String value) {
         this.useGitHubHooks = value;
@@ -356,11 +318,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the permitAll property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPermitAll() {
         return permitAll;
@@ -368,11 +328,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the permitAll property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPermitAll(String value) {
         this.permitAll = value;
@@ -380,11 +338,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the whitelist property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getWhitelist() {
         return whitelist;
@@ -392,11 +348,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the whitelist property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setWhitelist(String value) {
         this.whitelist = value;
@@ -404,11 +358,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the autoCloseFailedPullRequests property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getAutoCloseFailedPullRequests() {
         return autoCloseFailedPullRequests;
@@ -416,11 +368,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the autoCloseFailedPullRequests property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setAutoCloseFailedPullRequests(String value) {
         this.autoCloseFailedPullRequests = value;
@@ -428,11 +378,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the displayBuildErrorsOnDownstreamBuilds property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDisplayBuildErrorsOnDownstreamBuilds() {
         return displayBuildErrorsOnDownstreamBuilds;
@@ -440,11 +388,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the displayBuildErrorsOnDownstreamBuilds property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDisplayBuildErrorsOnDownstreamBuilds(String value) {
         this.displayBuildErrorsOnDownstreamBuilds = value;
@@ -452,11 +398,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the whiteListTargetBranches property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link WhiteListTargetBranchesType }
-     *     
+     *
+     * @return possible object is
+     * {@link WhiteListTargetBranchesType }
      */
     public WhiteListTargetBranchesType getWhiteListTargetBranches() {
         return whiteListTargetBranches;
@@ -464,11 +408,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the whiteListTargetBranches property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link WhiteListTargetBranchesType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link WhiteListTargetBranchesType }
      */
     public void setWhiteListTargetBranches(WhiteListTargetBranchesType value) {
         this.whiteListTargetBranches = value;
@@ -476,11 +418,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the blackListTargetBranches property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BlackListTargetBranchesType }
-     *     
+     *
+     * @return possible object is
+     * {@link BlackListTargetBranchesType }
      */
     public BlackListTargetBranchesType getBlackListTargetBranches() {
         return blackListTargetBranches;
@@ -488,11 +428,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the blackListTargetBranches property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BlackListTargetBranchesType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link BlackListTargetBranchesType }
      */
     public void setBlackListTargetBranches(BlackListTargetBranchesType value) {
         this.blackListTargetBranches = value;
@@ -500,11 +438,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the gitHubAuthId property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getGitHubAuthId() {
         return gitHubAuthId;
@@ -512,11 +448,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the gitHubAuthId property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setGitHubAuthId(String value) {
         this.gitHubAuthId = value;
@@ -524,11 +458,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the triggerPhrase property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getTriggerPhrase() {
         return triggerPhrase;
@@ -536,11 +468,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the triggerPhrase property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setTriggerPhrase(String value) {
         this.triggerPhrase = value;
@@ -548,11 +478,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the skipBuildPhrase property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getSkipBuildPhrase() {
         return skipBuildPhrase;
@@ -560,11 +488,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the skipBuildPhrase property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setSkipBuildPhrase(String value) {
         this.skipBuildPhrase = value;
@@ -572,11 +498,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the blackListCommitAuthor property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getBlackListCommitAuthor() {
         return blackListCommitAuthor;
@@ -584,11 +508,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the blackListCommitAuthor property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBlackListCommitAuthor(String value) {
         this.blackListCommitAuthor = value;
@@ -596,11 +518,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the blackListLabels property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getBlackListLabels() {
         return blackListLabels;
@@ -608,11 +528,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the blackListLabels property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setBlackListLabels(String value) {
         this.blackListLabels = value;
@@ -620,11 +538,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the whiteListLabels property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getWhiteListLabels() {
         return whiteListLabels;
@@ -632,11 +548,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the whiteListLabels property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setWhiteListLabels(String value) {
         this.whiteListLabels = value;
@@ -644,11 +558,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the includedRegions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getIncludedRegions() {
         return includedRegions;
@@ -656,11 +568,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the includedRegions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setIncludedRegions(String value) {
         this.includedRegions = value;
@@ -668,11 +578,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the excludedRegions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getExcludedRegions() {
         return excludedRegions;
@@ -680,11 +588,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the excludedRegions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setExcludedRegions(String value) {
         this.excludedRegions = value;
@@ -692,11 +598,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the extensions property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link ExtensionsType }
-     *     
+     *
+     * @return possible object is
+     * {@link ExtensionsType }
      */
     public ExtensionsType getExtensions() {
         return extensions;
@@ -704,11 +608,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the extensions property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link ExtensionsType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link ExtensionsType }
      */
     public void setExtensions(ExtensionsType value) {
         this.extensions = value;
@@ -716,11 +618,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Gets the value of the plugin property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPlugin() {
         return plugin;
@@ -728,11 +628,9 @@ public class OrgJenkinsciPluginsGhprbGhprbTriggerType {
 
     /**
      * Sets the value of the plugin property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPlugin(String value) {
         this.plugin = value;

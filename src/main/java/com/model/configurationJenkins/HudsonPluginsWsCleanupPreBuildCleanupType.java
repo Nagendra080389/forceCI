@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for hudson.plugins.ws__cleanup.PreBuildCleanupType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="hudson.plugins.ws__cleanup.PreBuildCleanupType">
  *   &lt;complexContent>
@@ -34,14 +34,12 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "hudson.plugins.ws__cleanup.PreBuildCleanupType", propOrder = {
-    "deleteDirs",
-    "cleanupParameter",
-    "externalDelete"
+        "deleteDirs",
+        "cleanupParameter",
+        "externalDelete"
 })
 public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
@@ -56,11 +54,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Gets the value of the deleteDirs property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDeleteDirs() {
         return deleteDirs;
@@ -68,11 +64,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Sets the value of the deleteDirs property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDeleteDirs(String value) {
         this.deleteDirs = value;
@@ -80,11 +74,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Gets the value of the cleanupParameter property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCleanupParameter() {
         return cleanupParameter;
@@ -92,11 +84,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Sets the value of the cleanupParameter property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCleanupParameter(String value) {
         this.cleanupParameter = value;
@@ -104,11 +94,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Gets the value of the externalDelete property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getExternalDelete() {
         return externalDelete;
@@ -116,11 +104,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Sets the value of the externalDelete property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setExternalDelete(String value) {
         this.externalDelete = value;
@@ -128,11 +114,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Gets the value of the plugin property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPlugin() {
         return plugin;
@@ -140,11 +124,9 @@ public class HudsonPluginsWsCleanupPreBuildCleanupType {
 
     /**
      * Sets the value of the plugin property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPlugin(String value) {
         this.plugin = value;

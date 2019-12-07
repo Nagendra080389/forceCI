@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for branchesType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="branchesType">
  *   &lt;complexContent>
@@ -30,12 +30,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "branchesType", propOrder = {
-    "hudsonPluginsGitBranchSpec"
+        "hudsonPluginsGitBranchSpec"
 })
 public class BranchesType {
 
@@ -44,11 +42,9 @@ public class BranchesType {
 
     /**
      * Gets the value of the hudsonPluginsGitBranchSpec property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link HudsonPluginsGitBranchSpecType }
-     *     
+     *
+     * @return possible object is
+     * {@link HudsonPluginsGitBranchSpecType }
      */
     public HudsonPluginsGitBranchSpecType getHudsonPluginsGitBranchSpec() {
         return hudsonPluginsGitBranchSpec;
@@ -56,11 +52,9 @@ public class BranchesType {
 
     /**
      * Sets the value of the hudsonPluginsGitBranchSpec property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link HudsonPluginsGitBranchSpecType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link HudsonPluginsGitBranchSpecType }
      */
     public void setHudsonPluginsGitBranchSpec(HudsonPluginsGitBranchSpecType value) {
         this.hudsonPluginsGitBranchSpec = value;

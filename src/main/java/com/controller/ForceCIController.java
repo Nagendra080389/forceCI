@@ -1,10 +1,9 @@
 package com.controller;
 
-import com.model.Config;
-import com.model.CreateWebhookPayload;
-import com.model.Repository;
+import com.dao.RepositoryWrapperMongoRepository;
+import com.google.gson.reflect.TypeToken;
+import com.model.*;
 import com.google.gson.*;
-import com.model.RepositoryWrapper;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -13,6 +12,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.kohsuke.github.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import spark.Request;
 
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -33,6 +35,18 @@ import static spark.Spark.post;
 
 @RestController
 public class ForceCIController {
+
+    @Value("${github.clientId}")
+    String githubClientId;
+
+    @Value("${github.clientSecret}")
+    String githubClientSecret;
+
+    @Value("${application.redirectURI}")
+    String redirectURI;
+
+    @Autowired
+    private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
 
     private static final String GITHUB_API = "https://api.github.com";
 
@@ -46,9 +60,9 @@ public class ForceCIController {
         PostMethod post = new PostMethod(environment);
         post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
         post.addParameter("code", code);
-        post.addParameter("redirect_uri", "https://forceci.herokuapp.com/auth");
-        post.addParameter("client_id", "0b5a2cb25fa55a0d2b76");
-        post.addParameter("client_secret", "27e2145693b538a466e8264735259dafdaf783e7");
+        post.addParameter("redirect_uri", redirectURI);
+        post.addParameter("client_id", githubClientId);
+        post.addParameter("client_secret", githubClientSecret);
         post.addParameter("state", state);
 
         httpClient.executeMethod(post);
@@ -116,6 +130,7 @@ public class ForceCIController {
     @RequestMapping(value = "/listRepository", method = RequestMethod.GET)
     public RepositoryWrapper getRepositoryList(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
         List<Repository> repositoryList = new ArrayList<>();
+        Gson gson = new Gson();
         RepositoryWrapper repositoryWrapper = null;
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
@@ -124,8 +139,9 @@ public class ForceCIController {
                 GetMethod getUserMethod = new GetMethod(GITHUB_API + "/user");
                 getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
                 HttpClient httpClient = new HttpClient();
-                httpClient.executeMethod(getUserMethod);
-                List<JSONObject> jsonObjects = new ArrayList<>();
+                int i = httpClient.executeMethod(getUserMethod);
+                System.out.println(" i value -> " + i);
+                System.out.println("getUserMethod.getResponseHeaders() -> "+getUserMethod.getResponseHeaders());
                 JSONObject jsonResponse = new JSONObject(new JSONTokener(new InputStreamReader(getUserMethod.getResponseBodyAsStream())));
                 if (jsonResponse.has("login")) {
                     String loginId = (String) jsonResponse.get("login");
@@ -138,17 +154,18 @@ public class ForceCIController {
                     if (parse.isJsonArray()) {
                         repositoryWrapper = new RepositoryWrapper();
                         JsonArray asJsonArray = parse.getAsJsonArray();
-                        System.out.println("asJsonArray -> "+asJsonArray);
+                        System.out.println("asJsonArray -> " + asJsonArray);
                         for (JsonElement jsonElement : asJsonArray) {
                             if (jsonElement.isJsonObject()) {
                                 String name = jsonElement.getAsJsonObject().get("name").getAsString();
                                 String htmlUrl = jsonElement.getAsJsonObject().get("html_url").getAsString();
-                                GetMethod getWebHook = new GetMethod(GITHUB_API + "/repos/" + loginId + "/"+ name + "/hooks");
+                                GetMethod getWebHook = new GetMethod(GITHUB_API + "/repos/" + loginId + "/" + name + "/hooks");
                                 getWebHook.setRequestHeader("Authorization", "token " + accessToken);
                                 httpClient = new HttpClient();
                                 httpClient.executeMethod(getWebHook);
-                                JsonElement getWebHookDetails = jsonParser.parse(new InputStreamReader(getWebHook.getResponseBodyAsStream()));
-                                System.out.println("getWebHookDetails -> "+getWebHookDetails);
+                                Type listOfWebHooks = new TypeToken<ArrayList<WebHook>>() {}.getType();
+                                List<WebHook> webHookList = gson.fromJson(getWebHook.getResponseBodyAsString(), listOfWebHooks);
+                                System.out.println("getWebHookDetails -> " + webHookList);
                                 Repository repository = new Repository();
                                 repository.setRepositoryName(name);
                                 repository.setRepositoryUrl(htmlUrl);
@@ -157,9 +174,10 @@ public class ForceCIController {
                             }
                         }
                     }
-                    if(repositoryWrapper != null) {
+                    if (repositoryWrapper != null) {
                         repositoryWrapper.setLstRepositories(repositoryList);
                         repositoryWrapper.setOwnerId(loginId);
+                        repositoryWrapperMongoRepository.save(repositoryWrapper);
                     }
                 }
             }
@@ -186,9 +204,9 @@ public class ForceCIController {
 
         String accessToken = fetchCookies(request);
 
-        System.out.println("accessToken --> "+accessToken);
-        if(accessToken != null){
-            PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner()+"/"+repository.getRepositoryName()+ "/hooks");
+        System.out.println("accessToken --> " + accessToken);
+        if (accessToken != null) {
+            PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" + repository.getRepositoryName() + "/hooks");
             createWebHook.setRequestHeader("Authorization", "token " + accessToken);
             createWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             CreateWebhookPayload createWebhookPayload = new CreateWebhookPayload();
@@ -199,17 +217,17 @@ public class ForceCIController {
             createWebhookPayload.setEvents(events);
             Config config = new Config();
             config.setContentType("json");
-            config.setUrl("https://forceci.herokuapp.com/"+repository.getRepositoryName());
+            config.setUrl("https://forceci.herokuapp.com/" + repository.getRepositoryName());
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
-            System.out.println("gson.toJson(createWebhookPayload) -> "+gson.toJson(createWebhookPayload));
+            System.out.println("gson.toJson(createWebhookPayload) -> " + gson.toJson(createWebhookPayload));
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
             httpClient.executeMethod(createWebHook);
             JsonParser jsonParser = new JsonParser();
             JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
-            System.out.println("createWebHook -> "+createWebHook.getRequestEntity().getContentType());
-            System.out.println(" parse---> "+parse);
+            System.out.println("createWebHook -> " + createWebHook.getRequestEntity().getContentType());
+            System.out.println(" parse---> " + parse);
             returnResponse = gson.toJson(parse);
         }
 
@@ -274,7 +292,7 @@ public class ForceCIController {
                 " is " + jsonObject.get("deployment_status").getAsJsonObject().get("state").getAsString());
     }
 
-    private static String fetchCookies(HttpServletRequest request){
+    private static String fetchCookies(HttpServletRequest request) {
         String returnResponse = null;
 
         Cookie[] cookies = request.getCookies();

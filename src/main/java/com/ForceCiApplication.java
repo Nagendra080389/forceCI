@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories(basePackages = "com.dao")
 public class ForceCiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ForceCiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ForceCiApplication.class, args);
+    }
 }

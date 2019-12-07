@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for whiteListTargetBranchesType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="whiteListTargetBranchesType">
  *   &lt;complexContent>
@@ -30,12 +30,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "whiteListTargetBranchesType", propOrder = {
-    "orgJenkinsciPluginsGhprbGhprbBranch"
+        "orgJenkinsciPluginsGhprbGhprbBranch"
 })
 public class WhiteListTargetBranchesType {
 
@@ -44,11 +42,9 @@ public class WhiteListTargetBranchesType {
 
     /**
      * Gets the value of the orgJenkinsciPluginsGhprbGhprbBranch property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link OrgJenkinsciPluginsGhprbGhprbBranchType }
-     *     
+     *
+     * @return possible object is
+     * {@link OrgJenkinsciPluginsGhprbGhprbBranchType }
      */
     public OrgJenkinsciPluginsGhprbGhprbBranchType getOrgJenkinsciPluginsGhprbGhprbBranch() {
         return orgJenkinsciPluginsGhprbGhprbBranch;
@@ -56,11 +52,9 @@ public class WhiteListTargetBranchesType {
 
     /**
      * Sets the value of the orgJenkinsciPluginsGhprbGhprbBranch property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link OrgJenkinsciPluginsGhprbGhprbBranchType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link OrgJenkinsciPluginsGhprbGhprbBranchType }
      */
     public void setOrgJenkinsciPluginsGhprbGhprbBranch(OrgJenkinsciPluginsGhprbGhprbBranchType value) {
         this.orgJenkinsciPluginsGhprbGhprbBranch = value;

@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for buildersType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="buildersType">
  *   &lt;complexContent>
@@ -30,12 +30,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "buildersType", propOrder = {
-    "hudsonTasksAnt"
+        "hudsonTasksAnt"
 })
 public class BuildersType {
 
@@ -44,11 +42,9 @@ public class BuildersType {
 
     /**
      * Gets the value of the hudsonTasksAnt property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link HudsonTasksAntType }
-     *     
+     *
+     * @return possible object is
+     * {@link HudsonTasksAntType }
      */
     public HudsonTasksAntType getHudsonTasksAnt() {
         return hudsonTasksAnt;
@@ -56,11 +52,9 @@ public class BuildersType {
 
     /**
      * Sets the value of the hudsonTasksAnt property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link HudsonTasksAntType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link HudsonTasksAntType }
      */
     public void setHudsonTasksAnt(HudsonTasksAntType value) {
         this.hudsonTasksAnt = value;

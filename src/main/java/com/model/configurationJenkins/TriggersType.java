@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for triggersType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="triggersType">
  *   &lt;complexContent>
@@ -30,12 +30,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "triggersType", propOrder = {
-    "orgJenkinsciPluginsGhprbGhprbTrigger"
+        "orgJenkinsciPluginsGhprbGhprbTrigger"
 })
 public class TriggersType {
 
@@ -44,11 +42,9 @@ public class TriggersType {
 
     /**
      * Gets the value of the orgJenkinsciPluginsGhprbGhprbTrigger property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link OrgJenkinsciPluginsGhprbGhprbTriggerType }
-     *     
+     *
+     * @return possible object is
+     * {@link OrgJenkinsciPluginsGhprbGhprbTriggerType }
      */
     public OrgJenkinsciPluginsGhprbGhprbTriggerType getOrgJenkinsciPluginsGhprbGhprbTrigger() {
         return orgJenkinsciPluginsGhprbGhprbTrigger;
@@ -56,11 +52,9 @@ public class TriggersType {
 
     /**
      * Sets the value of the orgJenkinsciPluginsGhprbGhprbTrigger property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link OrgJenkinsciPluginsGhprbGhprbTriggerType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link OrgJenkinsciPluginsGhprbGhprbTriggerType }
      */
     public void setOrgJenkinsciPluginsGhprbGhprbTrigger(OrgJenkinsciPluginsGhprbGhprbTriggerType value) {
         this.orgJenkinsciPluginsGhprbGhprbTrigger = value;

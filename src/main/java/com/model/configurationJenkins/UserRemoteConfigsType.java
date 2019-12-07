@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for userRemoteConfigsType complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="userRemoteConfigsType">
  *   &lt;complexContent>
@@ -30,12 +30,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "userRemoteConfigsType", propOrder = {
-    "hudsonPluginsGitUserRemoteConfig"
+        "hudsonPluginsGitUserRemoteConfig"
 })
 public class UserRemoteConfigsType {
 
@@ -44,11 +42,9 @@ public class UserRemoteConfigsType {
 
     /**
      * Gets the value of the hudsonPluginsGitUserRemoteConfig property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link HudsonPluginsGitUserRemoteConfigType }
-     *     
+     *
+     * @return possible object is
+     * {@link HudsonPluginsGitUserRemoteConfigType }
      */
     public HudsonPluginsGitUserRemoteConfigType getHudsonPluginsGitUserRemoteConfig() {
         return hudsonPluginsGitUserRemoteConfig;
@@ -56,11 +52,9 @@ public class UserRemoteConfigsType {
 
     /**
      * Sets the value of the hudsonPluginsGitUserRemoteConfig property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link HudsonPluginsGitUserRemoteConfigType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link HudsonPluginsGitUserRemoteConfigType }
      */
     public void setHudsonPluginsGitUserRemoteConfig(HudsonPluginsGitUserRemoteConfigType value) {
         this.hudsonPluginsGitUserRemoteConfig = value;
