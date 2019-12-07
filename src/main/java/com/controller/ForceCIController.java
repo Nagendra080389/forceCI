@@ -142,7 +142,7 @@ public class ForceCIController {
                 HttpClient httpClient = new HttpClient();
                 int i = httpClient.executeMethod(getUserMethod);
                 System.out.println(" i value -> " + i);
-                for (Header requestHeader : getUserMethod.getResponseHeaders()) {
+                for (Header requestHeader : getUserMethod.getResponseFooters()) {
                     System.out.println("getUserMethod.getResponseHeaders() -> "+requestHeader.getName()+" - " + requestHeader.getValue());
                 }
                 JSONObject jsonResponse = new JSONObject(new JSONTokener(new InputStreamReader(getUserMethod.getResponseBodyAsStream())));
