@@ -1,6 +1,14 @@
 var app = angular.module('forceCIApp', []);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
-    $http.get("/listRepository").then(listRepositoryCallback, listRepositoryErrorCallback);
+    //$http.get("/listRepository").then(listRepositoryCallback, listRepositoryErrorCallback);
+
+    $http.get("/fetchUserName").then(function (response) {
+        if (response.data !== undefined && response.data !== null) {
+            $scope.userName = response.data;
+        }
+    }, function (error) {
+
+    });
 
     function listRepositoryCallback(response) {
         var foundRepository = [];

@@ -161,7 +161,7 @@ public class ForceCIController {
                         getUserRepository.setRequestHeader("Authorization", "token " + accessToken);
                         httpClient = new HttpClient();
                         httpClient.executeMethod(getUserRepository);
-                        for (Header requestHeader : getUserRepository.getResponseHeaders()) {
+                        for (Header requestHeader : getUserRepository.getResponseHeaders("Link")) {
                             System.out.println("getUserRepository.getResponseHeaders() -> "+requestHeader.getName()+" - " + requestHeader.getValue());
                         }
                         Type listOfGitRepository = new TypeToken<ArrayList<GitRepository>>() {
@@ -200,6 +200,28 @@ public class ForceCIController {
             }
         }
         return repositoryWrapper;
+    }
+
+    @RequestMapping(value = "/fetchUserName", method = RequestMethod.GET)
+    public String getUserName(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+        RepositoryWrapper repositoryWrapper = null;
+        Cookie[] cookies = request.getCookies();
+        Gson gson = new Gson();
+        String loginNameAndAvatar = "";
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("ACCESS_TOKEN")) {
+                String accessToken = cookie.getValue();
+                GetMethod getUserMethod = new GetMethod(GITHUB_API + "/user");
+                getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
+                HttpClient httpClient = new HttpClient();
+                int intStatusOk = httpClient.executeMethod(getUserMethod);
+                if(intStatusOk == HTTP_STATUS_OK) {
+                    GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), "UTF-8"), GitRepositoryUser.class);
+                    loginNameAndAvatar = gson.toJson(gitRepositoryUser);
+                }
+            }
+        }
+        return loginNameAndAvatar;
     }
 
     @RequestMapping(value = "/modifyRepository", method = RequestMethod.POST)

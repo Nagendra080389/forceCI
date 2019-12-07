@@ -29,8 +29,8 @@
 <body ng-app="forceCIApp" ng-controller="orderFromController">
 
 <div id="repositoryRule">
-    <div class="modal-dialog">
-        <!-- Modal content-->
+    <!--<div class="modal-dialog">
+        &lt;!&ndash; Modal content&ndash;&gt;
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-body">
@@ -64,7 +64,34 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
+
+    <form>
+        <p><b>Search for a repository to connect to</b></p>
+
+        <div class="org-selection">
+            <div class="relative">
+                <select tabindex="0" id="ember367" class="">
+                    <option value="{{userName}}">{{userName}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="repo-selection">
+            <!---->
+            <div class="flex">
+                <input placeholder="repo-name" id="search-term"
+                       class="repo-name-search hk-input br--left flex-auto relative z-1 ember-text-field ember-view"
+                       type="search">
+                <button id="searchRepository" class="br--right bl-0 async-button fulfilled hk-button--primary ember-view"
+                        type="submit"> Search
+                </button>
+            </div>
+        </div>
+
+
+    </form>
 </div>
 
 </body>
