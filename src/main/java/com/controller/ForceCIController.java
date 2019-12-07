@@ -148,9 +148,6 @@ public class ForceCIController {
                         List<Repository> repositoryList = new ArrayList<>();
                         String loginId = (String) jsonResponse.get("login");
                         GetMethod getUserRepository = new GetMethod(GITHUB_API + "/users/" + loginId + "/repos");
-                        for (Header requestHeader : getUserRepository.getResponseHeaders()) {
-                            System.out.println("getUserRepository.getResponseHeaders() -> "+requestHeader.getName()+" - " + requestHeader.getValue());
-                        }
                         repositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(loginId);
                         List<String> listOfRepositoryNameInDb = new ArrayList<>();
                         if (repositoryWrapper != null) {
@@ -164,6 +161,9 @@ public class ForceCIController {
                         getUserRepository.setRequestHeader("Authorization", "token " + accessToken);
                         httpClient = new HttpClient();
                         httpClient.executeMethod(getUserRepository);
+                        for (Header requestHeader : getUserRepository.getResponseHeaders()) {
+                            System.out.println("getUserRepository.getResponseHeaders() -> "+requestHeader.getName()+" - " + requestHeader.getValue());
+                        }
                         Type listOfGitRepository = new TypeToken<ArrayList<GitRepository>>() {
                         }.getType();
                         List<GitRepository> lstGitRepos = gson.fromJson(IOUtils.toString(getUserRepository.getResponseBodyAsStream(), "UTF-8"), listOfGitRepository);
