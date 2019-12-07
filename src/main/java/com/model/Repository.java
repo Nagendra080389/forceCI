@@ -1,14 +1,14 @@
 package com.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Repository implements Serializable {
     private String repositoryName;
     private String repositoryUrl;
     private Boolean active;
     private String owner;
-    private String webHookId;
-    private String webHookUrl;
+    private WebHook webHook;
 
     public String getRepositoryName() {
         return repositoryName;
@@ -42,19 +42,11 @@ public class Repository implements Serializable {
         this.owner = owner;
     }
 
-    public String getWebHookId() {
-        return webHookId;
+    public WebHook getWebHook() {
+        return webHook;
     }
 
-    public void setWebHookId(String webHookId) {
-        this.webHookId = webHookId;
-    }
-
-    public String getWebHookUrl() {
-        return webHookUrl;
-    }
-
-    public void setWebHookUrl(String webHookUrl) {
-        this.webHookUrl = webHookUrl;
+    public void setWebHook(WebHook webHook) {
+        this.webHook = webHook;
     }
 }

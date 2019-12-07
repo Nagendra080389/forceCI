@@ -1,6 +1,8 @@
 package com.model;
 
-public class Last_response {
+import java.io.Serializable;
+
+public class Last_response implements Serializable {
     private String code;
 
     private String message;

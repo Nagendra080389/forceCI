@@ -9,6 +9,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -142,45 +143,43 @@ public class ForceCIController {
                 HttpClient httpClient = new HttpClient();
                 int i = httpClient.executeMethod(getUserMethod);
                 System.out.println(" i value -> " + i);
-                for (Header requestHeader : getUserMethod.getResponseFooters()) {
+                for (Header requestHeader : getUserMethod.getResponseHeaders()) {
                     System.out.println("getUserMethod.getResponseHeaders() -> "+requestHeader.getName()+" - " + requestHeader.getValue());
                 }
                 JSONObject jsonResponse = new JSONObject(new JSONTokener(new InputStreamReader(getUserMethod.getResponseBodyAsStream())));
                 if (jsonResponse.has("login")) {
+                    repositoryWrapper = new RepositoryWrapper();
                     String loginId = (String) jsonResponse.get("login");
                     GetMethod getUserRepository = new GetMethod(GITHUB_API + "/users/" + loginId + "/repos");
                     getUserRepository.setRequestHeader("Authorization", "token " + accessToken);
                     httpClient = new HttpClient();
                     httpClient.executeMethod(getUserRepository);
                     JsonParser jsonParser = new JsonParser();
-                    JsonElement parse = jsonParser.parse(new InputStreamReader(getUserRepository.getResponseBodyAsStream()));
-                    if (parse.isJsonArray()) {
-                        repositoryWrapper = new RepositoryWrapper();
-                        JsonArray asJsonArray = parse.getAsJsonArray();
-                        for (JsonElement jsonElement : asJsonArray) {
-                            if (jsonElement.isJsonObject()) {
-                                String name = jsonElement.getAsJsonObject().get("name").getAsString();
-                                String htmlUrl = jsonElement.getAsJsonObject().get("html_url").getAsString();
-                                GetMethod getWebHook = new GetMethod(GITHUB_API + "/repos/" + loginId + "/" + name + "/hooks");
-                                getWebHook.setRequestHeader("Authorization", "token " + accessToken);
-                                httpClient = new HttpClient();
-                                httpClient.executeMethod(getWebHook);
-                                Type listOfWebHooks = new TypeToken<ArrayList<WebHook>>() {}.getType();
-                                List<WebHook> webHookList = gson.fromJson(getWebHook.getResponseBodyAsString(), listOfWebHooks);
-                                System.out.println("getWebHookDetails -> " + webHookList);
-                                Repository repository = new Repository();
-                                repository.setRepositoryName(name);
-                                repository.setRepositoryUrl(htmlUrl);
-                                repository.setActive(Boolean.FALSE);
-                                repositoryList.add(repository);
+                    Type listOfGitRepository = new TypeToken<ArrayList<GitRepository>>() {}.getType();
+                    List<GitRepository> lstGitRepos = gson.fromJson(IOUtils.toString(getUserRepository.getResponseBodyAsStream(), "UTF-8"), listOfGitRepository);
+                    for (GitRepository eachGitRepository : lstGitRepos) {
+                        Repository repository = new Repository();
+                        String name = eachGitRepository.getName();
+                        String htmlUrl = eachGitRepository.getHtml_url();
+                        GetMethod getWebHook = new GetMethod(GITHUB_API + "/repos/" + loginId + "/" + name + "/hooks");
+                        getWebHook.setRequestHeader("Authorization", "token " + accessToken);
+                        httpClient = new HttpClient();
+                        httpClient.executeMethod(getWebHook);
+                        Type listOfWebHooks = new TypeToken<ArrayList<WebHook>>() {}.getType();
+                        List<WebHook> webHookList = gson.fromJson(getWebHook.getResponseBodyAsString(), listOfWebHooks);
+                        for (WebHook webHook : webHookList) {
+                            if(webHook.getName() != null && webHook.getName().contains("/forceCI/")){
+                                repository.setWebHook(webHook);
                             }
                         }
+                        repository.setRepositoryName(name);
+                        repository.setRepositoryUrl(htmlUrl);
+                        repository.setActive(Boolean.FALSE);
+                        repositoryList.add(repository);
                     }
-                    if (repositoryWrapper != null) {
-                        repositoryWrapper.setLstRepositories(repositoryList);
-                        repositoryWrapper.setOwnerId(loginId);
-                        repositoryWrapperMongoRepository.save(repositoryWrapper);
-                    }
+                    repositoryWrapper.setLstRepositories(repositoryList);
+                    repositoryWrapper.setOwnerId(loginId);
+                    repositoryWrapperMongoRepository.save(repositoryWrapper);
                 }
             }
         }

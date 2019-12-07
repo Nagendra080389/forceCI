@@ -1,6 +1,8 @@
 package com.model;
 
-public class WebHook {
+import java.io.Serializable;
+
+public class WebHook implements Serializable {
     private String updated_at;
 
     private String name;
