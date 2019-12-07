@@ -157,7 +157,6 @@ public class ForceCIController {
                     if (parse.isJsonArray()) {
                         repositoryWrapper = new RepositoryWrapper();
                         JsonArray asJsonArray = parse.getAsJsonArray();
-                        System.out.println("asJsonArray -> " + asJsonArray);
                         for (JsonElement jsonElement : asJsonArray) {
                             if (jsonElement.isJsonObject()) {
                                 String name = jsonElement.getAsJsonObject().get("name").getAsString();
