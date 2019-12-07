@@ -4,6 +4,7 @@ import com.dao.RepositoryWrapperMongoRepository;
 import com.google.gson.reflect.TypeToken;
 import com.model.*;
 import com.google.gson.*;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -141,7 +142,9 @@ public class ForceCIController {
                 HttpClient httpClient = new HttpClient();
                 int i = httpClient.executeMethod(getUserMethod);
                 System.out.println(" i value -> " + i);
-                System.out.println("getUserMethod.getResponseHeaders() -> "+getUserMethod.getResponseHeaders());
+                for (Header requestHeader : getUserMethod.getRequestHeaders()) {
+                    System.out.println("getUserMethod.getResponseHeaders() -> "+requestHeader.getName()+" - " + requestHeader.getValue());
+                }
                 JSONObject jsonResponse = new JSONObject(new JSONTokener(new InputStreamReader(getUserMethod.getResponseBodyAsStream())));
                 if (jsonResponse.has("login")) {
                     String loginId = (String) jsonResponse.get("login");
