@@ -47,7 +47,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         '\n' +
                         '                <span ng-model="repoNameToConnect">'+response.data.items[i].full_name+'</span>\n' +
                         '                <div class="flex-auto"></div>\n' +
-                        '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view" type="button" onclick="callWebHook(event)">    Connect\n' +
+                        '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button" onclick="callWebHook(event)">    Connect\n' +
                         '                </button>\n' +
                         '            </div>';
                     $('#repoDialog').append(eachNewDiv);
@@ -60,10 +60,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         }
     };
 
-    $scope.callWebHook = function () {
-        console.log($scope.repoNameToConnect);
-    };
-    
+    $( document ).on( "click", ".connectButton", function() {
+        console.log( $( this ).text() );
+    });
+
     function callWebHook(event) {
         $(event.target).closest('span');
     }
