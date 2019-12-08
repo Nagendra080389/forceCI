@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -234,8 +235,9 @@ public class ForceCIController {
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("ACCESS_TOKEN")) {
                 String accessToken = cookie.getValue();
-                String queryParam = repoName +" in:name+user:"+repoUser+"+fork:true".replaceAll(" ", "%20");
-                System.out.println(" asdas" +queryParam.replaceAll(" ", "%20"));
+                String queryParam = repoName +"%20in:name+user:"+repoUser+"+fork:true";
+                System.out.println(" asdas " +queryParam);
+                System.out.println("URL Encoder -> "+URLEncoder.encode(queryParam, StandardCharsets.UTF_8.name()));
                 GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+queryParam);
                 getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
                 HttpClient httpClient = new HttpClient();
