@@ -8,7 +8,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             const avatarSpanTag = '<span class="absolute flex items-center">\n' +
             '          <img src='+response.data.avatar_url+'>\n' +
             '        </span>';
-            $('#idSelectTab').insertBefore(avatarSpanTag);
+            $(avatarSpanTag).insertBefore('#idSelectTab');
         }
     }, function (error) {
 
