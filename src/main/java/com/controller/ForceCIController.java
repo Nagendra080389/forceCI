@@ -237,6 +237,7 @@ public class ForceCIController {
                 System.out.println("repoName -> "+repoName);
                 System.out.println("repoUser -> "+repoUser);
                 String queryParam = repoName +" in:name+user:"+repoUser+"+fork:true";
+                System.out.println("queryParam -> "+queryParam);
                 queryParam = URLEncoder.encode(queryParam, "UTF-8");
                 System.out.println("queryParam -> "+queryParam);
                 GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+queryParam);
@@ -244,9 +245,8 @@ public class ForceCIController {
                 HttpClient httpClient = new HttpClient();
                 int intStatusOk = httpClient.executeMethod(getRepoByName);
                 if(intStatusOk == HTTP_STATUS_OK) {
-                    Type listOfGitRepository = new TypeToken<ArrayList<GitRepository>>() {}.getType();
-                    List<GitRepository> lstGitRepos = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), "UTF-8"), listOfGitRepository);
-                    lstRepo = gson.toJson(lstGitRepos);
+                    GitRepositoryFromQuery gitRepositoryFromQuery = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), "UTF-8"), GitRepositoryFromQuery.class);
+                    lstRepo = gson.toJson(gitRepositoryFromQuery);
                 }
             }
         }
