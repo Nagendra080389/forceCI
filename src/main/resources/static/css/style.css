@@ -63,3 +63,9 @@ input:checked + .slider:before {
     width: calc(35% - 14px);
     margin-right: 10px;
 }
+
+.github-linker .repo-selection {
+    display: inline-block;
+    vertical-align: top;
+    width: 65%;
+}
