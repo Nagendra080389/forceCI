@@ -5,7 +5,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
-            const avatarSpanTag = '<span class="absolute flex items-center">\n' +
+            const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 nudge-down--4 ' +
+                'nudge-right--4 pe-none">\n' +
             '          <img src='+response.data.avatar_url+'>\n' +
             '        </span>';
             $(avatarSpanTag).insertBefore('#idSelectTab');

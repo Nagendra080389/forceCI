@@ -55,3 +55,11 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+.github-linker .org-selection {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: calc(35% - 14px);
+    margin-right: 10px;
+}

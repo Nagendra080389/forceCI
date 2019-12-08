@@ -14,6 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://www.herokucdn.com/purple3/latest/purple3.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/js/iziModal.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css" rel="stylesheet">
     <link href="../css/style.css" rel="stylesheet"/>
@@ -66,32 +67,34 @@
         </div>
     </div>-->
 
-    <form>
-        <p><b>Search for a repository to connect to</b></p>
+    <div class="github-linker ember-view">
+        <form>
+            <p><b>Search for a repository to connect to</b></p>
 
-        <div class="org-selection">
-            <div class="relative">
-                <select tabindex="0" id="idSelectTab" class="">
-                    <option value="{{userName}}">{{userName}}
-                    </option>
-                </select>
+            <div class="org-selection">
+                <div class="relative">
+                    <select tabindex="0" id="idSelectTab" class="hk-select pl5 org-name-select x-select ember-view">
+                        <option value="{{userName}}">{{userName}}
+                        </option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="repo-selection">
-            <!---->
-            <div class="flex">
-                <input placeholder="repo-name" id="search-term"
-                       class="repo-name-search hk-input br--left flex-auto relative z-1 ember-text-field ember-view"
-                       type="search">
-                <button id="searchRepository" class="br--right bl-0 async-button fulfilled hk-button--primary ember-view"
-                        type="submit"> Search
-                </button>
+            <div class="repo-selection">
+                <!---->
+                <div class="flex">
+                    <input placeholder="repo-name" id="search-term"
+                           class="repo-name-search hk-input br--left flex-auto relative z-1 ember-text-field ember-view"
+                           type="search">
+                    <button id="searchRepository" class="br--right bl-0 async-button fulfilled hk-button--primary ember-view"
+                            type="submit"> Search
+                    </button>
+                </div>
             </div>
-        </div>
 
 
-    </form>
+        </form>
+    </div>
 </div>
 
 </body>
