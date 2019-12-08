@@ -63,7 +63,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $( document ).on( "click", ".connectButton", function() {
         const $repositoryName = $(this).closest(".b--light-silver").find('span');
         const repositoryName = $repositoryName.text();
-        $http.post("/createWebHook", repositoryName).then(function (response) {
+        const data = {
+            repositoryName: repositoryName
+        };
+        $http.post("/createWebHook", data).then(function (response) {
             $repositoryName.attr('data-webHookId', response.data.id);
             $repositoryName.attr('data-webHookUrl', response.data.url);
             }, function (error) {
