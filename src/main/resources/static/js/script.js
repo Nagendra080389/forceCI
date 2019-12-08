@@ -45,7 +45,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         '                    </use>\n' +
                         '                </svg>\n' +
                         '\n' +
-                        '                <span class="repoFullName">'+response.data.items[i].full_name+'</span>\n' +
+                        '                <span class="repoFullName" data-repoName=" ' + response.data.items[i].name + '">'+response.data.items[i].full_name+'</span>\n' +
                         '                <div class="flex-auto"></div>\n' +
                         '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
                         '                </button>\n' +
@@ -62,7 +62,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $( document ).on( "click", ".connectButton", function() {
         const $repositoryName = $(this).closest(".b--light-silver").find('span');
-        const repositoryName = $repositoryName.text();
+        const repositoryName = $repositoryName.attr('data-repoName');
         const data = {
             active: true,
             repositoryName: repositoryName,
