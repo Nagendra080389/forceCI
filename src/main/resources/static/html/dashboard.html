@@ -68,7 +68,7 @@
     </div>-->
 
     <div class="github-linker ember-view">
-        <form>
+        <form ng-submit="submit()">
             <p><b>Search for a repository to connect to</b></p>
 
             <div class="org-selection">
@@ -87,7 +87,7 @@
                            class="repo-name-search hk-input br--left flex-auto relative z-1 ember-text-field ember-view"
                            type="search">
                     <button id="searchRepository" class="br--right bl-0 async-button fulfilled hk-button--primary ember-view"
-                            type="submit" ng-submit="fetchRepo()"> Search
+                            type="submit"> Search
                     </button>
                 </div>
             </div>
