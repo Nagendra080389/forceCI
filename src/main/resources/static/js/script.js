@@ -45,12 +45,12 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         '                    </use>\n' +
                         '                </svg>\n' +
                         '\n' +
-                        '                <span>'+response.data.items[i].full_name+'</span>\n' +
+                        '                <span ng-model="repoNameToConnect">'+response.data.items[i].full_name+'</span>\n' +
                         '                <div class="flex-auto"></div>\n' +
-                        '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view" type="submit">    Connect\n' +
+                        '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view" type="button" ng-click="createWebHook()">    Connect\n' +
                         '                </button>\n' +
                         '            </div>';
-                    $('#repoDialog').appendChild(eachNewDiv);
+                    $('#repoDialog').append(eachNewDiv);
                 }
                 $('#repoDialog').removeClass('hidden');
 
@@ -58,7 +58,11 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
             });
         }
-    }
+    };
+
+    $scope.createWebHook = function () {
+        console.log($scope.repoNameToConnect);
+    };
 
     function listRepositoryErrorCallback(error) {
     }
