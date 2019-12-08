@@ -29,8 +29,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.fetchRepo = function () {
         if ($scope.repoName) {
-            const createSearchAPI = $scope.repoName +' in:name+user:'+localStorage.getItem('githubOwner')+'+fork:true';
-            $http.get("/fetchRepository"+"?q="+createSearchAPI).then(function (response) {
+            $http.get("/fetchRepository"+"?repoName="+$scope.repoName+"&"+"repoUser="+localStorage.getItem('githubOwner')).then(function (response) {
                 console.log(response);
             }, function (error) {
 

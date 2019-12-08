@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -226,15 +227,19 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/fetchRepository", method = RequestMethod.GET)
-    public String getRepositoryByName(@RequestParam String q, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+    public String getRepositoryByName(@RequestParam String repoName, @RequestParam String repoUser, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
         Cookie[] cookies = request.getCookies();
         Gson gson = new Gson();
         String lstRepo = "";
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("ACCESS_TOKEN")) {
                 String accessToken = cookie.getValue();
-                System.out.println("q -> "+q);
-                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+q);
+                System.out.println("repoName -> "+repoName);
+                System.out.println("repoUser -> "+repoUser);
+                String queryParam = repoName +" in:name+user:"+repoUser+"+fork:true";
+                queryParam = URLEncoder.encode(queryParam, "UTF-8");
+                System.out.println("queryParam -> "+queryParam);
+                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+queryParam);
                 getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
                 HttpClient httpClient = new HttpClient();
                 int intStatusOk = httpClient.executeMethod(getRepoByName);
