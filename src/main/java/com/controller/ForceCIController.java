@@ -234,11 +234,7 @@ public class ForceCIController {
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("ACCESS_TOKEN")) {
                 String accessToken = cookie.getValue();
-                System.out.println("repoName -> "+repoName);
-                System.out.println("repoUser -> "+repoUser);
                 String queryParam = repoName +" in:name+user:"+repoUser+"+fork:true";
-                System.out.println("queryParam -> "+queryParam);
-                queryParam = URLEncoder.encode(queryParam, "UTF-8");
                 System.out.println("queryParam -> "+queryParam);
                 GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+queryParam);
                 getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
