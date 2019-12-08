@@ -24,6 +24,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -225,14 +226,14 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/fetchRepository", method = RequestMethod.GET)
-    public String getRepositoryByName(@RequestBody String createSearchAPI, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+    public String getRepositoryByName(@RequestParam String q, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
         Cookie[] cookies = request.getCookies();
         Gson gson = new Gson();
         String lstRepo = "";
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("ACCESS_TOKEN")) {
                 String accessToken = cookie.getValue();
-                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+createSearchAPI);
+                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+q);
                 getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
                 HttpClient httpClient = new HttpClient();
                 int intStatusOk = httpClient.executeMethod(getRepoByName);
