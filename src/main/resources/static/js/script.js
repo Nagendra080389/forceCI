@@ -45,7 +45,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         '                    </use>\n' +
                         '                </svg>\n' +
                         '\n' +
-                        '                <span class="repoFullName" ng-model="repoNameToConnect">'+response.data.items[i].full_name+'</span>\n' +
+                        '                <span class="repoFullName">'+response.data.items[i].full_name+'</span>\n' +
                         '                <div class="flex-auto"></div>\n' +
                         '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
                         '                </button>\n' +
@@ -61,7 +61,16 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     };
 
     $( document ).on( "click", ".connectButton", function() {
-        console.log( $( this ).text() );
+        const $repositoryName = $(this).closest(".b--light-silver").find('span');
+        const repositoryName = $repositoryName.text();
+        $http.post("/createWebHook", repositoryName).then(function (response) {
+            $repositoryName.attr('data-webHookId', response.data.id);
+            $repositoryName.attr('data-webHookUrl', response.data.url);
+            }, function (error) {
+                console.log(error);
+            }
+        );
+
     });
     
     function listRepositoryErrorCallback(error) {

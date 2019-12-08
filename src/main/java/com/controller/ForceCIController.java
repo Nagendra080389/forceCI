@@ -4,6 +4,7 @@ import com.dao.RepositoryWrapperMongoRepository;
 import com.google.gson.reflect.TypeToken;
 import com.model.*;
 import com.google.gson.*;
+import com.utils.ApiSecurity;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
@@ -50,6 +51,9 @@ public class ForceCIController {
 
     @Value("${application.redirectURI}")
     String redirectURI;
+
+    @Value("${application.hmacSecretKet}")
+    String hmacSecretKet;
 
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
@@ -281,8 +285,9 @@ public class ForceCIController {
             events.add("pull_request");
             createWebhookPayload.setEvents(events);
             Config config = new Config();
-            config.setContentType("json");
-            config.setUrl("https://forceci.herokuapp.com/" + repository.getRepositoryName());
+            config.setContent_type("json");
+            config.setSecret(ApiSecurity.getHashValue(hmacSecretKet, repository.getRepositoryName()));
+            config.setUrl("https://forceci.herokuapp.com/hooks/github");
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
             System.out.println("gson.toJson(createWebhookPayload) -> " + gson.toJson(createWebhookPayload));
@@ -291,8 +296,6 @@ public class ForceCIController {
             httpClient.executeMethod(createWebHook);
             JsonParser jsonParser = new JsonParser();
             JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
-            System.out.println("createWebHook -> " + createWebHook.getRequestEntity().getContentType());
-            System.out.println(" parse---> " + parse);
             returnResponse = gson.toJson(parse);
         }
 

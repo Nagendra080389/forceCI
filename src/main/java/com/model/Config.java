@@ -17,9 +17,8 @@ public class Config {
 
     private String insecure_ssl;
 
-    private String contentType;
-
     private String url;
+    private String secret;
 
     public String getContent_type() {
         return content_type;
@@ -37,19 +36,19 @@ public class Config {
         this.insecure_ssl = insecure_ssl;
     }
 
-    public String getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 }
