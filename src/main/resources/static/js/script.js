@@ -5,6 +5,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
+            localStorage.setItem('githubOwner', response.data.login);
             const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
                 'nudge-right--4 pe-none" style="top: -15px">\n' +
             '          <img src='+response.data.avatar_url+'>\n' +
@@ -22,7 +23,18 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 foundRepository.push(response.data.lstRepositories[index]);
             }
             $scope.lstRepositoryData = foundRepository;
-            localStorage.setItem('githubOwner', response.data.ownerId);
+
+        }
+    }
+
+    $scope.fetchRepo = function () {
+        if ($scope.repoName) {
+            const createSearchAPI = $scope.repoName +'in:name+user:'+localStorage.getItem('githubOwner')+'fork:true';
+            $http.get("/fetchRepository", createSearchAPI).then(function (response) {
+
+            }, function (error) {
+
+            });
         }
     }
 

@@ -83,11 +83,11 @@
             <div class="repo-selection">
                 <!---->
                 <div class="flex">
-                    <input placeholder="repo-name" id="search-term"
+                    <input placeholder="repo-name" id="search-term" ng-model="repoName"
                            class="repo-name-search hk-input br--left flex-auto relative z-1 ember-text-field ember-view"
                            type="search">
                     <button id="searchRepository" class="br--right bl-0 async-button fulfilled hk-button--primary ember-view"
-                            type="submit"> Search
+                            type="submit" ng-submit="fetchRepo()"> Search
                     </button>
                 </div>
             </div>

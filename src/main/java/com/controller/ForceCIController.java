@@ -224,6 +224,32 @@ public class ForceCIController {
         return loginNameAndAvatar;
     }
 
+    @RequestMapping(value = "/fetchRepository", method = RequestMethod.GET)
+    public String getRepositoryByName(@RequestBody String createSearchAPI, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+        Cookie[] cookies = request.getCookies();
+        Gson gson = new Gson();
+        String lstRepo = "";
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("ACCESS_TOKEN")) {
+                String accessToken = cookie.getValue();
+                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+createSearchAPI);
+                getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
+                HttpClient httpClient = new HttpClient();
+                int intStatusOk = httpClient.executeMethod(getRepoByName);
+                if(intStatusOk == HTTP_STATUS_OK) {
+                    Type listOfGitRepository = new TypeToken<ArrayList<GitRepository>>() {}.getType();
+                    List<GitRepository> lstGitRepos = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), "UTF-8"), listOfGitRepository);
+                    lstRepo = gson.toJson(lstGitRepos);
+                }
+            }
+        }
+        return lstRepo;
+    }
+
+
+
+
+
     @RequestMapping(value = "/modifyRepository", method = RequestMethod.POST)
     public Repository createFile(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
             request) {
