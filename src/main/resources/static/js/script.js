@@ -46,7 +46,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         '                    </use>\n' +
                         '                </svg>\n' +
                         '\n' +
-                        '                <span class="repoFullName" data-repoName="'+ response.data.items[i].name + '" data-repoId="'+ response.data.items[i].id + '">'+response.data.items[i].full_name+'</span>\n' +
+                        '                <span class="repoFullName" data-repoName="'+ response.data.items[i].name + '" data-repoId="'+ response.data.items[i].id + '" ' +
+                        'data-repoUrl="'+ response.data.items[i].name + '" data-ownerAvatarUrl="'+ response.data.items[i].owner.avatar_url + '" data-ownerlogin="'+ response.data.items[i].owner.login + '" ' +
+                        'data-htmlUrl="'+ response.data.items[i].owner.html_url + '">'+response.data.items[i].full_name+'</span>\n' +
                         '                <div class="flex-auto"></div>\n' +
                         '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
                         '                </button>\n' +
@@ -65,17 +67,27 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         const $repositoryName = $(this).closest(".b--light-silver").find('span');
         const repositoryName = $repositoryName.attr('data-repoName');
         const repositoryId = $repositoryName.attr('data-repoId');
+        const repositoryURL = $repositoryName.attr('data-repoUrl');
+        const repositoryOwnerAvatarUrl = $repositoryName.attr('data-ownerAvatarUrl');
+        const repositoryOwnerLogin = $repositoryName.attr('data-ownerlogin');
+        const htmlURL = $repositoryName.attr('data-htmlUrl');
         const repositoryFullName = $repositoryName.text();
         const data = {
             active: true,
             repositoryName: repositoryName,
             repositoryId: repositoryId,
-            full_name: repositoryFullName,
+            repositoryURL: repositoryURL,
+            repositoryOwnerAvatarUrl: repositoryOwnerAvatarUrl,
+            repositoryOwnerLogin: repositoryOwnerLogin,
+            repositoryFullName: repositoryFullName,
+            htmlURL: htmlURL,
             owner: localStorage.getItem('githubOwner')
         };
         $http.post("/createWebHook", data).then(function (response) {
-            $repositoryName.attr('data-webHookId', response.data.id);
-            $repositoryName.attr('data-webHookUrl', response.data.url);
+            $repositoryName.attr('data-webHookId', response.data.webHook.id);
+            $repositoryName.attr('data-webHookUrl', response.data.webHook.url);
+            $repositoryName.closest(".b--light-silver").remove();
+            $scope.lstRepositoryData.push(response.data);
             }, function (error) {
                 console.log(error);
             }

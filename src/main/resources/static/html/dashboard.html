@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://www.herokucdn.com/purple3/latest/purple3.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/js/iziModal.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css" rel="stylesheet">
+    <link href="../css/styleDashboard.css" rel="stylesheet"/>
     <link href="../css/style.css" rel="stylesheet"/>
     <script src="../js/pace/pace.min.js"></script>
     <link href="../css/pace/pace-theme-center-circle.css" rel="stylesheet">
@@ -97,6 +98,80 @@
         <div class="flex flex-column hk-hide-bb-last-row pt2 hidden" id="repoDialog">
 
         </div>
+
+        <li id="ember347" class="deploy-github list-group-item ember-view" style="margin-top: 15px">
+            <div class="panel-section ">
+                <div class="section-description">
+                    <div class="section-title f3 purple" role="heading" aria-level="3">
+                        Github Repo connected with ForceCI
+                    </div>
+                </div>
+
+                <div class="panel-content">
+                    <ul class="list-group" id="github-is-connected">
+                        <li class="list-group-item" ng-repeat="eachData in lstRepositoryData">
+                            <div class="ember-view">
+                                <div class="github-connection overflow-hidden shadow-outer-1 br2">
+                                    <div class="flex pa3 pv2 bg-white items-center">
+                                        <span class="flex-auto">
+                                          Connected to
+                                          <a href="{{eachData.repositoryURL}}" class="hk-link mr1 no-underline">
+
+                                        <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="repo-16" class="icon malibu-icon ml--2 fill-blue">
+                                          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#repo-16">
+                                            <title></title>
+                                          </use>
+                                        </svg>
+                                            <span class="underline">{{eachData.repositoryFullName}}</span>
+                                          </a>
+                                            by
+                                            <img src="{{eachData.repositoryOwnerAvatarUrl}}" alt="Nagendra080389" class="h1 w1 br4 ml1">
+                                            <a href="{{eachData.ownerHtmlUrl}}" class="hk-link">{{eachData.owner}}</a>
+                                        </span>
+                                        <button class="hk-button-sm--danger" type="button" ng-click="disconnectRepo(eachData)">
+                                            Disconnect...
+                                        </button>
+                                    </div>
+
+                                    <!---->
+                                    <ul class="list pa3 pt2 f5 dark-gray bg-near-white bt b--silver">
+                                        <li class="flex items-center pt1">
+
+                                            <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="git-commit-16"
+                                                 class="icon malibu-icon mr2 nudge-up--1 malibu-fill-gradient-dark-gray">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#git-commit-16">
+                                                    <title></title>
+                                                </use>
+                                            </svg>
+                                        </li>
+                                        <li class="flex items-center pt1">
+
+                                            <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="auto-16"
+                                                 class="icon malibu-icon mr2 nudge-up--1 malibu-fill-gradient-dark-gray">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#auto-16">
+                                                    <title></title>
+                                                </use>
+                                            </svg>
+
+                                            <span>Automatically deploys from <code>
+                                                <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="git-branch-16" class="icon malibu-icon nudge-up--1 fill-dark-gray">
+                                                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#git-branch-16">
+                                                    <title></title>
+                                                  </use>
+                                                </svg>
+                                               master</code>
+                                            </span>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </li>
     </div>
 </div>
 

@@ -227,14 +227,13 @@ public class ForceCIController {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), "UTF-8"), WebHook.class);
                 repository.setWebHook(webHookResponse);
                 repository.setHmacSecret(hashValue);
-                returnResponse = gson.toJson(webHookResponse);
-                SwingUtilities.invokeLater(() -> {
-                    RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
-                    repositoryWrapper.setOwnerId(repository.getOwner());
-                    repositoryWrapper.setRepository(repository);
-                    repositoryWrapperMongoRepository.save(repositoryWrapper);
-                });
+                RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
+                repositoryWrapper.setOwnerId(repository.getOwner());
+                repositoryWrapper.setRepository(repository);
+                repositoryWrapperMongoRepository.save(repositoryWrapper);
+                returnResponse = gson.toJson(repository);
             }
+
         }
 
         return returnResponse;

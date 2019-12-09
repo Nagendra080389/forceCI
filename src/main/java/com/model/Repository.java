@@ -5,13 +5,17 @@ import java.util.List;
 
 public class Repository implements Serializable {
     private String repositoryId;
+    private String repositoryURL;
+    private String repositoryOwnerAvatarUrl;
+    private String repositoryOwnerLogin;
+    private String repositoryFullName;
     private String full_name;
     private String repositoryName;
-    private String repositoryUrl;
     private Boolean active;
     private String owner;
     private WebHook webHook;
     private String hmacSecret;
+    private String htmlURL;
 
 
     public String getFull_name() {
@@ -22,20 +26,52 @@ public class Repository implements Serializable {
         this.full_name = full_name;
     }
 
+    public String getRepositoryId() {
+        return repositoryId;
+    }
+
+    public void setRepositoryId(String repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+
+    public String getRepositoryURL() {
+        return repositoryURL;
+    }
+
+    public void setRepositoryURL(String repositoryURL) {
+        this.repositoryURL = repositoryURL;
+    }
+
+    public String getRepositoryOwnerAvatarUrl() {
+        return repositoryOwnerAvatarUrl;
+    }
+
+    public void setRepositoryOwnerAvatarUrl(String repositoryOwnerAvatarUrl) {
+        this.repositoryOwnerAvatarUrl = repositoryOwnerAvatarUrl;
+    }
+
+    public String getRepositoryOwnerLogin() {
+        return repositoryOwnerLogin;
+    }
+
+    public void setRepositoryOwnerLogin(String repositoryOwnerLogin) {
+        this.repositoryOwnerLogin = repositoryOwnerLogin;
+    }
+
+    public String getRepositoryFullName() {
+        return repositoryFullName;
+    }
+
+    public void setRepositoryFullName(String repositoryFullName) {
+        this.repositoryFullName = repositoryFullName;
+    }
+
     public String getRepositoryName() {
         return repositoryName;
     }
 
     public void setRepositoryName(String repositoryName) {
         this.repositoryName = repositoryName;
-    }
-
-    public String getRepositoryUrl() {
-        return repositoryUrl;
-    }
-
-    public void setRepositoryUrl(String repositoryUrl) {
-        this.repositoryUrl = repositoryUrl;
     }
 
     public Boolean getActive() {
@@ -68,5 +104,13 @@ public class Repository implements Serializable {
 
     public void setHmacSecret(String hmacSecret) {
         this.hmacSecret = hmacSecret;
+    }
+
+    public String getHtmlURL() {
+        return htmlURL;
+    }
+
+    public void setHtmlURL(String htmlURL) {
+        this.htmlURL = htmlURL;
     }
 }
