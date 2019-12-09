@@ -29,8 +29,14 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
 
     $scope.disconnectRepo = function(eachData){
-
-    }
+        if(eachData.repositoryId) {
+            $http.delete("/deleteWebHook", eachData).then(function (response) {
+                console.log(response);
+            }, function (error) {
+                console.log(error);
+            })
+        }
+    };
 
     $scope.fetchRepo = function () {
         if ($scope.repoName) {

@@ -9,6 +9,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpHost;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.IOUtils;
@@ -194,6 +195,26 @@ public class ForceCIController {
             }
         }
         return lstRepo;
+    }
+
+    @RequestMapping(value = "/deleteWebHook", method = RequestMethod.DELETE)
+    public String deleteWebHook(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        Gson gson = new Gson();
+        int status = 0;
+
+        String accessToken = fetchCookies(request);
+        if (accessToken != null) {
+            DeleteMethod deleteWebHook = new DeleteMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" +
+                    repository.getRepositoryName() + "/hooks/"+repository.getRepositoryId());
+            deleteWebHook.setRequestHeader("Authorization", "token " + accessToken);
+            deleteWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
+            HttpClient httpClient = new HttpClient();
+            status = httpClient.executeMethod(deleteWebHook);
+        }
+
+        return gson.toJson(status);
     }
 
     @RequestMapping(value = "/createWebHook", method = RequestMethod.POST)
