@@ -28,6 +28,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
 
 
+    $scope.disconnectRepo = function(eachData){
+
+    }
 
     $scope.fetchRepo = function () {
         if ($scope.repoName) {
