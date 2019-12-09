@@ -1,31 +1,32 @@
 var app = angular.module('forceCIApp', []);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
-    //$http.get("/listRepository").then(listRepositoryCallback, listRepositoryErrorCallback);
-
+    $scope.reposInDB = [];
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
             localStorage.setItem('githubOwner', response.data.login);
+            $http.get("/fetchRepositoryInDB?gitHubUser="+response.data.login).then(function (response) {
+                console.log(response.data);
+            }, function (error) {
+
+            });
             const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
                 'nudge-right--4 pe-none" style="top: -15px">\n' +
-            '          <img src='+response.data.avatar_url+'>\n' +
-            '        </span>';
+                '          <img src='+response.data.avatar_url+'>\n' +
+                '        </span>';
             $(avatarSpanTag).insertAfter('#idSelectTab');
         }
     }, function (error) {
 
     });
+    $http.get("/listRepository").then(function (response) {
 
-    function listRepositoryCallback(response) {
-        var foundRepository = [];
-        if (response.data) {
-            for (var index = 0; index < response.data.lstRepositories.length; ++index) {
-                foundRepository.push(response.data.lstRepositories[index]);
-            }
-            $scope.lstRepositoryData = foundRepository;
+    }, function (error) {
 
-        }
-    }
+    });
+
+
+
 
     $scope.fetchRepo = function () {
         if ($scope.repoName) {
@@ -77,9 +78,6 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         );
 
     });
-    
-    function listRepositoryErrorCallback(error) {
-    }
 
     $scope.change = function (eachData) {
         var popMessage = '';

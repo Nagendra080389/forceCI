@@ -11,15 +11,16 @@ public class RepositoryWrapper implements Serializable {
 
     @Id
     private String id;
-    private List<Repository> lstRepositories;
+    private Repository repository;
     private String ownerId;
 
-    public List<Repository> getLstRepositories() {
-        return lstRepositories;
+
+    public Repository getRepository() {
+        return repository;
     }
 
-    public void setLstRepositories(List<Repository> lstRepositories) {
-        this.lstRepositories = lstRepositories;
+    public void setRepository(Repository repository) {
+        this.repository = repository;
     }
 
     public String getOwnerId() {

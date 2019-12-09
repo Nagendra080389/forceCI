@@ -9,6 +9,7 @@ public class Repository implements Serializable {
     private Boolean active;
     private String owner;
     private WebHook webHook;
+    private String hmacSecret;
 
     public String getRepositoryName() {
         return repositoryName;
@@ -48,5 +49,13 @@ public class Repository implements Serializable {
 
     public void setWebHook(WebHook webHook) {
         this.webHook = webHook;
+    }
+
+    public String getHmacSecret() {
+        return hmacSecret;
+    }
+
+    public void setHmacSecret(String hmacSecret) {
+        this.hmacSecret = hmacSecret;
     }
 }

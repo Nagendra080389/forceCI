@@ -7,10 +7,12 @@ import com.google.gson.*;
 import com.utils.ApiSecurity;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpHost;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -25,6 +27,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -54,6 +57,8 @@ public class ForceCIController {
 
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
+
+    public final static List<Integer> LIST_VALID_RESPONSE_CODES =  Arrays.asList(200, 201, 204, 207);
 
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
@@ -137,81 +142,19 @@ public class ForceCIController {
 
     }
 
-    @RequestMapping(value = "/listRepository", method = RequestMethod.GET)
-    public RepositoryWrapper getRepositoryList(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+    @RequestMapping(value = "/fetchRepositoryInDB", method = RequestMethod.GET)
+    public String getRepositoryList(@RequestParam String gitHubUser, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
         Gson gson = new Gson();
-        RepositoryWrapper repositoryWrapper = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("ACCESS_TOKEN")) {
-                String accessToken = cookie.getValue();
-                GetMethod getUserMethod = new GetMethod(GITHUB_API + "/user");
-                getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
-                HttpClient httpClient = new HttpClient();
-                int intStatusOk = httpClient.executeMethod(getUserMethod);
-                if(intStatusOk == HTTP_STATUS_OK) {
-                    JSONObject jsonResponse = new JSONObject(new JSONTokener(new InputStreamReader(getUserMethod.getResponseBodyAsStream())));
-                    if (jsonResponse.has("login")) {
-                        List<Repository> repositoryList = new ArrayList<>();
-                        String loginId = (String) jsonResponse.get("login");
-                        GetMethod getUserRepository = new GetMethod(GITHUB_API + "/users/" + loginId + "/repos");
-                        repositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(loginId);
-                        List<String> listOfRepositoryNameInDb = new ArrayList<>();
-                        if (repositoryWrapper != null) {
-                            for (Repository eachRepository : repositoryWrapper.getLstRepositories()) {
-                                listOfRepositoryNameInDb.add(eachRepository.getRepositoryName());
-                            }
-                        } else {
-                            repositoryWrapper = new RepositoryWrapper();
-                        }
-
-                        getUserRepository.setRequestHeader("Authorization", "token " + accessToken);
-                        httpClient = new HttpClient();
-                        httpClient.executeMethod(getUserRepository);
-                        for (Header requestHeader : getUserRepository.getResponseHeaders("Link")) {
-                            System.out.println("getUserRepository.getResponseHeaders() -> "+requestHeader.getName()+" - " + requestHeader.getValue());
-                        }
-                        Type listOfGitRepository = new TypeToken<ArrayList<GitRepository>>() {
-                        }.getType();
-                        List<GitRepository> lstGitRepos = gson.fromJson(IOUtils.toString(getUserRepository.getResponseBodyAsStream(), "UTF-8"), listOfGitRepository);
-                        for (GitRepository eachGitRepository : lstGitRepos) {
-                            String name = eachGitRepository.getName();
-                            if (!listOfRepositoryNameInDb.contains(name)) {
-                                Repository repository = new Repository();
-                                String htmlUrl = eachGitRepository.getHtml_url();
-                                GetMethod getWebHook = new GetMethod(GITHUB_API + "/repos/" + loginId + "/" + name + "/hooks");
-                                getWebHook.setRequestHeader("Authorization", "token " + accessToken);
-                                httpClient = new HttpClient();
-                                httpClient.executeMethod(getWebHook);
-
-                                Type listOfWebHooks = new TypeToken<ArrayList<WebHook>>() {
-                                }.getType();
-                                List<WebHook> webHookList = gson.fromJson(getWebHook.getResponseBodyAsString(), listOfWebHooks);
-                                for (WebHook webHook : webHookList) {
-                                    if (webHook.getName() != null && webHook.getName().contains("/forceCI/")) {
-                                        repository.setWebHook(webHook);
-                                    }
-                                }
-                                repository.setRepositoryName(name);
-                                repository.setRepositoryUrl(htmlUrl);
-                                repository.setActive(Boolean.FALSE);
-                                repositoryList.add(repository);
-                            }
-
-                        }
-                        repositoryWrapper.setLstRepositories(repositoryList);
-                        repositoryWrapper.setOwnerId(loginId);
-                        repositoryWrapperMongoRepository.save(repositoryWrapper);
-                    }
-                }
-            }
+        String reposOnDB = "";
+        List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(gitHubUser);
+        if(lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()){
+            reposOnDB = gson.toJson(lstRepositoryWrapper);
         }
-        return repositoryWrapper;
+        return reposOnDB;
     }
 
     @RequestMapping(value = "/fetchUserName", method = RequestMethod.GET)
     public String getUserName(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
-        RepositoryWrapper repositoryWrapper = null;
         Cookie[] cookies = request.getCookies();
         Gson gson = new Gson();
         String loginNameAndAvatar = "";
@@ -253,17 +196,6 @@ public class ForceCIController {
         return lstRepo;
     }
 
-
-    @RequestMapping(value = "/modifyRepository", method = RequestMethod.POST)
-    public Repository createFile(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
-            request) {
-        String accessToken = fetchCookies(request);
-
-        System.out.println("enabled ---> " + repository.getActive());
-        System.out.println("repositoryName ---> " + repository.getRepositoryName());
-        return repository;
-    }
-
     @RequestMapping(value = "/createWebHook", method = RequestMethod.POST)
     public String createWebHook(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
@@ -272,8 +204,6 @@ public class ForceCIController {
         String returnResponse = null;
 
         String accessToken = fetchCookies(request);
-
-        System.out.println("accessToken --> " + accessToken);
         if (accessToken != null) {
             PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" + repository.getRepositoryName() + "/hooks");
             createWebHook.setRequestHeader("Authorization", "token " + accessToken);
@@ -281,22 +211,30 @@ public class ForceCIController {
             CreateWebhookPayload createWebhookPayload = new CreateWebhookPayload();
             createWebhookPayload.setActive(repository.getActive());
             List<String> events = new ArrayList<>();
-            events.add("push");
-            events.add("pull_request");
+            events.add("*");
             createWebhookPayload.setEvents(events);
             Config config = new Config();
             config.setContent_type("json");
-            config.setSecret(ApiSecurity.getHashValue(hmacSecretKet, repository.getRepositoryName()));
+            String hashValue = ApiSecurity.getHashValue(hmacSecretKet, repository.getRepositoryName());
+            config.setSecret(hashValue);
             config.setUrl("https://forceci.herokuapp.com/hooks/github");
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
-            httpClient.executeMethod(createWebHook);
-            JsonParser jsonParser = new JsonParser();
-            System.out.println("createWebHook - > " + createWebHook.getResponseBodyAsString());
-            JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
-            returnResponse = gson.toJson(parse);
+            int status = httpClient.executeMethod(createWebHook);
+            if(LIST_VALID_RESPONSE_CODES.contains(status)) {
+                WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), "UTF-8"), WebHook.class);
+                repository.setWebHook(webHookResponse);
+                repository.setHmacSecret(hashValue);
+                returnResponse = gson.toJson(webHookResponse);
+                SwingUtilities.invokeLater(() -> {
+                    RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
+                    repositoryWrapper.setOwnerId(repository.getOwner());
+                    repositoryWrapper.setRepository(repository);
+                    repositoryWrapperMongoRepository.save(repositoryWrapper);
+                });
+            }
         }
 
         return returnResponse;
