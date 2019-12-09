@@ -1,6 +1,7 @@
 var app = angular.module('forceCIApp', []);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
+    $scope.lstRepositoryData = [];
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
