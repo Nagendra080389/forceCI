@@ -290,11 +290,11 @@ public class ForceCIController {
             config.setUrl("https://forceci.herokuapp.com/hooks/github");
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
-            System.out.println("gson.toJson(createWebhookPayload) -> " + gson.toJson(createWebhookPayload));
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
             httpClient.executeMethod(createWebHook);
             JsonParser jsonParser = new JsonParser();
+            System.out.println("createWebHook - > " + createWebHook.getResponseBodyAsString());
             JsonElement parse = jsonParser.parse(new InputStreamReader(createWebHook.getResponseBodyAsStream()));
             returnResponse = gson.toJson(parse);
         }
