@@ -2,6 +2,7 @@ package com.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Repository implements Serializable {
     private String repositoryId;
@@ -112,5 +113,29 @@ public class Repository implements Serializable {
 
     public void setHtmlURL(String htmlURL) {
         this.htmlURL = htmlURL;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Repository)) return false;
+        Repository that = (Repository) o;
+        return repositoryId.equals(that.repositoryId) &&
+                repositoryURL.equals(that.repositoryURL) &&
+                repositoryOwnerAvatarUrl.equals(that.repositoryOwnerAvatarUrl) &&
+                repositoryOwnerLogin.equals(that.repositoryOwnerLogin) &&
+                repositoryFullName.equals(that.repositoryFullName) &&
+                full_name.equals(that.full_name) &&
+                repositoryName.equals(that.repositoryName) &&
+                active.equals(that.active) &&
+                owner.equals(that.owner) &&
+                webHook.equals(that.webHook) &&
+                hmacSecret.equals(that.hmacSecret) &&
+                htmlURL.equals(that.htmlURL);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(repositoryId, repositoryURL, repositoryOwnerAvatarUrl, repositoryOwnerLogin, repositoryFullName, full_name, repositoryName, active, owner, webHook, hmacSecret, htmlURL);
     }
 }

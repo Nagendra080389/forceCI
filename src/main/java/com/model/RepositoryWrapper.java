@@ -1,6 +1,7 @@
 package com.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ public class RepositoryWrapper implements Serializable {
     @Id
     private String id;
     private Repository repository;
+    @Indexed
     private String ownerId;
 
 
@@ -30,4 +32,5 @@ public class RepositoryWrapper implements Serializable {
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
+
 }
