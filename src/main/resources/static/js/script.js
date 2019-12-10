@@ -34,8 +34,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 eachData.owner+"&webHookId="+eachData.webHook.id).then(function (response) {
                 console.log(response);
                 if(response.status === 200 && response.data === 204) {
-                    $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData));
-                    $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData));
+                    $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData), 1);
+                    $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData), 1);
                     if( $scope.lstRepositoryData.length === 0) {
                         $('#repoConnectedDialog').addClass('hidden');
                     }
@@ -53,7 +53,6 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.fetchRepo = function () {
         if ($scope.repoName) {
             $http.get("/fetchRepository"+"?repoName="+$scope.repoName+"&"+"repoUser="+localStorage.getItem('githubOwner')).then(function (response) {
-                console.log(response);
                 $('#repoDialog').empty();
                 for (let i = 0; i < response.data.items.length; i++) {
                     if(!$scope.reposInDB.includes(response.data.items[i].full_name)) {
