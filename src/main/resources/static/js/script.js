@@ -7,7 +7,13 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             $scope.userName = response.data.login;
             localStorage.setItem('githubOwner', response.data.login);
             $http.get("/fetchRepositoryInDB?gitHubUser="+response.data.login).then(function (response) {
-                console.log(response.data);
+                if(response.data.length > 0) {
+                    for (let i = 0; i < response.data.length; i++) {
+                        $scope.lstRepositoryData.push(response.data.repository[i]);
+                        $scope.reposInDB.push(response.data.repository[i].repositoryFullName);
+                    }
+                    $('#repoConnectedDialog').removeClass('hidden');
+                }
             }, function (error) {
 
             });
@@ -20,21 +26,17 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     }, function (error) {
 
     });
-    $http.get("/listRepository").then(function (response) {
-
-    }, function (error) {
-
-    });
-
 
 
     $scope.disconnectRepo = function(eachData){
         if(eachData.repositoryId) {
             $http.delete("/deleteWebHook?repositoryName="+eachData.repositoryName+"&repositoryOwner="+
-                eachData.owner+"&repositoryId="+eachData.repositoryId).then(function (response) {
+                eachData.owner+"&webHookId="+eachData.webhook.id).then(function (response) {
                 console.log(response);
+                iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook deleted successfully'});
             }, function (error) {
                 console.log(error);
+                iziToast.error({title: 'Error',message: 'Not able to delete WebHook, Please retry.',position: 'topRight'});
             })
         }
     };
@@ -44,27 +46,29 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             $http.get("/fetchRepository"+"?repoName="+$scope.repoName+"&"+"repoUser="+localStorage.getItem('githubOwner')).then(function (response) {
                 console.log(response);
                 for (let i = 0; i < response.data.items.length; i++) {
-                    const eachNewDiv = '<div class="bb b--light-silver pv2 flex-auto flex items-center">\n' +
-                        '\n' +
-                        '                <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="repo-16" class="icon malibu-icon fill-near-black nudge-down--1 mr1">\n' +
-                        '                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#repo-16">\n' +
-                        '                        <svg id="repo-16"\n' +
-                        '                             viewBox="0 0 16 16">\n' +
-                        '                            <path fill-rule="evenodd" d="M6 4v1h1V4H6zm0-2v1h1V2H6zM3 0c-.5 0-1 .5-1 1v12c0 .5.5 1 1 1h2v2l1.5-1.5L8 16v-2h5c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1H3zm9.5 13H8v-1H5v1H3.5c-.266 0-.5-.266-.5-.5V11h10v1.5c0 .25-.234.5-.5.5zM5 10V1h8.016L13 10H5zm1-2v1h1V8H6zm0-2v1h1V6H6z">\n' +
-                        '\n' +
-                        '                            </path></svg>\n' +
-                        '                        <title></title>\n' +
-                        '                    </use>\n' +
-                        '                </svg>\n' +
-                        '\n' +
-                        '                <span class="repoFullName" data-repoName="'+ response.data.items[i].name + '" data-repoId="'+ response.data.items[i].id + '" ' +
-                        'data-repoUrl="'+ response.data.items[i].name + '" data-ownerAvatarUrl="'+ response.data.items[i].owner.avatar_url + '" data-ownerlogin="'+ response.data.items[i].owner.login + '" ' +
-                        'data-htmlUrl="'+ response.data.items[i].owner.html_url + '">'+response.data.items[i].full_name+'</span>\n' +
-                        '                <div class="flex-auto"></div>\n' +
-                        '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
-                        '                </button>\n' +
-                        '            </div>';
-                    $('#repoDialog').append(eachNewDiv);
+                    if(!$scope.reposInDB.includes(response.data.items[i].full_name)) {
+                        const eachNewDiv = '<div class="bb b--light-silver pv2 flex-auto flex items-center">\n' +
+                            '\n' +
+                            '                <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="repo-16" class="icon malibu-icon fill-near-black nudge-down--1 mr1">\n' +
+                            '                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#repo-16">\n' +
+                            '                        <svg id="repo-16"\n' +
+                            '                             viewBox="0 0 16 16">\n' +
+                            '                            <path fill-rule="evenodd" d="M6 4v1h1V4H6zm0-2v1h1V2H6zM3 0c-.5 0-1 .5-1 1v12c0 .5.5 1 1 1h2v2l1.5-1.5L8 16v-2h5c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1H3zm9.5 13H8v-1H5v1H3.5c-.266 0-.5-.266-.5-.5V11h10v1.5c0 .25-.234.5-.5.5zM5 10V1h8.016L13 10H5zm1-2v1h1V8H6zm0-2v1h1V6H6z">\n' +
+                            '\n' +
+                            '                            </path></svg>\n' +
+                            '                        <title></title>\n' +
+                            '                    </use>\n' +
+                            '                </svg>\n' +
+                            '\n' +
+                            '                <span class="repoFullName" data-repoName="' + response.data.items[i].name + '" data-repoId="' + response.data.items[i].id + '" ' +
+                            'data-repoUrl="' + response.data.items[i].name + '" data-ownerAvatarUrl="' + response.data.items[i].owner.avatar_url + '" data-ownerlogin="' + response.data.items[i].owner.login + '" ' +
+                            'data-htmlUrl="' + response.data.items[i].owner.html_url + '">' + response.data.items[i].full_name + '</span>\n' +
+                            '                <div class="flex-auto"></div>\n' +
+                            '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
+                            '                </button>\n' +
+                            '            </div>';
+                        $('#repoDialog').append(eachNewDiv);
+                    }
                 }
                 $('#repoDialog').removeClass('hidden');
 
@@ -95,12 +99,13 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             owner: localStorage.getItem('githubOwner')
         };
         $http.post("/createWebHook", data).then(function (response) {
-            $repositoryName.attr('data-webHookId', response.data.webHook.id);
-            $repositoryName.attr('data-webHookUrl', response.data.webHook.url);
             $repositoryName.closest(".b--light-silver").remove();
             $scope.lstRepositoryData.push(response.data);
+            $('#repoConnectedDialog').removeClass('hidden');
+            iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook created successfully'});
             }, function (error) {
                 console.log(error);
+                iziToast.error({title: 'Error',message: 'Not able to create WebHook, Please retry.',position: 'topRight'});
             }
         );
 

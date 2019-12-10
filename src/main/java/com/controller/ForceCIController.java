@@ -199,7 +199,7 @@ public class ForceCIController {
 
     @RequestMapping(value = "/deleteWebHook", method = RequestMethod.DELETE)
     public String deleteWebHook(@RequestParam String repositoryName, @RequestParam String repositoryOwner,
-                                @RequestParam String repositoryId, HttpServletResponse response, HttpServletRequest
+                                @RequestParam String webHookId, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
         Gson gson = new Gson();
@@ -207,8 +207,7 @@ public class ForceCIController {
 
         String accessToken = fetchCookies(request);
         if (accessToken != null) {
-            DeleteMethod deleteWebHook = new DeleteMethod(GITHUB_API + "/repos/" + repositoryOwner + "/" +
-                    repositoryName + "/hooks/"+repositoryId);
+            DeleteMethod deleteWebHook = new DeleteMethod(GITHUB_API + "/repos/" + repositoryOwner + "/" + repositoryName + "/hooks/"+webHookId);
             deleteWebHook.setRequestHeader("Authorization", "token " + accessToken);
             deleteWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             HttpClient httpClient = new HttpClient();

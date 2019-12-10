@@ -30,43 +30,6 @@
 <body ng-app="forceCIApp" ng-controller="orderFromController">
 
 <div id="repositoryRule">
-    <!--<div class="modal-dialog">
-        &lt;!&ndash; Modal content&ndash;&gt;
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-body">
-                    <table class="table table-sm table-inverse table-responsive table-striped">
-                        <thead>
-                        <tr>
-                            <th>SL No.</th>
-                            <th>Repository Name</th>
-                            <th>Active</th>
-                        </tr>
-                        </thead>
-                        <tr ng-repeat="eachData in lstRepositoryData">
-
-                            <td>{{$index + 1}}</td>
-                            <td>{{eachData.repositoryName}}</td>
-                            <td>
-                                <label class="switch">
-                                    <input id="activeRepositorySlider" ng-if="eachData.active == true" type="checkbox"
-                                           checked ng-model="eachData.active"
-                                           ng-change='change(eachData)'
-                                           dataid="{{eachData.webHookId}}" dataurl="{{eachData.webHookUrl}}">
-                                    <input id="inactiveRepositorySlider" ng-if="eachData.active == false"
-                                           type="checkbox" ng-model="eachData.active"
-                                           ng-change='change(eachData)'
-                                           dataid="{{eachData.webHookId}}" dataurl="{{eachData.webHookUrl}}">
-                                    <span class="slider round"></span>
-                                </label>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>-->
-
     <div class="github-linker ember-view">
         <form ng-submit="fetchRepo()">
             <p><b>Search for a repository to connect to</b></p>
@@ -98,7 +61,7 @@
 
         </div>
 
-        <li id="ember347" class="deploy-github list-group-item ember-view" style="margin-top: 15px">
+        <li id="repoConnectedDialog" class="deploy-github list-group-item ember-view hidden" style="margin-top: 15px">
             <div class="panel-section ">
                 <div class="section-description">
                     <div class="section-title f3 purple" role="heading" aria-level="3">
