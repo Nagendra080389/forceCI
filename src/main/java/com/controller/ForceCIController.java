@@ -212,6 +212,10 @@ public class ForceCIController {
             deleteWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             HttpClient httpClient = new HttpClient();
             status = httpClient.executeMethod(deleteWebHook);
+            if(status == 201){
+                RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByRepositoryRepositoryName(repositoryName);
+                repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
+            }
         }
 
         return gson.toJson(status);
