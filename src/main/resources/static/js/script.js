@@ -35,7 +35,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 console.log(response);
                 if(response.status === 200 && response.data === 204) {
                     $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData), 1);
-                    $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData), 1);
+                    $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData.repositoryFullName), 1);
                     if( $scope.lstRepositoryData.length === 0) {
                         $('#repoConnectedDialog').addClass('hidden');
                     }
