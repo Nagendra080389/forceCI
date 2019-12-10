@@ -35,6 +35,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 console.log(response);
                 if(response.status === 200 && response.data === 204) {
                     $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData));
+                    $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData));
                     if( $scope.lstRepositoryData.length === 0) {
                         $('#repoConnectedDialog').addClass('hidden');
                     }
@@ -53,6 +54,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         if ($scope.repoName) {
             $http.get("/fetchRepository"+"?repoName="+$scope.repoName+"&"+"repoUser="+localStorage.getItem('githubOwner')).then(function (response) {
                 console.log(response);
+                $('#repoDialog').empty();
                 for (let i = 0; i < response.data.items.length; i++) {
                     if(!$scope.reposInDB.includes(response.data.items[i].full_name)) {
                         const eachNewDiv = '<div class="bb b--light-silver pv2 flex-auto flex items-center">\n' +
