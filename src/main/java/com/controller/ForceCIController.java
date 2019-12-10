@@ -212,7 +212,7 @@ public class ForceCIController {
             deleteWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             HttpClient httpClient = new HttpClient();
             status = httpClient.executeMethod(deleteWebHook);
-            if(status == 201){
+            if(status == 204){
                 RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByRepositoryRepositoryName(repositoryName);
                 System.out.println("byRepositoryRepositoryName - > "+byRepositoryRepositoryName);
                 System.out.println("repositoryName - > "+repositoryName);

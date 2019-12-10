@@ -33,9 +33,11 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             $http.delete("/deleteWebHook?repositoryName="+eachData.repositoryName+"&repositoryOwner="+
                 eachData.owner+"&webHookId="+eachData.webHook.id).then(function (response) {
                 console.log(response);
-                if(response === 201) {
+                if(response.status === 200 && response.data === 204) {
                     $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData));
                     iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook deleted successfully'});
+                } else {
+                    iziToast.error({title: 'Error',message: 'Not able to delete WebHook, Please retry.',position: 'topRight'});
                 }
             }, function (error) {
                 console.log(error);
