@@ -70,8 +70,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                             '                </svg>\n' +
                             '\n' +
                             '                <span class="repoFullName" data-repoName="' + response.data.items[i].name + '" data-repoId="' + response.data.items[i].id + '" ' +
-                            'data-repoUrl="' + response.data.items[i].name + '" data-ownerAvatarUrl="' + response.data.items[i].owner.avatar_url + '" data-ownerlogin="' + response.data.items[i].owner.login + '" ' +
-                            'data-htmlUrl="' + response.data.items[i].owner.html_url + '">' + response.data.items[i].full_name + '</span>\n' +
+                            'data-repoUrl="' + response.data.items[i].html_url + '" data-ownerAvatarUrl="' + response.data.items[i].owner.avatar_url + '" data-ownerlogin="' + response.data.items[i].owner.login + '" ' +
+                            'data-ownerHtmlUrl="' + response.data.items[i].owner.html_url + '">' + response.data.items[i].full_name + '</span>\n' +
                             '                <div class="flex-auto"></div>\n' +
                             '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
                             '                </button>\n' +
@@ -94,7 +94,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         const repositoryURL = $repositoryName.attr('data-repoUrl');
         const repositoryOwnerAvatarUrl = $repositoryName.attr('data-ownerAvatarUrl');
         const repositoryOwnerLogin = $repositoryName.attr('data-ownerlogin');
-        const htmlURL = $repositoryName.attr('data-htmlUrl');
+        const ownerHtmlUrl = $repositoryName.attr('data-ownerHtmlUrl');
         const repositoryFullName = $repositoryName.text();
         const data = {
             active: true,
@@ -104,7 +104,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             repositoryOwnerAvatarUrl: repositoryOwnerAvatarUrl,
             repositoryOwnerLogin: repositoryOwnerLogin,
             repositoryFullName: repositoryFullName,
-            htmlURL: htmlURL,
+            ownerHtmlUrl: ownerHtmlUrl,
             owner: localStorage.getItem('githubOwner')
         };
         $http.post("/createWebHook", data).then(function (response) {

@@ -16,7 +16,7 @@ public class Repository implements Serializable {
     private String owner;
     private WebHook webHook;
     private String hmacSecret;
-    private String htmlURL;
+    private String ownerHtmlUrl;
 
 
     public String getFull_name() {
@@ -107,12 +107,12 @@ public class Repository implements Serializable {
         this.hmacSecret = hmacSecret;
     }
 
-    public String getHtmlURL() {
-        return htmlURL;
+    public String getOwnerHtmlUrl() {
+        return ownerHtmlUrl;
     }
 
-    public void setHtmlURL(String htmlURL) {
-        this.htmlURL = htmlURL;
+    public void setOwnerHtmlUrl(String ownerHtmlUrl) {
+        this.ownerHtmlUrl = ownerHtmlUrl;
     }
 
     @Override
@@ -131,11 +131,11 @@ public class Repository implements Serializable {
                 owner.equals(that.owner) &&
                 webHook.equals(that.webHook) &&
                 hmacSecret.equals(that.hmacSecret) &&
-                htmlURL.equals(that.htmlURL);
+                ownerHtmlUrl.equals(that.ownerHtmlUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(repositoryId, repositoryURL, repositoryOwnerAvatarUrl, repositoryOwnerLogin, repositoryFullName, full_name, repositoryName, active, owner, webHook, hmacSecret, htmlURL);
+        return Objects.hash(repositoryId, repositoryURL, repositoryOwnerAvatarUrl, repositoryOwnerLogin, repositoryFullName, full_name, repositoryName, active, owner, webHook, hmacSecret, ownerHtmlUrl);
     }
 }
