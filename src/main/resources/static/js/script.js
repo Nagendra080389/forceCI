@@ -110,6 +110,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         $http.post("/createWebHook", data).then(function (response) {
             $repositoryName.closest(".b--light-silver").remove();
             $scope.lstRepositoryData.push(response.data);
+            $scope.reposInDB.push(response.data.repositoryFullName);
             $('#repoConnectedDialog').removeClass('hidden');
             iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook created successfully'});
             }, function (error) {
