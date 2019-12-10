@@ -20,6 +20,8 @@ import org.json.JSONTokener;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import spark.Request;
 
@@ -110,6 +112,32 @@ public class ForceCIController {
         httpResponse.addCookie(session2);
         httpResponse.sendRedirect("/html/dashboard.html");
 
+    }
+
+    @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
+    public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent, @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) {
+        Gson gson = new Gson();
+
+        // if signature is empty return 401
+        if (!StringUtils.hasText(signature)) {
+            return gson.toJson(HttpStatus.FORBIDDEN);
+        }
+
+        System.out.println(signature);
+        System.out.println(payload);
+        System.out.println(githubEvent);
+        GHEventPayload ghEventPayload = gson.fromJson(payload, GHEventPayload.class);
+
+        switch (githubEvent){
+            case "pull_request" :
+                System.out.println(ghEventPayload);
+                break;
+            case "push":
+                System.out.println(ghEventPayload);
+                break;
+        }
+
+        return gson.toJson("");
     }
 
     @RequestMapping(value = "/event_handler", method = RequestMethod.GET)
