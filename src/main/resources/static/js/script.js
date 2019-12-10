@@ -9,8 +9,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             $http.get("/fetchRepositoryInDB?gitHubUser="+response.data.login).then(function (response) {
                 if(response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
-                        $scope.lstRepositoryData.push(response.data.repository[i]);
-                        $scope.reposInDB.push(response.data.repository[i].repositoryFullName);
+                        $scope.lstRepositoryData.push(response.data[i].repository);
+                        $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
                     }
                     $('#repoConnectedDialog').removeClass('hidden');
                 }
