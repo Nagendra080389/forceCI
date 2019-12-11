@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.model.*;
 import com.google.gson.*;
 import com.utils.ApiSecurity;
+import org.apache.commons.codec.digest.HmacUtils;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpHost;
@@ -117,23 +118,24 @@ public class ForceCIController {
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
     public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent, @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) {
         Gson gson = new Gson();
-
+        System.out.println("System.getenv(\"GHSecretKey\") - > "+ System.getenv("GHSecretKey"));
         // if signature is empty return 401
         if (!StringUtils.hasText(signature)) {
             return gson.toJson(HttpStatus.FORBIDDEN);
         }
 
-        System.out.println(signature);
-        System.out.println(payload);
-        System.out.println(githubEvent);
-        GHEventPayload ghEventPayload = gson.fromJson(payload, GHEventPayload.class);
+        System.out.println(" signature - > " + signature);
+        System.out.println(" payload - > " +payload);
+        System.out.println(" githubEvent - > " +githubEvent);
+
+        JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
 
         switch (githubEvent){
             case "pull_request" :
-                System.out.println(ghEventPayload);
+                System.out.println(jsonObject);
                 break;
             case "push":
-                System.out.println(ghEventPayload);
+                System.out.println(jsonObject);
                 break;
         }
 
@@ -268,8 +270,8 @@ public class ForceCIController {
             createWebhookPayload.setEvents(events);
             Config config = new Config();
             config.setContent_type("json");
-            String hashValue = ApiSecurity.getHashValue(hmacSecretKet, repository.getRepositoryName());
-            config.setSecret(hashValue);
+            String randomString = ApiSecurity.generateSafeToken();
+            config.setSecret(randomString);
             config.setUrl("https://forceci.herokuapp.com/hooks/github");
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
@@ -279,7 +281,7 @@ public class ForceCIController {
             if(LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), "UTF-8"), WebHook.class);
                 repository.setWebHook(webHookResponse);
-                repository.setHmacSecret(hashValue);
+                repository.setHmacSecret(randomString);
                 RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
                 repositoryWrapper.setOwnerId(repository.getOwner());
                 repositoryWrapper.setRepository(repository);

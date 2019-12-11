@@ -1,27 +1,18 @@
 package com.utils;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 public class ApiSecurity {
-    public static String getHashValue(String secret, String message) {
-        String hash = "";
-        try {
 
-            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
-            sha256_HMAC.init(secret_key);
-
-            hash = Base64.encodeBase64String(sha256_HMAC.doFinal(message.getBytes()));
-        }
-        catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-
-        return hash;
+    public static String generateSafeToken() {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[20];
+        random.nextBytes(bytes);
+        Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+        return encoder.encodeToString(bytes);
     }
-
 }
