@@ -118,21 +118,17 @@ public class ForceCIController {
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
     public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent, @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) {
         Gson gson = new Gson();
-        System.out.println("System.getenv(\"GHSecretKey\") - > "+ System.getenv("GHSecretKey"));
         // if signature is empty return 401
         if (!StringUtils.hasText(signature)) {
             return gson.toJson(HttpStatus.FORBIDDEN);
         }
-
-        System.out.println(" signature - > " + signature);
-        System.out.println(" payload - > " +payload);
-        System.out.println(" githubEvent - > " +githubEvent);
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
 
         switch (githubEvent){
             case "pull_request" :
                 System.out.println(jsonObject);
+                start_deployment(jsonObject.get("pull_request").getAsJsonObject());
                 break;
             case "push":
                 System.out.println(jsonObject);
