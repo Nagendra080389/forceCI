@@ -1,23 +1,19 @@
 package com.controller;
 
 import com.dao.RepositoryWrapperMongoRepository;
-import com.google.gson.reflect.TypeToken;
+import com.dao.UserWrapperMongoRepository;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.model.*;
-import com.google.gson.*;
 import com.utils.ApiSecurity;
-import org.apache.commons.codec.digest.HmacUtils;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpHost;
-import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.conn.params.ConnRoutePNames;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,20 +27,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.*;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
 import static org.kohsuke.github.GHDeploymentState.SUCCESS;
-import static spark.Spark.get;
-import static spark.Spark.post;
 
 @RestController
 public class ForceCIController {
@@ -66,6 +54,9 @@ public class ForceCIController {
 
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
+
+    @Autowired
+    private UserWrapperMongoRepository userWrapperMongoRepository;
 
     private static final String GITHUB_API = "https://api.github.com";
 
@@ -126,6 +117,10 @@ public class ForceCIController {
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
+        if(!StringUtils.hasText(access_token)){
+            String user = jsonObject.get("user").getAsJsonObject().get("login").getAsString();
+            access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
+        }
         System.out.println("access_token -> "+access_token);
         switch (githubEvent){
             case "pull_request" :
@@ -201,6 +196,10 @@ public class ForceCIController {
                 int intStatusOk = httpClient.executeMethod(getUserMethod);
                 if(intStatusOk == HTTP_STATUS_OK) {
                     GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), "UTF-8"), GitRepositoryUser.class);
+                    UserWrapper userWrapper = new UserWrapper();
+                    userWrapper.setAccess_token(accessToken);
+                    userWrapper.setOwnerId(gitRepositoryUser.getLogin());
+                    userWrapperMongoRepository.save(userWrapper);
                     loginNameAndAvatar = gson.toJson(gitRepositoryUser);
                 }
             }
@@ -352,10 +351,12 @@ public class ForceCIController {
     private static String fetchCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String accessToken = null;
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("ACCESS_TOKEN")) {
-                accessToken = cookie.getValue();
-                break;
+        if( cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("ACCESS_TOKEN")) {
+                    accessToken = cookie.getValue();
+                    break;
+                }
             }
         }
         return accessToken;
