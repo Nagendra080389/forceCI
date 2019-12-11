@@ -125,11 +125,15 @@ public class ForceCIController {
         }
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
-
+        String access_token = fetchCookies(request);
+        System.out.println("access_token -> "+access_token);
         switch (githubEvent){
             case "pull_request" :
-                System.out.println(jsonObject);
-                start_deployment(jsonObject.get("pull_request").getAsJsonObject(), "");
+                if ("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) &&
+                        !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
+                    System.out.println("A pull request was created! A validation should start now...");
+                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), access_token);
+                }
                 break;
             case "push":
                 System.out.println(jsonObject);
@@ -304,15 +308,9 @@ public class ForceCIController {
 
         try {
             GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
-            GHRepository repository = gitHub.getRepository(
-                    jsonObject.get("head").getAsJsonObject()
-                            .get("repo").getAsJsonObject()
-                            .get("full_name").getAsString());
-            GHDeployment deployment =
-                    new GHDeploymentBuilder(
-                            repository,
-                            jsonObject.get("head").getAsJsonObject().get("sha").getAsString()
-                    ).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
+            System.out.println("gitHub -> "+gitHub);
+            GHRepository repository = gitHub.getRepository(jsonObject.get("head").getAsJsonObject().get("repo").getAsJsonObject().get("full_name").getAsString());
+            GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
         } catch (IOException e) {
             e.printStackTrace();
         }
