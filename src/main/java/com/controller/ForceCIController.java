@@ -116,7 +116,8 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
-    public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent, @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) {
+    public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent,
+                           @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) {
         Gson gson = new Gson();
         // if signature is empty return 401
         if (!StringUtils.hasText(signature)) {
@@ -128,7 +129,7 @@ public class ForceCIController {
         switch (githubEvent){
             case "pull_request" :
                 System.out.println(jsonObject);
-                start_deployment(jsonObject.get("pull_request").getAsJsonObject());
+                start_deployment(jsonObject.get("pull_request").getAsJsonObject(), "");
                 break;
             case "push":
                 System.out.println(jsonObject);
@@ -140,23 +141,25 @@ public class ForceCIController {
 
     @RequestMapping(value = "/event_handler", method = RequestMethod.GET)
     public void webhookReceiver(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
-            request) throws Exception {
+            request, HttpServletRequest servletRequest) throws Exception {
 
         Request req = (Request) request;
         String payload = req.body();
         String x_github_event = req.headers("X-GITHUB-EVENT");
+
+        String access_token = fetchCookies(servletRequest);
 
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
 
         switch (x_github_event) {
             case "pull_request":
-                if ("closed".equalsIgnoreCase(jsonObject.get("action").getAsString()) &&
+                if ("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) &&
                         jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
 
                     System.out.println("A pull request was merged! A deployment should start now...");
 
-                    start_deployment(jsonObject.get("pull_request").getAsJsonObject());
+                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), access_token);
                 }
                 break;
             case "deployment":
@@ -291,7 +294,7 @@ public class ForceCIController {
     }
 
 
-    private static void start_deployment(JsonObject jsonObject) {
+    private static void start_deployment(JsonObject jsonObject, String access_token) {
         String user = jsonObject.get("user").getAsJsonObject().get("login").getAsString();
         Map<String, String> map = new HashMap<>();
         map.put("environment", "QA");
@@ -300,7 +303,7 @@ public class ForceCIController {
         String payload = gson.toJson(map);
 
         try {
-            GitHub gitHub = GitHubBuilder.fromEnvironment().build();
+            GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
             GHRepository repository = gitHub.getRepository(
                     jsonObject.get("head").getAsJsonObject()
                             .get("repo").getAsJsonObject()
@@ -349,8 +352,6 @@ public class ForceCIController {
     }
 
     private static String fetchCookies(HttpServletRequest request) {
-        String returnResponse = null;
-
         Cookie[] cookies = request.getCookies();
         String accessToken = null;
         for (Cookie cookie : cookies) {
