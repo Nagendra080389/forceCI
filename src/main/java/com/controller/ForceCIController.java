@@ -118,8 +118,10 @@ public class ForceCIController {
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
         if(!StringUtils.hasText(access_token)){
-            String user = jsonObject.get("user").getAsJsonObject().get("login").getAsString();
-            access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
+            if (jsonObject.has("pull_request")) {
+                String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
+                access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
+            }
         }
         System.out.println("access_token -> "+access_token);
         switch (githubEvent){
