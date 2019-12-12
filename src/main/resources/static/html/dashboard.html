@@ -75,7 +75,7 @@
 
         </div>
 
-        <li id="repoConnectedDialog" class="deploy-github list-group-item ember-view" style="margin-top: 15px">
+        <li id="repoConnectedDialog" class="deploy-github list-group-item ember-view hidden" style="margin-top: 15px">
             <div class="panel-section ">
                 <div class="section-description">
                     <div class="section-title f3 purple" role="heading" aria-level="3">
@@ -100,7 +100,7 @@
                                             <span class="underline">{{eachData.repositoryFullName}}</span>
                                           </a>
                                             by
-                                            <img src="{{eachData.repositoryOwnerAvatarUrl}}" alt="Nagendra080389" class="h1 w1 br4 ml1">
+                                            <img src="{{eachData.repositoryOwnerAvatarUrl}}" class="h1 w1 br4 ml1">
                                             <a href="{{eachData.ownerHtmlUrl}}" class="hk-link">{{eachData.owner}}</a>
                                         </span>
                                     <button class="hk-button-sm--danger" type="button" ng-click="disconnectRepo(eachData)">
