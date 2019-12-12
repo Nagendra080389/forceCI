@@ -6,15 +6,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-    <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet prefetch" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.1/animate.min.css">
     <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://www.herokucdn.com/purple3/latest/purple3.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/js/iziModal.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/izimodal/1.5.1/css/iziModal.min.css" rel="stylesheet">
     <link href="../css/style.css" rel="stylesheet"/>
@@ -25,6 +24,21 @@
     <script src="../js/script.js"></script>
 
 
+    <style>
+
+        .panel-heading .accordion-toggle:after {
+            /* symbol for "opening" panels */
+            font-family: 'Glyphicons Halflings'; /* essential for enabling glyphicon */
+            content: "\e114"; /* adjust as needed, taken from bootstrap.css */
+            float: right; /* adjust as needed */
+            color: grey; /* adjust as needed */
+        }
+
+        .panel-heading .accordion-toggle.collapsed:after {
+            /* symbol for "collapsed" panels */
+            content: "\e080"; /* adjust as needed, taken from bootstrap.css */
+        }
+    </style>
 </head>
 
 <body ng-app="forceCIApp" ng-controller="orderFromController">
@@ -61,7 +75,7 @@
 
         </div>
 
-        <li id="repoConnectedDialog" class="deploy-github list-group-item ember-view hidden" style="margin-top: 15px">
+        <li id="repoConnectedDialog" class="deploy-github list-group-item ember-view" style="margin-top: 15px">
             <div class="panel-section ">
                 <div class="section-description">
                     <div class="section-title f3 purple" role="heading" aria-level="3">
@@ -71,10 +85,9 @@
 
                 <div class="panel-content">
                     <ul class="list-group" id="github-is-connected">
-                        <li class="list-group-item" ng-repeat="eachData in lstRepositoryData">
-                            <div class="ember-view">
-                                <div class="github-connection overflow-hidden shadow-outer-1 br2">
-                                    <div class="flex pa3 pv2 bg-white items-center">
+                        <div class="ember-view">
+                            <div class="github-connection overflow-hidden shadow-outer-1 br2">
+                                <div class="flex pa3 pv2 bg-white items-center">
                                         <span class="flex-auto">
                                           Connected to
                                           <a href="{{eachData.repositoryURL}}" class="hk-link mr1 no-underline">
@@ -90,13 +103,69 @@
                                             <img src="{{eachData.repositoryOwnerAvatarUrl}}" alt="Nagendra080389" class="h1 w1 br4 ml1">
                                             <a href="{{eachData.ownerHtmlUrl}}" class="hk-link">{{eachData.owner}}</a>
                                         </span>
-                                        <button class="hk-button-sm--danger" type="button" ng-click="disconnectRepo(eachData)">
-                                            Disconnect...
-                                        </button>
+                                    <button class="hk-button-sm--danger" type="button" ng-click="disconnectRepo(eachData)">
+                                        Disconnect...
+                                    </button>
+                                </div>
+                                <div class="panel-heading">
+                                    <a for="collapseOne accordion-toggle" data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Show SFDC
+                                        connections</a>
+                                    <div id="collapseOne" class="collapse mt3 panel-collapse">
+                                        <div class="row no-gutters pa3">
+                                            <div class="col-6 col-md-4">
+                                                <button type="button" class="btn btn-info" ng-click="createNewConnection();">Create New Connection</button>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-8">
+                                                <form>
+                                                    <div class="form-group row">
+                                                        <label for="inputOrgNamel3" class="col-sm-2 col-form-label">Name</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control" id="inputOrgNamel3" placeholder="Name" ng-model="sfdcOrg.OrgName">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="inputEnvironment3" class="col-sm-2 col-form-label">Environment</label>
+                                                        <div class="col-sm-10">
+                                                            <div class="dropdown bootstrap-select">
+                                                                <select class="form-control" id="inputEnvironment3" ng-model="sfdcOrg.Environment">
+                                                                    <option value="0" selected>Production/Developer</option>
+                                                                    <option value="1">Sandbox</option>
+                                                                    <option value="2">Custom Org</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="salesforceLoginl3" class="col-sm-2 col-form-label">Salesforce Login</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control" id="salesforceLoginl3" placeholder="Salesforce UserName" ng-model="sfdcOrg.UserName">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row"  ng-show="sfdcOrg.Environment === '2'">
+                                                        <label for="salesforceInstanceUrll3" class="col-sm-2 col-form-label">Instance Url</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control" id="salesforceInstanceUrll3" placeholder="Salesforce Instance Url" ng-model="sfdcOrg.InstanceURL" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-10">
+                                                                <button type="submit" class="btn btn-primary" ng-click="authorize();">Authorize</button>
+                                                                <button type="submit" class="btn btn-primary" ng-click="saveConnection();">Save</button>
+                                                                <button type="submit" class="btn btn-primary" ng-click="testConnection();">Test Connection</button>
+                                                                <button type="submit" class="btn btn-primary" ng-click="deleteConnection();">Delete</button>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
-                        </li>
+                        </div>
                     </ul>
 
                 </div>

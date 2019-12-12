@@ -2,6 +2,7 @@ var app = angular.module('forceCIApp', []);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
+    $scope.sfdcOrg = {};
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
@@ -120,6 +121,36 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         );
 
     });
+
+    $scope.authorize = function(){
+        console.log($scope.sfdcOrg);
+        let url = '';
+        if($scope.sfdcOrg) {
+            if ($scope.sfdcOrg.Environment === '0') {
+                url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.Environment;
+            } else if ($scope.sfdcOrg.Environment === '1') {
+                url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.Environment;
+            } else {
+                url = $scope.sfdcOrg.InstanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.Environment;
+            }
+            const newWindow = window.open(url, 'name', 'height=600,width=450,left=100,top=100');
+            if (window.focus) {
+                newWindow.focus();
+            }
+        }
+    };
+
+    $scope.createNewConnection = function(){
+        $scope.sfdcOrg = {
+            OrgName : '',
+            Environment : '',
+            UserName : '',
+            InstanceURL : ''
+        };
+    };
 
     $scope.change = function (eachData) {
         var popMessage = '';

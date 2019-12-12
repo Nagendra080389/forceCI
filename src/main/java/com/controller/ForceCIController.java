@@ -47,6 +47,17 @@ public class ForceCIController {
     @Value("${application.redirectURI}")
     String redirectURI;
 
+    @Value("${sfdc.clientId}")
+    String sfdcClientId;
+
+    @Value("${sfdc.clientSecret}")
+    String sfdcClientSecret;
+
+    @Value("${sfdc.redirectURI}")
+    String sfdcRedirectURI;
+
+
+
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
 
@@ -104,6 +115,73 @@ public class ForceCIController {
         httpResponse.addCookie(session2);
         httpResponse.sendRedirect("/html/dashboard.html");
 
+    }
+
+
+    @RequestMapping(value = "/sfdcAuth", method = RequestMethod.GET, params = {"code", "state"})
+    public void sfdcAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
+            request) throws Exception {
+
+        String environment = null;
+        System.out.println(" state -> "+state);
+        if (state.equals("0")) {
+            environment = "https://login.salesforce.com/services/oauth2/token";
+        } else if (state.contains("2")) {
+            environment = state + "/services/oauth2/token";
+        } else {
+            environment = "https://test.salesforce.com/services/oauth2/token";
+        }
+
+        System.out.println("environment -> " + environment);
+        HttpClient httpClient = new HttpClient();
+
+        PostMethod post = new PostMethod(environment);
+        post.addParameter("code", code);
+        post.addParameter("grant_type", "authorization_code");
+        post.addParameter("redirect_uri", sfdcRedirectURI);
+        post.addParameter("client_id", sfdcClientId);
+        post.addParameter("client_secret", sfdcClientSecret);
+
+        httpClient.executeMethod(post);
+        String responseBody = post.getResponseBodyAsString();
+
+        String accessToken = null;
+        String issuedAt = null;
+        String signature = null;
+        String id_token = null;
+        String instance_url = null;
+        String useridURL = null;
+        String username = null;
+        JsonParser parser = new JsonParser();
+
+        JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
+
+        try {
+
+            accessToken = jsonObject.get("access_token").getAsString();
+            instance_url = jsonObject.get("instance_url").getAsString();
+            useridURL = jsonObject.get("id").getAsString();
+
+            GetMethod getMethod = new GetMethod(useridURL);
+            getMethod.addRequestHeader("Authorization", "Bearer " + accessToken);
+            httpClient.executeMethod(getMethod);
+            String responseUserName = getMethod.getResponseBodyAsString();
+
+            try {
+                jsonObject = parser.parse(responseUserName).getAsJsonObject();
+                username = jsonObject.get("username").getAsString();
+            } catch (Exception e) {
+
+            } finally {
+                getMethod.releaseConnection();
+            }
+
+            System.out.println("jsonObject -> sfd -> "+jsonObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            post.releaseConnection();
+        }
     }
 
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
