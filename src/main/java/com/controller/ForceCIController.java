@@ -339,8 +339,10 @@ public class ForceCIController {
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
             Thread.sleep(20000L);
 
-            GHDeploymentStatus deploymentStatus2 = new GHDeploymentStatusBuilder(repository,
-                    jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), SUCCESS).create();
+            // This will happen only after validation is success
+
+           /* GHDeploymentStatus deploymentStatus2 = new GHDeploymentStatusBuilder(repository,
+                    jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), SUCCESS).create();*/
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
