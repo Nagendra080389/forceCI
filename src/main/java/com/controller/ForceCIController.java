@@ -117,7 +117,7 @@ public class ForceCIController {
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
-        System.out.println("access_token -> "+access_token);
+        System.out.println("githubEvent -> "+githubEvent);
         switch (githubEvent){
             case "pull_request" :
                 if(!StringUtils.hasText(access_token)){
@@ -141,6 +141,7 @@ public class ForceCIController {
                 process_deployment(jsonObject, access_token);
                 break;
         }
+        System.out.println("access_token -> "+access_token);
 
         return gson.toJson("");
     }
