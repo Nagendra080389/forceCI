@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -181,6 +182,18 @@ public class ForceCIController {
             e.printStackTrace();
         } finally {
             post.releaseConnection();
+        }
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        if(StringUtils.hasText(accessToken)){
+            Cookie accessTokenCookie = new Cookie("SFDC_ACCESS_TOKEN", accessToken);
+            Cookie userNameCookie = new Cookie("SFDC_USER_NAME", username);
+            httpResponse.addCookie(accessTokenCookie);
+            httpResponse.addCookie(userNameCookie);
+            accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            userNameCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            httpResponse.sendRedirect("/html/success.html");
+        } else {
+            httpResponse.sendRedirect("/html/error.html");
         }
     }
 
@@ -395,6 +408,8 @@ public class ForceCIController {
             GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
             System.out.println("gitHub -> "+gitHub);
             GHRepository repository = gitHub.getRepository(jsonObject.get("head").getAsJsonObject().get("repo").getAsJsonObject().get("full_name").getAsString());
+            GHDeploymentStatus deploymentStatus = new GHDeploymentStatusBuilder(repository,
+                    jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
             GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
         } catch (IOException e) {
             e.printStackTrace();

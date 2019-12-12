@@ -3,6 +3,19 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
     $scope.sfdcOrg = {};
+    let sfdcAccessTokenFromExternalPage;
+    let sfdcUserNameFromExternalPage;
+
+    window.addEventListener('message', function (objEvent) {
+        if(objEvent !== undefined && objEvent !== null &&
+            objEvent.data !== undefined && objEvent.data !== null &&
+            objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null
+            && objEvent.data.strDestinationId === 'OauthPayload'){
+            sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
+            sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
+        }
+    });
+
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
@@ -152,7 +165,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         };
     };
 
-    $scope.change = function (eachData) {
+    /*$scope.change = function (eachData) {
         var popMessage = '';
         if (eachData.active) {
             popMessage = 'Enabling this will add a WEBHOOK to this repository. Do you want to continue?'
@@ -205,5 +218,5 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     $scope.$apply();
                 }],]
         });
-    };
+    };*/
 });
