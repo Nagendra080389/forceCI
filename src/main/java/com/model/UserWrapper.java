@@ -50,16 +50,13 @@ public class UserWrapper implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof UserWrapper)) return false;
         UserWrapper that = (UserWrapper) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(ownerId, that.ownerId) &&
-                Objects.equals(access_token, that.access_token) &&
-                Objects.equals(token_type, that.token_type);
+        return Objects.equals(ownerId, that.ownerId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, ownerId, access_token, token_type);
+        return Objects.hash(ownerId);
     }
 }

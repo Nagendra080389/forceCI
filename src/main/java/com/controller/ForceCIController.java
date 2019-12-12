@@ -145,7 +145,7 @@ public class ForceCIController {
         return gson.toJson("");
     }
 
-    @RequestMapping(value = "/event_handler", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/event_handler", method = RequestMethod.GET)
     public void webhookReceiver(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request, HttpServletRequest servletRequest) throws Exception {
 
@@ -176,7 +176,7 @@ public class ForceCIController {
                 break;
         }
 
-    }
+    }*/
 
     @RequestMapping(value = "/fetchRepositoryInDB", method = RequestMethod.GET)
     public String getRepositoryList(@RequestParam String gitHubUser, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
