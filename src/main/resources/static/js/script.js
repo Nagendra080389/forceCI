@@ -136,7 +136,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 url = $scope.sfdcOrg.InstanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
                     'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.InstanceURL;
             }
-            const newWindow = window.open(url, 'name', 'height=600,width=450,left=100,top=100');
+            const newWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
             if (window.focus) {
                 newWindow.focus();
             }
