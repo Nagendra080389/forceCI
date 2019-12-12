@@ -117,15 +117,13 @@ public class ForceCIController {
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
-        if(!StringUtils.hasText(access_token)){
-            if (jsonObject.has("pull_request")) {
-                String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
-                access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
-            }
-        }
         System.out.println("access_token -> "+access_token);
         switch (githubEvent){
             case "pull_request" :
+                if(!StringUtils.hasText(access_token)){
+                    String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
+                    access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
+                }
                 if ("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
@@ -134,6 +132,13 @@ public class ForceCIController {
                 break;
             case "push":
                 System.out.println(jsonObject);
+                break;
+            case "deployment":
+                if(!StringUtils.hasText(access_token)){
+                    String user = jsonObject.get("repository").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString();
+                    access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
+                }
+                process_deployment(jsonObject, access_token);
                 break;
         }
 
@@ -164,7 +169,7 @@ public class ForceCIController {
                 }
                 break;
             case "deployment":
-                process_deployment(jsonObject);
+                process_deployment(jsonObject, access_token);
                 break;
             case "deployment_status":
                 update_deployment_status(jsonObject);
@@ -317,7 +322,7 @@ public class ForceCIController {
         }
     }
 
-    private static void process_deployment(JsonObject jsonObject) {
+    private static void process_deployment(JsonObject jsonObject, String access_token) {
         String payload_str = jsonObject.get("deployment").getAsJsonObject().get("payload").getAsString();
         Map payload = new Gson().fromJson(payload_str, Map.class);
 
@@ -326,13 +331,13 @@ public class ForceCIController {
 
         try {
             Thread.sleep(2000L);
-            GitHub gitHub = GitHubBuilder.fromEnvironment().build();
+            GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
             GHRepository repository = gitHub.getRepository(
                     jsonObject.get("repository").getAsJsonObject()
                             .get("full_name").getAsString());
             GHDeploymentStatus deploymentStatus = new GHDeploymentStatusBuilder(repository,
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
-            Thread.sleep(5000L);
+            Thread.sleep(20000L);
 
             GHDeploymentStatus deploymentStatus2 = new GHDeploymentStatusBuilder(repository,
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), SUCCESS).create();
