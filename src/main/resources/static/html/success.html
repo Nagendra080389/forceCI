@@ -14,7 +14,7 @@
                 sfdcAccessToken : sfdcAccessToken,
                 sfdcUserName : sfdcUserName
             };
-            window.postMessage(objOauth, window.location.origin);
+            window.opener.postMessage(objOauth, window.location.origin);
         })
     </script>
 </head>

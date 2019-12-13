@@ -6,16 +6,6 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
 
-    window.addEventListener('message', function (objEvent) {
-        if(objEvent !== undefined && objEvent !== null &&
-            objEvent.data !== undefined && objEvent.data !== null &&
-            objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null
-            && objEvent.data.strDestinationId === 'OauthPayload'){
-            sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
-            sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
-        }
-    });
-
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
@@ -153,16 +143,33 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             if (window.focus) {
                 newWindow.focus();
             }
+
+            const objGenericListener = function (objEvent) {
+                if(objEvent !== undefined && objEvent !== null &&
+                    objEvent.data !== undefined && objEvent.data !== null &&
+                    objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null
+                    && objEvent.data.strDestinationId === 'OauthPayload'){
+                    sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
+                    sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
+                    newWindow.close();
+                }
+            };
+            window.removeEventListener('message', objGenericListener);
+            window.addEventListener('message',objGenericListener );
         }
     };
 
     $scope.createNewConnection = function(){
+        $.removeCookie('SFDC_ACCESS_TOKEN');
+        $.removeCookie('SFDC_USER_NAME');
         $scope.sfdcOrg = {
             OrgName : '',
             Environment : '',
             UserName : '',
             InstanceURL : ''
         };
+        sfdcAccessTokenFromExternalPage = '';
+        sfdcUserNameFromExternalPage = '';
     };
 
     /*$scope.change = function (eachData) {
