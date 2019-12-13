@@ -4,10 +4,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.lstRepositoryData = [];
     $scope.lstSFDCConnectionData = [];
     $scope.sfdcOrg = {
-        OrgName: '',
-        Environment: '0',
-        UserName: '',
-        InstanceURL: '',
+        orgName: '',
+        environment: '0',
+        userName: '',
+        instanceURL: '',
         authorize: 'Authorize',
         save: 'Save',
         testConnection: 'Test Connection',
@@ -32,6 +32,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     objWindow.close();
                 }
                 $scope.sfdcOrg.oauthSuccess = 'true';
+                $scope.$apply();
             }
 
             if(objEvent.data.strDestinationId === 'OauthPayloadFailed'){
@@ -41,6 +42,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     objWindow.close();
                 }
                 $scope.sfdcOrg.oauthSuccess = 'false';
+                $scope.$apply();
             }
         }
 
@@ -169,15 +171,15 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         console.log($scope.sfdcOrg);
         let url = '';
         if ($scope.sfdcOrg) {
-            if ($scope.sfdcOrg.Environment === '0') {
+            if ($scope.sfdcOrg.environment === '0') {
                 url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.Environment;
-            } else if ($scope.sfdcOrg.Environment === '1') {
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
+            } else if ($scope.sfdcOrg.environment === '1') {
                 url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.Environment;
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
             } else {
-                url = $scope.sfdcOrg.InstanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.InstanceURL;
+                url = $scope.sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.instanceURL;
             }
             const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
             if (window.focus) {
@@ -190,10 +192,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         $.removeCookie('SFDC_ACCESS_TOKEN');
         $.removeCookie('SFDC_USER_NAME');
         $scope.sfdcOrg = {
-            OrgName: '',
-            Environment: '0',
-            UserName: '',
-            InstanceURL: '',
+            orgName: '',
+            environment: '0',
+            userName: '',
+            instanceURL: '',
             authorize: 'Authorize',
             save: 'Save',
             testConnection: 'Test Connection',
@@ -208,10 +210,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.saveConnection = function () {
         const sfdcDetails = {
-            OrgName : $scope.sfdcOrg.OrgName,
-            Environment : $scope.sfdcOrg.Environment,
-            UserName : $scope.sfdcOrg.UserName,
-            InstanceURL : $scope.sfdcOrg.InstanceURL,
+            orgName : $scope.sfdcOrg.orgName,
+            environment : $scope.sfdcOrg.environment,
+            userName : $scope.sfdcOrg.userName,
+            instanceURL : $scope.sfdcOrg.instanceURL,
             authorize : $scope.sfdcOrg.authorize,
             save : $scope.sfdcOrg.save,
             testConnection : $scope.sfdcOrg.testConnection,
@@ -222,8 +224,12 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthToken : sfdcAccessTokenFromExternalPage
         };
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
+            if(response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
+                $.removeCookie('SFDC_ACCESS_TOKEN');
+                $.removeCookie('SFDC_USER_NAME');
                 $scope.lstSFDCConnectionData.push(response.data);
                 iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'SFDC connection created successfully'});
+            }
             }, function (error) {
                 console.log(error);
                 iziToast.error({title: 'Error', message: 'SFDC connection failed, Please retry.', position: 'topRight'});

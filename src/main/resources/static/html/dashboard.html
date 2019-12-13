@@ -132,8 +132,8 @@
                                                             <li class="list-group-item" ng-repeat="eachSfdcConnection in lstSFDCConnectionData">
                                                                 <div class="form-group row">
                                                                     <div class="box" ng-click="showDataOnForm(eachSfdcConnection)">
-                                                                        <h2>{{eachSfdcConnection.OrgName}}</h2>
-                                                                        <p>{{eachSfdcConnection.UserName}}</p>
+                                                                        <h2>{{eachSfdcConnection.orgName}}</h2>
+                                                                        <p>{{eachSfdcConnection.userName}}</p>
                                                                     </div>
                                                                 </div>
                                                             </li>
@@ -144,16 +144,16 @@
                                                 <div class="col-12 col-sm-6 col-md-8">
                                                     <form>
                                                         <div class="form-group row">
-                                                            <label for="inputOrgNamel3" class="col-sm-2 col-form-label">Name</label>
+                                                            <label for="inputorgNamel3" class="col-sm-2 col-form-label">Name</label>
                                                             <div class="col-sm-10">
-                                                                <input type="text" class="form-control" id="inputOrgNamel3" placeholder="Name" ng-model="sfdcOrg.OrgName">
+                                                                <input type="text" class="form-control" id="inputorgNamel3" placeholder="Name" ng-model="sfdcOrg.orgName">
                                                             </div>
                                                         </div>
                                                         <div class="form-group row">
-                                                            <label for="inputEnvironment3" class="col-sm-2 col-form-label">Environment</label>
+                                                            <label for="inputenvironment3" class="col-sm-2 col-form-label">environment</label>
                                                             <div class="col-sm-10">
                                                                 <div class="dropdown bootstrap-select">
-                                                                    <select class="form-control" id="inputEnvironment3" ng-model="sfdcOrg.Environment" required>
+                                                                    <select class="form-control" id="inputenvironment3" ng-model="sfdcOrg.environment" required>
                                                                         <option value="0" selected>Production/Developer</option>
                                                                         <option value="1">Sandbox</option>
                                                                         <option value="2">Custom Org</option>
@@ -164,15 +164,15 @@
                                                         <div class="form-group row">
                                                             <label for="salesforceLoginl3" class="col-sm-2 col-form-label">Salesforce Login</label>
                                                             <div class="col-sm-10">
-                                                                <input type="text" class="form-control" id="salesforceLoginl3" placeholder="Salesforce UserName"
-                                                                       ng-model="sfdcOrg.UserName">
+                                                                <input type="text" class="form-control" id="salesforceLoginl3" placeholder="Salesforce userName"
+                                                                       ng-model="sfdcOrg.userName">
                                                             </div>
                                                         </div>
-                                                        <div class="form-group row" ng-show="sfdcOrg.Environment === '2'">
-                                                            <label for="salesforceInstanceUrll3" class="col-sm-2 col-form-label">Instance Url</label>
+                                                        <div class="form-group row" ng-show="sfdcOrg.environment === '2'">
+                                                            <label for="salesforceinstanceURLl3" class="col-sm-2 col-form-label">Instance Url</label>
                                                             <div class="col-sm-10">
-                                                                <input type="text" class="form-control" id="salesforceInstanceUrll3" placeholder="Salesforce Instance Url"
-                                                                       ng-model="sfdcOrg.InstanceURL" required>
+                                                                <input type="text" class="form-control" id="salesforceinstanceURLl3" placeholder="Salesforce Instance Url"
+                                                                       ng-model="sfdcOrg.instanceURL" required>
                                                             </div>
                                                         </div>
                                                         <div class="form-group row">

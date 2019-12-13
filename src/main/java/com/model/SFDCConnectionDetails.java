@@ -7,10 +7,10 @@ import java.io.Serializable;
 @Document(collection = "SFDCConnectionDetails")
 public class SFDCConnectionDetails implements Serializable {
 
-    private String OrgName;
-    private String Environment;
-    private String UserName;
-    private String InstanceURL;
+    private String orgName;
+    private String environment;
+    private String userName;
+    private String instanceURL;
     private String authorize;
     private String save;
     private String testConnection;
@@ -21,35 +21,35 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthToken;
 
     public String getOrgName() {
-        return OrgName;
+        return orgName;
     }
 
     public void setOrgName(String orgName) {
-        OrgName = orgName;
+        this.orgName = orgName;
     }
 
     public String getEnvironment() {
-        return Environment;
+        return environment;
     }
 
     public void setEnvironment(String environment) {
-        Environment = environment;
+        this.environment = environment;
     }
 
     public String getUserName() {
-        return UserName;
+        return userName;
     }
 
     public void setUserName(String userName) {
-        UserName = userName;
+        this.userName = userName;
     }
 
     public String getInstanceURL() {
-        return InstanceURL;
+        return instanceURL;
     }
 
     public void setInstanceURL(String instanceURL) {
-        InstanceURL = instanceURL;
+        this.instanceURL = instanceURL;
     }
 
     public String getAuthorize() {
