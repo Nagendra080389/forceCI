@@ -271,6 +271,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         );
     }
 
+    $scope.showDataOnForm = function (eachSfdcConnection) {
+        console.log(eachSfdcConnection);
+    }
+
     /*$scope.change = function (eachData) {
         var popMessage = '';
         if (eachData.active) {
