@@ -57,7 +57,8 @@
             display: block;
             padding: 10px 15px;
             margin-bottom: -1px;
-            background-color: #fff;
+            background-color: #f7f8fb !important;
+            border: 0 !important;
         }
 
         .pointerEvent {
@@ -145,10 +146,10 @@
                                                         <button type="button" class="btn btn-info" ng-click="createNewConnection();">Create New Connection</button>
                                                     </div>
                                                     <div class="col-12 col-sm-6 col-md-8 bg-lightest-silver">
-                                                        <ul>
+                                                        <ul style="padding: 0;">
                                                             <li class="list-group-item" ng-repeat="eachSfdcConnection in lstSFDCConnectionData">
-                                                                <div class="form-group row" style="border-bottom: 1px solid gray;">
-                                                                    <div class="box pointerEvent" ng-click="showDataOnForm(eachSfdcConnection)">
+                                                                <div style="border-bottom: 1px solid gray;">
+                                                                    <div class="pointerEvent" ng-click="showDataOnForm(eachSfdcConnection)">
                                                                         <h2>{{eachSfdcConnection.orgName}}</h2>
                                                                         <p>{{eachSfdcConnection.userName}}</p>
                                                                     </div>
