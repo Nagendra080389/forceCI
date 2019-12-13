@@ -184,18 +184,12 @@ public class ForceCIController {
                 getMethod.releaseConnection();
             }
 
-            System.out.println("jsonObject -> sfd -> "+jsonObject);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             post.releaseConnection();
         }
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpSession session = httpServletRequest.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
 
         if(StringUtils.hasText(accessToken)){
             Cookie accessTokenCookie = new Cookie("SFDC_ACCESS_TOKEN", accessToken);
