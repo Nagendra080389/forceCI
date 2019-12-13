@@ -58,6 +58,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 if (response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
                         $scope.lstRepositoryData.push(response.data[i].repository);
+                        for (let j = 0; j < response.data[i].repository.sfdcConnectionDetails.length; j++) {
+                            $scope.lstSFDCConnectionData.push(response.data[i].repository.sfdcConnectionDetails[j]);
+                        }
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
                     }
                     $('#repoConnectedDialog').removeClass('hidden');
@@ -242,7 +245,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 $.removeCookie('SFDC_USER_NAME',{ path: '/' });
                 const gitRepoId = response.data.gitRepoId;
                 $http.get("/showSfdcConnectionDetails?gitRepoId="+gitRepoId).then(function (response) {
-                    $scope.eachData.repository.sfdcConnectionDetails.push(response.data);
+                    $scope.lstSFDCConnectionData = response.data;
                 }, function (error) {
                     console.log(error);
                 });

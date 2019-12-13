@@ -112,7 +112,7 @@
                 <div class="panel-content">
                     <ul class="list-group" id="github-is-connected">
                         <li class="list-group-item" ng-repeat="eachData in lstRepositoryData">
-                            <div class="ember-view" ng-model="eachData">
+                            <div class="ember-view">
                                 <div class="github-connection overflow-hidden shadow-outer-1 br2">
                                     <div class="flex pa3 pv2 bg-white items-center">
                                         <span class="flex-auto">
@@ -146,7 +146,7 @@
                                                     </div>
                                                     <div class="col-12 col-sm-6 col-md-8 bg-lightest-silver">
                                                         <ul>
-                                                            <li class="list-group-item" ng-repeat="eachSfdcConnection in eachData.repository.sfdcConnectionDetails">
+                                                            <li class="list-group-item" ng-repeat="eachSfdcConnection in lstSFDCConnectionData">
                                                                 <div class="form-group row" style="border-bottom: 1px solid gray;">
                                                                     <div class="box pointerEvent" ng-click="showDataOnForm(eachSfdcConnection)">
                                                                         <h2>{{eachSfdcConnection.orgName}}</h2>
