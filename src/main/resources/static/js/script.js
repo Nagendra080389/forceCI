@@ -181,13 +181,13 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         if ($scope.sfdcOrg) {
             if ($scope.sfdcOrg.environment === '0') {
                 url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
             } else if ($scope.sfdcOrg.environment === '1') {
                 url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
             } else {
                 url = $scope.sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.instanceURL;
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.instanceURL;
             }
             const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
             if (window.focus) {
@@ -241,8 +241,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 $.removeCookie('SFDC_ACCESS_TOKEN',{ path: '/' });
                 $.removeCookie('SFDC_USER_NAME',{ path: '/' });
                 const gitRepoId = response.data.gitRepoId;
-                $http.get("showSfdcConnectionDetails?gitRepoId="+gitRepoId).then(function (response) {
-                    $scope.lstSFDCConnectionData = response.data;
+                $http.get("/showSfdcConnectionDetails?gitRepoId="+gitRepoId).then(function (response) {
+                    $scope.eachData.repository.sfdcConnectionDetails.push(response.data);
                 }, function (error) {
                     console.log(error);
                 });
