@@ -111,8 +111,8 @@
 
                 <div class="panel-content">
                     <ul class="list-group" id="github-is-connected">
-                        <li class="list-group-item" ng-model="eachData" ng-repeat="eachData in lstRepositoryData">
-                            <div class="ember-view">
+                        <li class="list-group-item" ng-repeat="eachData in lstRepositoryData">
+                            <div class="ember-view" ng-model="eachData">
                                 <div class="github-connection overflow-hidden shadow-outer-1 br2">
                                     <div class="flex pa3 pv2 bg-white items-center">
                                         <span class="flex-auto">
