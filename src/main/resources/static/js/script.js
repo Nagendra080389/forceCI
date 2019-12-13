@@ -49,6 +49,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     });
 
+
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
@@ -228,7 +229,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSuccess : 'true',
             oauthFailed : $scope.sfdcOrg.oauthFailed,
             oauthSaved : $scope.sfdcOrg.oauthSaved,
-            oauthToken : sfdcAccessTokenFromExternalPage
+            oauthToken : sfdcAccessTokenFromExternalPage,
+            gitRepo: $scope.repositoryFullName
         };
         if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' || $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === ''){
             return;
