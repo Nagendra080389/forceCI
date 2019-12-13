@@ -194,10 +194,13 @@ public class ForceCIController {
         if(StringUtils.hasText(accessToken)){
             Cookie accessTokenCookie = new Cookie("SFDC_ACCESS_TOKEN", accessToken);
             Cookie userNameCookie = new Cookie("SFDC_USER_NAME", username);
+            Cookie instanceURLCookie = new Cookie("SFDC_INSTANCE_URL", username);
             httpResponse.addCookie(accessTokenCookie);
             httpResponse.addCookie(userNameCookie);
+            httpResponse.addCookie(instanceURLCookie);
             accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
             userNameCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            instanceURLCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
             httpResponse.sendRedirect("/html/success.html");
         } else {
             httpResponse.sendRedirect("/html/error.html");

@@ -9,10 +9,12 @@
         $(document).ready(function () {
             let sfdcAccessToken = $.cookie("SFDC_ACCESS_TOKEN");
             let sfdcUserName = $.cookie("SFDC_USER_NAME");
+            let sfdcInstanceURL = $.cookie("SFDC_INSTANCE_URL");
             const objOauth = {
                 strDestinationId: 'OauthPayload',
                 sfdcAccessToken : sfdcAccessToken,
-                sfdcUserName : sfdcUserName
+                sfdcUserName : sfdcUserName,
+                sfdcInstanceURL : sfdcInstanceURL
             };
             window.opener.postMessage(objOauth, window.location.origin);
         })

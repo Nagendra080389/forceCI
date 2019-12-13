@@ -18,6 +18,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     };
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
+    let sfdcInstanceFromExternalPage;
     let objWindow;
 
 
@@ -28,6 +29,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             if(objEvent.data.strDestinationId === 'OauthPayload') {
                 sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
                 sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
+                sfdcInstanceFromExternalPage = objEvent.data.sfdcInstanceURL;
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
@@ -38,6 +40,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             if(objEvent.data.strDestinationId === 'OauthPayloadFailed'){
                 sfdcAccessTokenFromExternalPage = '';
                 sfdcUserNameFromExternalPage = '';
+                sfdcInstanceFromExternalPage = '';
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
@@ -202,6 +205,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.createNewConnection = function () {
         $.removeCookie('SFDC_ACCESS_TOKEN', { path: '/' });
         $.removeCookie('SFDC_USER_NAME', { path: '/' });
+        $.removeCookie('SFDC_INSTANCE_URL', { path: '/' });
         $scope.sfdcOrg = {
             orgName: '',
             environment: '0',
@@ -217,6 +221,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         };
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
+        sfdcInstanceFromExternalPage = '';
     };
 
     $scope.saveConnection = function (eachData) {
@@ -224,7 +229,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             orgName : $scope.sfdcOrg.orgName,
             environment : $scope.sfdcOrg.environment,
             userName : $scope.sfdcOrg.userName,
-            instanceURL : $scope.sfdcOrg.instanceURL,
+            instanceURL : sfdcInstanceFromExternalPage,
             authorize : $scope.sfdcOrg.authorize,
             save : $scope.sfdcOrg.save,
             testConnection : $scope.sfdcOrg.testConnection,
@@ -243,6 +248,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             if(response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
                 $.removeCookie('SFDC_ACCESS_TOKEN',{ path: '/' });
                 $.removeCookie('SFDC_USER_NAME',{ path: '/' });
+                $.removeCookie('SFDC_INSTANCE_URL',{ path: '/' });
                 const gitRepoId = response.data.gitRepoId;
                 $http.get("/showSfdcConnectionDetails?gitRepoId="+gitRepoId).then(function (response) {
                     $scope.lstSFDCConnectionData = response.data;
