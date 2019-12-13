@@ -16,6 +16,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         oauthFailed: 'false',
         oauthSaved: 'false'
     };
+    $scope.disabledForm = 'false';
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
     let sfdcInstanceFromExternalPage;
@@ -26,7 +27,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         if (objEvent !== undefined && objEvent !== null &&
             objEvent.data !== undefined && objEvent.data !== null &&
             objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null) {
-            if(objEvent.data.strDestinationId === 'OauthPayload') {
+            if (objEvent.data.strDestinationId === 'OauthPayload') {
                 sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
                 sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
                 sfdcInstanceFromExternalPage = objEvent.data.sfdcInstanceURL;
@@ -34,10 +35,15 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     objWindow.close();
                 }
                 $scope.sfdcOrg.oauthSuccess = 'true';
-                iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'SFDC connection successful.'});
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'SFDC connection successful.'
+                });
             }
 
-            if(objEvent.data.strDestinationId === 'OauthPayloadFailed'){
+            if (objEvent.data.strDestinationId === 'OauthPayloadFailed') {
                 sfdcAccessTokenFromExternalPage = '';
                 sfdcUserNameFromExternalPage = '';
                 sfdcInstanceFromExternalPage = '';
@@ -93,13 +99,26 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     if ($scope.lstRepositoryData.length === 0) {
                         $('#repoConnectedDialog').addClass('hidden');
                     }
-                    iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook deleted successfully'});
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: 'WebHook deleted successfully'
+                    });
                 } else {
-                    iziToast.error({title: 'Error', message: 'Not able to delete WebHook, Please retry.', position: 'topRight'});
+                    iziToast.error({
+                        title: 'Error',
+                        message: 'Not able to delete WebHook, Please retry.',
+                        position: 'topRight'
+                    });
                 }
             }, function (error) {
                 console.log(error);
-                iziToast.error({title: 'Error', message: 'Not able to delete WebHook, Please retry.', position: 'topRight'});
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Not able to delete WebHook, Please retry.',
+                    position: 'topRight'
+                });
             })
         }
     };
@@ -166,10 +185,19 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 $scope.lstRepositoryData.push(response.data);
                 $scope.reposInDB.push(response.data.repositoryFullName);
                 $('#repoConnectedDialog').removeClass('hidden');
-                iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook created successfully'});
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'WebHook created successfully'
+                });
             }, function (error) {
                 console.log(error);
-                iziToast.error({title: 'Error', message: 'Not able to create WebHook, Please retry.', position: 'topRight'});
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Not able to create WebHook, Please retry.',
+                    position: 'topRight'
+                });
             }
         );
 
@@ -178,9 +206,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.authorize = function () {
         console.log($scope.sfdcOrg);
         let url = '';
-        if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === ''
+        if ($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === ''
             || $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === '' || ($scope.sfdcOrg.environment === '2'
-                && ($scope.sfdcOrg.instanceURL === undefined || $scope.sfdcOrg.instanceURL === null || $scope.sfdcOrg.instanceURL === ''))){
+                && ($scope.sfdcOrg.instanceURL === undefined || $scope.sfdcOrg.instanceURL === null || $scope.sfdcOrg.instanceURL === ''))) {
             iziToast.warning({title: 'Caution', message: 'Please fill in required fields.', position: 'center'});
             return;
         }
@@ -203,9 +231,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     };
 
     $scope.createNewConnection = function () {
-        $.removeCookie('SFDC_ACCESS_TOKEN', { path: '/' });
-        $.removeCookie('SFDC_USER_NAME', { path: '/' });
-        $.removeCookie('SFDC_INSTANCE_URL', { path: '/' });
+        $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
+        $.removeCookie('SFDC_USER_NAME', {path: '/'});
+        $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
         $scope.sfdcOrg = {
             orgName: '',
             environment: '0',
@@ -222,63 +250,88 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
         sfdcInstanceFromExternalPage = '';
+        $scope.disabledForm = 'false';
     };
 
     $scope.saveConnection = function (eachData) {
         const sfdcDetails = {
-            orgName : $scope.sfdcOrg.orgName,
-            environment : $scope.sfdcOrg.environment,
-            userName : $scope.sfdcOrg.userName,
-            instanceURL : sfdcInstanceFromExternalPage,
-            authorize : $scope.sfdcOrg.authorize,
-            save : $scope.sfdcOrg.save,
-            testConnection : $scope.sfdcOrg.testConnection,
-            delete : $scope.sfdcOrg.delete,
-            oauthSuccess : 'true',
-            oauthFailed : $scope.sfdcOrg.oauthFailed,
-            oauthSaved : $scope.sfdcOrg.oauthSaved,
-            oauthToken : sfdcAccessTokenFromExternalPage,
+            orgName: $scope.sfdcOrg.orgName,
+            environment: $scope.sfdcOrg.environment,
+            userName: $scope.sfdcOrg.userName,
+            instanceURL: sfdcInstanceFromExternalPage,
+            authorize: $scope.sfdcOrg.authorize,
+            save: $scope.sfdcOrg.save,
+            testConnection: $scope.sfdcOrg.testConnection,
+            delete: $scope.sfdcOrg.delete,
+            oauthSuccess: 'true',
+            oauthFailed: $scope.sfdcOrg.oauthFailed,
+            oauthSaved: $scope.sfdcOrg.oauthSaved,
+            oauthToken: sfdcAccessTokenFromExternalPage,
             gitRepoId: eachData.repositoryId
         };
-        if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' ||
-            $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === ''){
+        if ($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' ||
+            $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === '') {
             return;
         }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
-            if(response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
-                $.removeCookie('SFDC_ACCESS_TOKEN',{ path: '/' });
-                $.removeCookie('SFDC_USER_NAME',{ path: '/' });
-                $.removeCookie('SFDC_INSTANCE_URL',{ path: '/' });
-                const gitRepoId = response.data.gitRepoId;
-                $http.get("/showSfdcConnectionDetails?gitRepoId="+gitRepoId).then(function (response) {
-                    $scope.lstSFDCConnectionData = response.data;
-                }, function (error) {
-                    console.log(error);
-                });
-                iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'SFDC connection created successfully'});
-                $scope.sfdcOrg = {
-                    orgName: '',
-                    environment: '0',
-                    userName: '',
-                    instanceURL: '',
-                    authorize: 'Authorize',
-                    save: 'Save',
-                    testConnection: 'Test Connection',
-                    delete: 'Delete',
-                    oauthSuccess: 'false',
-                    oauthFailed: 'false',
-                    oauthSaved: 'false'
-                };
-            }
+                if (response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
+                    $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
+                    $.removeCookie('SFDC_USER_NAME', {path: '/'});
+                    $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+                    const gitRepoId = response.data.gitRepoId;
+                    $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
+                        $scope.lstSFDCConnectionData = response.data;
+                    }, function (error) {
+                        console.log(error);
+                    });
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: 'SFDC connection created successfully'
+                    });
+                    $scope.sfdcOrg = {
+                        orgName: '',
+                        environment: '0',
+                        userName: '',
+                        instanceURL: '',
+                        authorize: 'Authorize',
+                        save: 'Save',
+                        testConnection: 'Test Connection',
+                        delete: 'Delete',
+                        oauthSuccess: 'false',
+                        oauthFailed: 'false',
+                        oauthSaved: 'false'
+                    };
+                }
             }, function (error) {
                 console.log(error);
-                iziToast.error({title: 'Error', message: 'SFDC connection failed, Please retry. ' + error, position: 'topRight'});
+                iziToast.error({
+                    title: 'Error',
+                    message: 'SFDC connection failed, Please retry. ' + error,
+                    position: 'topRight'
+                });
             }
         );
     }
 
     $scope.showDataOnForm = function (eachSfdcConnection) {
         console.log(eachSfdcConnection);
+        $scope.sfdcOrg = {
+            orgName: eachSfdcConnection.orgName,
+            environment: eachSfdcConnection.environment,
+            userName: eachSfdcConnection.userName,
+            instanceURL: eachSfdcConnection.instanceURL,
+            authorize: eachSfdcConnection.authorize,
+            save: eachSfdcConnection.save,
+            testConnection: eachSfdcConnection.testConnection,
+            delete: eachSfdcConnection.delete,
+            oauthSuccess: eachSfdcConnection.oauthSuccess,
+            oauthFailed: eachSfdcConnection.oauthFailed,
+            oauthSaved: eachSfdcConnection.oauthSaved
+        };
+        $scope.disabledForm = 'true';
+
     }
 
     /*$scope.change = function (eachData) {
