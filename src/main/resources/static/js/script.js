@@ -32,7 +32,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     objWindow.close();
                 }
                 $scope.sfdcOrg.oauthSuccess = 'true';
-                $scope.$apply();
+                iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'SFDC connection successful.'});
             }
 
             if(objEvent.data.strDestinationId === 'OauthPayloadFailed'){
@@ -42,9 +42,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     objWindow.close();
                 }
                 $scope.sfdcOrg.oauthSuccess = 'false';
-                $scope.$apply();
+                iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
             }
         }
+        $scope.$apply();
 
     });
 
@@ -195,8 +196,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     };
 
     $scope.createNewConnection = function () {
-        $.removeCookie('SFDC_ACCESS_TOKEN');
-        $.removeCookie('SFDC_USER_NAME');
+        $.removeCookie('SFDC_ACCESS_TOKEN', { path: '/' });
+        $.removeCookie('SFDC_USER_NAME', { path: '/' });
         $scope.sfdcOrg = {
             orgName: '',
             environment: '0',
@@ -234,10 +235,23 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
             if(response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
-                $.removeCookie('SFDC_ACCESS_TOKEN');
-                $.removeCookie('SFDC_USER_NAME');
+                $.removeCookie('SFDC_ACCESS_TOKEN',{ path: '/' });
+                $.removeCookie('SFDC_USER_NAME',{ path: '/' });
                 $scope.lstSFDCConnectionData.push(response.data);
                 iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'SFDC connection created successfully'});
+                $scope.sfdcOrg = {
+                    orgName: '',
+                    environment: '0',
+                    userName: '',
+                    instanceURL: '',
+                    authorize: 'Authorize',
+                    save: 'Save',
+                    testConnection: 'Test Connection',
+                    delete: 'Delete',
+                    oauthSuccess: 'false',
+                    oauthFailed: 'false',
+                    oauthSaved: 'false'
+                };
             }
             }, function (error) {
                 console.log(error);
