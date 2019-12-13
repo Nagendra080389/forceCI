@@ -2,16 +2,56 @@ var app = angular.module('forceCIApp', []);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
-    $scope.sfdcOrg = {};
+    $scope.lstSFDCConnectionData = [];
+    $scope.sfdcOrg = {
+        OrgName: '',
+        Environment: '0',
+        UserName: '',
+        InstanceURL: '',
+        authorize: 'Authorize',
+        save: 'Save',
+        testConnection: 'Test Connection',
+        delete: 'Delete',
+        oauthSuccess: 'false',
+        oauthFailed: 'false',
+        oauthSaved: 'false'
+    };
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
+    let objWindow;
+
+
+    window.addEventListener('message', function (objEvent) {
+        if (objEvent !== undefined && objEvent !== null &&
+            objEvent.data !== undefined && objEvent.data !== null &&
+            objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null) {
+            if(objEvent.data.strDestinationId === 'OauthPayload') {
+                sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
+                sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
+                if (objWindow !== undefined && objWindow !== null) {
+                    objWindow.close();
+                }
+                $scope.sfdcOrg.oauthSuccess = 'true';
+            }
+
+            if(objEvent.data.strDestinationId === 'OauthPayloadFailed'){
+                sfdcAccessTokenFromExternalPage = '';
+                sfdcUserNameFromExternalPage = '';
+                if (objWindow !== undefined && objWindow !== null) {
+                    objWindow.close();
+                }
+                $scope.sfdcOrg.oauthSuccess = 'false';
+            }
+        }
+
+    });
 
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
             localStorage.setItem('githubOwner', response.data.login);
-            $http.get("/fetchRepositoryInDB?gitHubUser="+response.data.login).then(function (response) {
-                if(response.data.length > 0) {
+            $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
+                if (response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
                         $scope.lstRepositoryData.push(response.data[i].repository);
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
@@ -23,7 +63,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             });
             const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
                 'nudge-right--4 pe-none" style="top: -15px">\n' +
-                '          <img src='+response.data.avatar_url+'>\n' +
+                '          <img src=' + response.data.avatar_url + '>\n' +
                 '        </span>';
             $(avatarSpanTag).insertAfter('#idSelectTab');
         }
@@ -32,34 +72,34 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     });
 
 
-    $scope.disconnectRepo = function(eachData){
-        if(eachData.repositoryId) {
-            $http.delete("/deleteWebHook?repositoryName="+eachData.repositoryName+"&repositoryOwner="+
-                eachData.owner+"&webHookId="+eachData.webHook.id).then(function (response) {
+    $scope.disconnectRepo = function (eachData) {
+        if (eachData.repositoryId) {
+            $http.delete("/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryOwner=" +
+                eachData.owner + "&webHookId=" + eachData.webHook.id).then(function (response) {
                 console.log(response);
-                if(response.status === 200 && response.data === 204) {
+                if (response.status === 200 && response.data === 204) {
                     $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData), 1);
                     $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData.repositoryFullName), 1);
-                    if( $scope.lstRepositoryData.length === 0) {
+                    if ($scope.lstRepositoryData.length === 0) {
                         $('#repoConnectedDialog').addClass('hidden');
                     }
                     iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook deleted successfully'});
                 } else {
-                    iziToast.error({title: 'Error',message: 'Not able to delete WebHook, Please retry.',position: 'topRight'});
+                    iziToast.error({title: 'Error', message: 'Not able to delete WebHook, Please retry.', position: 'topRight'});
                 }
             }, function (error) {
                 console.log(error);
-                iziToast.error({title: 'Error',message: 'Not able to delete WebHook, Please retry.',position: 'topRight'});
+                iziToast.error({title: 'Error', message: 'Not able to delete WebHook, Please retry.', position: 'topRight'});
             })
         }
     };
 
     $scope.fetchRepo = function () {
         if ($scope.repoName) {
-            $http.get("/fetchRepository"+"?repoName="+$scope.repoName+"&"+"repoUser="+localStorage.getItem('githubOwner')).then(function (response) {
+            $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + localStorage.getItem('githubOwner')).then(function (response) {
                 $('#repoDialog').empty();
                 for (let i = 0; i < response.data.items.length; i++) {
-                    if(!$scope.reposInDB.includes(response.data.items[i].full_name)) {
+                    if (!$scope.reposInDB.includes(response.data.items[i].full_name)) {
                         const eachNewDiv = '<div class="bb b--light-silver pv2 flex-auto flex items-center">\n' +
                             '\n' +
                             '                <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="repo-16" class="icon malibu-icon fill-near-black nudge-down--1 mr1">\n' +
@@ -91,7 +131,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         }
     };
 
-    $( document ).on( "click", ".connectButton", function() {
+    $(document).on("click", ".connectButton", function () {
         const $repositoryName = $(this).closest(".b--light-silver").find('span');
         const repositoryName = $repositoryName.attr('data-repoName');
         const repositoryId = $repositoryName.attr('data-repoId');
@@ -112,23 +152,23 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             owner: localStorage.getItem('githubOwner')
         };
         $http.post("/createWebHook", data).then(function (response) {
-            $repositoryName.closest(".b--light-silver").remove();
-            $scope.lstRepositoryData.push(response.data);
-            $scope.reposInDB.push(response.data.repositoryFullName);
-            $('#repoConnectedDialog').removeClass('hidden');
-            iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook created successfully'});
+                $repositoryName.closest(".b--light-silver").remove();
+                $scope.lstRepositoryData.push(response.data);
+                $scope.reposInDB.push(response.data.repositoryFullName);
+                $('#repoConnectedDialog').removeClass('hidden');
+                iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'WebHook created successfully'});
             }, function (error) {
                 console.log(error);
-                iziToast.error({title: 'Error',message: 'Not able to create WebHook, Please retry.',position: 'topRight'});
+                iziToast.error({title: 'Error', message: 'Not able to create WebHook, Please retry.', position: 'topRight'});
             }
         );
 
     });
 
-    $scope.authorize = function(){
+    $scope.authorize = function () {
         console.log($scope.sfdcOrg);
         let url = '';
-        if($scope.sfdcOrg) {
+        if ($scope.sfdcOrg) {
             if ($scope.sfdcOrg.Environment === '0') {
                 url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
                     'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.Environment;
@@ -139,38 +179,57 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 url = $scope.sfdcOrg.InstanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
                     'EXd0TDKa3J8.s6XrzeFsPDL_mxt&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.InstanceURL;
             }
-            const newWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
+            const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
             if (window.focus) {
                 newWindow.focus();
             }
-
-            const objGenericListener = function (objEvent) {
-                if(objEvent !== undefined && objEvent !== null &&
-                    objEvent.data !== undefined && objEvent.data !== null &&
-                    objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null
-                    && objEvent.data.strDestinationId === 'OauthPayload'){
-                    sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
-                    sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
-                    newWindow.close();
-                }
-            };
-            window.removeEventListener('message', objGenericListener);
-            window.addEventListener('message',objGenericListener );
         }
     };
 
-    $scope.createNewConnection = function(){
+    $scope.createNewConnection = function () {
         $.removeCookie('SFDC_ACCESS_TOKEN');
         $.removeCookie('SFDC_USER_NAME');
         $scope.sfdcOrg = {
-            OrgName : '',
-            Environment : '',
-            UserName : '',
-            InstanceURL : ''
+            OrgName: '',
+            Environment: '0',
+            UserName: '',
+            InstanceURL: '',
+            authorize: 'Authorize',
+            save: 'Save',
+            testConnection: 'Test Connection',
+            delete: 'Delete',
+            oauthSuccess: 'false',
+            oauthFailed: 'false',
+            oauthSaved: 'false'
         };
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
     };
+
+    $scope.saveConnection = function () {
+        const sfdcDetails = {
+            OrgName : $scope.sfdcOrg.OrgName,
+            Environment : $scope.sfdcOrg.Environment,
+            UserName : $scope.sfdcOrg.UserName,
+            InstanceURL : $scope.sfdcOrg.InstanceURL,
+            authorize : $scope.sfdcOrg.authorize,
+            save : $scope.sfdcOrg.save,
+            testConnection : $scope.sfdcOrg.testConnection,
+            delete : $scope.sfdcOrg.delete,
+            oauthSuccess : 'true',
+            oauthFailed : $scope.sfdcOrg.oauthFailed,
+            oauthSaved : $scope.sfdcOrg.oauthSaved,
+            oauthToken : sfdcAccessTokenFromExternalPage
+        };
+        $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
+                $scope.lstSFDCConnectionData.push(response.data);
+                iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'SFDC connection created successfully'});
+            }, function (error) {
+                console.log(error);
+                iziToast.error({title: 'Error', message: 'SFDC connection failed, Please retry.', position: 'topRight'});
+            }
+        );
+    }
 
     /*$scope.change = function (eachData) {
         var popMessage = '';

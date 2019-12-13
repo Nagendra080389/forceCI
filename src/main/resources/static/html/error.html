@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>Oauth Error</title>
+    <script>
+        $(document).ready(function () {
+            const objOauth = {
+                strDestinationId: 'OauthPayloadFailed'
+            };
+            window.opener.postMessage(objOauth, window.location.origin);
+        })
+    </script>
 </head>
 <body>
 Error!

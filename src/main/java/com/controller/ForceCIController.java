@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.dao.RepositoryWrapperMongoRepository;
+import com.dao.SFDCConnectionDetailsMongoRepository;
 import com.dao.UserWrapperMongoRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -70,6 +71,9 @@ public class ForceCIController {
 
     @Autowired
     private UserWrapperMongoRepository userWrapperMongoRepository;
+
+    @Autowired
+    private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
 
     private static final String GITHUB_API = "https://api.github.com";
 
@@ -396,6 +400,23 @@ public class ForceCIController {
                 returnResponse = gson.toJson(repository);
             }
 
+        }
+
+        return returnResponse;
+    }
+
+
+    @RequestMapping(value = "/saveSfdcConnectionDetails", method = RequestMethod.POST)
+    public String saveSfdcConnectionDetails(@RequestBody SFDCConnectionDetails sfdcConnectionDetails, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
+        SFDCConnectionDetails byUserName = sfdcConnectionDetailsMongoRepository.findByUserName(sfdcConnectionDetails.getUserName());
+        if(byUserName == null){
+            sfdcConnectionDetails.setOauthSaved("true");
+            SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
+            returnResponse = gson.toJson(connectionSaved);
         }
 
         return returnResponse;
