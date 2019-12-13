@@ -216,7 +216,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         sfdcUserNameFromExternalPage = '';
     };
 
-    $scope.saveConnection = function () {
+    $scope.saveConnection = function (eachData) {
         const sfdcDetails = {
             orgName : $scope.sfdcOrg.orgName,
             environment : $scope.sfdcOrg.environment,
@@ -230,7 +230,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthFailed : $scope.sfdcOrg.oauthFailed,
             oauthSaved : $scope.sfdcOrg.oauthSaved,
             oauthToken : sfdcAccessTokenFromExternalPage,
-            gitRepo: $scope.repositoryFullName
+            gitRepo: eachData.repositoryFullName
         };
         if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' || $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === ''){
             return;

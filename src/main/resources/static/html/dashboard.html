@@ -196,7 +196,7 @@
                                                             <div class="form-group">
                                                                 <div class="col-sm-10">
                                                                     <button type="button" class="btn btn-primary" ng-click="authorize();">{{sfdcOrg.authorize}}</button>
-                                                                    <button type="button" class="btn btn-primary" ng-click="saveConnection();"
+                                                                    <button type="button" class="btn btn-primary" ng-click="saveConnection(eachData);"
                                                                             ng-disabled="sfdcOrg.oauthSuccess === 'false'">{{sfdcOrg.save}}
                                                                     </button>
                                                                     <button type="button" class="btn btn-primary" ng-click="testConnection();"
