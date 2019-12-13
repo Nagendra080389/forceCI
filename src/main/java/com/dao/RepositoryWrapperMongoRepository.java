@@ -9,7 +9,7 @@ public interface RepositoryWrapperMongoRepository extends MongoRepository<Reposi
 
     List<RepositoryWrapper> findByOwnerId(String ownerId);
 
-    RepositoryWrapper findByRepositoryRepositoryName (String repositoryName);
+    RepositoryWrapper findByRepositoryRepositoryId (String repositoryId);
 
-    RepositoryWrapper findByOwnerIdAndRepositoryRepositoryName (String ownerId, String repositoryName);
+    RepositoryWrapper findByOwnerIdAndRepositoryRepositoryId (String ownerId, String repositoryId);
 }

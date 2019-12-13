@@ -78,7 +78,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.disconnectRepo = function (eachData) {
         if (eachData.repositoryId) {
-            $http.delete("/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryOwner=" +
+            $http.delete("/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryId=" + eachData.repositoryId + "&repositoryOwner=" +
                 eachData.owner + "&webHookId=" + eachData.webHook.id).then(function (response) {
                 console.log(response);
                 if (response.status === 200 && response.data === 204) {
@@ -230,16 +230,22 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthFailed : $scope.sfdcOrg.oauthFailed,
             oauthSaved : $scope.sfdcOrg.oauthSaved,
             oauthToken : sfdcAccessTokenFromExternalPage,
-            gitRepo: eachData.repositoryFullName
+            gitRepoId: eachData.repositoryId
         };
-        if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' || $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === ''){
+        if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' ||
+            $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === ''){
             return;
         }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
             if(response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
                 $.removeCookie('SFDC_ACCESS_TOKEN',{ path: '/' });
                 $.removeCookie('SFDC_USER_NAME',{ path: '/' });
-                $scope.lstSFDCConnectionData.push(response.data);
+                const gitRepoId = response.data.gitRepoId;
+                $http.get("showSfdcConnectionDetails?gitRepoId="+gitRepoId).then(function (response) {
+                    $scope.lstSFDCConnectionData = response.data;
+                }, function (error) {
+                    console.log(error);
+                });
                 iziToast.success({timeout: 5000, icon: 'fa fa-chrome', title: 'OK', message: 'SFDC connection created successfully'});
                 $scope.sfdcOrg = {
                     orgName: '',

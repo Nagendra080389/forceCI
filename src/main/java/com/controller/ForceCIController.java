@@ -282,8 +282,14 @@ public class ForceCIController {
         Gson gson = new Gson();
         String reposOnDB = "";
         List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(gitHubUser);
+        List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
         if(lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()){
-            reposOnDB = gson.toJson(lstRepositoryWrapper);
+            for (RepositoryWrapper repositoryWrapper : lstRepositoryWrapper){
+                List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
+                repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
+                newLstRepositoryWrapper.add(repositoryWrapper);
+            }
+            reposOnDB = gson.toJson(newLstRepositoryWrapper);
         }
         return reposOnDB;
     }
@@ -341,7 +347,7 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/deleteWebHook", method = RequestMethod.DELETE)
-    public String deleteWebHook(@RequestParam String repositoryName, @RequestParam String repositoryOwner,
+    public String deleteWebHook(@RequestParam String repositoryName, @RequestParam String repositoryId, @RequestParam String repositoryOwner,
                                 @RequestParam String webHookId, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
@@ -356,7 +362,7 @@ public class ForceCIController {
             HttpClient httpClient = new HttpClient();
             status = httpClient.executeMethod(deleteWebHook);
             if(status == 204){
-                RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryName(repositoryOwner, repositoryName);
+                RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryId(repositoryOwner, repositoryId);
                 repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
             }
         }
@@ -424,6 +430,18 @@ public class ForceCIController {
         return returnResponse;
     }
 
+    @RequestMapping(value = "/showSfdcConnectionDetails", method = RequestMethod.GET)
+    public String showSfdcConnectionDetails(@RequestParam String gitRepoId, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
+        List<SFDCConnectionDetails> gitReposById = sfdcConnectionDetailsMongoRepository.findByGitRepoId(gitRepoId);
+        if(gitReposById != null && !gitReposById.isEmpty()){
+            returnResponse = gson.toJson(gitReposById);
+        }
+        return returnResponse;
+    }
 
     private static void start_deployment(JsonObject jsonObject, String access_token) {
         String user = jsonObject.get("user").getAsJsonObject().get("login").getAsString();

@@ -17,6 +17,7 @@ public class Repository implements Serializable {
     private WebHook webHook;
     private String hmacSecret;
     private String ownerHtmlUrl;
+    private List<SFDCConnectionDetails> sfdcConnectionDetails;
 
 
     public String getFull_name() {
@@ -113,6 +114,14 @@ public class Repository implements Serializable {
 
     public void setOwnerHtmlUrl(String ownerHtmlUrl) {
         this.ownerHtmlUrl = ownerHtmlUrl;
+    }
+
+    public List<SFDCConnectionDetails> getSfdcConnectionDetails() {
+        return sfdcConnectionDetails;
+    }
+
+    public void setSfdcConnectionDetails(List<SFDCConnectionDetails> sfdcConnectionDetails) {
+        this.sfdcConnectionDetails = sfdcConnectionDetails;
     }
 
     @Override

@@ -136,9 +136,9 @@
                                         </button>
                                     </div>
                                     <div class="panel-heading">
-                                        <a for="collapseOne accordion-toggle" data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Show SFDC
+                                        <a for="collapse{{$index}} accordion-toggle" data-toggle="collapse" href="#collapse{{$index}}" aria-expanded="true" aria-controls="collapse{{$index}}">Show SFDC
                                             connections</a>
-                                        <div id="collapseOne" class="collapse mt3 panel-collapse">
+                                        <div id="collapse{{$index}}" class="collapse mt3 panel-collapse">
                                             <div class="row no-gutters pa3">
                                                 <div class="col-6 col-md-4 connectionButton">
                                                     <div>
@@ -146,7 +146,7 @@
                                                     </div>
                                                     <div class="col-12 col-sm-6 col-md-8 bg-lightest-silver">
                                                         <ul>
-                                                            <li class="list-group-item" ng-repeat="eachSfdcConnection in lstSFDCConnectionData">
+                                                            <li class="list-group-item" ng-repeat="eachSfdcConnection in eachData.repository.sfdcConnectionDetails">
                                                                 <div class="form-group row" style="border-bottom: 1px solid gray;">
                                                                     <div class="box pointerEvent" ng-click="showDataOnForm(eachSfdcConnection)">
                                                                         <h2>{{eachSfdcConnection.orgName}}</h2>

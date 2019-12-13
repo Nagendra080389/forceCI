@@ -19,7 +19,7 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthFailed;
     private String oauthSaved;
     private String oauthToken;
-    private String gitRepo;
+    private String gitRepoId;
 
     public String getOrgName() {
         return orgName;
@@ -117,11 +117,11 @@ public class SFDCConnectionDetails implements Serializable {
         this.oauthToken = oauthToken;
     }
 
-    public String getGitRepo() {
-        return gitRepo;
+    public String getGitRepoId() {
+        return gitRepoId;
     }
 
-    public void setGitRepo(String gitRepo) {
-        this.gitRepo = gitRepo;
+    public void setGitRepoId(String gitRepoId) {
+        this.gitRepoId = gitRepoId;
     }
 }
