@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import spark.Request;
 
 import javax.servlet.ServletRequest;
@@ -28,6 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -125,8 +128,7 @@ public class ForceCIController {
 
 
     @RequestMapping(value = "/sfdcAuth", method = RequestMethod.GET, params = {"code", "state"})
-    public void sfdcAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
-            request) throws Exception {
+    public void sfdcAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest request) throws Exception {
 
         String environment = null;
         System.out.println(" state -> "+state);
@@ -189,6 +191,12 @@ public class ForceCIController {
             post.releaseConnection();
         }
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        HttpSession session = httpServletRequest.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
         if(StringUtils.hasText(accessToken)){
             Cookie accessTokenCookie = new Cookie("SFDC_ACCESS_TOKEN", accessToken);
             Cookie userNameCookie = new Cookie("SFDC_USER_NAME", username);

@@ -52,7 +52,19 @@
             content:"*";color:red;
         }
 
-    </style>
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: -1px;
+            background-color: #fff;
+        }
+
+        .pointerEvent {
+            cursor: pointer;
+        }
+
+</style>
 </head>
 
 <body ng-app="forceCIApp" ng-controller="orderFromController">
@@ -135,8 +147,8 @@
                                                     <div class="col-12 col-sm-6 col-md-8 bg-lightest-silver">
                                                         <ul>
                                                             <li class="list-group-item" ng-repeat="eachSfdcConnection in lstSFDCConnectionData">
-                                                                <div class="form-group row">
-                                                                    <div class="box" ng-click="showDataOnForm(eachSfdcConnection)">
+                                                                <div class="form-group row" style="border-bottom: 1px solid gray;">
+                                                                    <div class="box pointerEvent" ng-click="showDataOnForm(eachSfdcConnection)">
                                                                         <h2>{{eachSfdcConnection.orgName}}</h2>
                                                                         <p>{{eachSfdcConnection.userName}}</p>
                                                                     </div>
