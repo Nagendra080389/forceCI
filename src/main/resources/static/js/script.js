@@ -170,6 +170,12 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.authorize = function () {
         console.log($scope.sfdcOrg);
         let url = '';
+        if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === ''
+            || $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === '' || ($scope.sfdcOrg.environment === '2'
+                && ($scope.sfdcOrg.instanceURL === undefined || $scope.sfdcOrg.instanceURL === null || $scope.sfdcOrg.instanceURL === ''))){
+            iziToast.warning({title: 'Caution', message: 'Please fill in required fields.', position: 'center'});
+            return;
+        }
         if ($scope.sfdcOrg) {
             if ($scope.sfdcOrg.environment === '0') {
                 url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
@@ -223,6 +229,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSaved : $scope.sfdcOrg.oauthSaved,
             oauthToken : sfdcAccessTokenFromExternalPage
         };
+        if($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' || $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === ''){
+            return;
+        }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
             if(response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
                 $.removeCookie('SFDC_ACCESS_TOKEN');
@@ -232,7 +241,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             }
             }, function (error) {
                 console.log(error);
-                iziToast.error({title: 'Error', message: 'SFDC connection failed, Please retry.', position: 'topRight'});
+                iziToast.error({title: 'Error', message: 'SFDC connection failed, Please retry. ' + error, position: 'topRight'});
             }
         );
     }
