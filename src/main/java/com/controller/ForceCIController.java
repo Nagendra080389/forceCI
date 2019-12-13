@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -62,7 +63,7 @@ public class ForceCIController {
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
 
-    public final static List<Integer> LIST_VALID_RESPONSE_CODES =  Arrays.asList(200, 201, 204, 207);
+    private final static List<Integer> LIST_VALID_RESPONSE_CODES =  Arrays.asList(200, 201, 204, 207);
 
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
@@ -171,7 +172,7 @@ public class ForceCIController {
             try {
                 jsonObject = parser.parse(responseUserName).getAsJsonObject();
                 username = jsonObject.get("username").getAsString();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             } finally {
                 getMethod.releaseConnection();
@@ -294,10 +295,15 @@ public class ForceCIController {
                 HttpClient httpClient = new HttpClient();
                 int intStatusOk = httpClient.executeMethod(getUserMethod);
                 if(intStatusOk == HTTP_STATUS_OK) {
-                    GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), "UTF-8"), GitRepositoryUser.class);
-                    UserWrapper userWrapper = new UserWrapper();
-                    userWrapper.setAccess_token(accessToken);
-                    userWrapper.setOwnerId(gitRepositoryUser.getLogin());
+                    GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
+                    UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(gitRepositoryUser.getLogin());
+                    if(userWrapper != null){
+                        userWrapper.setAccess_token(accessToken);
+                    } else {
+                        userWrapper = new UserWrapper();
+                        userWrapper.setAccess_token(accessToken);
+                        userWrapper.setOwnerId(gitRepositoryUser.getLogin());
+                    }
                     userWrapperMongoRepository.save(userWrapper);
                     loginNameAndAvatar = gson.toJson(gitRepositoryUser);
                 }
@@ -320,7 +326,7 @@ public class ForceCIController {
                 HttpClient httpClient = new HttpClient();
                 int intStatusOk = httpClient.executeMethod(getRepoByName);
                 if(intStatusOk == HTTP_STATUS_OK) {
-                    GitRepositoryFromQuery gitRepositoryFromQuery = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), "UTF-8"), GitRepositoryFromQuery.class);
+                    GitRepositoryFromQuery gitRepositoryFromQuery = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryFromQuery.class);
                     lstRepo = gson.toJson(gitRepositoryFromQuery);
                 }
             }
@@ -380,7 +386,7 @@ public class ForceCIController {
             HttpClient httpClient = new HttpClient();
             int status = httpClient.executeMethod(createWebHook);
             if(LIST_VALID_RESPONSE_CODES.contains(status)) {
-                WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), "UTF-8"), WebHook.class);
+                WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
                 repository.setWebHook(webHookResponse);
                 repository.setHmacSecret(randomString);
                 RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
@@ -437,9 +443,7 @@ public class ForceCIController {
 
            /* GHDeploymentStatus deploymentStatus2 = new GHDeploymentStatusBuilder(repository,
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), SUCCESS).create();*/
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
