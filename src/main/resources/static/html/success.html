@@ -5,19 +5,19 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="../js/jqueryCookie/jquery.cookie.js"/>
     <title>Oauth Success</title>
+    <script>
+        $(document).ready(function () {
+            let sfdcAccessToken = $.cookie("SFDC_ACCESS_TOKEN");
+            let sfdcUserName = $.cookie("SFDC_USER_NAME");
+            const objOauth = {
+                strDestinationId: 'OauthPayload',
+                sfdcAccessToken : sfdcAccessToken,
+                sfdcUserName : sfdcUserName
+            };
+            window.postMessage(objOauth, window.location.origin);
+        })
+    </script>
 </head>
-<script>
-    $(document).ready(function () {
-        let sfdcAccessToken = $.cookie("SFDC_ACCESS_TOKEN");
-        let sfdcUserName = $.cookie("SFDC_USER_NAME");
-        const objOauth = {
-            strDestinationId: 'OauthPayload',
-            sfdcAccessToken : sfdcAccessToken,
-            sfdcUserName : sfdcUserName
-        };
-        window.postMessage(objOauth, window.location.origin);
-    })
-</script>
 <body>
 Success!
 </body>
