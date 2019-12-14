@@ -14,7 +14,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         oauthSuccess: 'false',
         oauthFailed: 'false',
         oauthSaved: 'false',
-        disabledForm : 'false'
+        disabledForm: 'false',
+        multiBranchData: [],
+        multiExtraSettings: {enableSearch: true},
+        multiSelectedBranches: []
     };
     //$scope.disabledForm = 'false';
     let sfdcAccessTokenFromExternalPage;
@@ -65,7 +68,14 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             localStorage.setItem('githubOwner', response.data.login);
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 if (response.data.length > 0) {
-                    for (let i = 0; i < response.data.length; i++) {
+                    for (let i = 0; i < response.data[i].repository.length; i++) {
+                        let lstBranches = [];
+                        $.each(response.data[i].repository.mapBranches, function (key, value) {
+                            console.log(key);
+                            lstBranches.push(key);
+                        });
+                        sfdcOrg.multiBranchData = lstBranches;
+                        sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches;
                         response.data[i].repository.sfdcOrg = sfdcOrg;
                         $scope.lstRepositoryData.push(response.data[i].repository);
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
@@ -181,6 +191,15 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         $http.post("/createWebHook", data).then(function (response) {
                 $repositoryName.closest(".b--light-silver").remove();
                 $scope.lstRepositoryData.push(response.data);
+                let lstBranches = [];
+                $.each(response.data.mapBranches, function (key, value) {
+                    console.log(key);
+                    lstBranches.push(key);
+                });
+
+                sfdcOrg.multiBranchData = lstBranches;
+                response.data.sfdcOrg = sfdcOrg;
+
                 $scope.reposInDB.push(response.data.repositoryFullName);
                 $('#repoConnectedDialog').removeClass('hidden');
                 iziToast.success({
@@ -252,7 +271,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthFailed: eachData.oauthFailed,
             oauthSaved: eachData.oauthSaved,
             oauthToken: sfdcAccessTokenFromExternalPage,
-            gitRepoId: eachData.repositoryId
+            gitRepoId: eachData.repositoryId,
+            lstSelectedBranches : eachData.sfdcOrg.multiSelectedBranches
         };
         if (eachData.orgName === undefined || eachData.orgName === null || eachData.orgName === '' ||
             eachData.userName === undefined || eachData.userName === null || eachData.userName === '') {
@@ -275,6 +295,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         title: 'OK',
                         message: 'SFDC connection created successfully'
                     });
+                    sfdcOrg.multiSelectedBranches = $scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches;
                     $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
                 }
             }, function (error) {
@@ -290,6 +311,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.showDataOnForm = function (eachSfdcConnection, eachdata) {
         let eachdataLocal = $scope.lstRepositoryData[$scope.lstRepositoryData.indexOf(eachdata)];
+        let lstBranches = [];
+        $.each(eachdataLocal.mapBranches, function(key, value) {
+            lstBranches.push(key);
+        });
         eachdataLocal.sfdcOrg = {
             orgName: eachSfdcConnection.orgName,
             environment: eachSfdcConnection.environment,
@@ -302,7 +327,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSuccess: eachSfdcConnection.oauthSuccess,
             oauthFailed: eachSfdcConnection.oauthFailed,
             oauthSaved: eachSfdcConnection.oauthSaved,
-            disabledForm: 'true'
+            disabledForm: 'true',
+            multiBranchData: lstBranches,
+            multiExtraSettings: {enableSearch: true},
+            multiSelectedBranches: eachSfdcConnection.lstSelectedBranches
         };
         //$scope.disabledForm = 'true';
 

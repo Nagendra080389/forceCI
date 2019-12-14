@@ -3,6 +3,7 @@ package com.model;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Document(collection = "SFDCConnectionDetails")
 public class SFDCConnectionDetails implements Serializable {
@@ -20,6 +21,7 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthSaved;
     private String oauthToken;
     private String gitRepoId;
+    private List<String> lstSelectedBranches;
 
     public String getOrgName() {
         return orgName;
@@ -123,5 +125,13 @@ public class SFDCConnectionDetails implements Serializable {
 
     public void setGitRepoId(String gitRepoId) {
         this.gitRepoId = gitRepoId;
+    }
+
+    public List<String> getLstSelectedBranches() {
+        return lstSelectedBranches;
+    }
+
+    public void setLstSelectedBranches(List<String> lstSelectedBranches) {
+        this.lstSelectedBranches = lstSelectedBranches;
     }
 }
