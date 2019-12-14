@@ -16,7 +16,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         oauthSaved: 'false',
         disabledForm: 'false',
         multiBranchData: [],
-        multiExtraSettings: {enableSearch: true},
+        multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
         multiSelectedBranches: []
     };
     //$scope.disabledForm = 'false';
@@ -272,7 +272,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSaved: eachData.oauthSaved,
             oauthToken: sfdcAccessTokenFromExternalPage,
             gitRepoId: eachData.repositoryId,
-            lstSelectedBranches : changeListToObjectList(eachData.sfdcOrg.multiSelectedBranches)
+            lstSelectedBranches: changeListToObjectList(eachData.sfdcOrg.multiSelectedBranches)
         };
         if (eachData.orgName === undefined || eachData.orgName === null || eachData.orgName === '' ||
             eachData.userName === undefined || eachData.userName === null || eachData.userName === '') {
@@ -312,7 +312,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.showDataOnForm = function (eachSfdcConnection, eachdata) {
         let eachdataLocal = $scope.lstRepositoryData[$scope.lstRepositoryData.indexOf(eachdata)];
         let lstBranches = [];
-        $.each(eachdataLocal.mapBranches, function(key, value) {
+        $.each(eachdataLocal.mapBranches, function (key, value) {
             lstBranches.push(key);
         });
         eachdataLocal.sfdcOrg = {
@@ -329,7 +329,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSaved: eachSfdcConnection.oauthSaved,
             disabledForm: 'true',
             multiBranchData: changeListToObjectList(lstBranches),
-            multiExtraSettings: {enableSearch: true},
+            multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
             multiSelectedBranches: eachSfdcConnection.lstSelectedBranches === undefined || null ? [] : changeListToObjectList(eachSfdcConnection.lstSelectedBranches)
         };
         //$scope.disabledForm = 'true';
