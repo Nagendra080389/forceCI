@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.model.*;
 import com.utils.ApiSecurity;
 import org.apache.commons.httpclient.HttpClient;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -392,9 +394,21 @@ public class ForceCIController {
             int status = httpClient.executeMethod(createWebHook);
             if(LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
-                GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(accessToken).build();
-                Map<String, GHBranch> branches = gitHub.getRepositoryById(repository.getRepositoryId()).getBranches();
-                repository.setMapBranches(branches);
+                GetMethod fetchBranches = new GetMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" + repository.getRepositoryName() + "/branches");
+                fetchBranches.setRequestHeader("Authorization", "token " + accessToken);
+                fetchBranches.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
+                httpClient = new HttpClient();
+                status = httpClient.executeMethod(fetchBranches);
+                if(LIST_VALID_RESPONSE_CODES.contains(status)) {
+                    Type listBranches = new TypeToken<ArrayList<GitBranches>>(){}.getType();
+                    List<GitBranches> branchesListFromApi = new Gson().fromJson(IOUtils.toString(fetchBranches.getResponseBodyAsStream(), StandardCharsets.UTF_8), listBranches);
+                    Map<String, GitBranches> stringGitBranchesMap = new HashMap<>();
+                    for (GitBranches eachBranch : branchesListFromApi) {
+                        stringGitBranchesMap.put(eachBranch.getName(), eachBranch);
+                    }
+                    repository.setMapBranches(stringGitBranchesMap);
+                }
+
                 repository.setWebHook(webHookResponse);
                 repository.setHmacSecret(randomString);
                 RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
