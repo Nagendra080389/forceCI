@@ -2,23 +2,6 @@ var app = angular.module('forceCIApp', ["angularjs-dropdown-multiselect"]);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
-    const sfdcOrg = {
-        orgName: '',
-        environment: '0',
-        userName: '',
-        instanceURL: '',
-        authorize: 'Authorize',
-        save: 'Save',
-        testConnection: 'Test Connection',
-        delete: 'Delete',
-        oauthSuccess: 'false',
-        oauthFailed: 'false',
-        oauthSaved: 'false',
-        disabledForm: 'false',
-        multiBranchData: [],
-        multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-        multiSelectedBranches: []
-    };
     //$scope.disabledForm = 'false';
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
@@ -74,6 +57,23 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                             console.log(key);
                             lstBranches.push(key);
                         });
+                        const sfdcOrg = {
+                            orgName: '',
+                            environment: '0',
+                            userName: '',
+                            instanceURL: '',
+                            authorize: 'Authorize',
+                            save: 'Save',
+                            testConnection: 'Test Connection',
+                            delete: 'Delete',
+                            oauthSuccess: 'false',
+                            oauthFailed: 'false',
+                            oauthSaved: 'false',
+                            disabledForm: 'false',
+                            multiBranchData: [],
+                            multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
+                            multiSelectedBranches: []
+                        };
                         sfdcOrg.multiBranchData = changeListToObjectList(lstBranches);
                         sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches === undefined || null ? [] : changeListToObjectList(response.data[i].repository.lstSelectedBranches);
                         response.data[i].repository.sfdcOrg = sfdcOrg;
@@ -197,6 +197,23 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     lstBranches.push(key);
                 });
 
+                const sfdcOrg = {
+                    orgName: '',
+                    environment: '0',
+                    userName: '',
+                    instanceURL: '',
+                    authorize: 'Authorize',
+                    save: 'Save',
+                    testConnection: 'Test Connection',
+                    delete: 'Delete',
+                    oauthSuccess: 'false',
+                    oauthFailed: 'false',
+                    oauthSaved: 'false',
+                    disabledForm: 'false',
+                    multiBranchData: [],
+                    multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
+                    multiSelectedBranches: []
+                };
                 sfdcOrg.multiBranchData = changeListToObjectList(lstBranches);
                 response.data.sfdcOrg = sfdcOrg;
 
@@ -250,6 +267,23 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
         $.removeCookie('SFDC_USER_NAME', {path: '/'});
         $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+        const sfdcOrg = {
+            orgName: '',
+            environment: '0',
+            userName: '',
+            instanceURL: '',
+            authorize: 'Authorize',
+            save: 'Save',
+            testConnection: 'Test Connection',
+            delete: 'Delete',
+            oauthSuccess: 'false',
+            oauthFailed: 'false',
+            oauthSaved: 'false',
+            disabledForm: 'false',
+            multiBranchData: [],
+            multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
+            multiSelectedBranches: []
+        };
         $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
@@ -295,6 +329,23 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         title: 'OK',
                         message: 'SFDC connection created successfully'
                     });
+                    const sfdcOrg = {
+                        orgName: '',
+                        environment: '0',
+                        userName: '',
+                        instanceURL: '',
+                        authorize: 'Authorize',
+                        save: 'Save',
+                        testConnection: 'Test Connection',
+                        delete: 'Delete',
+                        oauthSuccess: 'false',
+                        oauthFailed: 'false',
+                        oauthSaved: 'false',
+                        disabledForm: 'false',
+                        multiBranchData: [],
+                        multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
+                        multiSelectedBranches: []
+                    };
                     sfdcOrg.multiSelectedBranches = changeListToObjectList($scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches);
                     $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
                 }
