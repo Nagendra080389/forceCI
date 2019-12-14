@@ -239,22 +239,22 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.authorize = function (eachData, $index) {
         let url = '';
-        if (eachData.orgName === undefined || eachData.orgName === null || eachData.orgName === ''
-            || eachData.userName === undefined || eachData.userName === null || eachData.userName === '' || (eachData.environment === '2'
-                && (eachData.instanceURL === undefined || eachData.instanceURL === null || eachData.instanceURL === ''))) {
+        if (eachData.sfdcOrg.orgName === undefined || eachData.sfdcOrg.orgName === null || eachData.sfdcOrg.orgName === ''
+            || eachData.sfdcOrg.userName === undefined || eachData.sfdcOrg.userName === null || eachData.sfdcOrg.userName === '' || (eachData.sfdcOrg.environment === '2'
+                && (eachData.sfdcOrg.instanceURL === undefined || eachData.sfdcOrg.instanceURL === null || eachData.sfdcOrg.instanceURL === ''))) {
             iziToast.warning({title: 'Caution', message: 'Please fill in required fields.', position: 'center'});
             return;
         }
-        if (eachData) {
-            if (eachData.environment === '0') {
+        if (eachData && eachData.sfdcOrg) {
+            if (eachData.sfdcOrg.environment === '0') {
                 url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.environment;
-            } else if (eachData.environment === '1') {
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
+            } else if (eachData.sfdcOrg.environment === '1') {
                 url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.environment;
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
             } else {
-                url = eachData.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.instanceURL;
+                url = eachData.sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.instanceURL;
             }
             const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
             if (window.focus) {
@@ -293,23 +293,23 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.saveConnection = function (eachData, $index) {
         const sfdcDetails = {
-            orgName: eachData.orgName,
-            environment: eachData.environment,
-            userName: eachData.userName,
+            orgName: eachData.sfdcOrg.orgName,
+            environment: eachData.sfdcOrg.environment,
+            userName: eachData.sfdcOrg.userName,
             instanceURL: sfdcInstanceFromExternalPage,
-            authorize: eachData.authorize,
-            save: eachData.save,
-            testConnection: eachData.testConnection,
-            delete: eachData.delete,
+            authorize: eachData.sfdcOrg.authorize,
+            save: eachData.sfdcOrg.save,
+            testConnection: eachData.sfdcOrg.testConnection,
+            delete: eachData.sfdcOrg.delete,
             oauthSuccess: 'true',
-            oauthFailed: eachData.oauthFailed,
-            oauthSaved: eachData.oauthSaved,
+            oauthFailed: eachData.sfdcOrg.oauthFailed,
+            oauthSaved: eachData.sfdcOrg.oauthSaved,
             oauthToken: sfdcAccessTokenFromExternalPage,
             gitRepoId: eachData.repositoryId,
             lstSelectedBranches: changeListToObjectList(eachData.sfdcOrg.multiSelectedBranches)
         };
-        if (eachData.orgName === undefined || eachData.orgName === null || eachData.orgName === '' ||
-            eachData.userName === undefined || eachData.userName === null || eachData.userName === '') {
+        if (eachData.sfdcOrg.orgName === undefined || eachData.sfdcOrg.orgName === null || eachData.sfdcOrg.orgName === '' ||
+            eachData.sfdcOrg.userName === undefined || eachData.sfdcOrg.userName === null || eachData.sfdcOrg.userName === '') {
             return;
         }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
