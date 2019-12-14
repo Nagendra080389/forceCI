@@ -13,9 +13,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         delete: 'Delete',
         oauthSuccess: 'false',
         oauthFailed: 'false',
-        oauthSaved: 'false'
+        oauthSaved: 'false',
+        disabledForm : 'false'
     };
-    $scope.disabledForm = 'false';
+    //$scope.disabledForm = 'false';
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
     let sfdcInstanceFromExternalPage;
@@ -234,7 +235,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
         sfdcInstanceFromExternalPage = '';
-        $scope.disabledForm = 'false';
+        //$scope.disabledForm = 'false';
     };
 
     $scope.saveConnection = function (eachData, $index) {
@@ -300,9 +301,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             delete: eachSfdcConnection.delete,
             oauthSuccess: eachSfdcConnection.oauthSuccess,
             oauthFailed: eachSfdcConnection.oauthFailed,
-            oauthSaved: eachSfdcConnection.oauthSaved
+            oauthSaved: eachSfdcConnection.oauthSaved,
+            disabledForm: 'true'
         };
-        $scope.disabledForm = 'true';
+        //$scope.disabledForm = 'true';
 
 
     }
