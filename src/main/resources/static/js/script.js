@@ -280,7 +280,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthFailed: 'false',
             oauthSaved: 'false',
             disabledForm: 'false',
-            multiBranchData: [],
+            multiBranchData: $scope.lstRepositoryData[$index].sfdcOrg.multiBranchData === undefined || null ? [] : $scope.lstRepositoryData[$index].sfdcOrg.multiBranchData,
             multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
             multiSelectedBranches: []
         };
@@ -391,8 +391,10 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     function changeListToObjectList(lstData) {
         let lstOfObjects = [];
         for (let i = 0; i < lstData.length; i++) {
-            const branchData = {id: i + 1, label: lstData[i]};
-            lstOfObjects.push(branchData);
+            if($.type(lstData[i]) === 'string') {
+                const branchData = {id: i + 1, label: lstData[i]};
+                lstOfObjects.push(branchData);
+            }
         }
         return lstOfObjects;
     }
