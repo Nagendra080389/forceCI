@@ -74,8 +74,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                             console.log(key);
                             lstBranches.push(key);
                         });
-                        sfdcOrg.multiBranchData = lstBranches;
-                        sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches === undefined || null ? [] : response.data[i].repository.lstSelectedBranches;
+                        sfdcOrg.multiBranchData = changeListToObjectList(lstBranches);
+                        sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches === undefined || null ? [] : changeListToObjectList(response.data[i].repository.lstSelectedBranches);
                         response.data[i].repository.sfdcOrg = sfdcOrg;
                         $scope.lstRepositoryData.push(response.data[i].repository);
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
@@ -197,7 +197,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     lstBranches.push(key);
                 });
 
-                sfdcOrg.multiBranchData = lstBranches;
+                sfdcOrg.multiBranchData = changeListToObjectList(lstBranches);
                 response.data.sfdcOrg = sfdcOrg;
 
                 $scope.reposInDB.push(response.data.repositoryFullName);
@@ -272,7 +272,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSaved: eachData.oauthSaved,
             oauthToken: sfdcAccessTokenFromExternalPage,
             gitRepoId: eachData.repositoryId,
-            lstSelectedBranches : eachData.sfdcOrg.multiSelectedBranches
+            lstSelectedBranches : changeListToObjectList(eachData.sfdcOrg.multiSelectedBranches)
         };
         if (eachData.orgName === undefined || eachData.orgName === null || eachData.orgName === '' ||
             eachData.userName === undefined || eachData.userName === null || eachData.userName === '') {
@@ -295,7 +295,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         title: 'OK',
                         message: 'SFDC connection created successfully'
                     });
-                    sfdcOrg.multiSelectedBranches = $scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches;
+                    sfdcOrg.multiSelectedBranches = changeListToObjectList($scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches);
                     $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
                 }
             }, function (error) {
@@ -328,13 +328,22 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthFailed: eachSfdcConnection.oauthFailed,
             oauthSaved: eachSfdcConnection.oauthSaved,
             disabledForm: 'true',
-            multiBranchData: lstBranches,
+            multiBranchData: changeListToObjectList(lstBranches),
             multiExtraSettings: {enableSearch: true},
-            multiSelectedBranches: eachSfdcConnection.lstSelectedBranches
+            multiSelectedBranches: eachSfdcConnection.lstSelectedBranches === undefined || null ? [] : changeListToObjectList(eachSfdcConnection.lstSelectedBranches)
         };
         //$scope.disabledForm = 'true';
 
 
+    }
+
+    function changeListToObjectList(lstData) {
+        let lstOfObjects = [];
+        for (let i = 0; i < lstData.length; i++) {
+            const branchData = {id: i + 1, label: lstData[i]};
+            lstOfObjects.push(branchData);
+        }
+        return lstOfObjects;
     }
 
     /*$scope.change = function (eachData) {
