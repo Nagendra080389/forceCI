@@ -419,7 +419,7 @@ public class ForceCIController {
 
     @RequestMapping(value = "/saveSfdcConnectionDetails", method = RequestMethod.POST)
     public String saveSfdcConnectionDetails(@RequestBody SFDCConnectionDetails sfdcConnectionDetails, HttpServletResponse response, HttpServletRequest
-            request) throws IOException {
+            request) throws Exception {
 
         Gson gson = new Gson();
         String returnResponse = null;
@@ -428,6 +428,8 @@ public class ForceCIController {
             sfdcConnectionDetails.setOauthSaved("true");
             SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
             returnResponse = gson.toJson(connectionSaved);
+        } else {
+            throw new Exception("User already connected to ForceCI");
         }
 
         return returnResponse;
