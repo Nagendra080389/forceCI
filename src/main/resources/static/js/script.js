@@ -68,7 +68,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             localStorage.setItem('githubOwner', response.data.login);
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 if (response.data.length > 0) {
-                    for (let i = 0; i < response.data[i].repository.length; i++) {
+                    for (let i = 0; i < response.data.length; i++) {
                         let lstBranches = [];
                         $.each(response.data[i].repository.mapBranches, function (key, value) {
                             console.log(key);
