@@ -2,8 +2,7 @@ var app = angular.module('forceCIApp', []);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
-    $scope.lstSFDCConnectionData = [];
-    $scope.sfdcOrg = {
+    const sfdcOrg = {
         orgName: '',
         environment: '0',
         userName: '',
@@ -34,7 +33,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
-                $scope.sfdcOrg.oauthSuccess = 'true';
+                //$scope.sfdcOrg.oauthSuccess = 'true';
                 iziToast.success({
                     timeout: 5000,
                     icon: 'fa fa-chrome',
@@ -50,7 +49,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
-                $scope.sfdcOrg.oauthSuccess = 'false';
+                //$scope.sfdcOrg.oauthSuccess = 'false';
                 iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
             }
         }
@@ -66,10 +65,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 if (response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
+                        response.data[i].repository.sfdcOrg = sfdcOrg;
                         $scope.lstRepositoryData.push(response.data[i].repository);
-                        for (let j = 0; j < response.data[i].repository.sfdcConnectionDetails.length; j++) {
-                            $scope.lstSFDCConnectionData.push(response.data[i].repository.sfdcConnectionDetails[j]);
-                        }
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
                     }
                     $('#repoConnectedDialog').removeClass('hidden');
@@ -203,25 +200,24 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     });
 
-    $scope.authorize = function () {
-        console.log($scope.sfdcOrg);
+    $scope.authorize = function (eachData, $index) {
         let url = '';
-        if ($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === ''
-            || $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === '' || ($scope.sfdcOrg.environment === '2'
-                && ($scope.sfdcOrg.instanceURL === undefined || $scope.sfdcOrg.instanceURL === null || $scope.sfdcOrg.instanceURL === ''))) {
+        if (eachData.orgName === undefined || eachData.orgName === null || eachData.orgName === ''
+            || eachData.userName === undefined || eachData.userName === null || eachData.userName === '' || (eachData.environment === '2'
+                && (eachData.instanceURL === undefined || eachData.instanceURL === null || eachData.instanceURL === ''))) {
             iziToast.warning({title: 'Caution', message: 'Please fill in required fields.', position: 'center'});
             return;
         }
-        if ($scope.sfdcOrg) {
-            if ($scope.sfdcOrg.environment === '0') {
+        if (eachData) {
+            if (eachData.environment === '0') {
                 url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
-            } else if ($scope.sfdcOrg.environment === '1') {
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.environment;
+            } else if (eachData.environment === '1') {
                 url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.environment;
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.environment;
             } else {
-                url = $scope.sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + $scope.sfdcOrg.instanceURL;
+                url = eachData.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.instanceURL;
             }
             const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
             if (window.focus) {
@@ -230,47 +226,35 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         }
     };
 
-    $scope.createNewConnection = function () {
+    $scope.createNewConnection = function ($index) {
         $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
         $.removeCookie('SFDC_USER_NAME', {path: '/'});
         $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
-        $scope.sfdcOrg = {
-            orgName: '',
-            environment: '0',
-            userName: '',
-            instanceURL: '',
-            authorize: 'Authorize',
-            save: 'Save',
-            testConnection: 'Test Connection',
-            delete: 'Delete',
-            oauthSuccess: 'false',
-            oauthFailed: 'false',
-            oauthSaved: 'false'
-        };
+        $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
         sfdcInstanceFromExternalPage = '';
         $scope.disabledForm = 'false';
     };
 
-    $scope.saveConnection = function (eachData) {
+    $scope.saveConnection = function (eachData, $index) {
         const sfdcDetails = {
-            orgName: $scope.sfdcOrg.orgName,
-            environment: $scope.sfdcOrg.environment,
-            userName: $scope.sfdcOrg.userName,
+            orgName: eachData.orgName,
+            environment: eachData.environment,
+            userName: eachData.userName,
             instanceURL: sfdcInstanceFromExternalPage,
-            authorize: $scope.sfdcOrg.authorize,
-            save: $scope.sfdcOrg.save,
-            testConnection: $scope.sfdcOrg.testConnection,
-            delete: $scope.sfdcOrg.delete,
+            authorize: eachData.authorize,
+            save: eachData.save,
+            testConnection: eachData.testConnection,
+            delete: eachData.delete,
             oauthSuccess: 'true',
-            oauthFailed: $scope.sfdcOrg.oauthFailed,
-            oauthSaved: $scope.sfdcOrg.oauthSaved,
+            oauthFailed: eachData.oauthFailed,
+            oauthSaved: eachData.oauthSaved,
             oauthToken: sfdcAccessTokenFromExternalPage,
             gitRepoId: eachData.repositoryId
         };
-        if ($scope.sfdcOrg.orgName === undefined || $scope.sfdcOrg.orgName === null || $scope.sfdcOrg.orgName === '' ||
-            $scope.sfdcOrg.userName === undefined || $scope.sfdcOrg.userName === null || $scope.sfdcOrg.userName === '') {
+        if (eachData.orgName === undefined || eachData.orgName === null || eachData.orgName === '' ||
+            eachData.userName === undefined || eachData.userName === null || eachData.userName === '') {
             return;
         }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
@@ -280,7 +264,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
                     const gitRepoId = response.data.gitRepoId;
                     $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
-                        $scope.lstSFDCConnectionData = response.data;
+                        $scope.lstRepositoryData[$index].sfdcConnectionDetails.push(response.data);
                     }, function (error) {
                         console.log(error);
                     });
@@ -290,19 +274,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                         title: 'OK',
                         message: 'SFDC connection created successfully'
                     });
-                    $scope.sfdcOrg = {
-                        orgName: '',
-                        environment: '0',
-                        userName: '',
-                        instanceURL: '',
-                        authorize: 'Authorize',
-                        save: 'Save',
-                        testConnection: 'Test Connection',
-                        delete: 'Delete',
-                        oauthSuccess: 'false',
-                        oauthFailed: 'false',
-                        oauthSaved: 'false'
-                    };
+                    $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
                 }
             }, function (error) {
                 console.log(error);
@@ -315,9 +287,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         );
     }
 
-    $scope.showDataOnForm = function (eachSfdcConnection) {
-        console.log(eachSfdcConnection);
-        $scope.sfdcOrg = {
+    $scope.showDataOnForm = function (eachSfdcConnection, eachdata) {
+        let eachdataLocal = $scope.lstRepositoryData[$scope.lstRepositoryData.indexOf(eachdata)];
+        eachdataLocal.sfdcOrg = {
             orgName: eachSfdcConnection.orgName,
             environment: eachSfdcConnection.environment,
             userName: eachSfdcConnection.userName,
@@ -331,6 +303,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSaved: eachSfdcConnection.oauthSaved
         };
         $scope.disabledForm = 'true';
+
 
     }
 

@@ -21,24 +21,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import spark.Request;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
-import static org.kohsuke.github.GHDeploymentState.SUCCESS;
 
 @RestController
 public class ForceCIController {
@@ -61,8 +54,6 @@ public class ForceCIController {
 
     @Value("${sfdc.redirectURI}")
     String sfdcRedirectURI;
-
-
 
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
@@ -103,7 +94,6 @@ public class ForceCIController {
         JsonParser parser = new JsonParser();
 
         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
-        System.out.println("jsonObject is now " + jsonObject);
 
         try {
 
@@ -402,6 +392,9 @@ public class ForceCIController {
             int status = httpClient.executeMethod(createWebHook);
             if(LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
+                GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(accessToken).build();
+                Map<String, GHBranch> branches = gitHub.getRepositoryById(repository.getRepositoryId()).getBranches();
+                repository.setMapBranches(branches);
                 repository.setWebHook(webHookResponse);
                 repository.setHmacSecret(randomString);
                 RepositoryWrapper repositoryWrapper = new RepositoryWrapper();

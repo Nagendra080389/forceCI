@@ -1,7 +1,10 @@
 package com.model;
 
+import org.kohsuke.github.GHBranch;
+
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Repository implements Serializable {
@@ -17,6 +20,7 @@ public class Repository implements Serializable {
     private WebHook webHook;
     private String hmacSecret;
     private String ownerHtmlUrl;
+    private Map<String, GHBranch> mapBranches;
     private List<SFDCConnectionDetails> sfdcConnectionDetails;
 
 
@@ -122,6 +126,14 @@ public class Repository implements Serializable {
 
     public void setSfdcConnectionDetails(List<SFDCConnectionDetails> sfdcConnectionDetails) {
         this.sfdcConnectionDetails = sfdcConnectionDetails;
+    }
+
+    public Map<String, GHBranch> getMapBranches() {
+        return mapBranches;
+    }
+
+    public void setMapBranches(Map<String, GHBranch> mapBranches) {
+        this.mapBranches = mapBranches;
     }
 
     @Override

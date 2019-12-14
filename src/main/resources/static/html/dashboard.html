@@ -20,8 +20,10 @@
     <script src="../js/pace/pace.min.js"></script>
     <link href="../css/pace/pace-theme-center-circle.css" rel="stylesheet">
     <link href="../css/iziToast/iziToast.min.css" rel="stylesheet">
-    <script src="../js/jqueryCookie/jquery.cookie.js"></script>
+    <link href="../css/jqueryPlugin/jquery.magicsearch.min.css" rel="stylesheet">
+    <script src="../js/jqueryPlugin/jquery.cookie.js"></script>
     <script src="../js/iziToast/iziToast.min.js"></script>
+    <script src="../js/jqueryPlugin/jquery.magicsearch.js"></script>
     <script src="../js/script.js"></script>
     <style>
 
@@ -143,13 +145,13 @@
                                             <div class="row no-gutters pa3">
                                                 <div class="col-6 col-md-4 connectionButton">
                                                     <div>
-                                                        <button type="button" class="btn btn-info" ng-click="createNewConnection();">Create New Connection</button>
+                                                        <button type="button" class="btn btn-info" ng-click="createNewConnection($index);">Create New Connection</button>
                                                     </div>
                                                     <div class="col-12 col-sm-6 col-md-8 bg-lightest-silver">
                                                         <ul style="padding: 0;">
-                                                            <li class="list-group-item" ng-repeat="eachSfdcConnection in lstSFDCConnectionData">
+                                                            <li class="list-group-item" ng-repeat="eachSfdcConnection in eachdata.sfdcConnectionDetails">
                                                                 <div style="border-bottom: 1px solid gray;">
-                                                                    <div class="pointerEvent" ng-click="showDataOnForm(eachSfdcConnection)">
+                                                                    <div class="pointerEvent" ng-click="showDataOnForm(eachSfdcConnection, eachdata)">
                                                                         <h2>{{eachSfdcConnection.orgName}}</h2>
                                                                         <p>{{eachSfdcConnection.userName}}</p>
                                                                     </div>
@@ -164,14 +166,14 @@
                                                         <div class="form-group row">
                                                             <label for="inputorgNamel3" class="col-sm-2 col-form-label required">Name</label>
                                                             <div class="col-sm-10">
-                                                                <input type="text" class="form-control" id="inputorgNamel3" placeholder="Name" ng-model="sfdcOrg.orgName" ng-disabled="disabledForm == 'true'">
+                                                                <input type="text" class="form-control" id="inputorgNamel3" placeholder="Name" ng-model="eachdata.sfdcOrg.orgName" ng-disabled="disabledForm == 'true'">
                                                             </div>
                                                         </div>
                                                         <div class="form-group row">
                                                             <label for="inputenvironment3" class="col-sm-2 col-form-label required">Environment</label>
                                                             <div class="col-sm-10">
                                                                 <div class="dropdown bootstrap-select">
-                                                                    <select class="form-control" id="inputenvironment3" ng-model="sfdcOrg.environment" ng-disabled="disabledForm == 'true'">
+                                                                    <select class="form-control" id="inputenvironment3" ng-model="eachdata.sfdcOrg.environment" ng-disabled="disabledForm == 'true'">
                                                                         <option value="0" selected>Production/Developer</option>
                                                                         <option value="1">Sandbox</option>
                                                                         <option value="2">Custom Org</option>
@@ -183,35 +185,39 @@
                                                             <label for="salesforceLoginl3" class="col-sm-2 col-form-label required">Salesforce Login</label>
                                                             <div class="col-sm-10">
                                                                 <input type="text" class="form-control" id="salesforceLoginl3" placeholder="Salesforce userName"
-                                                                       ng-model="sfdcOrg.userName" ng-disabled="disabledForm == 'true'">
+                                                                       ng-model="eachdata.sfdcOrg.userName" ng-disabled="disabledForm == 'true'">
                                                             </div>
                                                         </div>
-                                                        <div class="form-group row" ng-show="sfdcOrg.environment === '2'">
+                                                        <div class="form-group row" ng-show="eachdata.sfdcOrg.environment === '2'">
                                                             <label for="salesforceinstanceURLl3" class="col-sm-2 col-form-label required">Instance Url</label>
                                                             <div class="col-sm-10">
                                                                 <input type="text" class="form-control" id="salesforceinstanceURLl3" placeholder="Salesforce Instance Url"
-                                                                       ng-model="sfdcOrg.instanceURL" ng-disabled="disabledForm == 'true'">
+                                                                       ng-model="eachdata.sfdcOrg.instanceURL" ng-disabled="disabledForm == 'true'">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="branchNamel3" class="col-sm-2 col-form-label required">Branch Name</label>
+                                                            <div class="col-sm-10">
+                                                                <input class="form-control" id="branchNamel3" placeholder="search branches..."
+                                                                       ng-model="eachdata.sfdcOrg.instanceURL">
                                                             </div>
                                                         </div>
                                                         <div class="form-group row">
                                                             <div class="form-group">
                                                                 <div class="col-sm-10">
-                                                                    <button type="button" class="btn btn-primary" ng-click="authorize();">{{sfdcOrg.authorize}}</button>
-                                                                    <button type="button" class="btn btn-primary" ng-click="saveConnection(eachData);"
-                                                                            ng-disabled="sfdcOrg.oauthSuccess === 'false'">{{sfdcOrg.save}}
+                                                                    <button type="button" class="btn btn-primary" ng-click="authorize(eachData, $index);">{{eachdata.sfdcOrg.authorize}}</button>
+                                                                    <button type="button" class="btn btn-primary" ng-click="saveConnection(eachData, $index);"
+                                                                            ng-disabled="eachdata.sfdcOrg.oauthSuccess === 'false'">{{eachdata.sfdcOrg.save}}
                                                                     </button>
-                                                                    <button type="button" class="btn btn-primary" ng-click="testConnection();"
-                                                                            ng-disabled="sfdcOrg.oauthSuccess === 'false'">{{sfdcOrg.testConnection}}
+                                                                    <button type="button" class="btn btn-primary" ng-click="testConnection(eachData, $index);"
+                                                                            ng-disabled="eachdata.sfdcOrg.oauthSuccess === 'false'">{{eachdata.sfdcOrg.testConnection}}
                                                                     </button>
-                                                                    <button type="button" class="btn btn-primary" ng-click="deleteConnection();"
-                                                                            ng-disabled="sfdcOrg.oauthSaved === 'false'">{{sfdcOrg.delete}}
+                                                                    <button type="button" class="btn btn-primary" ng-click="deleteConnection(eachData, $index);"
+                                                                            ng-disabled="eachdata.sfdcOrg.oauthSaved === 'false'">{{eachdata.sfdcOrg.delete}}
                                                                     </button>
                                                                 </div>
 
                                                             </div>
-                                                        </div>
-                                                        <div class="form-group row alert alert-danger" role="alert" ng-show="sfdcOrg.oauthFailed === 'true'">
-                                                            Oauth failed! {{sfdcOrg.oauthFailedMessage}}
                                                         </div>
                                                     </form>
                                                 </div>
