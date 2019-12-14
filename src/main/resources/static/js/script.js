@@ -1,4 +1,4 @@
-var app = angular.module('forceCIApp', []);
+var app = angular.module('forceCIApp', ["angularjs-dropdown-multiselect"]);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
@@ -75,7 +75,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                             lstBranches.push(key);
                         });
                         sfdcOrg.multiBranchData = lstBranches;
-                        sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches;
+                        sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches === undefined || null ? [] : response.data[i].repository.lstSelectedBranches;
                         response.data[i].repository.sfdcOrg = sfdcOrg;
                         $scope.lstRepositoryData.push(response.data[i].repository);
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
