@@ -463,6 +463,7 @@ public class ForceCIController {
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
 
             List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(String.valueOf(repository.getId()));
+            System.out.println(" byGitRepoId-> "+byGitRepoId);
             Thread.sleep(20000L);
 
             // This will happen only after validation is success
