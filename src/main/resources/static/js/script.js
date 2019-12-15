@@ -292,6 +292,8 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     };
 
     $scope.saveConnection = function (eachData, $index) {
+
+
         const sfdcDetails = {
             orgName: eachData.sfdcOrg.orgName,
             environment: eachData.sfdcOrg.environment,

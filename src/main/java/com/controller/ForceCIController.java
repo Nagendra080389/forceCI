@@ -186,7 +186,7 @@ public class ForceCIController {
         if(StringUtils.hasText(accessToken)){
             Cookie accessTokenCookie = new Cookie("SFDC_ACCESS_TOKEN", accessToken);
             Cookie userNameCookie = new Cookie("SFDC_USER_NAME", username);
-            Cookie instanceURLCookie = new Cookie("SFDC_INSTANCE_URL", username);
+            Cookie instanceURLCookie = new Cookie("SFDC_INSTANCE_URL", instance_url);
             httpResponse.addCookie(accessTokenCookie);
             httpResponse.addCookie(userNameCookie);
             httpResponse.addCookie(instanceURLCookie);
