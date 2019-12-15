@@ -7,6 +7,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     let sfdcUserNameFromExternalPage;
     let sfdcInstanceFromExternalPage;
     let objWindow;
+    let current$index;
 
 
     window.addEventListener('message', function (objEvent) {
@@ -20,7 +21,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
-                //$scope.sfdcOrg.oauthSuccess = 'true';
+                $scope.lstRepositoryData[current$index].sfdcOrg.oauthSuccess = 'true';
                 iziToast.success({
                     timeout: 5000,
                     icon: 'fa fa-chrome',
@@ -36,7 +37,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
-                //$scope.sfdcOrg.oauthSuccess = 'false';
+                $scope.lstRepositoryData[current$index].sfdcOrg.oauthSuccess = 'false';
                 iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
             }
         }
@@ -245,6 +246,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             iziToast.warning({title: 'Caution', message: 'Please fill in required fields.', position: 'center'});
             return;
         }
+        current$index = $index;
         if (eachData && eachData.sfdcOrg) {
             if (eachData.sfdcOrg.environment === '0') {
                 url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
