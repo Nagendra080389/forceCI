@@ -14,7 +14,13 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.json.JSONException;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +34,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -201,7 +211,7 @@ public class ForceCIController {
 
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
     public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent,
-                           @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) {
+                           @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) throws IOException, GitAPIException {
         Gson gson = new Gson();
         // if signature is empty return 401
         if (!StringUtils.hasText(signature)) {
@@ -220,6 +230,12 @@ public class ForceCIController {
                 if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
+                    GHPullRequest gitPullRequest = gson.fromJson(payload, GHPullRequest.class);
+                    // Create a new repository; the path must exist
+                    Path tempDirectory = Files.createTempDirectory(gitPullRequest.getRepository().getName());
+                    // Create a new repository; the path must exist
+
+                    Git git = Git.init().setDirectory(tempDirectory.toFile()).call();
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), access_token);
                 }
                 break;
@@ -435,14 +451,16 @@ public class ForceCIController {
         String payload = gson.toJson(map);
 
         try {
+
             System.out.println("inside start_deployment -> "+access_token);
             GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
             System.out.println("gitHub -> "+gitHub);
             GHRepository repository = gitHub.getRepository(jsonObject.get("head").getAsJsonObject().get("repo").getAsJsonObject().get("full_name").getAsString());
             System.out.println("repository -> "+repository);
-            GHDeploymentStatus deploymentStatus = new GHDeploymentStatusBuilder(repository,
-                    jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
-            GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
+            GHBranch branch = repository.getBranch(jsonObject.get("pull_request").getAsJsonObject().get("head").getAsJsonObject().get("repo").getAsJsonObject().get("name").getAsString());
+
+
+            //GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
         } catch (IOException e) {
             e.printStackTrace();
         }
