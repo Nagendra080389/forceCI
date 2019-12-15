@@ -239,38 +239,6 @@ public class ForceCIController {
         return gson.toJson("");
     }
 
-    /*@RequestMapping(value = "/event_handler", method = RequestMethod.GET)
-    public void webhookReceiver(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
-            request, HttpServletRequest servletRequest) throws Exception {
-
-        Request req = (Request) request;
-        String payload = req.body();
-        String x_github_event = req.headers("X-GITHUB-EVENT");
-
-        String access_token = fetchCookies(servletRequest);
-
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
-
-        switch (x_github_event) {
-            case "pull_request":
-                if ("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) &&
-                        jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
-
-                    System.out.println("A pull request was merged! A deployment should start now...");
-
-                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), access_token);
-                }
-                break;
-            case "deployment":
-                process_deployment(jsonObject, access_token);
-                break;
-            case "deployment_status":
-                update_deployment_status(jsonObject);
-                break;
-        }
-
-    }*/
 
     @RequestMapping(value = "/fetchRepositoryInDB", method = RequestMethod.GET)
     public String getRepositoryList(@RequestParam String gitHubUser, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
@@ -359,6 +327,8 @@ public class ForceCIController {
             if(status == 204){
                 RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryId(repositoryOwner, repositoryId);
                 repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
+                List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
+                sfdcConnectionDetailsMongoRepository.deleteAll(byGitRepoId);
             }
         }
 
@@ -476,7 +446,7 @@ public class ForceCIController {
         }
     }
 
-    private static void process_deployment(JsonObject jsonObject, String access_token) {
+    private void process_deployment(JsonObject jsonObject, String access_token) {
         String payload_str = jsonObject.get("deployment").getAsJsonObject().get("payload").getAsString();
         Map payload = new Gson().fromJson(payload_str, Map.class);
 
@@ -491,6 +461,8 @@ public class ForceCIController {
                             .get("full_name").getAsString());
             GHDeploymentStatus deploymentStatus = new GHDeploymentStatusBuilder(repository,
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
+
+            List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(String.valueOf(repository.getId()));
             Thread.sleep(20000L);
 
             // This will happen only after validation is success
