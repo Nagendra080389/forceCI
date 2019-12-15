@@ -217,7 +217,7 @@ public class ForceCIController {
                     String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
                     access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
                 }
-                if ("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) &&
+                if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), access_token);
@@ -435,9 +435,11 @@ public class ForceCIController {
         String payload = gson.toJson(map);
 
         try {
+            System.out.println("inside start_deployment -> "+access_token);
             GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
             System.out.println("gitHub -> "+gitHub);
             GHRepository repository = gitHub.getRepository(jsonObject.get("head").getAsJsonObject().get("repo").getAsJsonObject().get("full_name").getAsString());
+            System.out.println("repository -> "+repository);
             GHDeploymentStatus deploymentStatus = new GHDeploymentStatusBuilder(repository,
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
             GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
@@ -463,6 +465,7 @@ public class ForceCIController {
                     jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
 
             List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(String.valueOf(repository.getId()));
+
             System.out.println(" byGitRepoId-> "+byGitRepoId);
             Thread.sleep(20000L);
 
