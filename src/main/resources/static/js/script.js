@@ -321,7 +321,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                     $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
                     const gitRepoId = response.data.gitRepoId;
                     $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
-                        $scope.lstRepositoryData[$index].sfdcConnectionDetails.push(response.data);
+                        $scope.lstRepositoryData[$index].sfdcConnectionDetails = response.data;
                     }, function (error) {
                         console.log(error);
                     });
