@@ -42,6 +42,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             }
         }
         $scope.$apply();
+        current$index = '';
 
     });
 
@@ -306,7 +307,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             orgName: eachData.sfdcOrg.orgName,
             environment: eachData.sfdcOrg.environment,
             userName: eachData.sfdcOrg.userName,
-            instanceURL: eachData.sfdcOrg.instanceURL === undefined || null ? sfdcInstanceFromExternalPage : eachData.sfdcOrg.instanceURL,
+            instanceURL: eachData.sfdcOrg.instanceURL === undefined || null || '' ? sfdcInstanceFromExternalPage : eachData.sfdcOrg.instanceURL,
             authorize: eachData.sfdcOrg.authorize,
             save: eachData.sfdcOrg.save,
             testConnection: eachData.sfdcOrg.testConnection,
@@ -314,7 +315,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSuccess: 'true',
             oauthFailed: eachData.sfdcOrg.oauthFailed,
             oauthSaved: eachData.sfdcOrg.oauthSaved,
-            oauthToken: eachData.sfdcOrg.oauthToken === undefined || null ? sfdcAccessTokenFromExternalPage : eachData.sfdcOrg.oauthToken,
+            oauthToken: eachData.sfdcOrg.oauthToken === undefined || null || ''? sfdcAccessTokenFromExternalPage : eachData.sfdcOrg.oauthToken,
             gitRepoId: eachData.repositoryId,
             lstSelectedBranches: changeListToObjectList(lstSelectedBranch)
         };
@@ -323,42 +324,41 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             return;
         }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
-                if (response.data.userName && response.data.userName === $.cookie('SFDC_USER_NAME')) {
-                    $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
-                    $.removeCookie('SFDC_USER_NAME', {path: '/'});
-                    $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
-                    const gitRepoId = response.data.gitRepoId;
-                    $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
-                        $scope.lstRepositoryData[$index].sfdcConnectionDetails = response.data;
-                    }, function (error) {
-                        console.log(error);
-                    });
-                    iziToast.success({
-                        timeout: 5000,
-                        icon: 'fa fa-chrome',
-                        title: 'OK',
-                        message: 'SFDC connection created successfully'
-                    });
-                    const sfdcOrg = {
-                        orgName: '',
-                        environment: '0',
-                        userName: '',
-                        instanceURL: '',
-                        authorize: 'Authorize',
-                        save: 'Save',
-                        testConnection: 'Test Connection',
-                        delete: 'Delete',
-                        oauthSuccess: 'false',
-                        oauthFailed: 'false',
-                        oauthSaved: 'false',
-                        disabledForm: 'false',
-                        multiBranchData: [],
-                        multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-                        multiSelectedBranches: []
-                    };
-                    sfdcOrg.multiSelectedBranches = changeListToObjectList($scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches);
-                    $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
-                }
+            $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
+            $.removeCookie('SFDC_USER_NAME', {path: '/'});
+            $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+            $scope.lstRepositoryData[$index].sfdcConnectionDetails= [];
+            const gitRepoId = response.data.gitRepoId;
+            $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
+                $scope.lstRepositoryData[$index].sfdcConnectionDetails = response.data;
+            }, function (error) {
+                console.log(error);
+            });
+            iziToast.success({
+                timeout: 5000,
+                icon: 'fa fa-chrome',
+                title: 'OK',
+                message: 'SFDC connection created successfully'
+            });
+            const sfdcOrg = {
+                orgName: '',
+                environment: '0',
+                userName: '',
+                instanceURL: '',
+                authorize: 'Authorize',
+                save: 'Save',
+                testConnection: 'Test Connection',
+                delete: 'Delete',
+                oauthSuccess: 'false',
+                oauthFailed: 'false',
+                oauthSaved: 'false',
+                disabledForm: 'false',
+                multiBranchData: [],
+                multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
+                multiSelectedBranches: []
+            };
+            sfdcOrg.multiSelectedBranches = changeListToObjectList($scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches);
+            $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
             }, function (error) {
                 console.log(error);
                 iziToast.error({
