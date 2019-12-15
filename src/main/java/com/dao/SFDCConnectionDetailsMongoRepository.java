@@ -10,4 +10,6 @@ public interface SFDCConnectionDetailsMongoRepository extends MongoRepository<SF
     SFDCConnectionDetails findByUserName(String UserName);
 
     List<SFDCConnectionDetails> findByGitRepoId(String gitRepoId);
+
+    SFDCConnectionDetails findById(String id);
 }

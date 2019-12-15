@@ -292,13 +292,19 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     };
 
     $scope.saveConnection = function (eachData, $index) {
-
+        const lstSelectedBranch = eachData.sfdcOrg.multiSelectedBranches;
+        for (let i = 0; i < eachData.sfdcConnectionDetails.length; i++) {
+            if(eachData.sfdcConnectionDetails[i].userName === eachData.sfdcOrg.userName){
+                eachData.sfdcOrg = eachData.sfdcConnectionDetails[i];
+            }
+        }
 
         const sfdcDetails = {
+            id : eachData.sfdcOrg.id,
             orgName: eachData.sfdcOrg.orgName,
             environment: eachData.sfdcOrg.environment,
             userName: eachData.sfdcOrg.userName,
-            instanceURL: sfdcInstanceFromExternalPage,
+            instanceURL: eachData.sfdcOrg.instanceURL === undefined || null ? sfdcInstanceFromExternalPage : eachData.sfdcOrg.instanceURL,
             authorize: eachData.sfdcOrg.authorize,
             save: eachData.sfdcOrg.save,
             testConnection: eachData.sfdcOrg.testConnection,
@@ -306,9 +312,9 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSuccess: 'true',
             oauthFailed: eachData.sfdcOrg.oauthFailed,
             oauthSaved: eachData.sfdcOrg.oauthSaved,
-            oauthToken: sfdcAccessTokenFromExternalPage,
+            oauthToken: eachData.sfdcOrg.oauthToken === undefined || null ? sfdcAccessTokenFromExternalPage : eachData.sfdcOrg.oauthToken,
             gitRepoId: eachData.repositoryId,
-            lstSelectedBranches: changeListToObjectList(eachData.sfdcOrg.multiSelectedBranches)
+            lstSelectedBranches: changeListToObjectList(lstSelectedBranch)
         };
         if (eachData.sfdcOrg.orgName === undefined || eachData.sfdcOrg.orgName === null || eachData.sfdcOrg.orgName === '' ||
             eachData.sfdcOrg.userName === undefined || eachData.sfdcOrg.userName === null || eachData.sfdcOrg.userName === '') {
@@ -392,10 +398,15 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     function changeListToObjectList(lstData) {
         let lstOfObjects = [];
-        for (let i = 0; i < lstData.length; i++) {
-            if($.type(lstData[i]) === 'string') {
-                const branchData = {id: i + 1, label: lstData[i]};
-                lstOfObjects.push(branchData);
+        if(lstData !== undefined && lstData !== null) {
+            for (let i = 0; i < lstData.length; i++) {
+                if ($.type(lstData[i]) === 'string') {
+                    const branchData = {id: i + 1, label: lstData[i]};
+                    lstOfObjects.push(branchData);
+                }
+                if ($.type(lstData[i]) === 'object') {
+                    lstOfObjects.push(lstData[i].label);
+                }
             }
         }
         return lstOfObjects;

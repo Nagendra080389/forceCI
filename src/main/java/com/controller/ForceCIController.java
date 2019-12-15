@@ -430,14 +430,15 @@ public class ForceCIController {
 
         Gson gson = new Gson();
         String returnResponse = null;
-        SFDCConnectionDetails byUserName = sfdcConnectionDetailsMongoRepository.findByUserName(sfdcConnectionDetails.getUserName());
-        if(byUserName == null){
-            sfdcConnectionDetails.setOauthSaved("true");
-            SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
-            returnResponse = gson.toJson(connectionSaved);
-        } else {
-            throw new Exception("User already connected to ForceCI");
+        if(sfdcConnectionDetails.getId() ==  null){
+            SFDCConnectionDetails byUserName = sfdcConnectionDetailsMongoRepository.findByUserName(sfdcConnectionDetails.getUserName());
+            if(byUserName != null){
+                throw new Exception("User already connected to ForceCI");
+            }
         }
+        sfdcConnectionDetails.setOauthSaved("true");
+        SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
+        returnResponse = gson.toJson(connectionSaved);
 
         return returnResponse;
     }
