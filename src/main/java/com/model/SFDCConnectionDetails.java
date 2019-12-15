@@ -1,5 +1,6 @@
 package com.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -8,6 +9,8 @@ import java.util.List;
 @Document(collection = "SFDCConnectionDetails")
 public class SFDCConnectionDetails implements Serializable {
 
+    @Id
+    private String id;
     private String orgName;
     private String environment;
     private String userName;
@@ -22,6 +25,14 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthToken;
     private String gitRepoId;
     private List<String> lstSelectedBranches;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getOrgName() {
         return orgName;
