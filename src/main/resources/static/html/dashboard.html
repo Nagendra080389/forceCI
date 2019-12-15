@@ -6,6 +6,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.min.js"></script>
     <link rel="stylesheet prefetch" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.1/animate.min.css">
     <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -52,7 +53,8 @@
         }
 
         .form-group .required.col-form-label:after {
-            content:"*";color:red;
+            content: "*";
+            color: red;
         }
 
         .list-group-item {
@@ -68,7 +70,7 @@
             cursor: pointer;
         }
 
-</style>
+    </style>
 </head>
 
 <body ng-app="forceCIApp" ng-controller="orderFromController">
@@ -80,7 +82,8 @@
 
             <div class="org-selection">
                 <div class="relative">
-                    <select tabindex="0" id="idSelectTab" class="hk-select pl5 org-name-select x-select ember-view" style="width: 100%;">
+                    <select tabindex="0" id="idSelectTab" class="hk-select pl5 org-name-select x-select ember-view"
+                            style="width: 100%;">
                         <option value="{{userName}}">{{userName}}
                         </option>
                     </select>
@@ -93,7 +96,8 @@
                     <input placeholder="repo-name" id="search-term" ng-model="repoName"
                            class="repo-name-search hk-input br--left flex-auto relative z-1 ember-text-field ember-view"
                            type="search">
-                    <button id="searchRepository" class="br--right bl-0 async-button fulfilled hk-button--primary ember-view"
+                    <button id="searchRepository"
+                            class="br--right bl-0 async-button fulfilled hk-button--primary ember-view"
                             type="submit"> Search
                     </button>
                 </div>
@@ -161,73 +165,98 @@
                                                         </ul>
                                                     </div>
 
-                                                </div>
-                                                <div class="col-12 col-sm-6 col-md-8">
-                                                    <form>
-                                                        <div class="form-group row">
-                                                            <label for="inputorgNamel3" class="col-sm-2 col-form-label required">Name</label>
-                                                            <div class="col-sm-10">
-                                                                <input type="text" class="form-control" id="inputorgNamel3" placeholder="Name" ng-model="eachData.sfdcOrg.orgName" ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-8">
+                                                <form>
+                                                    <div class="form-group row">
+                                                        <label for="inputorgNamel3"
+                                                               class="col-sm-2 col-form-label required">Name</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control"
+                                                                   id="inputorgNamel3" placeholder="Name"
+                                                                   ng-model="eachData.sfdcOrg.orgName"
+                                                                   ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="inputenvironment3"
+                                                               class="col-sm-2 col-form-label required">Environment</label>
+                                                        <div class="col-sm-10">
+                                                            <div class="dropdown bootstrap-select">
+                                                                <select class="form-control" id="inputenvironment3"
+                                                                        ng-model="eachData.sfdcOrg.environment"
+                                                                        ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
+                                                                    <option value="0" selected>
+                                                                        Production/Developer
+                                                                    </option>
+                                                                    <option value="1">Sandbox</option>
+                                                                    <option value="2">Custom Org</option>
+                                                                </select>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group row">
-                                                            <label for="inputenvironment3" class="col-sm-2 col-form-label required">Environment</label>
-                                                            <div class="col-sm-10">
-                                                                <div class="dropdown bootstrap-select">
-                                                                    <select class="form-control" id="inputenvironment3" ng-model="eachData.sfdcOrg.environment" ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
-                                                                        <option value="0" selected>Production/Developer</option>
-                                                                        <option value="1">Sandbox</option>
-                                                                        <option value="2">Custom Org</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="salesforceLoginl3"
+                                                               class="col-sm-2 col-form-label required">Salesforce
+                                                            Login</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control"
+                                                                   id="salesforceLoginl3"
+                                                                   placeholder="Salesforce userName"
+                                                                   ng-model="eachData.sfdcOrg.userName"
+                                                                   ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
                                                         </div>
-                                                        <div class="form-group row">
-                                                            <label for="salesforceLoginl3" class="col-sm-2 col-form-label required">Salesforce Login</label>
-                                                            <div class="col-sm-10">
-                                                                <input type="text" class="form-control" id="salesforceLoginl3" placeholder="Salesforce userName"
-                                                                       ng-model="eachData.sfdcOrg.userName" ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
-                                                            </div>
+                                                    </div>
+                                                    <div class="form-group row"
+                                                         ng-show="eachData.sfdcOrg.environment === '2'">
+                                                        <label for="salesforceinstanceURLl3"
+                                                               class="col-sm-2 col-form-label required">Instance
+                                                            Url</label>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control"
+                                                                   id="salesforceinstanceURLl3"
+                                                                   placeholder="Salesforce Instance Url"
+                                                                   ng-model="eachData.sfdcOrg.instanceURL"
+                                                                   ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
                                                         </div>
-                                                        <div class="form-group row" ng-show="eachData.sfdcOrg.environment === '2'">
-                                                            <label for="salesforceinstanceURLl3" class="col-sm-2 col-form-label required">Instance Url</label>
-                                                            <div class="col-sm-10">
-                                                                <input type="text" class="form-control" id="salesforceinstanceURLl3" placeholder="Salesforce Instance Url"
-                                                                       ng-model="eachData.sfdcOrg.instanceURL" ng-disabled="eachData.sfdcOrg.disabledForm == 'true'">
-                                                            </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="branchNamel3" class="col-sm-2 col-form-label">Branch
+                                                            Name</label>
+                                                        <div class="col-sm-10">
+                                                            <div ng-dropdown-multiselect=""
+                                                                 options="eachData.sfdcOrg.multiBranchData"
+                                                                 extra-settings="eachData.sfdcOrg.multiExtraSettings"
+                                                                 id="branchNamel3"
+                                                                 selected-model="eachData.sfdcOrg.multiSelectedBranches"></div>
                                                         </div>
-                                                        <div class="form-group row">
-                                                            <label for="branchNamel3" class="col-sm-2 col-form-label">Branch Name</label>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="form-group">
                                                             <div class="col-sm-10">
-                                                                <div ng-dropdown-multiselect="" options="eachData.sfdcOrg.multiBranchData" extra-settings="eachData.sfdcOrg.multiExtraSettings"
-                                                                     id="branchNamel3" selected-model="eachData.sfdcOrg.multiSelectedBranches"></div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="form-group row">
-                                                            <div class="form-group">
-                                                                <div class="col-sm-10">
                                                                     <button type="button" class="btn btn-primary" ng-click="authorize(eachData, $index);">{{eachData.sfdcOrg.authorize}}</button>
                                                                     <button type="button" class="btn btn-primary" ng-click="saveConnection(eachData, $index);"
                                                                             ng-disabled="eachData.sfdcOrg.oauthSuccess === 'false'">{{eachData.sfdcOrg.save}}
-                                                                    </button>
+                                                                </button>
                                                                     <button type="button" class="btn btn-primary" ng-click="testConnection(eachData, $index);"
                                                                             ng-disabled="eachData.sfdcOrg.oauthSuccess === 'false'">{{eachData.sfdcOrg.testConnection}}
-                                                                    </button>
+                                                                </button>
                                                                     <button type="button" class="btn btn-primary" ng-click="deleteConnection(eachData, $index);"
-                                                                            ng-disabled="eachData.sfdcOrg.oauthSaved === 'false'">{{eachData.sfdcOrg.delete}}
-                                                                    </button>
-                                                                </div>
-
+                                                                        ng-disabled="eachData.sfdcOrg.oauthSaved === 'false'">
+                                                                    {{eachData.sfdcOrg.delete}}
+                                                                </button>
                                                             </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
 
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </li>
                     </ul>
                 </div>
@@ -235,6 +264,7 @@
         </li>
     </div>
 </div>
+
 
 </body>
 </html>

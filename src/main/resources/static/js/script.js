@@ -2,7 +2,6 @@ var app = angular.module('forceCIApp', ["angularjs-dropdown-multiselect"]);
 app.controller('orderFromController', function ($scope, $http, $attrs) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
-    //$scope.disabledForm = 'false';
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
     let sfdcInstanceFromExternalPage;
@@ -296,7 +295,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.saveConnection = function (eachData, $index) {
         const lstSelectedBranch = eachData.sfdcOrg.multiSelectedBranches;
-        if(eachData.sfdcConnectionDetails !== undefined && eachData.sfdcConnectionDetails !== null) {
+        if (eachData.sfdcConnectionDetails !== undefined && eachData.sfdcConnectionDetails !== null) {
             for (let i = 0; i < eachData.sfdcConnectionDetails.length; i++) {
                 if (eachData.sfdcConnectionDetails[i].userName === eachData.sfdcOrg.userName) {
                     eachData.sfdcOrg = eachData.sfdcConnectionDetails[i];
@@ -305,7 +304,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         }
 
         const sfdcDetails = {
-            id : eachData.sfdcOrg.id,
+            id: eachData.sfdcOrg.id,
             orgName: eachData.sfdcOrg.orgName,
             environment: eachData.sfdcOrg.environment,
             userName: eachData.sfdcOrg.userName,
@@ -326,41 +325,41 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             return;
         }
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
-            $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
-            $.removeCookie('SFDC_USER_NAME', {path: '/'});
-            $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
-            $scope.lstRepositoryData[$index].sfdcConnectionDetails= [];
-            const gitRepoId = response.data.gitRepoId;
-            $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
-                $scope.lstRepositoryData[$index].sfdcConnectionDetails = response.data;
-            }, function (error) {
-                console.log(error);
-            });
-            iziToast.success({
-                timeout: 5000,
-                icon: 'fa fa-chrome',
-                title: 'OK',
-                message: 'SFDC connection created successfully'
-            });
-            const sfdcOrg = {
-                orgName: '',
-                environment: '0',
-                userName: '',
-                instanceURL: '',
-                authorize: 'Authorize',
-                save: 'Save',
-                testConnection: 'Test Connection',
-                delete: 'Delete',
-                oauthSuccess: 'false',
-                oauthFailed: 'false',
-                oauthSaved: 'false',
-                disabledForm: 'false',
-                multiBranchData: [],
-                multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-                multiSelectedBranches: []
-            };
-            sfdcOrg.multiSelectedBranches = changeListToObjectList($scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches);
-            $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
+                $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
+                $.removeCookie('SFDC_USER_NAME', {path: '/'});
+                $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+                $scope.lstRepositoryData[$index].sfdcConnectionDetails = [];
+                const gitRepoId = response.data.gitRepoId;
+                $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
+                    $scope.lstRepositoryData[$index].sfdcConnectionDetails = response.data;
+                }, function (error) {
+                    console.log(error);
+                });
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'SFDC connection created successfully'
+                });
+                const sfdcOrg = {
+                    orgName: '',
+                    environment: '0',
+                    userName: '',
+                    instanceURL: '',
+                    authorize: 'Authorize',
+                    save: 'Save',
+                    testConnection: 'Test Connection',
+                    delete: 'Delete',
+                    oauthSuccess: 'false',
+                    oauthFailed: 'false',
+                    oauthSaved: 'false',
+                    disabledForm: 'false',
+                    multiBranchData: [],
+                    multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
+                    multiSelectedBranches: []
+                };
+                sfdcOrg.multiSelectedBranches = changeListToObjectList($scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches);
+                $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
             }, function (error) {
                 console.log(error);
                 iziToast.error({
@@ -396,6 +395,19 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
             multiSelectedBranches: checkIfInValid(eachSfdcConnection.lstSelectedBranches) ? [] : changeListToObjectList(eachSfdcConnection.lstSelectedBranches)
         };
+        if (eachdataLocal.sfdcOrg.multiBranchData !== undefined && eachdataLocal.sfdcOrg.multiBranchData !== null && eachdataLocal.sfdcOrg.multiBranchData.length > 0) {
+            eachdataLocal.sfdcOrg.multiSelectedBranches = [];
+            for (let i = 0; i < eachdataLocal.sfdcOrg.multiBranchData.length; i++) {
+                if (eachSfdcConnection.lstSelectedBranches !== undefined && eachSfdcConnection.lstSelectedBranches !== null && eachSfdcConnection.lstSelectedBranches.length > 0) {
+                    for (let j = 0; j < eachSfdcConnection.lstSelectedBranches.length; j++) {
+                        if (eachSfdcConnection.lstSelectedBranches[j] === eachdataLocal.sfdcOrg.multiBranchData[i].label) {
+                            eachdataLocal.sfdcOrg.multiSelectedBranches.push(eachdataLocal.sfdcOrg.multiBranchData[i]);
+                        }
+                    }
+                }
+
+            }
+        }
         //$scope.disabledForm = 'true';
 
 
@@ -403,7 +415,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     function changeListToObjectList(lstData) {
         let lstOfObjects = [];
-        if(lstData !== undefined && lstData !== null) {
+        if (lstData !== undefined && lstData !== null) {
             for (let i = 0; i < lstData.length; i++) {
                 if ($.type(lstData[i]) === 'string') {
                     const branchData = {id: i + 1, label: lstData[i]};
@@ -418,7 +430,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
     }
 
     function checkIfInValid(objData) {
-        if(objData === undefined || objData === null || objData || ''){
+        if (objData === undefined || objData === null || objData === '') {
             return true;
         } else {
             return false;
