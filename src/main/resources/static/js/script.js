@@ -77,7 +77,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
                             multiSelectedBranches: []
                         };
                         sfdcOrg.multiBranchData = changeListToObjectList(lstBranches);
-                        sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches === undefined || null ? [] : changeListToObjectList(response.data[i].repository.lstSelectedBranches);
+                        sfdcOrg.multiSelectedBranches = response.data[i].repository.lstSelectedBranches === (undefined || null) ? [] : changeListToObjectList(response.data[i].repository.lstSelectedBranches);
                         response.data[i].repository.sfdcOrg = sfdcOrg;
                         $scope.lstRepositoryData.push(response.data[i].repository);
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
@@ -283,7 +283,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthFailed: 'false',
             oauthSaved: 'false',
             disabledForm: 'false',
-            multiBranchData: $scope.lstRepositoryData[$index].sfdcOrg.multiBranchData === undefined || null ? [] : $scope.lstRepositoryData[$index].sfdcOrg.multiBranchData,
+            multiBranchData: $scope.lstRepositoryData[$index].sfdcOrg.multiBranchData === (undefined || null) ? [] : $scope.lstRepositoryData[$index].sfdcOrg.multiBranchData,
             multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
             multiSelectedBranches: []
         };
@@ -296,9 +296,11 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
 
     $scope.saveConnection = function (eachData, $index) {
         const lstSelectedBranch = eachData.sfdcOrg.multiSelectedBranches;
-        for (let i = 0; i < eachData.sfdcConnectionDetails.length; i++) {
-            if(eachData.sfdcConnectionDetails[i].userName === eachData.sfdcOrg.userName){
-                eachData.sfdcOrg = eachData.sfdcConnectionDetails[i];
+        if(eachData.sfdcConnectionDetails !== undefined && eachData.sfdcConnectionDetails !== null) {
+            for (let i = 0; i < eachData.sfdcConnectionDetails.length; i++) {
+                if (eachData.sfdcConnectionDetails[i].userName === eachData.sfdcOrg.userName) {
+                    eachData.sfdcOrg = eachData.sfdcConnectionDetails[i];
+                }
             }
         }
 
@@ -307,7 +309,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             orgName: eachData.sfdcOrg.orgName,
             environment: eachData.sfdcOrg.environment,
             userName: eachData.sfdcOrg.userName,
-            instanceURL: eachData.sfdcOrg.instanceURL === undefined || null || '' ? sfdcInstanceFromExternalPage : eachData.sfdcOrg.instanceURL,
+            instanceURL: eachData.sfdcOrg.instanceURL === (undefined || null || '') ? sfdcInstanceFromExternalPage : eachData.sfdcOrg.instanceURL,
             authorize: eachData.sfdcOrg.authorize,
             save: eachData.sfdcOrg.save,
             testConnection: eachData.sfdcOrg.testConnection,
@@ -315,7 +317,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             oauthSuccess: 'true',
             oauthFailed: eachData.sfdcOrg.oauthFailed,
             oauthSaved: eachData.sfdcOrg.oauthSaved,
-            oauthToken: eachData.sfdcOrg.oauthToken === undefined || null || ''? sfdcAccessTokenFromExternalPage : eachData.sfdcOrg.oauthToken,
+            oauthToken: eachData.sfdcOrg.oauthToken === (undefined || null || '') ? sfdcAccessTokenFromExternalPage : eachData.sfdcOrg.oauthToken,
             gitRepoId: eachData.repositoryId,
             lstSelectedBranches: changeListToObjectList(lstSelectedBranch)
         };
@@ -391,7 +393,7 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
             disabledForm: 'true',
             multiBranchData: changeListToObjectList(lstBranches),
             multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-            multiSelectedBranches: eachSfdcConnection.lstSelectedBranches === undefined || null ? [] : changeListToObjectList(eachSfdcConnection.lstSelectedBranches)
+            multiSelectedBranches: eachSfdcConnection.lstSelectedBranches === (undefined || null || '') ? [] : changeListToObjectList(eachSfdcConnection.lstSelectedBranches)
         };
         //$scope.disabledForm = 'true';
 
