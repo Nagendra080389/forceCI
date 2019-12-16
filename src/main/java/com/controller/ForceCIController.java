@@ -233,7 +233,6 @@ public class ForceCIController {
                 if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
-                    GHPullRequest gitPullRequest = gson.fromJson(payload, GHPullRequest.class);
 
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token, sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails);
                 }
