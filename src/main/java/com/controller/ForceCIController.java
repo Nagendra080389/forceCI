@@ -499,17 +499,19 @@ public class ForceCIController {
                 InputStream gitDiffAfterMerge = classLoader.getResourceAsStream("build/get_diff_commits.sh");
                 InputStream propertiesHelper = classLoader.getResourceAsStream("build/properties_helper.sh");
                 File buildFile = BuildUtils.stream2file(buildXml, "build", ".xml");
+                System.out.println(buildFile.getPath());
                 File antJar = BuildUtils.stream2file(antSalesforce, "ant-salesforce", ".jar");
                 File create_changes = BuildUtils.stream2file(createChanges, "create_changes", ".sh");
                 File generate_package_unix = BuildUtils.stream2file(generatePackageUnix, "generate_package_unix", ".sh");
                 File generate_package = BuildUtils.stream2file(generatePackage, "generate_package", ".sh");
                 File get_clone = BuildUtils.stream2file(gitClone, "get_clone", ".sh");
+                System.out.println(get_clone.getPath());
                 File get_diff_branches = BuildUtils.stream2file(gitDiffBeforeMerge, "get_diff_branches", ".sh");
                 File get_diff_commits = BuildUtils.stream2file(gitDiffAfterMerge, "get_diff_commits", ".sh");
                 File properties_helper = BuildUtils.stream2file(propertiesHelper, "properties_helper", ".sh");
                 AntExecutor.executeAntTask(buildFile.getPath(), "sf_prepare_deployment", propertiesMap);
             } catch (Exception e){
-
+                e.printStackTrace();
             } finally {
                 FileUtils.deleteDirectory(tempDirectory.toFile());
             }
