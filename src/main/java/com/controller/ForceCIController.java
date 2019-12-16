@@ -488,8 +488,25 @@ public class ForceCIController {
             propertiesMap.put("sf.logType", "None");
             propertiesMap.put("targetName", targetBranch);
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            InputStream resourceAsStream = classLoader.getResourceAsStream("build/build.xml");
-            AntExecutor.executeAntTask(BuildUtils.stream2file(resourceAsStream).getPath(), "sf_prepare_deployment", propertiesMap);
+            InputStream buildXml = classLoader.getResourceAsStream("build/build.xml");
+            InputStream antSalesforce = classLoader.getResourceAsStream("build/ant-salesforce.jar");
+            InputStream createChanges = classLoader.getResourceAsStream("build/create_changes.sh");
+            InputStream generatePackageUnix = classLoader.getResourceAsStream("build/generate_package_unix.sh");
+            InputStream generatePackage = classLoader.getResourceAsStream("build/generate_package.sh");
+            InputStream gitClone = classLoader.getResourceAsStream("build/get_clone.sh");
+            InputStream gitDiffBeforeMerge = classLoader.getResourceAsStream("build/get_diff_branches.sh");
+            InputStream gitDiffAfterMerge = classLoader.getResourceAsStream("build/get_diff_commits.sh");
+            InputStream propertiesHelper = classLoader.getResourceAsStream("build/properties_helper.sh");
+            File buildFile = BuildUtils.stream2file(buildXml, "build", ".xml");
+            File antJar = BuildUtils.stream2file(antSalesforce, "ant-salesforce", ".jar");
+            File create_changes = BuildUtils.stream2file(createChanges, "create_changes", ".sh");
+            File generate_package_unix = BuildUtils.stream2file(generatePackageUnix, "generate_package_unix", ".sh");
+            File generate_package = BuildUtils.stream2file(generatePackage, "generate_package", ".sh");
+            File get_clone = BuildUtils.stream2file(gitClone, "get_clone", ".sh");
+            File get_diff_branches = BuildUtils.stream2file(gitDiffBeforeMerge, "get_diff_branches", ".sh");
+            File get_diff_commits = BuildUtils.stream2file(gitDiffAfterMerge, "get_diff_commits", ".sh");
+            File properties_helper = BuildUtils.stream2file(propertiesHelper, "properties_helper", ".sh");
+            AntExecutor.executeAntTask(buildFile.getPath(), "sf_prepare_deployment", propertiesMap);
             FileUtils.deleteDirectory(tempDirectory.toFile());
 
 

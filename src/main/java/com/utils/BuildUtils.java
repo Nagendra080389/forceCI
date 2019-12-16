@@ -139,4 +139,15 @@ public class BuildUtils {
         }
         return tempFile;
     }
+
+    public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
+        final File tempFile = File.createTempFile(prefix, suffix);
+        tempFile.deleteOnExit();
+        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
+            IOUtils.copy(in, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempFile;
+    }
 }
