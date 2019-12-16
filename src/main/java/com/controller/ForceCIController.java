@@ -442,8 +442,8 @@ public class ForceCIController {
 
     private static void start_deployment(JsonObject pullRequestJsonObject,JsonObject repositoryJsonObject , String access_token, SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail) {
         String user = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
-        String gitCloneURL = repositoryJsonObject.get("repository").getAsJsonObject().get("clone_url").getAsString();
-        String gitRepoId = repositoryJsonObject.get("repository").getAsJsonObject().get("id").getAsString();
+        String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
+        String gitRepoId = repositoryJsonObject.get("id").getAsString();
         String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
         String targetBranch = pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString();
         List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(gitRepoId);
