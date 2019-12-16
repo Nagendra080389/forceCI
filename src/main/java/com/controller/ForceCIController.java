@@ -223,6 +223,7 @@ public class ForceCIController {
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
         System.out.println("githubEvent -> "+githubEvent);
+        SFDCConnectionDetails sfdcConnectionDetails = null;
         switch (githubEvent){
             case "pull_request" :
                 if(!StringUtils.hasText(access_token)){
@@ -233,12 +234,8 @@ public class ForceCIController {
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
                     GHPullRequest gitPullRequest = gson.fromJson(payload, GHPullRequest.class);
-                    // Create a new repository; the path must exist
-                    Path tempDirectory = Files.createTempDirectory(gitPullRequest.getRepository().getName());
-                    // Create a new repository; the path must exist
 
-                    Git git = Git.init().setDirectory(tempDirectory.toFile()).call();
-                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token);
+                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token, sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails);
                 }
                 break;
             case "push":
@@ -444,40 +441,54 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    private static void start_deployment(JsonObject pullRequestJsonObject,JsonObject repositoryJsonObject , String access_token) {
+    private static void start_deployment(JsonObject pullRequestJsonObject,JsonObject repositoryJsonObject , String access_token, SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail) {
         String user = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("repository").getAsJsonObject().get("clone_url").getAsString();
-        Map<String, String> map = new HashMap<>();
-        map.put("environment", "QA");
-        map.put("deploy_user", user);
-        Gson gson = new Gson();
-        String payload = gson.toJson(map);
+        String gitRepoId = repositoryJsonObject.get("repository").getAsJsonObject().get("id").getAsString();
+        String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
+        String targetBranch = pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString();
+        List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(gitRepoId);
+
+        if(byGitRepoId != null && !byGitRepoId.isEmpty()) {
+            for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                if(sfdcConnectionDetails.getLstSelectedBranches() != null){
+                    for (String lstSelectedBranch : sfdcConnectionDetails.getLstSelectedBranches()) {
+                        if(lstSelectedBranch.equals(targetBranch)){
+                            sfdcConnectionDetail = sfdcConnectionDetails;
+                            break;
+                        }
+                    }
+
+                }
+            }
+
+        }
 
         try {
 
             System.out.println("inside start_deployment -> "+access_token);
-            String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
-            String targetBranch = pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString();
             Map<String, String> propertiesMap  = new HashMap<>();
-            Path tempDirectory = Files.createTempDirectory("TestMe");
+            Path tempDirectory = Files.createTempDirectory(sourceBranch);
             propertiesMap.put("diffDir", tempDirectory.toFile().getPath()+"/deploy");
             propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
             propertiesMap.put("originURL", gitCloneURL);
             propertiesMap.put("generatePackage", tempDirectory.toFile().getPath()+"/final.txt");
             propertiesMap.put("scriptName", "get_diff_branches");
-            propertiesMap.put("sf.deploy.serverurl", "https://login.salesforce.com");
-            propertiesMap.put("sf.deploy.username", "nagendra@deloitte.com");
+            propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
+            propertiesMap.put("sf.deploy.username", sfdcConnectionDetail.getUserName());
             propertiesMap.put("sf.checkOnly", "true");
             propertiesMap.put("sf.pollWaitMillis", "100000");
             propertiesMap.put("sf.runAllTests", "false");
             propertiesMap.put("target", targetBranch);
             propertiesMap.put("sourceBranch", sourceBranch);
             propertiesMap.put("sf.maxPoll", "100");
-            propertiesMap.put("sf.deploy.sessionId", "*****");
+            propertiesMap.put("sf.deploy.sessionId", sfdcConnectionDetail.getOauthToken());
             propertiesMap.put("sf.logType", "None");
             propertiesMap.put("targetName", targetBranch);
             File file = ResourceUtils.getFile("classpath:build/build.xml");
             AntExecutor.executeAntTask(file.getPath(), "sf_prepare_deployment", propertiesMap);
+            FileUtils.deleteDirectory(tempDirectory.toFile());
+
 
             //GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
         } catch (IOException e) {
