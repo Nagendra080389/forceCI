@@ -224,19 +224,23 @@ public class ForceCIController {
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
+        String emailId = null;
         System.out.println("githubEvent -> "+githubEvent);
         SFDCConnectionDetails sfdcConnectionDetails = null;
         switch (githubEvent){
             case "pull_request" :
-                if(!StringUtils.hasText(access_token)){
-                    String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
-                    access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
+                String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
+                UserWrapper byOwnerId = userWrapperMongoRepository.findByOwnerId(user);
+                if(byOwnerId != null){
+                    access_token = byOwnerId.getAccess_token();
+                    emailId = byOwnerId.getEmail_Id();
                 }
                 if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
 
-                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token, sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails);
+                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId);
                 }
                 break;
             case "push":
@@ -244,8 +248,8 @@ public class ForceCIController {
                 break;
             case "deployment":
                 if(!StringUtils.hasText(access_token)){
-                    String user = jsonObject.get("repository").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString();
-                    access_token = userWrapperMongoRepository.findByOwnerId(user).getAccess_token();
+                    String userId = jsonObject.get("repository").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString();
+                    access_token = userWrapperMongoRepository.findByOwnerId(userId).getAccess_token();
                 }
                 process_deployment(jsonObject, access_token);
                 break;
@@ -294,6 +298,7 @@ public class ForceCIController {
                         userWrapper = new UserWrapper();
                         userWrapper.setAccess_token(accessToken);
                         userWrapper.setOwnerId(gitRepositoryUser.getLogin());
+                        userWrapper.setEmail_Id(gitRepositoryUser.getEmail());
                     }
                     userWrapperMongoRepository.save(userWrapper);
                     loginNameAndAvatar = gson.toJson(gitRepositoryUser);
@@ -442,8 +447,9 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    private static void start_deployment(JsonObject pullRequestJsonObject,JsonObject repositoryJsonObject , String access_token, SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail) {
-        String user = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
+    private static void start_deployment(JsonObject pullRequestJsonObject,JsonObject repositoryJsonObject , String access_token,
+                                         SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId) {
+        String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
         String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
@@ -507,7 +513,8 @@ public class ForceCIController {
                 propertiesMap.put("get_diff_commits", get_diff_commits.getName());
 
                 propertiesMap.put("generate_package_unix", generate_package_unix.getName());
-
+                propertiesMap.put("userEmail", emailId);
+                propertiesMap.put("userName", userName);
                 propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
                 propertiesMap.put("sf.deploy.username", sfdcConnectionDetail.getUserName());
                 propertiesMap.put("sf.checkOnly", "true");

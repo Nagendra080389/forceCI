@@ -34,11 +34,15 @@
 			<arg value="${gitClone}" />
 			<arg value="${diffDirUpLevel}" />
 			<arg value="${originURL}" />
+			<arg value="${userEmail}" />
+			<arg value="${userName}" />
 		</exec>
 		<exec executable="/bin/bash" osfamily="unix" failonerror="true">
 			<arg value="${gitClone}" />
 			<arg value="${diffDirUpLevel}" />
 			<arg value="${originURL}" />
+			<arg value="${userEmail}" />
+			<arg value="${userName}" />
 		</exec>
 
 		<mkdir dir="${diffDir}" />

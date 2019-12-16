@@ -14,6 +14,7 @@ public class UserWrapper implements Serializable {
     private String ownerId;
     private String access_token;
     private String token_type;
+    private String email_Id;
 
     public String getId() {
         return id;
@@ -45,6 +46,14 @@ public class UserWrapper implements Serializable {
 
     public void setToken_type(String token_type) {
         this.token_type = token_type;
+    }
+
+    public String getEmail_Id() {
+        return email_Id;
+    }
+
+    public void setEmail_Id(String email_Id) {
+        this.email_Id = email_Id;
     }
 
     @Override

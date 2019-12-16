@@ -8,6 +8,8 @@ public class GitRepositoryUser implements Serializable {
 
     private String avatar_url;
 
+    private String email;
+
     public String getLogin() {
         return login;
     }
@@ -25,4 +27,11 @@ public class GitRepositoryUser implements Serializable {
         this.avatar_url = avatar_url;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
