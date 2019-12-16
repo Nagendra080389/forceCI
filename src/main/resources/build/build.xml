@@ -47,14 +47,14 @@
 			<arg value="${scriptName}.sh" />
 			<arg value="${target}" />
 			<arg value="${targetName}" />
-			<arg value="${ghprbTargetBranch}" />
+			<arg value="${sourceBranch}" />
 			<arg value="${diffDirUpLevel}" />
 		</exec>
 		<exec executable="/bin/bash" osfamily="unix" failonerror="true">
 			<arg value="${scriptName}.sh" />
 			<arg value="${target}" />
 			<arg value="${targetName}" />
-			<arg value="${ghprbTargetBranch}" />
+			<arg value="${sourceBranch}" />
 			<arg value="${diffDirUpLevel}" />
 		</exec>
 		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">

@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.model.*;
+import com.utils.AntExecutor;
 import com.utils.ApiSecurity;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
@@ -26,6 +27,7 @@ import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.ServletRequest;
@@ -236,7 +238,7 @@ public class ForceCIController {
                     // Create a new repository; the path must exist
 
                     Git git = Git.init().setDirectory(tempDirectory.toFile()).call();
-                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), access_token);
+                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token);
                 }
                 break;
             case "push":
@@ -442,8 +444,9 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    private static void start_deployment(JsonObject jsonObject, String access_token) {
-        String user = jsonObject.get("user").getAsJsonObject().get("login").getAsString();
+    private static void start_deployment(JsonObject pullRequestJsonObject,JsonObject repositoryJsonObject , String access_token) {
+        String user = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
+        String gitCloneURL = repositoryJsonObject.get("repository").getAsJsonObject().get("clone_url").getAsString();
         Map<String, String> map = new HashMap<>();
         map.put("environment", "QA");
         map.put("deploy_user", user);
@@ -453,12 +456,28 @@ public class ForceCIController {
         try {
 
             System.out.println("inside start_deployment -> "+access_token);
-            GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
-            System.out.println("gitHub -> "+gitHub);
-            GHRepository repository = gitHub.getRepository(jsonObject.get("head").getAsJsonObject().get("repo").getAsJsonObject().get("full_name").getAsString());
-            System.out.println("repository -> "+repository);
-            GHBranch branch = repository.getBranch(jsonObject.get("pull_request").getAsJsonObject().get("head").getAsJsonObject().get("repo").getAsJsonObject().get("name").getAsString());
-
+            String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
+            String targetBranch = pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString();
+            Map<String, String> propertiesMap  = new HashMap<>();
+            Path tempDirectory = Files.createTempDirectory("TestMe");
+            propertiesMap.put("diffDir", tempDirectory.toFile().getPath()+"/deploy");
+            propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
+            propertiesMap.put("originURL", gitCloneURL);
+            propertiesMap.put("generatePackage", tempDirectory.toFile().getPath()+"/final.txt");
+            propertiesMap.put("scriptName", "get_diff_branches");
+            propertiesMap.put("sf.deploy.serverurl", "https://login.salesforce.com");
+            propertiesMap.put("sf.deploy.username", "nagendra@deloitte.com");
+            propertiesMap.put("sf.checkOnly", "true");
+            propertiesMap.put("sf.pollWaitMillis", "100000");
+            propertiesMap.put("sf.runAllTests", "false");
+            propertiesMap.put("target", targetBranch);
+            propertiesMap.put("sourceBranch", sourceBranch);
+            propertiesMap.put("sf.maxPoll", "100");
+            propertiesMap.put("sf.deploy.sessionId", "*****");
+            propertiesMap.put("sf.logType", "None");
+            propertiesMap.put("targetName", targetBranch);
+            File file = ResourceUtils.getFile("classpath:build/build.xml");
+            AntExecutor.executeAntTask(file.getPath(), "sf_prepare_deployment", propertiesMap);
 
             //GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
         } catch (IOException e) {
