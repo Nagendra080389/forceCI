@@ -6,8 +6,7 @@ echo $4
 
 echo 'Starting git clone'
 
-sudo apt-get update
-sudo apt-get install xmlstarlet
+apt-get install xmlstarlet
 
 cd $1 || exit
 
