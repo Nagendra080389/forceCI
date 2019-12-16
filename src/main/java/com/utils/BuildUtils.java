@@ -129,7 +129,7 @@ public class BuildUtils {
         return consoleLogger;
     }
 
-    protected static File stream2file(InputStream in) throws IOException {
+    public static File stream2file(InputStream in) throws IOException {
         final File tempFile = File.createTempFile("build", ".xml");
         tempFile.deleteOnExit();
         try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {

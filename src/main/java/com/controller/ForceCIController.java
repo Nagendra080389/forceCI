@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import com.model.*;
 import com.utils.AntExecutor;
 import com.utils.ApiSecurity;
+import com.utils.BuildUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -39,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -466,6 +468,7 @@ public class ForceCIController {
         try {
 
             System.out.println("inside start_deployment -> "+access_token);
+            System.out.println("inside start_deployment -> "+sfdcConnectionDetail);
             Map<String, String> propertiesMap  = new HashMap<>();
             Path tempDirectory = Files.createTempDirectory(sourceBranch);
             propertiesMap.put("diffDir", tempDirectory.toFile().getPath()+"/deploy");
@@ -484,8 +487,9 @@ public class ForceCIController {
             propertiesMap.put("sf.deploy.sessionId", sfdcConnectionDetail.getOauthToken());
             propertiesMap.put("sf.logType", "None");
             propertiesMap.put("targetName", targetBranch);
-            File file = ResourceUtils.getFile("classpath:build/build.xml");
-            AntExecutor.executeAntTask(file.getPath(), "sf_prepare_deployment", propertiesMap);
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            InputStream resourceAsStream = classLoader.getResourceAsStream("build/build.xml");
+            AntExecutor.executeAntTask(BuildUtils.stream2file(resourceAsStream).getPath(), "sf_prepare_deployment", propertiesMap);
             FileUtils.deleteDirectory(tempDirectory.toFile());
 
 
