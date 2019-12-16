@@ -502,7 +502,7 @@ public class ForceCIController {
                 propertiesMap.put("gitClone", get_clone.getName());
                 propertiesMap.put("create_changes", create_changes.getName());
                 propertiesMap.put("generate_package", generate_package.getName());
-
+                propertiesMap.put("originURL", gitCloneURL);
                 // Only run on Merge
                 propertiesMap.put("get_diff_commits", get_diff_commits.getName());
 
