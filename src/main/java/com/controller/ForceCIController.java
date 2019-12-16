@@ -471,22 +471,7 @@ public class ForceCIController {
             System.out.println("inside start_deployment -> "+sfdcConnectionDetail);
             Map<String, String> propertiesMap  = new HashMap<>();
             Path tempDirectory = Files.createTempDirectory(sourceBranch);
-            propertiesMap.put("diffDir", tempDirectory.toFile().getPath()+"/deploy");
-            propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
-            propertiesMap.put("originURL", gitCloneURL);
-            propertiesMap.put("generatePackage", tempDirectory.toFile().getPath()+"/final.txt");
-            propertiesMap.put("scriptName", "get_diff_branches");
-            propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
-            propertiesMap.put("sf.deploy.username", sfdcConnectionDetail.getUserName());
-            propertiesMap.put("sf.checkOnly", "true");
-            propertiesMap.put("sf.pollWaitMillis", "100000");
-            propertiesMap.put("sf.runAllTests", "false");
-            propertiesMap.put("target", targetBranch);
-            propertiesMap.put("sourceBranch", sourceBranch);
-            propertiesMap.put("sf.maxPoll", "100");
-            propertiesMap.put("sf.deploy.sessionId", sfdcConnectionDetail.getOauthToken());
-            propertiesMap.put("sf.logType", "None");
-            propertiesMap.put("targetName", targetBranch);
+
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             try {
                 InputStream buildXml = classLoader.getResourceAsStream("build/build.xml");
@@ -505,10 +490,36 @@ public class ForceCIController {
                 File generate_package_unix = BuildUtils.stream2file(generatePackageUnix, "generate_package_unix", ".sh");
                 File generate_package = BuildUtils.stream2file(generatePackage, "generate_package", ".sh");
                 File get_clone = BuildUtils.stream2file(gitClone, "get_clone", ".sh");
-                System.out.println(get_clone.getPath());
                 File get_diff_branches = BuildUtils.stream2file(gitDiffBeforeMerge, "get_diff_branches", ".sh");
                 File get_diff_commits = BuildUtils.stream2file(gitDiffAfterMerge, "get_diff_commits", ".sh");
                 File properties_helper = BuildUtils.stream2file(propertiesHelper, "properties_helper", ".sh");
+
+                propertiesMap.put("diffDir", tempDirectory.toFile().getPath()+"/deploy");
+                propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
+
+                propertiesMap.put("generatePackage", tempDirectory.toFile().getPath()+"/final.txt");
+                propertiesMap.put("scriptName", get_diff_branches.getName());
+                propertiesMap.put("gitClone", get_clone.getName());
+                propertiesMap.put("create_changes", create_changes.getName());
+                propertiesMap.put("generate_package", generate_package.getName());
+
+                // Only run on Merge
+                propertiesMap.put("get_diff_commits", get_diff_commits.getName());
+
+                propertiesMap.put("generate_package_unix", generate_package_unix.getName());
+
+                propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
+                propertiesMap.put("sf.deploy.username", sfdcConnectionDetail.getUserName());
+                propertiesMap.put("sf.checkOnly", "true");
+                propertiesMap.put("sf.pollWaitMillis", "100000");
+                propertiesMap.put("sf.runAllTests", "false");
+                propertiesMap.put("target", targetBranch);
+                propertiesMap.put("sourceBranch", sourceBranch);
+                propertiesMap.put("sf.maxPoll", "100");
+                propertiesMap.put("sf.deploy.sessionId", sfdcConnectionDetail.getOauthToken());
+                propertiesMap.put("sf.logType", "None");
+                propertiesMap.put("targetName", targetBranch);
+
                 AntExecutor.executeAntTask(buildFile.getPath(), "sf_prepare_deployment", propertiesMap);
             } catch (Exception e){
                 e.printStackTrace();

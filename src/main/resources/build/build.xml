@@ -31,12 +31,12 @@
 		<echo message="Checking against target: ${target}" />
 
 		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows" failonerror="true">
-			<arg value="get_clone.sh" />
+			<arg value="${gitClone}" />
 			<arg value="${diffDirUpLevel}" />
 			<arg value="${originURL}" />
 		</exec>
 		<exec executable="/bin/bash" osfamily="unix" failonerror="true">
-			<arg value="get_clone.sh" />
+			<arg value="${gitClone}" />
 			<arg value="${diffDirUpLevel}" />
 			<arg value="${originURL}" />
 		</exec>
@@ -44,60 +44,61 @@
 		<mkdir dir="${diffDir}" />
 		<mkdir dir="${diffDir}/src" />
 		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows" failonerror="true">
-			<arg value="${scriptName}.sh" />
+			<arg value="${scriptName}" />
 			<arg value="${target}" />
 			<arg value="${targetName}" />
 			<arg value="${sourceBranch}" />
 			<arg value="${diffDirUpLevel}" />
 		</exec>
 		<exec executable="/bin/bash" osfamily="unix" failonerror="true">
-			<arg value="${scriptName}.sh" />
+			<arg value="${scriptName}" />
 			<arg value="${target}" />
 			<arg value="${targetName}" />
 			<arg value="${sourceBranch}" />
 			<arg value="${diffDirUpLevel}" />
 		</exec>
 		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
-			<arg value="create_changes.sh" />
+			<arg value="${create_changes}" />
 			<arg value="${diffDir}" />
 			<arg value="${diffDirUpLevel}" />
 		</exec>
 
 		<exec executable="/bin/bash" osfamily="unix">
-			<arg value="create_changes.sh" />
+			<arg value="${create_changes}" />
 			<arg value="${diffDir}" />
 			<arg value="${diffDirUpLevel}" />
 		</exec>
 		<echo message="Generating package.xml" />
 
 		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
-			<arg value="generate_package.sh" />
+			<arg value="${generate_package}" />
 			<arg value="${generatePackage}" />
 			<arg value="package" />
 			<arg value="${diffDir}/src" />
 		</exec>
 
 		<exec executable="/bin/bash" osfamily="unix">
-			<arg value="generate_package_unix.sh" />
+			<arg value="${generate_package_unix}" />
 			<arg value="${generatePackage}" />
 			<arg value="package" />
 			<arg value="${diffDir}/src" />
 		</exec>
 		<echo message="Package generated." />
-		<echo message="Adding properties if applicable" />
 
-		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
-			<arg value="properties_helper.sh" />
-			<arg value="${propsEnv}" />
-			<arg value="${diffDir}/src" />
-		</exec>
+		<!--
+                <echo message="Adding properties if applicable" />
+            <exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
+                    <arg value="properties_helper.sh" />
+                    <arg value="${propsEnv}" />
+                    <arg value="${diffDir}/src" />
+                </exec>
 
-		<exec executable="/bin/bash" osfamily="unix">
-			<arg value="properties_helper.sh" />
-			<arg value="${propsEnv}" />
-			<arg value="${diffDir}/src" />
-		</exec>
-		<echo message="Properties added. Finished." />
+                <exec executable="/bin/bash" osfamily="unix">
+                    <arg value="properties_helper.sh" />
+                    <arg value="${propsEnv}" />
+                    <arg value="${diffDir}/src" />
+                </exec>
+                <echo message="Properties added. Finished." />-->
 	</target>
 
 	<target name="sf_prepare_full_deployment">
