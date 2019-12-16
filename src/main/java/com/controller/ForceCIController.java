@@ -18,19 +18,17 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.json.JSONException;
 import org.kohsuke.github.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
@@ -38,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -51,6 +48,8 @@ import static org.kohsuke.github.GHDeploymentState.PENDING;
 
 @RestController
 public class ForceCIController {
+
+    private Logger logger = LoggerFactory.getLogger(ForceCIController.class);
 
     public static final int HTTP_STATUS_OK = 200;
     @Value("${github.clientId}")
@@ -74,6 +73,9 @@ public class ForceCIController {
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
 
+    @Value("${originURL}")
+    String originURL;
+
     private final static List<Integer> LIST_VALID_RESPONSE_CODES =  Arrays.asList(200, 201, 204, 207);
 
     @Autowired
@@ -94,6 +96,11 @@ public class ForceCIController {
         String environment = "https://github.com/login/oauth/access_token";
         HttpClient httpClient = new HttpClient();
 
+        logger.info("code - > ", code);
+        logger.info("redirect_uri - > ", redirectURI);
+        logger.info("client_id - > ", githubClientId);
+        logger.info("client_secret - > ", githubClientSecret);
+
         PostMethod post = new PostMethod(environment);
         post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
         post.addParameter("code", code);
@@ -102,7 +109,7 @@ public class ForceCIController {
         post.addParameter("client_secret", githubClientSecret);
         post.addParameter("state", state);
 
-        httpClient.executeMethod(post);
+        int i = httpClient.executeMethod(post);
         String responseBody = post.getResponseBodyAsString();
 
         String accessToken = null;
@@ -377,7 +384,7 @@ public class ForceCIController {
             config.setContent_type("json");
             String randomString = ApiSecurity.generateSafeToken();
             config.setSecret(randomString);
-            config.setUrl("https://forceci.herokuapp.com/hooks/github");
+            config.setUrl(originURL+"/hooks/github");
             createWebhookPayload.setConfig(config);
             createWebhookPayload.setName("web");
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));

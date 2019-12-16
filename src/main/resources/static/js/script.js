@@ -249,14 +249,11 @@ app.controller('orderFromController', function ($scope, $http, $attrs) {
         current$index = $index;
         if (eachData && eachData.sfdcOrg) {
             if (eachData.sfdcOrg.environment === '0') {
-                url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
+                url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRfJvUVqyioZ4eu6oqjSeOLmdB1buGiaGEqKJbQPRVvuJG5PpS2kfY7AO3.hR&prompt=login&redirect_uri=https://connect2deploy-env.2hi822xtmp.ap-south-1.elasticbeanstalk.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
             } else if (eachData.sfdcOrg.environment === '1') {
-                url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
+                url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRfJvUVqyioZ4eu6oqjSeOLmdB1buGiaGEqKJbQPRVvuJG5PpS2kfY7AO3.hR&prompt=login&redirect_uri=https://connect2deploy-env.2hi822xtmp.ap-south-1.elasticbeanstalk.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
             } else {
-                url = eachData.sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.instanceURL;
+                url = eachData.sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRfJvUVqyioZ4eu6oqjSeOLmdB1buGiaGEqKJbQPRVvuJG5PpS2kfY7AO3.hR&prompt=login&redirect_uri=https://connect2deploy-env.2hi822xtmp.ap-south-1.elasticbeanstalk.com/sfdcAuth&state=' + eachData.sfdcOrg.instanceURL;
             }
             const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
             if (window.focus) {
