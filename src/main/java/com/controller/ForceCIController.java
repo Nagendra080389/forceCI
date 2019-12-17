@@ -92,7 +92,6 @@ public class ForceCIController {
             request) throws Exception {
 
         Gson gson = new Gson();
-        String returnMessage = null;
         String environment = "https://github.com/login/oauth/access_token";
         HttpClient httpClient = new HttpClient();
 
@@ -106,7 +105,7 @@ public class ForceCIController {
         post.addParameter("state", state);
 
         httpClient.executeMethod(post);
-        String responseBody = post.getResponseBodyAsString();
+        String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
         System.out.println("responseBody - > "+responseBody);
         String accessToken = null;
@@ -126,13 +125,11 @@ public class ForceCIController {
             session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
             httpResponse.addCookie(session1);
             httpResponse.addCookie(session2);
-            returnMessage = "success";
         } catch (Exception e) {
             e.printStackTrace();
-            returnMessage = "failed";
         }
 
-        return gson.toJson(returnMessage);
+        return gson.toJson(responseBody);
 
     }
 
