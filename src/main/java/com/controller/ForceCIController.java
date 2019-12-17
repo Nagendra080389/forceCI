@@ -128,7 +128,7 @@ public class ForceCIController {
         session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
         httpResponse.addCookie(session1);
         httpResponse.addCookie(session2);
-        httpResponse.sendRedirect("/html/dashboard.html");
+        httpResponse.sendRedirect("/apps/dashboard");
 
     }
 

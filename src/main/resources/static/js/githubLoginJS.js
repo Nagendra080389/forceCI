@@ -4,6 +4,9 @@ connect2Deploy.config(function($routeProvider) {
         .when('/index', {
             templateUrl: './html/loginGithub.html'
         })
+        .when('/apps/dashboard', {
+            templateUrl: './html/dashboard.html'
+        })
         .otherwise({
             redirectTo: '/index'
         });
