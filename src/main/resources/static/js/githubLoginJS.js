@@ -27,7 +27,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $l
                 if(objResponse.access_token !== undefined && objResponse.access_token !== null && objResponse.access_token !== '') {
                     $location.path("/apps/dashboard");
                 } else {
-                    $location.path("/apps/error");
+                    $location.path("/index");
                 }
             }, function (error) {
 
