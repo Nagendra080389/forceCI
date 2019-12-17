@@ -9,7 +9,7 @@ echo 'Starting git clone'
 cd $1 || exit
 
 echo 'Switched to '$1
-
+ls -a
 git config --global user.email $3
 git config --global user.name $4
 git clone $2 .
