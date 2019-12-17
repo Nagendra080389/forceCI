@@ -88,9 +88,11 @@ public class ForceCIController {
     private static final String GITHUB_API = "https://api.github.com";
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
-    public String auth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
+    public String gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
+        Gson gson = new Gson();
+        String returnMessage = null;
         String environment = "https://github.com/login/oauth/access_token";
         HttpClient httpClient = new HttpClient();
 
@@ -117,21 +119,20 @@ public class ForceCIController {
 
             accessToken = jsonObject.get("access_token").getAsString();
             token_type = jsonObject.get("token_type").getAsString();
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
+            Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
+            session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            httpResponse.addCookie(session1);
+            httpResponse.addCookie(session2);
+            returnMessage = "success";
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            post.releaseConnection();
+            returnMessage = "failed";
         }
 
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
-        Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
-        session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-        session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-        httpResponse.addCookie(session1);
-        httpResponse.addCookie(session2);
-
-        return "success";
+        return gson.toJson(returnMessage);
 
     }
 
