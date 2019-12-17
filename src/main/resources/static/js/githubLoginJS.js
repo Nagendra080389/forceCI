@@ -18,7 +18,7 @@ connect2Deploy.config(function($routeProvider) {
 
 connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $location) {
     let accessToken = $.cookie("ACCESS_TOKEN");
-    if(accessToken !== undefined){
+    if(accessToken !== undefined && accessToken !== null && accessToken !== ''){
         $location.path("/apps/dashboard");
     } else {
         $location.path("/apps/error");
