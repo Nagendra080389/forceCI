@@ -7,6 +7,9 @@ connect2Deploy.config(function($routeProvider) {
         .when('/apps/dashboard', {
             templateUrl: './html/dashboard.html'
         })
+        .when('/apps/error', {
+            templateUrl: './html/error.html'
+        })
         .otherwise({
             redirectTo: '/index'
         });
@@ -20,8 +23,11 @@ connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $l
 
         if(code !== undefined && code !== null && code !== '' && state !== undefined && state !== null && state !== '') {
             $http.get("/gitAuth?code=" + code+"&state="+state).then(function (response) {
-                if(response.data === 'success') {
+                let objResponse = JSON.parse(response.data);
+                if(objResponse.access_token !== undefined && objResponse.access_token !== null && objResponse.access_token !== '') {
                     $location.path("/apps/dashboard");
+                } else {
+                    $location.path("/apps/error");
                 }
             }, function (error) {
 
