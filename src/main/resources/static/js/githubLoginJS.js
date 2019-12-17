@@ -15,7 +15,8 @@ connect2Deploy.config(function($routeProvider) {
 connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $location) {
 
     if($location){
-        debugger;
+        let code = new URL($location.$$absUrl).searchParams.get('code');
+        let state = new URL($location.$$absUrl).searchParams.get('state');
     }
     $http.get("/gitAuth").then(function (response) {
 
