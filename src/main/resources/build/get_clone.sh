@@ -6,8 +6,6 @@ echo $4
 
 echo 'Starting git clone'
 
-apt-get install xmlstarlet
-
 cd $1 || exit
 
 git config --global user.email $3
