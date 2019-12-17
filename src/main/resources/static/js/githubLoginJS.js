@@ -1,4 +1,4 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute']);
 connect2Deploy.config(function($routeProvider) {
     $routeProvider
         .when('/index', {
