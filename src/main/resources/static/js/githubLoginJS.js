@@ -11,3 +11,13 @@ connect2Deploy.config(function($routeProvider) {
             redirectTo: '/index'
         });
 });
+
+connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $location) {
+
+    if($location){
+        debugger;
+    }
+    $http.get("/gitAuth").then(function (response) {
+
+    })
+})
