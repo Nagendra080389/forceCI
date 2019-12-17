@@ -2,7 +2,8 @@ var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dro
 connect2Deploy.config(function($routeProvider) {
     $routeProvider
         .when('/index', {
-            templateUrl: './html/loginGithub.html'
+            templateUrl: './html/loginGithub.html',
+            controller: 'indexController'
         })
         .when('/apps/dashboard', {
             templateUrl: './html/dashboard.html',
