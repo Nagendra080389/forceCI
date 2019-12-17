@@ -528,6 +528,7 @@ public class ForceCIController {
                 propertiesMap.put("targetName", targetBranch);
 
                 AntExecutor.executeAntTask(buildFile.getPath(), "sf_prepare_deployment", propertiesMap);
+                AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
             } catch (Exception e){
                 e.printStackTrace();
             } finally {
