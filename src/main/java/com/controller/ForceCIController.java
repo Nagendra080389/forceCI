@@ -509,6 +509,7 @@ public class ForceCIController {
                 propertiesMap.put("create_changes", create_changes.getName());
                 propertiesMap.put("generate_package", generate_package.getName());
                 propertiesMap.put("originURL", gitCloneURL);
+                propertiesMap.put("antPath", antJar.getPath());
                 // Only run on Merge
                 propertiesMap.put("get_diff_commits", get_diff_commits.getName());
 
@@ -516,7 +517,6 @@ public class ForceCIController {
                 propertiesMap.put("userEmail", emailId);
                 propertiesMap.put("userName", userName);
                 propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
-                propertiesMap.put("sf.deploy.username", sfdcConnectionDetail.getUserName());
                 propertiesMap.put("sf.checkOnly", "true");
                 propertiesMap.put("sf.pollWaitMillis", "100000");
                 propertiesMap.put("sf.runAllTests", "false");
