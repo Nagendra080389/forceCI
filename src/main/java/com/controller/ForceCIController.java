@@ -94,6 +94,7 @@ public class ForceCIController {
         String environment = "https://github.com/login/oauth/access_token";
         HttpClient httpClient = new HttpClient();
 
+        System.out.println("code - > "+code);
         PostMethod post = new PostMethod(environment);
         post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
         post.addParameter("code", code);
@@ -105,6 +106,7 @@ public class ForceCIController {
         httpClient.executeMethod(post);
         String responseBody = post.getResponseBodyAsString();
 
+        System.out.println("responseBody - > "+responseBody);
         String accessToken = null;
         String token_type = null;
         JsonParser parser = new JsonParser();
