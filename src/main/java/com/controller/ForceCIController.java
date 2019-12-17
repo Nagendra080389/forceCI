@@ -88,7 +88,7 @@ public class ForceCIController {
     private static final String GITHUB_API = "https://api.github.com";
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
-    public String gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
+    public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
         Gson gson = new Gson();
@@ -113,12 +113,12 @@ public class ForceCIController {
         JsonParser parser = new JsonParser();
 
         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
-
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         try {
 
             accessToken = jsonObject.get("access_token").getAsString();
             token_type = jsonObject.get("token_type").getAsString();
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
+
             Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
             Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
             session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
@@ -128,9 +128,7 @@ public class ForceCIController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return gson.toJson(responseBody);
-
+        httpResponse.sendRedirect("/index.html");
     }
 
 
