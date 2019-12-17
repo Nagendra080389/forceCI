@@ -3,11 +3,11 @@ connect2Deploy.config(function($routeProvider) {
     $routeProvider
         .when('/index', {
             templateUrl: './html/loginGithub.html',
-            controller: 'indexController'
+            controller: 'indexController',
         })
         .when('/apps/dashboard', {
             templateUrl: './html/dashboard.html',
-            controller: 'dashBoardController'
+            controller: 'dashBoardController',
         })
         .when('/apps/error', {
             templateUrl: './html/error.html'
