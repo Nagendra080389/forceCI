@@ -137,19 +137,18 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<!-- tag::plugin[] -->
-			<!--<plugin>
+			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
 				<version>1.3.6</version>
 				<configuration>
 					<repository>${docker.image.prefix}/${project.artifactId}</repository>
 				</configuration>
-			</plugin>-->
+			</plugin>
 			<!-- end::plugin[] -->
 
 			<!-- tag::unpack[] -->
-
-			<!--<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -168,31 +167,6 @@
 								</artifactItem>
 							</artifactItems>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>-->
-
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.6</version>
-				<executions>
-					<execution>
-						<id>prepare</id>
-						<phase>package</phase>
-						<configuration>
-							<tasks>
-								<unzip src="${project.build.directory}/${project.build.finalName}.jar" dest="${project.build.directory}/${project.build.finalName}" />
-								<copy todir="${project.build.directory}/${project.build.finalName}/" overwrite="false">
-									<fileset dir="./" includes=".ebextensions/**"/>
-								</copy>
-								<zip compress="false" destfile="${project.build.directory}/${project.build.finalName}.jar" basedir="${project.build.directory}/${project.build.finalName}"/>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>
