@@ -471,6 +471,10 @@ public class ForceCIController {
 
         }
 
+        createTempDirectoryForDeployment(access_token, sfdcConnectionDetail, emailId, userName, gitCloneURL, sourceBranch, targetBranch);
+    }
+
+    private static void createTempDirectoryForDeployment(String access_token, SFDCConnectionDetails sfdcConnectionDetail, String emailId, String userName, String gitCloneURL, String sourceBranch, String targetBranch) {
         try {
 
             System.out.println("inside start_deployment -> "+access_token);
@@ -512,7 +516,6 @@ public class ForceCIController {
                 propertiesMap.put("antPath", antJar.getPath());
                 // Only run on Merge
                 propertiesMap.put("get_diff_commits", get_diff_commits.getName());
-
                 propertiesMap.put("generate_package_unix", generate_package_unix.getName());
                 propertiesMap.put("userEmail", emailId);
                 propertiesMap.put("userName", userName);
@@ -533,10 +536,6 @@ public class ForceCIController {
             } finally {
                 FileUtils.deleteDirectory(tempDirectory.toFile());
             }
-
-
-
-            //GHDeployment deployment = new GHDeploymentBuilder(repository,jsonObject.get("head").getAsJsonObject().get("sha").getAsString()).description("Auto Deploy after merge").payload(payload).autoMerge(false).create();
         } catch (IOException e) {
             e.printStackTrace();
         }
