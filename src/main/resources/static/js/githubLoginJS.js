@@ -14,11 +14,18 @@ connect2Deploy.config(function($routeProvider) {
 
 connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $location) {
 
-    if($location){
+    if($location) {
         let code = new URL($location.$$absUrl).searchParams.get('code');
         let state = new URL($location.$$absUrl).searchParams.get('state');
-    }
-    $http.get("/gitAuth").then(function (response) {
 
-    })
+        if(code !== undefined && code !== null && code !== '' && state !== undefined && state !== null && state !== '') {
+            $http.get("/gitAuth?code=" + code+"&state="+state).then(function (response) {
+                if(response.data === 'success') {
+                    $location.path("/apps/dashboard");
+                }
+            }, function (error) {
+
+            });
+        }
+    }
 })

@@ -88,7 +88,7 @@ public class ForceCIController {
     private static final String GITHUB_API = "https://api.github.com";
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
-    public void auth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
+    public String auth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
         String environment = "https://github.com/login/oauth/access_token";
@@ -128,6 +128,8 @@ public class ForceCIController {
         session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
         httpResponse.addCookie(session1);
         httpResponse.addCookie(session2);
+
+        return "success";
 
     }
 
