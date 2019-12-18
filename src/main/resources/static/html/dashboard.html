@@ -62,9 +62,9 @@
                                             <img src="{{eachData.repositoryOwnerAvatarUrl}}" class="h1 w1 br4 ml1">
                                             <a href="{{eachData.ownerHtmlUrl}}" class="hk-link">{{eachData.owner}}</a>
                                         </span>
-                                        <button class="hk-button-sm--danger" type="button" ng-click="disconnectRepo(eachData)">
-                                            Disconnect...
-                                        </button>
+                                        <a href="#/app/dashboard/{{eachData.repositoryName}}/{{eachData.repositoryId}}" class="hk-button-sm--primary fr" type="button">
+                                            Open App
+                                        </a>
                                     </div>
                                     <div class="panel-heading">
                                         <a for="collapse{{$index}} accordion-toggle" data-toggle="collapse" href="javascript:;" data-target="#collapse{{$index}}" aria-expanded="true" aria-controls="collapse{{$index}}">Show SFDC
