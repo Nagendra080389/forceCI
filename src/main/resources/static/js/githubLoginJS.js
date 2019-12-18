@@ -9,7 +9,7 @@ connect2Deploy.config(function($routeProvider, $locationProvider) {
             templateUrl: './html/dashboard.html',
             controller: 'dashBoardController',
         })
-        .when('/apps/dashboard/app/:repoId', {
+        .when('/apps/dashboard/app/:repoName/:repoId', {
             templateUrl: './html/repoDetails.html',
             controller: 'repoController',
         })
