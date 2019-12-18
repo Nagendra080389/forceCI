@@ -65,13 +65,13 @@
                                         <button class="hk-button-sm--danger" type="button" ng-click="disconnectRepo(eachData)">
                                             Disconnect...
                                         </button>
-                                        <a href="apps/dashboard/app/{{eachData.repositoryName}}/{{eachData.repositoryId}}" class="hk-button-sm--primary fr" type="button">
-                                            Open App
-                                        </a>
                                     </div>
                                     <div class="panel-heading">
                                         <a for="collapse{{$index}} accordion-toggle" data-toggle="collapse" href="javascript:;" data-target="#collapse{{$index}}" aria-expanded="true" aria-controls="collapse{{$index}}">Show SFDC
                                             connections</a>
+                                        <a href="apps/dashboard/app/{{eachData.repositoryName}}/{{eachData.repositoryId}}" class="hk-button-sm--primary fr" type="button">
+                                            Open App
+                                        </a>
                                         <div id="collapse{{$index}}" class="collapse mt3 panel-collapse">
                                             <div class="row no-gutters pa3">
                                                 <div class="col-6 col-md-4 connectionButton">
