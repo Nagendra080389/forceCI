@@ -1,4 +1,4 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect']);
 connect2Deploy.config(function($routeProvider) {
     $routeProvider
         .when('/index', {
@@ -17,7 +17,7 @@ connect2Deploy.config(function($routeProvider) {
         });
 });
 
-connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $location) {
+connect2Deploy.controller('indexController', function ($scope, $http, $location) {
     $scope.redirectJS = function(){
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     }
@@ -30,7 +30,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $attrs, $l
     }
 })
 
-connect2Deploy.controller('dashBoardController', function ($scope, $http, $attrs) {
+connect2Deploy.controller('dashBoardController', function ($scope, $http) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
     let sfdcAccessTokenFromExternalPage;
