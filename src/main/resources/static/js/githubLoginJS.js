@@ -1,5 +1,5 @@
 var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect']);
-connect2Deploy.config(function($routeProvider) {
+connect2Deploy.config(function($routeProvider, $locationProvider) {
     $routeProvider
         .when('/index', {
             templateUrl: './html/loginGithub.html',
@@ -15,6 +15,9 @@ connect2Deploy.config(function($routeProvider) {
         .otherwise({
             redirectTo: '/index'
         });
+
+    // use the HTML5 History API
+    $locationProvider.html5Mode(true);
 });
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location) {
