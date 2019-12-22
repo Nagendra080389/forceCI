@@ -20,6 +20,9 @@ connect2Deploy.config(function($routeProvider, $locationProvider) {
             redirectTo: '/index'
         });
 
+    // use the HTML5 History API
+    $locationProvider.html5Mode(true);
+
 });
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location) {
