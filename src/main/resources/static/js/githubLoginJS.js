@@ -528,13 +528,4 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.repoId=$routeParams.repoId;
     $scope.repoName=$routeParams.repoName;
 
-    $scope.lstRepositoryData = [];
-    for (let i = 0; i < 3; i++) {
-        const testObj = {
-            owner : 'Nagendra',
-            repositoryFullName: '/asdasd'
-        };
-        $scope.lstRepositoryData.push(testObj);
-    }
-
 });
