@@ -85,6 +85,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
+            $scope.avatar_url = response.data.avatar_url;
             localStorage.setItem('githubOwner', response.data.login);
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 if (response.data.length > 0) {
@@ -117,16 +118,16 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
                         $scope.lstRepositoryData.push(response.data[i].repository);
                         $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
                     }
-                    $('#repoConnectedDialog').removeClass('hidden');
+                    //$('#repoConnectedDialog').removeClass('hidden');
                 }
             }, function (error) {
 
             });
-            const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
+           /* const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
                 'nudge-right--4 pe-none" style="top: -15px">\n' +
                 '          <img src=' + response.data.avatar_url + '>\n' +
                 '        </span>';
-            $(avatarSpanTag).insertAfter('#idSelectTab');
+            $(avatarSpanTag).insertAfter('#idSelectTab');*/
         }
     }, function (error) {
 
@@ -142,7 +143,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
                     $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData), 1);
                     $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData.repositoryFullName), 1);
                     if ($scope.lstRepositoryData.length === 0) {
-                        $('#repoConnectedDialog').addClass('hidden');
+                        //$('#repoConnectedDialog').addClass('hidden');
                     }
                     iziToast.success({
                         timeout: 5000,
@@ -255,7 +256,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
                 response.data.sfdcOrg = sfdcOrg;
 
                 $scope.reposInDB.push(response.data.repositoryFullName);
-                $('#repoConnectedDialog').removeClass('hidden');
+                //$('#repoConnectedDialog').removeClass('hidden');
                 iziToast.success({
                     timeout: 5000,
                     icon: 'fa fa-chrome',
