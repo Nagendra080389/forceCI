@@ -88,6 +88,14 @@ public class ForceCIController {
 
     private static final String GITHUB_API = "https://api.github.com";
 
+    @RequestMapping(value = "/**/{[path:[^\\.]*}")
+    public String redirect(ServletResponse response, ServletRequest
+            request) throws IOException {
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        // Forward to home page so that route is preserved.
+        httpResponse.sendRedirect("/");
+        return null;
+    }
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
     public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
@@ -214,7 +222,7 @@ public class ForceCIController {
         }
     }
 
-    @RequestMapping(value = "/getAllBranches", method = RequestMethod.POST)
+    @RequestMapping(value = "/getAllBranches", method = RequestMethod.GET)
     public String getAllBranches(@RequestParam String strRepoId, HttpServletResponse response, HttpServletRequest request) throws IOException, GitAPIException {
         String access_token = fetchCookies(request);
         GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
