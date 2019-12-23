@@ -88,14 +88,6 @@ public class ForceCIController {
 
     private static final String GITHUB_API = "https://api.github.com";
 
-    @RequestMapping(value = "/**/{[path:[^\\.]*}")
-    public String redirect(ServletResponse response, ServletRequest
-            request) throws IOException {
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        // Forward to home page so that route is preserved.
-        httpResponse.sendRedirect("/");
-        return null;
-    }
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
     public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
