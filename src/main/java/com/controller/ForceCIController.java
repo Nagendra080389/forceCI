@@ -228,8 +228,13 @@ public class ForceCIController {
         GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
         GHRepository repository = gitHub.getRepositoryById(strRepoId);
         Map<String, GHBranch> branches = repository.getBranches();
+        List<String> lstBranchesToBeReturned = new ArrayList<>();
+        for (Map.Entry<String, GHBranch> stringGHBranchEntry : branches.entrySet()) {
+            lstBranchesToBeReturned.add(stringGHBranchEntry.getValue().getName());
+        }
+
         Gson gson = new Gson();
-        return gson.toJson(branches);
+        return gson.toJson(lstBranchesToBeReturned);
     }
 
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
