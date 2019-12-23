@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
@@ -74,7 +75,7 @@ public class ForceCIController {
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
 
-    private final static List<Integer> LIST_VALID_RESPONSE_CODES =  Arrays.asList(200, 201, 204, 207);
+    private final static List<Integer> LIST_VALID_RESPONSE_CODES = Arrays.asList(200, 201, 204, 207);
 
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
@@ -104,7 +105,7 @@ public class ForceCIController {
         String environment = "https://github.com/login/oauth/access_token";
         HttpClient httpClient = new HttpClient();
 
-        System.out.println("code - > "+code);
+        System.out.println("code - > " + code);
         PostMethod post = new PostMethod(environment);
         post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
         post.addParameter("code", code);
@@ -116,7 +117,7 @@ public class ForceCIController {
         httpClient.executeMethod(post);
         String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
-        System.out.println("responseBody - > "+responseBody);
+        System.out.println("responseBody - > " + responseBody);
         String accessToken = null;
         String token_type = null;
         JsonParser parser = new JsonParser();
@@ -145,7 +146,7 @@ public class ForceCIController {
     public void sfdcAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest request) throws Exception {
 
         String environment = null;
-        System.out.println(" state -> "+state);
+        System.out.println(" state -> " + state);
         if (state.equals("0")) {
             environment = "https://login.salesforce.com/services/oauth2/token";
         } else if (state.contains("2")) {
@@ -205,7 +206,7 @@ public class ForceCIController {
         }
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        if(StringUtils.hasText(accessToken)){
+        if (StringUtils.hasText(accessToken)) {
             Cookie accessTokenCookie = new Cookie("SFDC_ACCESS_TOKEN", accessToken);
             Cookie userNameCookie = new Cookie("SFDC_USER_NAME", username);
             Cookie instanceURLCookie = new Cookie("SFDC_INSTANCE_URL", instance_url);
@@ -221,6 +222,16 @@ public class ForceCIController {
         }
     }
 
+    @RequestMapping(value = "/getAllBranches", method = RequestMethod.POST)
+    public String getAllBranches(@RequestParam String strRepoId, HttpServletResponse response, HttpServletRequest request) throws IOException, GitAPIException {
+        String access_token = fetchCookies(request);
+        GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
+        GHRepository repository = gitHub.getRepositoryById(strRepoId);
+        Map<String, GHBranch> branches = repository.getBranches();
+        Gson gson = new Gson();
+        return gson.toJson(branches);
+    }
+
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
     public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent,
                            @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) throws IOException, GitAPIException {
@@ -233,13 +244,13 @@ public class ForceCIController {
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
         String emailId = null;
-        System.out.println("githubEvent -> "+githubEvent);
+        System.out.println("githubEvent -> " + githubEvent);
         SFDCConnectionDetails sfdcConnectionDetails = null;
-        switch (githubEvent){
-            case "pull_request" :
+        switch (githubEvent) {
+            case "pull_request":
                 String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
                 UserWrapper byOwnerId = userWrapperMongoRepository.findByOwnerId(user);
-                if(byOwnerId != null){
+                if (byOwnerId != null) {
                     access_token = byOwnerId.getAccess_token();
                     emailId = byOwnerId.getEmail_Id();
                 }
@@ -255,14 +266,14 @@ public class ForceCIController {
                 System.out.println(jsonObject);
                 break;
             case "deployment":
-                if(!StringUtils.hasText(access_token)){
+                if (!StringUtils.hasText(access_token)) {
                     String userId = jsonObject.get("repository").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString();
                     access_token = userWrapperMongoRepository.findByOwnerId(userId).getAccess_token();
                 }
                 process_deployment(jsonObject, access_token);
                 break;
         }
-        System.out.println("access_token -> "+access_token);
+        System.out.println("access_token -> " + access_token);
 
         return gson.toJson("");
     }
@@ -274,8 +285,8 @@ public class ForceCIController {
         String reposOnDB = "";
         List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(gitHubUser);
         List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
-        if(lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()){
-            for (RepositoryWrapper repositoryWrapper : lstRepositoryWrapper){
+        if (lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()) {
+            for (RepositoryWrapper repositoryWrapper : lstRepositoryWrapper) {
                 List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
                 repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                 newLstRepositoryWrapper.add(repositoryWrapper);
@@ -297,10 +308,10 @@ public class ForceCIController {
                 getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
                 HttpClient httpClient = new HttpClient();
                 int intStatusOk = httpClient.executeMethod(getUserMethod);
-                if(intStatusOk == HTTP_STATUS_OK) {
+                if (intStatusOk == HTTP_STATUS_OK) {
                     GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
                     UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(gitRepositoryUser.getLogin());
-                    if(userWrapper != null){
+                    if (userWrapper != null) {
                         userWrapper.setAccess_token(accessToken);
                     } else {
                         userWrapper = new UserWrapper();
@@ -324,12 +335,12 @@ public class ForceCIController {
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("ACCESS_TOKEN")) {
                 String accessToken = cookie.getValue();
-                String queryParam = repoName +"%20in:name+user:"+repoUser+"+fork:true";
-                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q="+queryParam);
+                String queryParam = repoName + "%20in:name+user:" + repoUser + "+fork:true";
+                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q=" + queryParam);
                 getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
                 HttpClient httpClient = new HttpClient();
                 int intStatusOk = httpClient.executeMethod(getRepoByName);
-                if(intStatusOk == HTTP_STATUS_OK) {
+                if (intStatusOk == HTTP_STATUS_OK) {
                     GitRepositoryFromQuery gitRepositoryFromQuery = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryFromQuery.class);
                     lstRepo = gson.toJson(gitRepositoryFromQuery);
                 }
@@ -341,19 +352,19 @@ public class ForceCIController {
     @RequestMapping(value = "/deleteWebHook", method = RequestMethod.DELETE)
     public String deleteWebHook(@RequestParam String repositoryName, @RequestParam String repositoryId, @RequestParam String repositoryOwner,
                                 @RequestParam String webHookId, HttpServletResponse response, HttpServletRequest
-            request) throws IOException {
+                                        request) throws IOException {
 
         Gson gson = new Gson();
         int status = 0;
 
         String accessToken = fetchCookies(request);
         if (accessToken != null) {
-            DeleteMethod deleteWebHook = new DeleteMethod(GITHUB_API + "/repos/" + repositoryOwner + "/" + repositoryName + "/hooks/"+webHookId);
+            DeleteMethod deleteWebHook = new DeleteMethod(GITHUB_API + "/repos/" + repositoryOwner + "/" + repositoryName + "/hooks/" + webHookId);
             deleteWebHook.setRequestHeader("Authorization", "token " + accessToken);
             deleteWebHook.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             HttpClient httpClient = new HttpClient();
             status = httpClient.executeMethod(deleteWebHook);
-            if(status == 204){
+            if (status == 204) {
                 RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryId(repositoryOwner, repositoryId);
                 repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
                 List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
@@ -391,7 +402,7 @@ public class ForceCIController {
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
             int status = httpClient.executeMethod(createWebHook);
-            if(LIST_VALID_RESPONSE_CODES.contains(status)) {
+            if (LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
                 GetMethod fetchBranches = new GetMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" + repository.getRepositoryName() + "/branches");
                 fetchBranches.setRequestHeader("Authorization", "token " + accessToken);
@@ -429,9 +440,9 @@ public class ForceCIController {
 
         Gson gson = new Gson();
         String returnResponse = null;
-        if(sfdcConnectionDetails.getId() ==  null){
+        if (sfdcConnectionDetails.getId() == null) {
             SFDCConnectionDetails byUserName = sfdcConnectionDetailsMongoRepository.findByUserName(sfdcConnectionDetails.getUserName());
-            if(byUserName != null){
+            if (byUserName != null) {
                 throw new Exception("User already connected to ForceCI");
             }
         }
@@ -449,13 +460,13 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
         List<SFDCConnectionDetails> gitReposById = sfdcConnectionDetailsMongoRepository.findByGitRepoId(gitRepoId);
-        if(gitReposById != null && !gitReposById.isEmpty()){
+        if (gitReposById != null && !gitReposById.isEmpty()) {
             returnResponse = gson.toJson(gitReposById);
         }
         return returnResponse;
     }
 
-    private static void start_deployment(JsonObject pullRequestJsonObject,JsonObject repositoryJsonObject , String access_token,
+    private static void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                          SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId) {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
@@ -464,16 +475,13 @@ public class ForceCIController {
         String targetBranch = pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString();
         List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(gitRepoId);
 
-        if(byGitRepoId != null && !byGitRepoId.isEmpty()) {
+        if (byGitRepoId != null && !byGitRepoId.isEmpty()) {
             for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
-                if(sfdcConnectionDetails.getLstSelectedBranches() != null){
-                    for (String lstSelectedBranch : sfdcConnectionDetails.getLstSelectedBranches()) {
-                        if(lstSelectedBranch.equals(targetBranch)){
-                            sfdcConnectionDetail = sfdcConnectionDetails;
-                            break;
-                        }
+                if (sfdcConnectionDetails.getBranchConnectedTo() != null) {
+                    if (sfdcConnectionDetails.getBranchConnectedTo().equals(targetBranch)) {
+                        sfdcConnectionDetail = sfdcConnectionDetails;
+                        break;
                     }
-
                 }
             }
 
@@ -485,9 +493,9 @@ public class ForceCIController {
     private static void createTempDirectoryForDeployment(String access_token, SFDCConnectionDetails sfdcConnectionDetail, String emailId, String userName, String gitCloneURL, String sourceBranch, String targetBranch) {
         try {
 
-            System.out.println("inside start_deployment -> "+access_token);
-            System.out.println("inside start_deployment -> "+sfdcConnectionDetail);
-            Map<String, String> propertiesMap  = new HashMap<>();
+            System.out.println("inside start_deployment -> " + access_token);
+            System.out.println("inside start_deployment -> " + sfdcConnectionDetail);
+            Map<String, String> propertiesMap = new HashMap<>();
             Path tempDirectory = Files.createTempDirectory(sourceBranch);
 
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -512,10 +520,10 @@ public class ForceCIController {
                 File get_diff_commits = BuildUtils.stream2file(gitDiffAfterMerge, "get_diff_commits", ".sh");
                 File properties_helper = BuildUtils.stream2file(propertiesHelper, "properties_helper", ".sh");
 
-                propertiesMap.put("diffDir", tempDirectory.toFile().getPath()+"/deploy");
+                propertiesMap.put("diffDir", tempDirectory.toFile().getPath() + "/deploy");
                 propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
 
-                propertiesMap.put("generatePackage", tempDirectory.toFile().getPath()+"/final.txt");
+                propertiesMap.put("generatePackage", tempDirectory.toFile().getPath() + "/final.txt");
                 propertiesMap.put("scriptName", get_diff_branches.getName());
                 propertiesMap.put("gitClone", get_clone.getName());
                 propertiesMap.put("create_changes", create_changes.getName());
@@ -539,7 +547,7 @@ public class ForceCIController {
                 propertiesMap.put("targetName", targetBranch);
 
                 AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 FileUtils.deleteDirectory(tempDirectory.toFile());
@@ -567,7 +575,7 @@ public class ForceCIController {
 
             List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(String.valueOf(repository.getId()));
 
-            System.out.println(" byGitRepoId-> "+byGitRepoId);
+            System.out.println(" byGitRepoId-> " + byGitRepoId);
             Thread.sleep(20000L);
 
             // This will happen only after validation is success
@@ -589,7 +597,7 @@ public class ForceCIController {
     private static String fetchCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         String accessToken = null;
-        if( cookies != null) {
+        if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("ACCESS_TOKEN")) {
                     accessToken = cookie.getValue();

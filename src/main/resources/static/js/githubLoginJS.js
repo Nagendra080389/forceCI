@@ -1,5 +1,5 @@
 var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect']);
-connect2Deploy.config(function($routeProvider, $locationProvider) {
+connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
         .when('/index', {
             templateUrl: './html/loginGithub.html',
@@ -26,12 +26,12 @@ connect2Deploy.config(function($routeProvider, $locationProvider) {
 });
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location) {
-    $scope.redirectJS = function(){
+    $scope.redirectJS = function () {
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     };
 
     let accessToken = $.cookie("ACCESS_TOKEN");
-    if(accessToken !== undefined && accessToken !== null && accessToken !== ''){
+    if (accessToken !== undefined && accessToken !== null && accessToken !== '') {
         $location.path("/apps/dashboard");
     } else {
         $location.path("/index");
@@ -126,11 +126,11 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
             }, function (error) {
 
             });
-           /* const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
-                'nudge-right--4 pe-none" style="top: -15px">\n' +
-                '          <img src=' + response.data.avatar_url + '>\n' +
-                '        </span>';
-            $(avatarSpanTag).insertAfter('#idSelectTab');*/
+            /* const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
+                 'nudge-right--4 pe-none" style="top: -15px">\n' +
+                 '          <img src=' + response.data.avatar_url + '>\n' +
+                 '        </span>';
+             $(avatarSpanTag).insertAfter('#idSelectTab');*/
         }
     }, function (error) {
 
@@ -478,23 +478,23 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
     }
 
     // Toggle the side navigation
-    $("#sidebarToggle, #sidebarToggleTop").on('click', function(e) {
+    $("#sidebarToggle, #sidebarToggleTop").on('click', function (e) {
         $("body").toggleClass("sidebar-toggled");
         $(".sidebar").toggleClass("toggled");
         if ($(".sidebar").hasClass("toggled")) {
             $('.sidebar .collapse').collapse('hide');
-        };
+        }
     });
 
     // Close any open menu accordions when window is resized below 768px
-    $(window).resize(function() {
+    $(window).resize(function () {
         if ($(window).width() < 768) {
             $('.sidebar .collapse').collapse('hide');
-        };
+        }
     });
 
     // Prevent the content wrapper from scrolling when the fixed side navigation hovered over
-    $('body.fixed-nav .sidebar').on('mousewheel DOMMouseScroll wheel', function(e) {
+    $('body.fixed-nav .sidebar').on('mousewheel DOMMouseScroll wheel', function (e) {
         if ($(window).width() > 768) {
             var e0 = e.originalEvent,
                 delta = e0.wheelDelta || -e0.detail;
@@ -504,7 +504,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
     });
 
     // Scroll to top button appear
-    $(document).on('scroll', function() {
+    $(document).on('scroll', function () {
         var scrollDistance = $(this).scrollTop();
         if (scrollDistance > 100) {
             $('.scroll-to-top').fadeIn();
@@ -514,7 +514,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
     });
 
     // Smooth scrolling using jQuery easing
-    $(document).on('click', 'a.scroll-to-top', function(e) {
+    $(document).on('click', 'a.scroll-to-top', function (e) {
         var $anchor = $(this);
         $('html, body').stop().animate({
             scrollTop: ($($anchor.attr('href')).offset().top)
@@ -525,7 +525,211 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
-    $scope.repoId=$routeParams.repoId;
-    $scope.repoName=$routeParams.repoName;
+    $scope.repoId = $routeParams.repoId;
+    $scope.repoName = $routeParams.repoName;
+    $scope.lstSFDCConnectionDetails = [];
+    let objWindow;
+    $scope.sfdcOrg = {
+        orgName: '',
+        environment: '0',
+        userName: '',
+        instanceURL: '',
+        authorize: 'Authorize',
+        save: 'Save',
+        testConnection: 'Test Connection',
+        delete: 'Delete',
+        oauthSuccess: 'false',
+        oauthFailed: 'false',
+        oauthSaved: 'false',
+        disabledForm: 'false',
+    };
+    $scope.availableTags = [];
+
+
+
+    window.addEventListener('message', function (objEvent) {
+        if (objEvent !== undefined && objEvent !== null &&
+            objEvent.data !== undefined && objEvent.data !== null &&
+            objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null) {
+            if (objEvent.data.strDestinationId === 'OauthPayload') {
+                sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
+                sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
+                sfdcInstanceFromExternalPage = objEvent.data.sfdcInstanceURL;
+                if (objWindow !== undefined && objWindow !== null) {
+                    objWindow.close();
+                }
+                $scope.sfdcOrg.oauthSuccess = 'true';
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'SFDC connection successful.'
+                });
+            }
+
+            if (objEvent.data.strDestinationId === 'OauthPayloadFailed') {
+                sfdcAccessTokenFromExternalPage = '';
+                sfdcUserNameFromExternalPage = '';
+                sfdcInstanceFromExternalPage = '';
+                if (objWindow !== undefined && objWindow !== null) {
+                    objWindow.close();
+                }
+                $scope.sfdcOrg.oauthSuccess = 'false';
+                iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
+            }
+        }
+        $scope.$apply();
+
+    });
+
+
+    $http.get("/showSfdcConnectionDetails?gitRepoId=" + $scope.repoId).then(function (response) {
+        $scope.lstSFDCConnectionDetails = response.data;
+    }, function (error) {
+        console.log(error);
+    });
+
+    $http.get("/getAllBranches?strRepoId=" + $scope.repoId).then(function (response) {
+        console.log(response.data);
+    }, function (error) {
+        console.log(error);
+    });
+    $scope.complete = function () {
+        $("#branchNamel3").autocomplete({
+            source: $scope.availableTags
+        });
+    };
+
+    $scope.createNewConnection = function () {
+        $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
+        $.removeCookie('SFDC_USER_NAME', {path: '/'});
+        $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+        $scope.sfdcOrg = {
+            orgName: '',
+            environment: '0',
+            userName: '',
+            instanceURL: '',
+            authorize: 'Authorize',
+            save: 'Save',
+            testConnection: 'Test Connection',
+            delete: 'Delete',
+            oauthSuccess: 'false',
+            oauthFailed: 'false',
+            oauthSaved: 'false',
+            disabledForm: 'false',
+            branchConnectedTo: 'false',
+            isActive: 'false',
+        };
+        sfdcAccessTokenFromExternalPage = '';
+        sfdcUserNameFromExternalPage = '';
+        sfdcInstanceFromExternalPage = '';
+        //$scope.disabledForm = 'false';
+    };
+
+
+    $scope.authorize = function (sfdcOrg) {
+        let url = '';
+        if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === ''
+            || sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '' || (sfdcOrg.environment === '2'
+                && (sfdcOrg.instanceURL === undefined || sfdcOrg.instanceURL === null || sfdcOrg.instanceURL === ''))) {
+            iziToast.warning({title: 'Caution', message: 'Please fill in required fields.', position: 'center'});
+            return;
+        }
+        if (sfdcOrg) {
+            if (sfdcOrg.environment === '0') {
+                url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + sfdcOrg.environment;
+            } else if (sfdcOrg.environment === '1') {
+                url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + sfdcOrg.environment;
+            } else {
+                url = sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
+                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + sfdcOrg.instanceURL;
+            }
+            const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
+            if (window.focus) {
+                newWindow.focus();
+            }
+        }
+    };
+
+    $scope.saveConnection = function (sfdcOrg) {
+        const sfdcDetails = {
+            id: sfdcOrg.id,
+            orgName: sfdcOrg.orgName,
+            environment: sfdcOrg.environment,
+            userName: sfdcOrg.userName,
+            instanceURL: checkIfInValid(sfdcOrg.instanceURL) ? sfdcInstanceFromExternalPage : sfdcOrg.instanceURL,
+            authorize: sfdcOrg.authorize,
+            save: sfdcOrg.save,
+            testConnection: sfdcOrg.testConnection,
+            delete: sfdcOrg.delete,
+            oauthSuccess: 'true',
+            oauthFailed: sfdcOrg.oauthFailed,
+            oauthSaved: sfdcOrg.oauthSaved,
+            oauthToken: checkIfInValid(sfdcOrg.oauthToken) ? sfdcAccessTokenFromExternalPage : sfdcOrg.oauthToken,
+            gitRepoId: $scope.repoId,
+        };
+        if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === '' ||
+            sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '') {
+            iziToast.error({
+                title: 'Error',
+                message: 'Please fill in all fields.',
+                position: 'topRight'
+            });
+            return;
+        }
+        $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
+                $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
+                $.removeCookie('SFDC_USER_NAME', {path: '/'});
+                $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+                $scope.lstSFDCConnectionDetails = [];
+                const gitRepoId = response.data.gitRepoId;
+                $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
+                    $scope.lstSFDCConnectionDetails = response.data;
+                }, function (error) {
+                    console.log(error);
+                });
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'SFDC connection created successfully'
+                });
+                $scope.sfdcOrg = {
+                    orgName: '',
+                    environment: '0',
+                    userName: '',
+                    instanceURL: '',
+                    authorize: 'Authorize',
+                    save: 'Save',
+                    testConnection: 'Test Connection',
+                    delete: 'Delete',
+                    oauthSuccess: 'false',
+                    oauthFailed: 'false',
+                    oauthSaved: 'false',
+                    disabledForm: 'false',
+                    branchConnectedTo: 'false',
+                    isActive: 'false',
+                };
+
+            }, function (error) {
+                console.log(error);
+                iziToast.error({
+                    title: 'Error',
+                    message: 'SFDC connection failed, Please retry. ' + error.data.message,
+                    position: 'topRight'
+                });
+            }
+        );
+    };
+
+    function checkIfInValid(objData) {
+        if (objData === undefined || objData === null || objData === '') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 });

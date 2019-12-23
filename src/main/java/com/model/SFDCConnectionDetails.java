@@ -24,7 +24,8 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthSaved;
     private String oauthToken;
     private String gitRepoId;
-    private List<String> lstSelectedBranches;
+    private String branchConnectedTo;
+    private boolean isActive;
 
     public String getId() {
         return id;
@@ -138,11 +139,19 @@ public class SFDCConnectionDetails implements Serializable {
         this.gitRepoId = gitRepoId;
     }
 
-    public List<String> getLstSelectedBranches() {
-        return lstSelectedBranches;
+    public String getBranchConnectedTo() {
+        return branchConnectedTo;
     }
 
-    public void setLstSelectedBranches(List<String> lstSelectedBranches) {
-        this.lstSelectedBranches = lstSelectedBranches;
+    public void setBranchConnectedTo(String branchConnectedTo) {
+        this.branchConnectedTo = branchConnectedTo;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
