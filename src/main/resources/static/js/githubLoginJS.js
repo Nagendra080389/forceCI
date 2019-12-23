@@ -90,6 +90,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
             $scope.userName = response.data.login;
             $scope.avatar_url = response.data.avatar_url;
             localStorage.setItem('githubOwner', response.data.login);
+            localStorage.setItem('avatar_url', response.data.avatar_url);
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 if (response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
@@ -529,6 +530,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
     let objWindow;
+    $scope.userName = localStorage.githubOwner;
+    $scope.avatar_url = localStorage.avatar_url;
     $scope.sfdcOrg = {
         orgName: '',
         environment: '0',
@@ -544,9 +547,6 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         disabledForm: 'false',
     };
     $scope.availableTags = [];
-
-
-
     window.addEventListener('message', function (objEvent) {
         if (objEvent !== undefined && objEvent !== null &&
             objEvent.data !== undefined && objEvent.data !== null &&
@@ -590,7 +590,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     });
 
     $http.get("/getAllBranches?strRepoId=" + $scope.repoId).then(function (response) {
-        console.log(response.data);
+        $scope.availableTags = response.data;
     }, function (error) {
         console.log(error);
     });
