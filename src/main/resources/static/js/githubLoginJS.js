@@ -605,7 +605,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     $scope.deleteConnection = function (sfdcOrg) {
         $http.delete("/deleteSfdcConnectionDetails?sfdcDetailsId=" + sfdcOrg.id).then(function (response) {
-            fetchDetailsFromDB(gitRepoId);
+            fetchDetailsFromDB($scope.repoId);
             iziToast.success({
                 timeout: 5000,
                 icon: 'fa fa-chrome',
