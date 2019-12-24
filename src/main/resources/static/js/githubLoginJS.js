@@ -453,7 +453,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         $.removeCookie('SFDC_USER_NAME', {path: '/'});
         $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
         $scope.sfdcOrg = {
-            id:'',
+            id: '',
             orgName: '',
             environment: '0',
             userName: '',
@@ -503,7 +503,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     $scope.showDataOnForm = function (sfdcOrg) {
         $scope.sfdcOrg = {
-            id:sfdcOrg.id,
+            id: sfdcOrg.id,
             orgName: sfdcOrg.orgName,
             environment: sfdcOrg.environment,
             userName: sfdcOrg.userName,
@@ -560,6 +560,12 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 $scope.lstSFDCConnectionDetails = [];
                 const gitRepoId = response.data.gitRepoId;
                 fetchDetailsFromDB(gitRepoId);
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'SFDC connection created successfully'
+                });
 
             }, function (error) {
                 console.log(error);
@@ -571,20 +577,15 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             }
         );
     };
+
     function fetchDetailsFromDB(gitRepoId) {
         $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
             $scope.lstSFDCConnectionDetails = response.data;
         }, function (error) {
             console.log(error);
         });
-        iziToast.success({
-            timeout: 5000,
-            icon: 'fa fa-chrome',
-            title: 'OK',
-            message: 'SFDC connection created successfully'
-        });
         $scope.sfdcOrg = {
-            id:'',
+            id: '',
             orgName: '',
             environment: '0',
             userName: '',
@@ -603,8 +604,14 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     }
 
     $scope.deleteConnection = function (sfdcOrg) {
-        $http.delete("/deleteSfdcConnectionDetails?sfdcDetailsId="+sfdcOrg.Id).then(function (response) {
+        $http.delete("/deleteSfdcConnectionDetails?sfdcDetailsId=" + sfdcOrg.Id).then(function (response) {
             fetchDetailsFromDB(gitRepoId);
+            iziToast.success({
+                timeout: 5000,
+                icon: 'fa fa-chrome',
+                title: 'OK',
+                message: 'SFDC connection deleted successfully'
+            });
         }, function (error) {
 
         })
