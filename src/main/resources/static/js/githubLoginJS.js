@@ -13,6 +13,10 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             templateUrl: './html/repoDetails.html',
             controller: 'repoController',
         })
+        .when('/apps/dashboard/createApp', {
+            templateUrl: './html/addApp.html',
+            controller: 'appPageRepoController',
+        })
         .when('/apps/error', {
             templateUrl: './html/error.html'
         })
@@ -89,11 +93,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
             }, function (error) {
 
             });
-            /* const avatarSpanTag = '<span class="absolute flex items-center justify-center w2 h2 z-2 ' +
-                 'nudge-right--4 pe-none" style="top: -15px">\n' +
-                 '          <img src=' + response.data.avatar_url + '>\n' +
-                 '        </span>';
-             $(avatarSpanTag).insertAfter('#idSelectTab');*/
+
         }
     }, function (error) {
 
@@ -618,11 +618,13 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     };
 
     function checkIfInValid(objData) {
-        if (objData === undefined || objData === null || objData === '') {
-            return true;
-        } else {
-            return false;
-        }
+        return objData === undefined || objData === null || objData === '';
     }
+
+});
+
+connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location) {
+    $scope.userName = localStorage.githubOwner;
+    $scope.avatar_url = localStorage.avatar_url;
 
 });

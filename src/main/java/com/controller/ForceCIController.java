@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.model.*;
+import com.rabbitMQ.RabbitMqConfig;
 import com.utils.AntExecutor;
 import com.utils.ApiSecurity;
 import com.utils.BuildUtils;
@@ -25,8 +26,11 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.json.JSONException;
 import org.kohsuke.github.*;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
@@ -85,6 +89,9 @@ public class ForceCIController {
 
     @Autowired
     private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
+
+    @Autowired
+    private RabbitMqConfig rabbitMqConfig;
 
     private static final String GITHUB_API = "https://api.github.com";
 
