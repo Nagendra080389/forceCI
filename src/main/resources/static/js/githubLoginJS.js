@@ -547,6 +547,11 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         disabledForm: 'false',
     };
     $scope.availableTags = [];
+    let sfdcAccessTokenFromExternalPage;
+    let sfdcUserNameFromExternalPage;
+    let sfdcInstanceFromExternalPage;
+
+
     window.addEventListener('message', function (objEvent) {
         if (objEvent !== undefined && objEvent !== null &&
             objEvent.data !== undefined && objEvent.data !== null &&
@@ -669,6 +674,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             oauthSaved: sfdcOrg.oauthSaved,
             oauthToken: checkIfInValid(sfdcOrg.oauthToken) ? sfdcAccessTokenFromExternalPage : sfdcOrg.oauthToken,
             gitRepoId: $scope.repoId,
+            branchConnectedTo: $scope.branchConnectedTo,
+            isActive: $scope.isActive,
         };
         if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === '' ||
             sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '') {
