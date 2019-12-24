@@ -474,12 +474,12 @@ public class ForceCIController {
     @RequestMapping(value = "/deleteSfdcConnectionDetails", method = RequestMethod.DELETE)
     public String deleteSfdcConnectionDetails(@RequestParam String sfdcDetailsId, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
-
+        Gson gson = new Gson();
         try {
             sfdcConnectionDetailsMongoRepository.deleteById(sfdcDetailsId);
-            return "Success";
+            return gson.toJson("Success");
         } catch (Exception e){
-            return "Error";
+            return gson.toJson("Error");
         }
 
     }
