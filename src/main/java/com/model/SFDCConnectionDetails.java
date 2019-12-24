@@ -25,7 +25,7 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthToken;
     private String gitRepoId;
     private String branchConnectedTo;
-    private boolean isActive;
+    private boolean boolActive;
 
     public String getId() {
         return id;
@@ -147,11 +147,11 @@ public class SFDCConnectionDetails implements Serializable {
         this.branchConnectedTo = branchConnectedTo;
     }
 
-    public boolean isActive() {
-        return isActive;
+    public boolean isBoolActive() {
+        return boolActive;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setBoolActive(boolean boolActive) {
+        this.boolActive = boolActive;
     }
 }

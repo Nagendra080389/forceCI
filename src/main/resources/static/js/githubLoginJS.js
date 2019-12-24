@@ -623,7 +623,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             oauthSaved: 'false',
             disabledForm: 'false',
             branchConnectedTo: '',
-            isActive: false,
+            boolActive: false,
         };
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
@@ -675,7 +675,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             oauthToken: checkIfInValid(sfdcOrg.oauthToken) ? sfdcAccessTokenFromExternalPage : sfdcOrg.oauthToken,
             gitRepoId: $scope.repoId,
             branchConnectedTo: sfdcOrg.branchConnectedTo,
-            isActive: sfdcOrg.isActive,
+            boolActive: sfdcOrg.boolActive,
         };
         if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === '' ||
             sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '') {
@@ -717,7 +717,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                     oauthSaved: 'false',
                     disabledForm: 'false',
                     branchConnectedTo: '',
-                    isActive: false,
+                    boolActive: false,
                 };
 
             }, function (error) {
