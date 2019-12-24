@@ -47,44 +47,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
     let objWindow;
     let current$index;
 
-
-    window.addEventListener('message', function (objEvent) {
-        if (objEvent !== undefined && objEvent !== null &&
-            objEvent.data !== undefined && objEvent.data !== null &&
-            objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null) {
-            if (objEvent.data.strDestinationId === 'OauthPayload') {
-                sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
-                sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
-                sfdcInstanceFromExternalPage = objEvent.data.sfdcInstanceURL;
-                if (objWindow !== undefined && objWindow !== null) {
-                    objWindow.close();
-                }
-                $scope.lstRepositoryData[current$index].sfdcOrg.oauthSuccess = 'true';
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'SFDC connection successful.'
-                });
-            }
-
-            if (objEvent.data.strDestinationId === 'OauthPayloadFailed') {
-                sfdcAccessTokenFromExternalPage = '';
-                sfdcUserNameFromExternalPage = '';
-                sfdcInstanceFromExternalPage = '';
-                if (objWindow !== undefined && objWindow !== null) {
-                    objWindow.close();
-                }
-                $scope.lstRepositoryData[current$index].sfdcOrg.oauthSuccess = 'false';
-                iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
-            }
-        }
-        $scope.$apply();
-        current$index = '';
-
-    });
-
-
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;

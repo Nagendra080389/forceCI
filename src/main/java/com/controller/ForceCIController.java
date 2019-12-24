@@ -446,8 +446,8 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
         if (sfdcConnectionDetails.getId() == null) {
-            SFDCConnectionDetails byUserName = sfdcConnectionDetailsMongoRepository.findByUserName(sfdcConnectionDetails.getUserName());
-            if (byUserName != null) {
+            SFDCConnectionDetails byBranchConnectedToAndBoolActive = sfdcConnectionDetailsMongoRepository.findByBranchConnectedToAndBoolActive(sfdcConnectionDetails.getBranchConnectedTo(), true);
+            if (byBranchConnectedToAndBoolActive != null) {
                 throw new Exception("User already connected to ForceCI");
             }
         }

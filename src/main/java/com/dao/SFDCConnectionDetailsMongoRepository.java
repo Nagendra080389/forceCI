@@ -12,4 +12,6 @@ public interface SFDCConnectionDetailsMongoRepository extends MongoRepository<SF
     List<SFDCConnectionDetails> findByGitRepoId(String gitRepoId);
 
     SFDCConnectionDetails findById(String id);
+
+    SFDCConnectionDetails findByBranchConnectedToAndBoolActive(String branchConnectedTo, boolean boolActive);
 }
