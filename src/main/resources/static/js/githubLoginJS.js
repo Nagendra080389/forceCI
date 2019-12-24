@@ -135,42 +135,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
         }
     };
 
-    $scope.fetchRepo = function () {
-        if ($scope.repoName) {
-            $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + localStorage.getItem('githubOwner')).then(function (response) {
-                $('#repoDialog').empty();
-                for (let i = 0; i < response.data.items.length; i++) {
-                    if (!$scope.reposInDB.includes(response.data.items[i].full_name)) {
-                        const eachNewDiv = '<div class="bb b--light-silver pv2 flex-auto flex items-center">\n' +
-                            '\n' +
-                            '                <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="repo-16" class="icon malibu-icon fill-near-black nudge-down--1 mr1">\n' +
-                            '                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#repo-16">\n' +
-                            '                        <svg id="repo-16"\n' +
-                            '                             viewBox="0 0 16 16">\n' +
-                            '                            <path fill-rule="evenodd" d="M6 4v1h1V4H6zm0-2v1h1V2H6zM3 0c-.5 0-1 .5-1 1v12c0 .5.5 1 1 1h2v2l1.5-1.5L8 16v-2h5c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1H3zm9.5 13H8v-1H5v1H3.5c-.266 0-.5-.266-.5-.5V11h10v1.5c0 .25-.234.5-.5.5zM5 10V1h8.016L13 10H5zm1-2v1h1V8H6zm0-2v1h1V6H6z">\n' +
-                            '\n' +
-                            '                            </path></svg>\n' +
-                            '                        <title></title>\n' +
-                            '                    </use>\n' +
-                            '                </svg>\n' +
-                            '\n' +
-                            '                <span class="repoFullName" data-repoName="' + response.data.items[i].name + '" data-repoId="' + response.data.items[i].id + '" ' +
-                            'data-repoUrl="' + response.data.items[i].html_url + '" data-ownerAvatarUrl="' + response.data.items[i].owner.avatar_url + '" data-ownerlogin="' + response.data.items[i].owner.login + '" ' +
-                            'data-ownerHtmlUrl="' + response.data.items[i].owner.html_url + '">' + response.data.items[i].full_name + '</span>\n' +
-                            '                <div class="flex-auto"></div>\n' +
-                            '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
-                            '                </button>\n' +
-                            '            </div>';
-                        $('#repoDialog').append(eachNewDiv);
-                    }
-                }
-                $('#repoDialog').removeClass('hidden');
 
-            }, function (error) {
-
-            });
-        }
-    };
 
     $(document).on("click", ".connectButton", function () {
         const $repositoryName = $(this).closest(".b--light-silver").find('span');
@@ -626,5 +591,53 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location) {
     $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
+    $scope.lstRepositoryFromApi = [];
+
+    for (let i = 0; i < 10; i++) {
+        var objVariable = {
+            full_name : 'full_name'+i
+        };
+
+        $scope.lstRepositoryFromApi.push(objVariable);
+    }
+
+    $scope.fetchRepo = function (eachRepository) {
+        if ($scope.repoName) {
+            $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
+
+
+                //$('#repoDialog').empty();
+                /*for (let i = 0; i < response.data.items.length; i++) {
+                    if (!$scope.reposInDB.includes(response.data.items[i].full_name)) {
+                        const eachNewDiv = '<div class="bb b--light-silver pv2 flex-auto flex items-center">\n' +
+                            '\n' +
+                            '                <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="repo-16" class="icon malibu-icon fill-near-black nudge-down--1 mr1">\n' +
+                            '                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#repo-16">\n' +
+                            '                        <svg id="repo-16"\n' +
+                            '                             viewBox="0 0 16 16">\n' +
+                            '                            <path fill-rule="evenodd" d="M6 4v1h1V4H6zm0-2v1h1V2H6zM3 0c-.5 0-1 .5-1 1v12c0 .5.5 1 1 1h2v2l1.5-1.5L8 16v-2h5c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1H3zm9.5 13H8v-1H5v1H3.5c-.266 0-.5-.266-.5-.5V11h10v1.5c0 .25-.234.5-.5.5zM5 10V1h8.016L13 10H5zm1-2v1h1V8H6zm0-2v1h1V6H6z">\n' +
+                            '\n' +
+                            '                            </path></svg>\n' +
+                            '                        <title></title>\n' +
+                            '                    </use>\n' +
+                            '                </svg>\n' +
+                            '\n' +
+                            '                <span class="repoFullName" data-repoName="' + response.data.items[i].name + '" data-repoId="' + response.data.items[i].id + '" ' +
+                            'data-repoUrl="' + response.data.items[i].html_url + '" data-ownerAvatarUrl="' + response.data.items[i].owner.avatar_url + '" data-ownerlogin="' + response.data.items[i].owner.login + '" ' +
+                            'data-ownerHtmlUrl="' + response.data.items[i].owner.html_url + '">' + response.data.items[i].full_name + '</span>\n' +
+                            '                <div class="flex-auto"></div>\n' +
+                            '                <button id="ember88" class="async-button default hk-button-sm--secondary ember-view connectButton" type="button">    Connect\n' +
+                            '                </button>\n' +
+                            '            </div>';
+                        $('#repoDialog').append(eachNewDiv);
+                    }
+                }*/
+                //$('#repoDialog').removeClass('hidden');
+
+            }, function (error) {
+
+            });
+        }
+    };
 
 });

@@ -1,4 +1,33 @@
-<div id="wrapper">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="../vendor/angular/angular.min.js"></script>
+<script src="../vendor/angular/angular-route.min.js"></script>
+<script src="../vendor/jquery/jquery.js"></script>
+<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="../vendor/pace/js/pace.min.js"></script>
+<script src="../vendor/jqueryPlugin/jquery.cookie.js"></script>
+<script src="../vendor/jqueryPlugin/jquery.magicsearch.js"></script>
+<script src="../vendor/jqueryPlugin/jquery.cookie.js"></script>
+<script src="../vendor/jqueryPlugin/angularjs-dropdown-multiselect.min.js"></script>
+<script src="../vendor/jqueryPlugin/jquery-ui.min.js"></script>
+<script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="../vendor/iziToast/iziToast.min.js"></script>
+<script src="../js/githubLoginJS.js"></script>
+<script src="../js/sb-admin-2.js"></script>
+
+<link href="../vendor/pace/css/pace-theme-center-circle.css" rel="stylesheet">
+<link href="../vendor/iziToast/iziToast.min.css" rel="stylesheet">
+<link href="../vendor/jqueryPlugin/jquery-ui.min.css" rel="stylesheet">
+<link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+<!-- Custom styles for this template-->
+<link href="../css/sb-admin-2.css" rel="stylesheet">
+<link href="../css/style.css" rel="stylesheet">
+
+<title>Connect 2 Deploy</title>
+<base href="/" />
+
+<div id="wrapper" ng-app="connect2Deploy" ng-controller="appPageRepoController">
 
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -15,7 +44,7 @@
         <hr class="sidebar-divider my-0">
 
         <!-- Nav Item - Dashboard -->
-        <li class="nav-item active">
+        <li class="nav-item">
             <a class="nav-link" href="apps/dashboard">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Dashboard</span></a>
@@ -36,10 +65,10 @@
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Apps</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Custom Components:</h6>
-                    <a class="collapse-item active" href="javascript:;">Add Apps</a>
+                    <a class="collapse-item active" href="javascript:;">Manage Apps</a>
                     <a class="collapse-item" href="javascript:;">-----</a>
                 </div>
             </div>
@@ -63,7 +92,136 @@
         <!-- Main Content -->
         <div id="content">
 
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+                <!-- Topbar Search -->
+                <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                               aria-label="Search" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ml-auto">
+
+                    <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                    <li class="nav-item dropdown no-arrow d-sm-none">
+                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <!-- Dropdown - Messages -->
+                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                             aria-labelledby="searchDropdown">
+                            <form class="form-inline mr-auto w-100 navbar-search">
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light border-0 small"
+                                           placeholder="Search for..." aria-label="Search"
+                                           aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button">
+                                            <i class="fas fa-search fa-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <!-- Nav Item - User Information -->
+                    <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{userName}}</span>
+                            <img class="img-profile rounded-circle" src="{{avatar_url}}">
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="javascript:;">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="javascript:;" data-toggle="modal" data-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+
+                </ul>
+
+            </nav>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                <!-- Content Row -->
+                <form class="navbar-search">
+                    <div class="input-group">
+                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for Repository..."
+                               aria-label="Search" ng-model="repoName" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit" ng-click="fetchRepo()">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row">
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-12 col-md-12 mb-4" ng-repeat="eachRepository in lstRepositoryFromApi">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-xl-9 col-md-9 mr-2">
+                                        <div class="text-xs font-weight-bold text-primary mb-1">
+                                            <svg style="width: 16px; height: 16px;" data-test-target="malibu-icon" data-test-icon-name="repo-16" class="icon malibu-icon fill-near-black nudge-down--1 mr1">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#repo-16">
+                                                    <svg id="repo-16"
+                                                         viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M6 4v1h1V4H6zm0-2v1h1V2H6zM3 0c-.5 0-1 .5-1 1v12c0 .5.5 1 1 1h2v2l1.5-1.5L8 16v-2h5c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1H3zm9.5 13H8v-1H5v1H3.5c-.266 0-.5-.266-.5-.5V11h10v1.5c0 .25-.234.5-.5.5zM5 10V1h8.016L13 10H5zm1-2v1h1V8H6zm0-2v1h1V6H6z">
+
+                                                        </path></svg>
+                                                    <title></title>
+                                                </use>
+                                            </svg>
+                                            {{eachRepository.full_name}}
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-2 col-md-2 mr-2">
+                                        <a href="#" class="btn btn-secondary btn-icon-split float-right">
+                                        <span class="icon text-white-50">
+                                          <i class="fab fa-connectdevelop mt-1"></i>
+                                        </span>
+                                            <span class="text">Connect</span>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
 
         </div>
         <!-- End of Main Content -->
