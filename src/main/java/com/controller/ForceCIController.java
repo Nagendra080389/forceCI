@@ -471,6 +471,19 @@ public class ForceCIController {
         return returnResponse;
     }
 
+    @RequestMapping(value = "/deleteSfdcConnectionDetails", method = RequestMethod.GET)
+    public String deleteSfdcConnectionDetails(@RequestParam String sfdcDetailsId, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        try {
+            sfdcConnectionDetailsMongoRepository.deleteById(Integer.valueOf(sfdcDetailsId));
+            return "Success";
+        } catch (Exception e){
+            return "Error";
+        }
+
+    }
+
     private static void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                          SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId) {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
