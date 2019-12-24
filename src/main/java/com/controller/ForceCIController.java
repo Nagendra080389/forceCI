@@ -471,12 +471,12 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    @RequestMapping(value = "/deleteSfdcConnectionDetails", method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteSfdcConnectionDetails", method = RequestMethod.DELETE)
     public String deleteSfdcConnectionDetails(@RequestParam String sfdcDetailsId, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
         try {
-            sfdcConnectionDetailsMongoRepository.deleteById(Integer.valueOf(sfdcDetailsId));
+            sfdcConnectionDetailsMongoRepository.deleteById(sfdcDetailsId);
             return "Success";
         } catch (Exception e){
             return "Error";
