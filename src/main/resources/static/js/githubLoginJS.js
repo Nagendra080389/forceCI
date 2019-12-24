@@ -617,8 +617,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             oauthFailed: 'false',
             oauthSaved: 'false',
             disabledForm: 'false',
-            branchConnectedTo: 'false',
-            isActive: 'false',
+            branchConnectedTo: '',
+            isActive: false,
         };
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
@@ -709,8 +709,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                     oauthFailed: 'false',
                     oauthSaved: 'false',
                     disabledForm: 'false',
-                    branchConnectedTo: 'false',
-                    isActive: 'false',
+                    branchConnectedTo: '',
+                    isActive: false,
                 };
 
             }, function (error) {
