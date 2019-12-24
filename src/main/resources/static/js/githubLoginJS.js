@@ -296,125 +296,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
         //$scope.disabledForm = 'false';
     };
 
-    $scope.saveConnection = function (eachData, $index) {
-        const lstSelectedBranch = eachData.sfdcOrg.multiSelectedBranches;
-        if (eachData.sfdcConnectionDetails !== undefined && eachData.sfdcConnectionDetails !== null) {
-            for (let i = 0; i < eachData.sfdcConnectionDetails.length; i++) {
-                if (eachData.sfdcConnectionDetails[i].userName === eachData.sfdcOrg.userName) {
-                    eachData.sfdcOrg = eachData.sfdcConnectionDetails[i];
-                }
-            }
-        }
-
-        const sfdcDetails = {
-            id: eachData.sfdcOrg.id,
-            orgName: eachData.sfdcOrg.orgName,
-            environment: eachData.sfdcOrg.environment,
-            userName: eachData.sfdcOrg.userName,
-            instanceURL: checkIfInValid(eachData.sfdcOrg.instanceURL) ? sfdcInstanceFromExternalPage : eachData.sfdcOrg.instanceURL,
-            authorize: eachData.sfdcOrg.authorize,
-            save: eachData.sfdcOrg.save,
-            testConnection: eachData.sfdcOrg.testConnection,
-            delete: eachData.sfdcOrg.delete,
-            oauthSuccess: 'true',
-            oauthFailed: eachData.sfdcOrg.oauthFailed,
-            oauthSaved: eachData.sfdcOrg.oauthSaved,
-            oauthToken: checkIfInValid(eachData.sfdcOrg.oauthToken) ? sfdcAccessTokenFromExternalPage : eachData.sfdcOrg.oauthToken,
-            gitRepoId: eachData.repositoryId,
-            lstSelectedBranches: changeListToObjectList(lstSelectedBranch)
-        };
-        if (eachData.sfdcOrg.orgName === undefined || eachData.sfdcOrg.orgName === null || eachData.sfdcOrg.orgName === '' ||
-            eachData.sfdcOrg.userName === undefined || eachData.sfdcOrg.userName === null || eachData.sfdcOrg.userName === '') {
-            return;
-        }
-        $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
-                $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
-                $.removeCookie('SFDC_USER_NAME', {path: '/'});
-                $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
-                $scope.lstRepositoryData[$index].sfdcConnectionDetails = [];
-                const gitRepoId = response.data.gitRepoId;
-                $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
-                    $scope.lstRepositoryData[$index].sfdcConnectionDetails = response.data;
-                }, function (error) {
-                    console.log(error);
-                });
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'SFDC connection created successfully'
-                });
-                const sfdcOrg = {
-                    orgName: '',
-                    environment: '0',
-                    userName: '',
-                    instanceURL: '',
-                    authorize: 'Authorize',
-                    save: 'Save',
-                    testConnection: 'Test Connection',
-                    delete: 'Delete',
-                    oauthSuccess: 'false',
-                    oauthFailed: 'false',
-                    oauthSaved: 'false',
-                    disabledForm: 'false',
-                    multiBranchData: [],
-                    multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-                    multiSelectedBranches: []
-                };
-                sfdcOrg.multiSelectedBranches = changeListToObjectList($scope.lstRepositoryData[$index].sfdcOrg.multiSelectedBranches);
-                $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
-            }, function (error) {
-                console.log(error);
-                iziToast.error({
-                    title: 'Error',
-                    message: 'SFDC connection failed, Please retry. ' + error.data.message,
-                    position: 'topRight'
-                });
-            }
-        );
-    }
-
-    $scope.showDataOnForm = function (eachSfdcConnection, eachdata) {
-        let eachdataLocal = $scope.lstRepositoryData[$scope.lstRepositoryData.indexOf(eachdata)];
-        let lstBranches = [];
-        $.each(eachdataLocal.mapBranches, function (key, value) {
-            lstBranches.push(key);
-        });
-        eachdataLocal.sfdcOrg = {
-            orgName: eachSfdcConnection.orgName,
-            environment: eachSfdcConnection.environment,
-            userName: eachSfdcConnection.userName,
-            instanceURL: eachSfdcConnection.instanceURL,
-            authorize: eachSfdcConnection.authorize,
-            save: eachSfdcConnection.save,
-            testConnection: eachSfdcConnection.testConnection,
-            delete: eachSfdcConnection.delete,
-            oauthSuccess: eachSfdcConnection.oauthSuccess,
-            oauthFailed: eachSfdcConnection.oauthFailed,
-            oauthSaved: eachSfdcConnection.oauthSaved,
-            oauthToken: eachSfdcConnection.oauthToken,
-            disabledForm: 'true',
-            multiBranchData: changeListToObjectList(lstBranches),
-            multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-            multiSelectedBranches: checkIfInValid(eachSfdcConnection.lstSelectedBranches) ? [] : changeListToObjectList(eachSfdcConnection.lstSelectedBranches)
-        };
-        if (eachdataLocal.sfdcOrg.multiBranchData !== undefined && eachdataLocal.sfdcOrg.multiBranchData !== null && eachdataLocal.sfdcOrg.multiBranchData.length > 0) {
-            eachdataLocal.sfdcOrg.multiSelectedBranches = [];
-            for (let i = 0; i < eachdataLocal.sfdcOrg.multiBranchData.length; i++) {
-                if (eachSfdcConnection.lstSelectedBranches !== undefined && eachSfdcConnection.lstSelectedBranches !== null && eachSfdcConnection.lstSelectedBranches.length > 0) {
-                    for (let j = 0; j < eachSfdcConnection.lstSelectedBranches.length; j++) {
-                        if (eachSfdcConnection.lstSelectedBranches[j] === eachdataLocal.sfdcOrg.multiBranchData[i].label) {
-                            eachdataLocal.sfdcOrg.multiSelectedBranches.push(eachdataLocal.sfdcOrg.multiBranchData[i]);
-                        }
-                    }
-                }
-
-            }
-        }
-        //$scope.disabledForm = 'true';
-
-
-    }
 
     function changeListToObjectList(lstData) {
         let lstOfObjects = [];
@@ -590,7 +471,6 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
         sfdcInstanceFromExternalPage = '';
-        //$scope.disabledForm = 'false';
     };
 
 
@@ -620,6 +500,28 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         }
     };
 
+    $scope.showDataOnForm = function (sfdcOrg) {
+        $scope.sfdcOrg = {
+            orgName: sfdcOrg.orgName,
+            environment: sfdcOrg.environment,
+            userName: sfdcOrg.userName,
+            instanceURL: sfdcOrg.instanceURL,
+            authorize: sfdcOrg.authorize,
+            save: sfdcOrg.save,
+            testConnection: sfdcOrg.testConnection,
+            delete: sfdcOrg.delete,
+            oauthSuccess: sfdcOrg.oauthSuccess,
+            oauthFailed: sfdcOrg.oauthFailed,
+            oauthSaved: sfdcOrg.oauthSaved,
+            oauthToken: sfdcOrg.oauthToken,
+            disabledForm: 'true',
+            gitRepoId: sfdcOrg.gitRepoId,
+            branchConnectedTo: sfdcOrg.branchConnectedTo,
+            boolActive: sfdcOrg.boolActive,
+        };
+    };
+
+
     $scope.saveConnection = function (sfdcOrg) {
         const sfdcDetails = {
             id: sfdcOrg.id,
@@ -648,39 +550,44 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             });
             return;
         }
+
+        function fetchDetailsFromDB(gitRepoId) {
+            $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
+                $scope.lstSFDCConnectionDetails = response.data;
+            }, function (error) {
+                console.log(error);
+            });
+            iziToast.success({
+                timeout: 5000,
+                icon: 'fa fa-chrome',
+                title: 'OK',
+                message: 'SFDC connection created successfully'
+            });
+            $scope.sfdcOrg = {
+                orgName: '',
+                environment: '0',
+                userName: '',
+                instanceURL: '',
+                authorize: 'Authorize',
+                save: 'Save',
+                testConnection: 'Test Connection',
+                delete: 'Delete',
+                oauthSuccess: 'false',
+                oauthFailed: 'false',
+                oauthSaved: 'false',
+                disabledForm: 'false',
+                branchConnectedTo: '',
+                boolActive: false,
+            };
+        }
+
         $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
                 $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
                 $.removeCookie('SFDC_USER_NAME', {path: '/'});
                 $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
                 $scope.lstSFDCConnectionDetails = [];
                 const gitRepoId = response.data.gitRepoId;
-                $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
-                    $scope.lstSFDCConnectionDetails = response.data;
-                }, function (error) {
-                    console.log(error);
-                });
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'SFDC connection created successfully'
-                });
-                $scope.sfdcOrg = {
-                    orgName: '',
-                    environment: '0',
-                    userName: '',
-                    instanceURL: '',
-                    authorize: 'Authorize',
-                    save: 'Save',
-                    testConnection: 'Test Connection',
-                    delete: 'Delete',
-                    oauthSuccess: 'false',
-                    oauthFailed: 'false',
-                    oauthSaved: 'false',
-                    disabledForm: 'false',
-                    branchConnectedTo: '',
-                    boolActive: false,
-                };
+                fetchDetailsFromDB(gitRepoId);
 
             }, function (error) {
                 console.log(error);
@@ -691,6 +598,14 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 });
             }
         );
+    };
+
+    $scope.deleteConnection = function (sfdcOrg) {
+        /*$http.delete("/deleteSfdcConnectionDetails?sfdcDetailsId="+sfdcOrg.Id).then(function (response) {
+
+        }, function (error) {
+
+        })*/
     };
 
     function checkIfInValid(objData) {
