@@ -91,19 +91,19 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                     //$('#repoConnectedDialog').removeClass('hidden');
                 }
             }, function (error) {
-                $.removeCookie('ACCESS_TOKEN', {path: '/'});
-                $.removeCookie('TOKEN_TYPE', {path: '/'});
-                iziToast.error({
-                    title: 'Error',
-                    message: error.data.message,
-                    position: 'topRight'
-                });
-                $location.path("/index");
+
             });
 
         }
     }, function (error) {
-
+        $.removeCookie('ACCESS_TOKEN', {path: '/'});
+        $.removeCookie('TOKEN_TYPE', {path: '/'});
+        iziToast.error({
+            title: 'Error',
+            message: error.data.message,
+            position: 'topRight'
+        });
+        $location.path("/index");
     });
 
 
