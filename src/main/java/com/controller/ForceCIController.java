@@ -134,6 +134,8 @@ public class ForceCIController {
                 System.out.println("property Value -> " + property + " ---- " + "property key -> " + stringPropertyName);
             }
         } else {
+            Queue queue = new Queue(branchName, true);
+            rabbitMqConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange("ForceCI")).withQueueName());
             String develop1 = rabbitMqConfig.amqpAdmin().declareQueue(new Queue(branchName, true));
             System.out.println(develop1);
         }
