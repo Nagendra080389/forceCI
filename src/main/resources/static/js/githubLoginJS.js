@@ -202,7 +202,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     });
 
     $scope.createDynamicQueues = function () {
-        let number = String.valueOf(Math.random());
+        let number = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
         $http.get("/createDynamicQueues?branchName="+number).then(function (response) {
             console.log(response);
         }, function (error) {

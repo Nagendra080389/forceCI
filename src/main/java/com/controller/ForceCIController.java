@@ -108,7 +108,7 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/createDynamicQueues", method = RequestMethod.GET)
-    public void createDynamicQueues(@RequestParam String branchName, @RequestParam String state, ServletResponse response, ServletRequest
+    public void createDynamicQueues(@RequestParam String branchName, ServletResponse response, ServletRequest
             request) throws URISyntaxException {
         Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties(branchName);
 
