@@ -26,9 +26,10 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.json.JSONException;
 import org.kohsuke.github.*;
-import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -97,6 +98,9 @@ public class ForceCIController {
     @Autowired
     private RabbitMqConfig rabbitMqConfig;
 
+    @Autowired
+    private AmqpTemplate rabbitTemplate;
+
     private static final String GITHUB_API = "https://api.github.com";
 
     @RequestMapping(value = "/**/{[path:[^\\.]*}")
@@ -106,6 +110,16 @@ public class ForceCIController {
         // Forward to home page so that route is preserved.
         httpResponse.sendRedirect("/");
         return null;
+    }
+
+
+    @RequestMapping(value = "/createExchange", method = RequestMethod.GET)
+    public void createExchange(ServletResponse response, ServletRequest
+            request) throws URISyntaxException {
+
+
+        rabbitMqConfig.amqpAdmin().declareExchange(new DirectExchange("ForceCI"));
+
     }
 
     @RequestMapping(value = "/createDynamicQueues", method = RequestMethod.GET)
@@ -119,10 +133,36 @@ public class ForceCIController {
                 String property = develop.getProperty(stringPropertyName);
                 System.out.println("property Value -> " + property + " ---- " + "property key -> " + stringPropertyName);
             }
+        } else {
+            String develop1 = rabbitMqConfig.amqpAdmin().declareQueue(new Queue(branchName, true));
+            System.out.println(develop1);
         }
+    }
 
-        String develop1 = rabbitMqConfig.amqpAdmin().declareQueue(new Queue(branchName, true));
-        System.out.println(develop1);
+    @RequestMapping(value = "/sendMessageToQueuesDevelop", method = RequestMethod.GET)
+    public void sendMessageToQueuesDevelop(ServletResponse response, ServletRequest
+            request) throws URISyntaxException {
+
+
+        Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties("develop");
+        String queue_name = develop.getProperty("QUEUE_NAME");
+
+        rabbitTemplate.convertAndSend("ForceCI", queue_name, "TestMessage");
+
+
+    }
+
+    @RequestMapping(value = "/sendMessageToQueuesMaster", method = RequestMethod.GET)
+    public void sendMessageToQueuesMaster(ServletResponse response, ServletRequest
+            request) throws URISyntaxException {
+
+
+        Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties("master");
+        String queue_name = develop.getProperty("QUEUE_NAME");
+
+        rabbitTemplate.convertAndSend("ForceCI", queue_name, "TestMessage1");
+
+
     }
 
 

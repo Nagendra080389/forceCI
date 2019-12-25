@@ -201,15 +201,41 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
         e.preventDefault();
     });
 
-    $scope.createDynamicQueues = function () {
-        let number = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
-        $http.get("/createDynamicQueues?branchName="+number).then(function (response) {
+    $scope.createDynamicQueuesDevelop = function () {
+        $http.get("/createDynamicQueues?branchName="+"develop").then(function (response) {
             console.log(response);
         }, function (error) {
             console.log(error);
         });
 
-    }
+    };
+
+    $scope.createDynamicQueuesMaster = function () {
+        $http.get("/createDynamicQueues?branchName="+"master").then(function (response) {
+            console.log(response);
+        }, function (error) {
+            console.log(error);
+        });
+
+    };
+
+    $scope.sendMessageToQueuesDevelop = function () {
+        $http.get("/sendMessageToQueuesDevelop").then(function (response) {
+            console.log(response);
+        }, function (error) {
+            console.log(error);
+        });
+
+    };
+
+    $scope.sendMessageToQueuesMaster = function () {
+        $http.get("/sendMessageToQueuesMaster").then(function (response) {
+            console.log(response);
+        }, function (error) {
+            console.log(error);
+        });
+
+    };
 
 });
 
