@@ -52,6 +52,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             localStorage.setItem('githubOwner', response.data.login);
             localStorage.setItem('avatar_url', response.data.avatar_url);
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
+                $scope.lstRepositoryData = [];
                 if (response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
                         $scope.lstRepositoryData.push(response.data[i].repository);
@@ -450,6 +451,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.lstRepositoryFromApi = [];
 
     $scope.fetchRepo = function (eachRepository) {
+        $scope.lstRepositoryFromApi = [];
         if ($scope.repoName) {
             $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
                 let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
