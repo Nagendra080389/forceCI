@@ -108,6 +108,16 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                                     title: 'OK',
                                     message: 'App deleted successfully'
                                 });
+                                $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
+                                    $scope.lstRepositoryData = [];
+                                    if (response.data.length > 0) {
+                                        for (let i = 0; i < response.data.length; i++) {
+                                            $scope.lstRepositoryData.push(response.data[i].repository);
+                                        }
+                                    }
+                                }, function (error) {
+
+                                });
                             } else {
                                 iziToast.error({
                                     title: 'Error',
@@ -453,43 +463,48 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
 
-    $scope.fetchRepo = function (eachRepository) {
-        $scope.lstRepositoryFromApi = [];
+    $scope.fetchRepo = function () {
         if ($scope.repoName) {
-            $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
-                let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
-                let repositoryWrappers = response.data.repositoryWrappers;
-                for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
-                    const data = {
-                        active: true,
-                        repositoryName: gitRepositoryFromQuery.items[i].name,
-                        repositoryId: gitRepositoryFromQuery.items[i].id,
-                        repositoryURL: gitRepositoryFromQuery.items[i].html_url,
-                        repositoryOwnerAvatarUrl: $scope.avatar_url,
-                        repositoryOwnerLogin: gitRepositoryFromQuery.items[i].owner.login,
-                        repositoryFullName: gitRepositoryFromQuery.items[i].full_name,
-                        ownerHtmlUrl: gitRepositoryFromQuery.items[i].owner.html_url,
-                        owner: $scope.userName,
-                        full_name: gitRepositoryFromQuery.items[i].full_name
-                    };
-                    if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
-                        for (let j = 0; j < repositoryWrappers.length; j++) {
-                            if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
-                                $scope.lstRepositoryFromApi.push(data);
-                            }
-                        }
-                    } else {
-                        $scope.lstRepositoryFromApi.push(data);
-                    }
-                }
-            }, function (error) {
-
-            });
+            fetchRepoFromApi();
         }
     };
 
+    function fetchRepoFromApi() {
+        $scope.lstRepositoryFromApi = [];
+        $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
+            let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
+            let repositoryWrappers = response.data.repositoryWrappers;
+            for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
+                const data = {
+                    active: true,
+                    repositoryName: gitRepositoryFromQuery.items[i].name,
+                    repositoryId: gitRepositoryFromQuery.items[i].id,
+                    repositoryURL: gitRepositoryFromQuery.items[i].html_url,
+                    repositoryOwnerAvatarUrl: $scope.avatar_url,
+                    repositoryOwnerLogin: gitRepositoryFromQuery.items[i].owner.login,
+                    repositoryFullName: gitRepositoryFromQuery.items[i].full_name,
+                    ownerHtmlUrl: gitRepositoryFromQuery.items[i].owner.html_url,
+                    owner: $scope.userName,
+                    full_name: gitRepositoryFromQuery.items[i].full_name
+                };
+                if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
+                    for (let j = 0; j < repositoryWrappers.length; j++) {
+                        if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
+                            $scope.lstRepositoryFromApi.push(data);
+                        }
+                    }
+                } else {
+                    $scope.lstRepositoryFromApi.push(data);
+                }
+            }
+        }, function (error) {
+
+        });
+    }
+
     $scope.connectAndCreateApp = function (data) {
         $http.post("/createWebHook", data).then(function (response) {
+            fetchRepoFromApi();
                 iziToast.success({
                     timeout: 5000,
                     icon: 'fa fa-chrome',
