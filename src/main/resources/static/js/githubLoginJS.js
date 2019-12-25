@@ -557,20 +557,30 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.fetchRepo = function (eachRepository) {
         if ($scope.repoName) {
             $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
-                for (let i = 0; i < response.data.items.length; i++) {
+                let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
+                let repositoryWrappers = response.data.repositoryWrappers;
+                for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
                     const data = {
                         active: true,
-                        repositoryName: response.data.items[i].name,
-                        repositoryId: response.data.items[i].id,
-                        repositoryURL: response.data.items[i].html_url,
+                        repositoryName: gitRepositoryFromQuery[i].name,
+                        repositoryId: gitRepositoryFromQuery[i].id,
+                        repositoryURL: gitRepositoryFromQuery[i].html_url,
                         repositoryOwnerAvatarUrl: $scope.avatar_url,
-                        repositoryOwnerLogin: response.data.items[i].owner.login,
-                        repositoryFullName: response.data.items[i].full_name,
-                        ownerHtmlUrl: response.data.items[i].owner.html_url,
+                        repositoryOwnerLogin: gitRepositoryFromQuery[i].owner.login,
+                        repositoryFullName: gitRepositoryFromQuery[i].full_name,
+                        ownerHtmlUrl: gitRepositoryFromQuery[i].owner.html_url,
                         owner: $scope.userName,
-                        full_name: response.data.items[i].full_name
+                        full_name: gitRepositoryFromQuery[i].full_name
                     };
-                    $scope.lstRepositoryFromApi.push(data);
+                    if(repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '') {
+                        for (let j = 0; j < repositoryWrappers.length; j++) {
+                            if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery[i].id) {
+                                $scope.lstRepositoryFromApi.push(data);
+                            }
+                        }
+                    } else {
+                        $scope.lstRepositoryFromApi.push(data);
+                    }
                 }
             }, function (error) {
 
