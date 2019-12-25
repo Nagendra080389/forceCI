@@ -27,6 +27,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.json.JSONException;
 import org.kohsuke.github.*;
 import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,6 +106,24 @@ public class ForceCIController {
         httpResponse.sendRedirect("/");
         return null;
     }
+
+    @RequestMapping(value = "/createDynamicQueues", method = RequestMethod.GET)
+    public void createDynamicQueues(@RequestParam String branchName, @RequestParam String state, ServletResponse response, ServletRequest
+            request) throws URISyntaxException {
+        Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties(branchName);
+
+        System.out.println("develop -> "+develop);
+        if(develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
+            for (String stringPropertyName : develop.stringPropertyNames()) {
+                String property = develop.getProperty(stringPropertyName);
+                System.out.println("property Value -> " + property + " ---- " + "property key -> " + stringPropertyName);
+            }
+        }
+
+        String develop1 = rabbitMqConfig.amqpAdmin().declareQueue(new Queue(branchName, true));
+        System.out.println(develop1);
+    }
+
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
     public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest

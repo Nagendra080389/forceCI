@@ -201,6 +201,16 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
         e.preventDefault();
     });
 
+    $scope.createDynamicQueues = function () {
+        let number = String.valueOf(Math.random());
+        $http.get("/createDynamicQueues?branchName="+number).then(function (response) {
+            console.log(response);
+        }, function (error) {
+            console.log(error);
+        });
+
+    }
+
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
