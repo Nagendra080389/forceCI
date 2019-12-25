@@ -18,7 +18,7 @@ public class Repository implements Serializable {
     private WebHook webHook;
     private String hmacSecret;
     private String ownerHtmlUrl;
-    private Map<String, GitBranches> mapBranches;
+    private List<String> lstBranches;
     private List<SFDCConnectionDetails> sfdcConnectionDetails;
 
 
@@ -126,12 +126,13 @@ public class Repository implements Serializable {
         this.sfdcConnectionDetails = sfdcConnectionDetails;
     }
 
-    public Map<String, GitBranches> getMapBranches() {
-        return mapBranches;
+
+    public List<String> getLstBranches() {
+        return lstBranches;
     }
 
-    public void setMapBranches(Map<String, GitBranches> mapBranches) {
-        this.mapBranches = mapBranches;
+    public void setLstBranches(List<String> lstBranches) {
+        this.lstBranches = lstBranches;
     }
 
     @Override

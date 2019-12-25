@@ -417,20 +417,16 @@ public class ForceCIController {
             if (LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
                 GetMethod fetchBranches = new GetMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" + repository.getRepositoryName() + "/branches");
-                fetchBranches.setRequestHeader("Authorization", "token " + accessToken);
-                fetchBranches.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
-                httpClient = new HttpClient();
-                status = httpClient.executeMethod(fetchBranches);
-                if(LIST_VALID_RESPONSE_CODES.contains(status)) {
-                    Type listBranches = new TypeToken<ArrayList<GitBranches>>(){}.getType();
-                    List<GitBranches> branchesListFromApi = new Gson().fromJson(IOUtils.toString(fetchBranches.getResponseBodyAsStream(), StandardCharsets.UTF_8), listBranches);
-                    Map<String, GitBranches> stringGitBranchesMap = new HashMap<>();
-                    for (GitBranches eachBranch : branchesListFromApi) {
-                        stringGitBranchesMap.put(eachBranch.getName(), eachBranch);
+                GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(accessToken).build();
+                GHRepository repositoryFromLib = gitHub.getRepositoryById(repository.getRepositoryId());
+                Map<String, GHBranch> branches = repositoryFromLib.getBranches();
+                List<String> lstBranchesInRepo = new ArrayList<>();
+                if(!branches.isEmpty()) {
+                    for (String eachKey : branches.keySet()) {
+                        lstBranchesInRepo.add(branches.get(eachKey).getName());
                     }
-                    repository.setMapBranches(stringGitBranchesMap);
                 }
-
+                repository.setLstBranches(lstBranchesInRepo);
                 repository.setWebHook(webHookResponse);
                 repository.setHmacSecret(randomString);
                 RepositoryWrapper repositoryWrapper = new RepositoryWrapper();
