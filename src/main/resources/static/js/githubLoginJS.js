@@ -574,7 +574,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     };
                     if(repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '') {
                         for (let j = 0; j < repositoryWrappers.length; j++) {
-                            if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery[i].id) {
+                            if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
                                 $scope.lstRepositoryFromApi.push(data);
                             }
                         }
