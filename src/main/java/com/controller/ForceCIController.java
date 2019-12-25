@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -113,7 +114,7 @@ public class ForceCIController {
         Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties(branchName);
 
         System.out.println("develop -> "+develop);
-        if(develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
+        if(develop != null && develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
             for (String stringPropertyName : develop.stringPropertyNames()) {
                 String property = develop.getProperty(stringPropertyName);
                 System.out.println("property Value -> " + property + " ---- " + "property key -> " + stringPropertyName);
