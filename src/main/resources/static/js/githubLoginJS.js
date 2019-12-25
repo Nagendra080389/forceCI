@@ -42,7 +42,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
     }
 });
 
-connect2Deploy.controller('dashBoardController', function ($scope, $http, $location) {
+connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route) {
     $scope.lstRepositoryData = [];
 
     $http.get("/fetchUserName").then(function (response) {
@@ -92,7 +92,10 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             buttons: [
                 ['<button><b>YES</b></button>', function (instance, toast) {
                     instance.hide({
-                        transitionOut: 'fadeOut'
+                        transitionOut: 'fadeOut',
+                        onClosing: function (instance, toast, closedBy) {
+                            iziToast.destroy();
+                        }
                     }, toast, 'button');
                     if (eachData.repositoryId) {
                         $http.delete("/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryId=" + eachData.repositoryId + "&repositoryOwner=" +
@@ -469,7 +472,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                         owner: $scope.userName,
                         full_name: gitRepositoryFromQuery.items[i].full_name
                     };
-                    if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '') {
+                    if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
                         for (let j = 0; j < repositoryWrappers.length; j++) {
                             if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
                                 $scope.lstRepositoryFromApi.push(data);
