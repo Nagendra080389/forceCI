@@ -11,7 +11,6 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +20,8 @@ import java.net.URISyntaxException;
 
 @EnableRabbit
 @Configuration
-public class RabbitMqConfig {
-    private static final Logger logger = LoggerFactory.getLogger(RabbitMqConfig.class);
+public class RabbitMqSenderConfig {
+    private static final Logger logger = LoggerFactory.getLogger(RabbitMqSenderConfig.class);
 
     @Value("${spring.rabbitmq.addresses}")
     private String addressURL;

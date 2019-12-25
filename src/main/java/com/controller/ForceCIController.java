@@ -7,9 +7,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import com.model.*;
-import com.rabbitMQ.RabbitMqConfig;
+import com.rabbitMQ.ConsumerHandler;
+import com.rabbitMQ.RabbitMqConsumer;
+import com.rabbitMQ.RabbitMqSenderConfig;
 import com.utils.AntExecutor;
 import com.utils.ApiSecurity;
 import com.utils.BuildUtils;
@@ -19,23 +20,16 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.json.JSONException;
 import org.kohsuke.github.*;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,10 +40,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -96,7 +88,7 @@ public class ForceCIController {
     private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
 
     @Autowired
-    private RabbitMqConfig rabbitMqConfig;
+    private RabbitMqSenderConfig rabbitMqSenderConfig;
 
     @Autowired
     private AmqpTemplate rabbitTemplate;
@@ -118,14 +110,14 @@ public class ForceCIController {
             request) throws URISyntaxException {
 
 
-        rabbitMqConfig.amqpAdmin().declareExchange(new DirectExchange("ForceCI"));
+        rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange("ForceCI"));
 
     }
 
     @RequestMapping(value = "/createDynamicQueues", method = RequestMethod.GET)
     public void createDynamicQueues(@RequestParam String branchName, ServletResponse response, ServletRequest
             request) throws URISyntaxException {
-        Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties(branchName);
+        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(branchName);
 
         System.out.println("develop -> "+develop);
         if(develop != null && develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
@@ -135,8 +127,9 @@ public class ForceCIController {
             }
         } else {
             Queue queue = new Queue(branchName, true);
-            String develop1 = rabbitMqConfig.amqpAdmin().declareQueue(new Queue(branchName, true));
-            rabbitMqConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange("ForceCI")).withQueueName());
+            String develop1 = rabbitMqSenderConfig.amqpAdmin().declareQueue(new Queue(branchName, true));
+            rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange("ForceCI")).withQueueName());
+
 
             System.out.println(develop1);
         }
@@ -144,27 +137,38 @@ public class ForceCIController {
 
     @RequestMapping(value = "/sendMessageToQueuesDevelop", method = RequestMethod.GET)
     public void sendMessageToQueuesDevelop(ServletResponse response, ServletRequest
-            request) throws URISyntaxException {
+            request) throws Exception {
 
 
-        Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties("develop");
+        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties("develop");
         String queue_name = develop.getProperty("QUEUE_NAME");
 
         rabbitTemplate.convertAndSend("ForceCI", queue_name, "TestMessage");
+        RabbitMqConsumer container = new RabbitMqConsumer();
+        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+        container.setQueueNames(queue_name);
+        container.setConcurrentConsumers(1);
+        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+        container.startConsumers();
 
 
     }
 
     @RequestMapping(value = "/sendMessageToQueuesMaster", method = RequestMethod.GET)
     public void sendMessageToQueuesMaster(ServletResponse response, ServletRequest
-            request) throws URISyntaxException {
+            request) throws Exception {
 
 
-        Properties develop = rabbitMqConfig.amqpAdmin().getQueueProperties("master");
+        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties("master");
         String queue_name = develop.getProperty("QUEUE_NAME");
 
         rabbitTemplate.convertAndSend("ForceCI", queue_name, "TestMessage1");
-
+        RabbitMqConsumer container = new RabbitMqConsumer();
+        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+        container.setQueueNames(queue_name);
+        container.setConcurrentConsumers(1);
+        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+        container.startConsumers();
 
     }
 
