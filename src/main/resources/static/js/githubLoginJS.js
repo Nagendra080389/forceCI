@@ -593,14 +593,6 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
 
-    for (let i = 0; i < 10; i++) {
-        var objVariable = {
-            full_name : 'full_name'+i
-        };
-
-        $scope.lstRepositoryFromApi.push(objVariable);
-    }
-
     $scope.fetchRepo = function (eachRepository) {
         if ($scope.repoName) {
             $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {

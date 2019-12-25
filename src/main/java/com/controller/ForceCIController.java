@@ -310,30 +310,29 @@ public class ForceCIController {
 
     @RequestMapping(value = "/fetchUserName", method = RequestMethod.GET)
     public String getUserName(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
-        Cookie[] cookies = request.getCookies();
         Gson gson = new Gson();
         String loginNameAndAvatar = "";
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("ACCESS_TOKEN")) {
-                String accessToken = cookie.getValue();
-                GetMethod getUserMethod = new GetMethod(GITHUB_API + "/user");
-                getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
-                HttpClient httpClient = new HttpClient();
-                int intStatusOk = httpClient.executeMethod(getUserMethod);
-                if (intStatusOk == HTTP_STATUS_OK) {
-                    GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
-                    UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(gitRepositoryUser.getLogin());
-                    if (userWrapper != null) {
-                        userWrapper.setAccess_token(accessToken);
-                    } else {
-                        userWrapper = new UserWrapper();
-                        userWrapper.setAccess_token(accessToken);
-                        userWrapper.setOwnerId(gitRepositoryUser.getLogin());
-                        userWrapper.setEmail_Id(gitRepositoryUser.getEmail());
-                    }
-                    userWrapperMongoRepository.save(userWrapper);
-                    loginNameAndAvatar = gson.toJson(gitRepositoryUser);
+        String accessToken = fetchCookies(request);
+        if (StringUtils.hasText(accessToken)) {
+            GetMethod getUserMethod = new GetMethod(GITHUB_API + "/user");
+            getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
+            HttpClient httpClient = new HttpClient();
+            int intStatusOk = httpClient.executeMethod(getUserMethod);
+            System.out.println("intStatusOk -> "+intStatusOk);
+            System.out.println("getUserMethod -> "+getUserMethod.getResponseBodyAsString());
+            if (intStatusOk == HTTP_STATUS_OK) {
+                GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
+                UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(gitRepositoryUser.getLogin());
+                if (userWrapper != null) {
+                    userWrapper.setAccess_token(accessToken);
+                } else {
+                    userWrapper = new UserWrapper();
+                    userWrapper.setAccess_token(accessToken);
+                    userWrapper.setOwnerId(gitRepositoryUser.getLogin());
+                    userWrapper.setEmail_Id(gitRepositoryUser.getEmail());
                 }
+                userWrapperMongoRepository.save(userWrapper);
+                loginNameAndAvatar = gson.toJson(gitRepositoryUser);
             }
         }
         return loginNameAndAvatar;
