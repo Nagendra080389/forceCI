@@ -562,15 +562,15 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                 for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
                     const data = {
                         active: true,
-                        repositoryName: gitRepositoryFromQuery[i].name,
-                        repositoryId: gitRepositoryFromQuery[i].id,
-                        repositoryURL: gitRepositoryFromQuery[i].html_url,
+                        repositoryName: gitRepositoryFromQuery.items[i].name,
+                        repositoryId: gitRepositoryFromQuery.items[i].id,
+                        repositoryURL: gitRepositoryFromQuery.items[i].html_url,
                         repositoryOwnerAvatarUrl: $scope.avatar_url,
-                        repositoryOwnerLogin: gitRepositoryFromQuery[i].owner.login,
-                        repositoryFullName: gitRepositoryFromQuery[i].full_name,
-                        ownerHtmlUrl: gitRepositoryFromQuery[i].owner.html_url,
+                        repositoryOwnerLogin: gitRepositoryFromQuery.items[i].owner.login,
+                        repositoryFullName: gitRepositoryFromQuery.items[i].full_name,
+                        ownerHtmlUrl: gitRepositoryFromQuery.items[i].owner.html_url,
                         owner: $scope.userName,
-                        full_name: gitRepositoryFromQuery[i].full_name
+                        full_name: gitRepositoryFromQuery.items[i].full_name
                     };
                     if(repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '') {
                         for (let j = 0; j < repositoryWrappers.length; j++) {
