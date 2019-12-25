@@ -58,6 +58,7 @@ import static org.kohsuke.github.GHDeploymentState.PENDING;
 public class ForceCIController {
 
     public static final int HTTP_STATUS_OK = 200;
+    public static final int HTTP_STATUS_FAILED = 401;
     @Value("${github.clientId}")
     String githubClientId;
 
@@ -318,8 +319,6 @@ public class ForceCIController {
             getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
             HttpClient httpClient = new HttpClient();
             int intStatusOk = httpClient.executeMethod(getUserMethod);
-            System.out.println("intStatusOk -> "+intStatusOk);
-            System.out.println("getUserMethod -> "+getUserMethod.getResponseBodyAsString());
             if (intStatusOk == HTTP_STATUS_OK) {
                 GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
                 UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(gitRepositoryUser.getLogin());
@@ -333,6 +332,8 @@ public class ForceCIController {
                 }
                 userWrapperMongoRepository.save(userWrapper);
                 loginNameAndAvatar = gson.toJson(gitRepositoryUser);
+            } else {
+                throw new JSONException("Bad Credentials");
             }
         }
         return loginNameAndAvatar;

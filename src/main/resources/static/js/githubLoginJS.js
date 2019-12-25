@@ -42,7 +42,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
     }
 });
 
-connect2Deploy.controller('dashBoardController', function ($scope, $http) {
+connect2Deploy.controller('dashBoardController', function ($scope, $http, $location) {
     $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
     let sfdcAccessTokenFromExternalPage;
@@ -91,7 +91,14 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http) {
                     //$('#repoConnectedDialog').removeClass('hidden');
                 }
             }, function (error) {
-
+                $.removeCookie('ACCESS_TOKEN', {path: '/'});
+                $.removeCookie('TOKEN_TYPE', {path: '/'});
+                iziToast.error({
+                    title: 'Error',
+                    message: error.data.message,
+                    position: 'topRight'
+                });
+                $location.path("/index");
             });
 
         }
