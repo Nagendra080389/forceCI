@@ -344,6 +344,8 @@ public class ForceCIController {
         Cookie[] cookies = request.getCookies();
         Gson gson = new Gson();
         String lstRepo = "";
+
+        FinalResult finalResult = new FinalResult();
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("ACCESS_TOKEN")) {
                 String accessToken = cookie.getValue();
@@ -358,7 +360,12 @@ public class ForceCIController {
                 }
             }
         }
-        return lstRepo;
+
+        List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(repoUser);
+        finalResult.setGitRepositoryFromQuery(lstRepo);
+        finalResult.setRepositoryWrappers(lstRepositoryWrapper);
+
+        return gson.toJson(finalResult);
     }
 
     @RequestMapping(value = "/deleteWebHook", method = RequestMethod.DELETE)
@@ -627,5 +634,27 @@ public class ForceCIController {
             }
         }
         return accessToken;
+    }
+
+    private class FinalResult {
+
+        private String gitRepositoryFromQuery;
+        private List<RepositoryWrapper> repositoryWrappers;
+
+        public String getGitRepositoryFromQuery() {
+            return gitRepositoryFromQuery;
+        }
+
+        public void setGitRepositoryFromQuery(String gitRepositoryFromQuery) {
+            this.gitRepositoryFromQuery = gitRepositoryFromQuery;
+        }
+
+        public List<RepositoryWrapper> getRepositoryWrappers() {
+            return repositoryWrappers;
+        }
+
+        public void setRepositoryWrappers(List<RepositoryWrapper> repositoryWrappers) {
+            this.repositoryWrappers = repositoryWrappers;
+        }
     }
 }
