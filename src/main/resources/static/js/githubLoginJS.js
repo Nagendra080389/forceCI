@@ -201,6 +201,15 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
         e.preventDefault();
     });
 
+    $scope.createExchange = function () {
+        $http.get("/createExchange").then(function (response) {
+            console.log(response);
+        }, function (error) {
+            console.log(error);
+        });
+
+    };
+
     $scope.createDynamicQueuesDevelop = function () {
         $http.get("/createDynamicQueues?branchName="+"develop").then(function (response) {
             console.log(response);
