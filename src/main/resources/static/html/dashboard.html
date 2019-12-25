@@ -146,26 +146,27 @@
 
                 <!-- Content Row -->
 
-                        <div class="row">
-                            <!-- Earnings (Monthly) Card Example -->
-                            <div class="col-xl-3 col-md-6 mb-4" ng-repeat="eachData in lstRepositoryData">
-                                <div class="card border-left-primary shadow h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                    {{eachData.owner}}
-                                                </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{eachData.repositoryName}}</div>
-                                            </div>
-                                            <a href="apps/dashboard/app/{{eachData.repositoryName}}/{{eachData.repositoryId}}" class="btn btn-primary btn-icon-split">
-                                                <span class="text">Open App</span>
-                                            </a>
+                <div class="row">
+                    <!-- Earnings (Monthly) Card Example -->
+                    <div class="col-xl-4 col-md-6 mb-4" ng-repeat="eachData in lstRepositoryData">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            {{eachData.owner}}
+                                            <i aria-hidden="true" class="fa fa-trash trashIcon" style="cursor: pointer" ng-click="disconnectAndDelete(eachData)"></i>
                                         </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{eachData.repositoryName}}</div>
                                     </div>
+                                    <a href="apps/dashboard/app/{{eachData.repositoryName}}/{{eachData.repositoryId}}" class="btn btn-primary btn-icon-split">
+                                        <span class="text">Open App</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
 
             </div>

@@ -43,13 +43,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
 });
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location) {
-    $scope.reposInDB = [];
     $scope.lstRepositoryData = [];
-    let sfdcAccessTokenFromExternalPage;
-    let sfdcUserNameFromExternalPage;
-    let sfdcInstanceFromExternalPage;
-    let objWindow;
-    let current$index;
 
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
@@ -60,35 +54,8 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 if (response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
-                        let lstBranches = [];
-                        $.each(response.data[i].repository.mapBranches, function (key, value) {
-                            console.log(key);
-                            lstBranches.push(key);
-                        });
-                        const sfdcOrg = {
-                            orgName: '',
-                            environment: '0',
-                            userName: '',
-                            instanceURL: '',
-                            authorize: 'Authorize',
-                            save: 'Save',
-                            testConnection: 'Test Connection',
-                            delete: 'Delete',
-                            oauthSuccess: 'false',
-                            oauthFailed: 'false',
-                            oauthSaved: 'false',
-                            disabledForm: 'false',
-                            multiBranchData: [],
-                            multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-                            multiSelectedBranches: []
-                        };
-                        sfdcOrg.multiBranchData = changeListToObjectList(lstBranches);
-                        sfdcOrg.multiSelectedBranches = checkIfInValid(response.data[i].repository.lstSelectedBranches) ? [] : changeListToObjectList(response.data[i].repository.lstSelectedBranches);
-                        response.data[i].repository.sfdcOrg = sfdcOrg;
                         $scope.lstRepositoryData.push(response.data[i].repository);
-                        $scope.reposInDB.push(response.data[i].repository.repositoryFullName);
                     }
-                    //$('#repoConnectedDialog').removeClass('hidden');
                 }
             }, function (error) {
 
@@ -107,137 +74,65 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     });
 
 
-    $scope.disconnectRepo = function (eachData) {
-        if (eachData.repositoryId) {
-            $http.delete("/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryId=" + eachData.repositoryId + "&repositoryOwner=" +
-                eachData.owner + "&webHookId=" + eachData.webHook.id).then(function (response) {
-                console.log(response);
-                if (response.status === 200 && response.data === 204) {
-                    $scope.lstRepositoryData.splice($scope.lstRepositoryData.indexOf(eachData), 1);
-                    $scope.reposInDB.splice($scope.reposInDB.indexOf(eachData.repositoryFullName), 1);
-                    if ($scope.lstRepositoryData.length === 0) {
-                        //$('#repoConnectedDialog').addClass('hidden');
+    $scope.disconnectAndDelete = function (eachData) {
+
+        iziToast.question({
+            timeout: false,
+            pauseOnHover: true,
+            close: false,
+            overlay: true,
+            toastOnce: true,
+            backgroundColor: 'fff',
+            id: 'question',
+            zindex: 999,
+            title: 'Confirm',
+            message: 'Are you sure you want to delete?',
+            position: 'center',
+            buttons: [
+                ['<button><b>YES</b></button>', function (instance, toast) {
+                    instance.hide({
+                        transitionOut: 'fadeOut'
+                    }, toast, 'button');
+                    if (eachData.repositoryId) {
+                        $http.delete("/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryId=" + eachData.repositoryId + "&repositoryOwner=" +
+                            eachData.owner + "&webHookId=" + eachData.webHook.id).then(function (response) {
+                            console.log(response);
+                            if (response.status === 200 && response.data === 204) {
+                                iziToast.success({
+                                    timeout: 5000,
+                                    icon: 'fa fa-chrome',
+                                    title: 'OK',
+                                    message: 'App deleted successfully'
+                                });
+                            } else {
+                                iziToast.error({
+                                    title: 'Error',
+                                    message: 'Not able to delete WebHook, Please retry.',
+                                    position: 'topRight'
+                                });
+                            }
+                        }, function (error) {
+                            console.log(error);
+                            iziToast.error({
+                                title: 'Error',
+                                message: 'Not able to delete WebHook, Please retry.',
+                                position: 'topRight'
+                            });
+                        })
                     }
-                    iziToast.success({
-                        timeout: 5000,
-                        icon: 'fa fa-chrome',
-                        title: 'OK',
-                        message: 'WebHook deleted successfully'
-                    });
-                } else {
-                    iziToast.error({
-                        title: 'Error',
-                        message: 'Not able to delete WebHook, Please retry.',
-                        position: 'topRight'
-                    });
-                }
-            }, function (error) {
-                console.log(error);
-                iziToast.error({
-                    title: 'Error',
-                    message: 'Not able to delete WebHook, Please retry.',
-                    position: 'topRight'
-                });
-            })
-        }
+                }, true],
+                ['<button>NO</button>', function (instance, toast) {
+                    instance.hide({
+                        transitionOut: 'fadeOut',
+                        onClosing: function (instance, toast, closedBy) {
+                            iziToast.destroy();
+                        }
+                    }, toast, 'button');
+                }],]
+        });
+
+
     };
-
-
-    $(document).on("click", ".connectButton", function () {
-        const $repositoryName = $(this).closest(".b--light-silver").find('span');
-        const repositoryName = $repositoryName.attr('data-repoName');
-        const repositoryId = $repositoryName.attr('data-repoId');
-        const repositoryURL = $repositoryName.attr('data-repoUrl');
-        const repositoryOwnerAvatarUrl = $repositoryName.attr('data-ownerAvatarUrl');
-        const repositoryOwnerLogin = $repositoryName.attr('data-ownerlogin');
-        const ownerHtmlUrl = $repositoryName.attr('data-ownerHtmlUrl');
-        const repositoryFullName = $repositoryName.text();
-        const data = {
-            active: true,
-            repositoryName: repositoryName,
-            repositoryId: repositoryId,
-            repositoryURL: repositoryURL,
-            repositoryOwnerAvatarUrl: repositoryOwnerAvatarUrl,
-            repositoryOwnerLogin: repositoryOwnerLogin,
-            repositoryFullName: repositoryFullName,
-            ownerHtmlUrl: ownerHtmlUrl,
-            owner: localStorage.getItem('githubOwner')
-        };
-
-
-    });
-
-    $scope.authorize = function (eachData, $index) {
-        let url = '';
-        if (eachData.sfdcOrg.orgName === undefined || eachData.sfdcOrg.orgName === null || eachData.sfdcOrg.orgName === ''
-            || eachData.sfdcOrg.userName === undefined || eachData.sfdcOrg.userName === null || eachData.sfdcOrg.userName === '' || (eachData.sfdcOrg.environment === '2'
-                && (eachData.sfdcOrg.instanceURL === undefined || eachData.sfdcOrg.instanceURL === null || eachData.sfdcOrg.instanceURL === ''))) {
-            iziToast.warning({title: 'Caution', message: 'Please fill in required fields.', position: 'center'});
-            return;
-        }
-        current$index = $index;
-        if (eachData && eachData.sfdcOrg) {
-            if (eachData.sfdcOrg.environment === '0') {
-                url = 'https://login.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
-            } else if (eachData.sfdcOrg.environment === '1') {
-                url = 'https://test.salesforce.com/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.environment;
-            } else {
-                url = eachData.sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
-                    'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + eachData.sfdcOrg.instanceURL;
-            }
-            const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
-            if (window.focus) {
-                newWindow.focus();
-            }
-        }
-    };
-
-    $scope.createNewConnection = function ($index) {
-        $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
-        $.removeCookie('SFDC_USER_NAME', {path: '/'});
-        $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
-        const sfdcOrg = {
-            orgName: '',
-            environment: '0',
-            userName: '',
-            instanceURL: '',
-            authorize: 'Authorize',
-            save: 'Save',
-            testConnection: 'Test Connection',
-            delete: 'Delete',
-            oauthSuccess: 'false',
-            oauthFailed: 'false',
-            oauthSaved: 'false',
-            disabledForm: 'false',
-            multiBranchData: checkIfInValid($scope.lstRepositoryData[$index].sfdcOrg.multiBranchData) ? [] : $scope.lstRepositoryData[$index].sfdcOrg.multiBranchData,
-            multiExtraSettings: {enableSearch: true, showCheckAll: false, showUncheckAll: false},
-            multiSelectedBranches: []
-        };
-        $scope.lstRepositoryData[$index].sfdcOrg = sfdcOrg;
-        sfdcAccessTokenFromExternalPage = '';
-        sfdcUserNameFromExternalPage = '';
-        sfdcInstanceFromExternalPage = '';
-        //$scope.disabledForm = 'false';
-    };
-
-
-    function changeListToObjectList(lstData) {
-        let lstOfObjects = [];
-        if (lstData !== undefined && lstData !== null) {
-            for (let i = 0; i < lstData.length; i++) {
-                if ($.type(lstData[i]) === 'string') {
-                    const branchData = {id: i + 1, label: lstData[i]};
-                    lstOfObjects.push(branchData);
-                }
-                if ($.type(lstData[i]) === 'object') {
-                    lstOfObjects.push(lstData[i].label);
-                }
-            }
-        }
-        return lstOfObjects;
-    }
 
     function checkIfInValid(objData) {
         if (objData === undefined || objData === null || objData === '') {
@@ -572,7 +467,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                         owner: $scope.userName,
                         full_name: gitRepositoryFromQuery.items[i].full_name
                     };
-                    if(repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '') {
+                    if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '') {
                         for (let j = 0; j < repositoryWrappers.length; j++) {
                             if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
                                 $scope.lstRepositoryFromApi.push(data);
