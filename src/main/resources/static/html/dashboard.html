@@ -148,6 +148,7 @@
 
                 <div class="row">
                     <!-- Earnings (Monthly) Card Example -->
+                    <div ng-show="!lstRepositoryData.length" style="font-weight: 900;">No Apps added, go to Manage App to add.</div>
                     <div class="col-xl-4 col-md-6 mb-4" ng-repeat="eachData in lstRepositoryData">
                         <div class="card border-left-primary shadow h-100 py-2">
                             <div class="card-body">
