@@ -563,12 +563,6 @@ public class ForceCIController {
                     System.out.println(" message payload -> " + payload);
                     emitter.next(payload);
                 }
-
-                public void handleMessage(DeploymentJob deploymentJob){
-                    emitter.next("deploymentJob");
-                }
-
-
             });
 
             emitter.onRequest(new LongConsumer() {
@@ -724,5 +718,9 @@ public class ForceCIController {
         public void setRepositoryWrappers(List<RepositoryWrapper> repositoryWrappers) {
             this.repositoryWrappers = repositoryWrappers;
         }
+    }
+
+    public void handleMessage(DeploymentJob deploymentJob){
+        System.out.println("deploymentJob");
     }
 }
