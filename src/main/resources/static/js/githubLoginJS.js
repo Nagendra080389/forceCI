@@ -272,6 +272,12 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         console.log(error);
     });
 
+    $http.get("/queue/master").then(function (response) {
+        console.log(response.data);
+    }, function (error) {
+        console.log(error);
+    });
+
     $http.get("/getAllBranches?strRepoId=" + $scope.repoId).then(function (response) {
         $scope.availableTags = response.data;
     }, function (error) {

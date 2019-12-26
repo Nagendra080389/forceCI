@@ -27,13 +27,18 @@ import org.kohsuke.github.*;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -48,7 +53,10 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.LongConsumer;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
 
@@ -529,6 +537,68 @@ public class ForceCIController {
 
     }
 
+
+    @GetMapping(value = "/queue/{name}", produces = org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<?> receiveMessagesFromQueue(@PathVariable String name) throws Exception {
+
+        RabbitMqConsumer container = new RabbitMqConsumer();
+        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+        container.setQueueNames(name);
+        container.setConcurrentConsumers(1);
+
+        Flux<String> f = Flux.<String> create(emitter -> {
+
+            container.setupMessageListener(new MessageListenerAdapter() {
+                @Override
+                public void onMessage(Message m) {
+                    if(m != null) {
+                        System.out.println(" message body -> " + m.toString());
+                    }
+                    if (emitter.isCancelled()) {
+                        container.stop();
+                        return;
+                    }
+
+                    String payload = new String(m.getBody());
+                    System.out.println(" message payload -> " + payload);
+                    emitter.next(payload);
+
+                }
+            });
+
+            emitter.onRequest(new LongConsumer() {
+                @Override
+                public void accept(long v) {
+                    container.start();
+                }
+            });
+
+            emitter.onDispose(new Disposable() {
+                @Override
+                public void dispose() {
+                    container.stop();
+                }
+            });
+            /*try {
+                container.startConsumers();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+
+
+        });
+
+
+        return Flux.interval(Duration.ofSeconds(5))
+                .map(v -> {
+                    return "No news is good news";
+                })
+                .mergeWith(f);
+
+
+
+    }
+
     private static void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                          SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
                                          RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
@@ -568,12 +638,12 @@ public class ForceCIController {
         deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
         rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
-        RabbitMqConsumer container = new RabbitMqConsumer();
+        /*RabbitMqConsumer container = new RabbitMqConsumer();
         container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
         container.setQueueNames(queue_name);
         container.setConcurrentConsumers(1);
         container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
-        container.startConsumers();
+        container.startConsumers();*/
 
 
     }
