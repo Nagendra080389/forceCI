@@ -163,12 +163,12 @@ public class ForceCIController {
         String queue_name = develop.getProperty("QUEUE_NAME");
 
         rabbitTemplate.convertAndSend("ForceCI", queue_name, "TestMessage1");
-        /*RabbitMqConsumer container = new RabbitMqConsumer();
+        RabbitMqConsumer container = new RabbitMqConsumer();
         container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
         container.setQueueNames(queue_name);
         container.setConcurrentConsumers(1);
         container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
-        container.startConsumers();*/
+        container.startConsumers();
 
     }
 
