@@ -552,26 +552,10 @@ public class ForceCIController {
             container.setMessageListener(new MessageListenerAdapter(new Object(){
 
                 public void handleMessage(DeploymentJob deploymentJob){
+                    emitter.next("deploymentJob");
                     System.out.println(" deploymentJob receiveMessagesFromQueue -> " + deploymentJob) ;
                 }
             }, new Jackson2JsonMessageConverter()));
-
-            container.setupMessageListener(new MessageListenerAdapter() {
-                @Override
-                public void onMessage(Message m) {
-                    if(m != null) {
-                        System.out.println(" message body -> " + m.toString());
-                    }
-                    if (emitter.isCancelled()) {
-                        container.stop();
-                        return;
-                    }
-
-                    String payload = new String(m.getBody());
-                    System.out.println(" message payload -> " + payload);
-                    emitter.next(payload);
-                }
-            });
 
             emitter.onRequest(new LongConsumer() {
                 @Override
