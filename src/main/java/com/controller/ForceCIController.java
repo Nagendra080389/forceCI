@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.model.*;
 import com.rabbitMQ.ConsumerHandler;
+import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.utils.AntExecutor;
@@ -25,6 +26,7 @@ import org.json.JSONException;
 import org.kohsuke.github.*;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,74 +106,14 @@ public class ForceCIController {
         return null;
     }
 
-
-    @RequestMapping(value = "/createExchange", method = RequestMethod.GET)
-    public void createExchange(ServletResponse response, ServletRequest
-            request) throws URISyntaxException {
-
-
-        rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange("ForceCI"));
-
-    }
-
-    @RequestMapping(value = "/createDynamicQueues", method = RequestMethod.GET)
-    public void createDynamicQueues(@RequestParam String branchName, ServletResponse response, ServletRequest
-            request) throws URISyntaxException {
-        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(branchName);
-
-        System.out.println("develop -> "+develop);
-        if(develop != null && develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
-            for (String stringPropertyName : develop.stringPropertyNames()) {
-                String property = develop.getProperty(stringPropertyName);
-                System.out.println("property Value -> " + property + " ---- " + "property key -> " + stringPropertyName);
-            }
-        } else {
-            Queue queue = new Queue(branchName, true);
-            String develop1 = rabbitMqSenderConfig.amqpAdmin().declareQueue(new Queue(branchName, true));
-            rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange("ForceCI")).withQueueName());
-
-
-            System.out.println(develop1);
-        }
-    }
-
     @RequestMapping(value = "/sendMessageToQueuesDevelop", method = RequestMethod.GET)
     public void sendMessageToQueuesDevelop(ServletResponse response, ServletRequest
             request) throws Exception {
 
 
-        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties("develop");
-        String queue_name = develop.getProperty("QUEUE_NAME");
-
-        rabbitTemplate.convertAndSend("ForceCI", queue_name, "TestMessage");
-        RabbitMqConsumer container = new RabbitMqConsumer();
-        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-        container.setQueueNames(queue_name);
-        container.setConcurrentConsumers(1);
-        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
-        container.startConsumers();
 
 
     }
-
-    @RequestMapping(value = "/sendMessageToQueuesMaster", method = RequestMethod.GET)
-    public void sendMessageToQueuesMaster(ServletResponse response, ServletRequest
-            request) throws Exception {
-
-
-        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties("master");
-        String queue_name = develop.getProperty("QUEUE_NAME");
-
-        rabbitTemplate.convertAndSend("ForceCI", queue_name, "TestMessage1");
-        RabbitMqConsumer container = new RabbitMqConsumer();
-        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-        container.setQueueNames(queue_name);
-        container.setConcurrentConsumers(1);
-        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
-        container.startConsumers();
-
-    }
-
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
     public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
@@ -315,7 +257,7 @@ public class ForceCIController {
 
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
     public String webhooks(@RequestHeader("X-Hub-Signature") String signature, @RequestHeader("X-GitHub-Event") String githubEvent,
-                           @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) throws IOException, GitAPIException {
+                           @RequestBody String payload, HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
         // if signature is empty return 401
         if (!StringUtils.hasText(signature)) {
@@ -340,7 +282,7 @@ public class ForceCIController {
                     System.out.println("A pull request was created! A validation should start now...");
 
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId);
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate);
                 }
                 break;
             case "push":
@@ -439,7 +381,7 @@ public class ForceCIController {
     @RequestMapping(value = "/deleteWebHook", method = RequestMethod.DELETE)
     public String deleteWebHook(@RequestParam String repositoryName, @RequestParam String repositoryId, @RequestParam String repositoryOwner,
                                 @RequestParam String webHookId, HttpServletResponse response, HttpServletRequest
-                                        request) throws IOException {
+                                        request) throws IOException, URISyntaxException {
 
         Gson gson = new Gson();
         int status = 0;
@@ -452,10 +394,19 @@ public class ForceCIController {
             HttpClient httpClient = new HttpClient();
             status = httpClient.executeMethod(deleteWebHook);
             if (status == 204) {
+                try {
+                    rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryName);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
                 RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryId(repositoryOwner, repositoryId);
                 repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
                 List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
                 sfdcConnectionDetailsMongoRepository.deleteAll(byGitRepoId);
+                for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                    rabbitMqSenderConfig.amqpAdmin().deleteQueue(sfdcConnectionDetails.getBranchConnectedTo());
+                }
+
             }
         }
 
@@ -508,6 +459,11 @@ public class ForceCIController {
                 repositoryWrapper.setOwnerId(repository.getOwner());
                 repositoryWrapper.setRepository(repository);
                 repositoryWrapperMongoRepository.save(repositoryWrapper);
+                try {
+                    rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange(repository.getRepositoryName()));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
                 returnResponse = gson.toJson(repository);
             }
 
@@ -528,6 +484,17 @@ public class ForceCIController {
             if (byBranchConnectedToAndBoolActive != null) {
                 throw new Exception("User already connected to ForceCI");
             }
+        }
+        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(sfdcConnectionDetails.getBranchConnectedTo());
+
+        if(develop != null && develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
+            // Do nothing
+        } else {
+            RepositoryWrapper byRepositoryRepositoryId = repositoryWrapperMongoRepository.findByRepositoryRepositoryId(sfdcConnectionDetails.getGitRepoId());
+            Queue queue = new Queue(sfdcConnectionDetails.getBranchConnectedTo(), true);
+            rabbitMqSenderConfig.amqpAdmin().declareQueue(new Queue(sfdcConnectionDetails.getBranchConnectedTo(), true));
+            System.out.println("byRepositoryRepositoryId.getRepository().getRepositoryName() -> "+byRepositoryRepositoryId.getRepository().getRepositoryName());
+            rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(byRepositoryRepositoryId.getRepository().getRepositoryName())).withQueueName());
         }
         sfdcConnectionDetails.setOauthSaved("true");
         SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
@@ -563,11 +530,13 @@ public class ForceCIController {
     }
 
     private static void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
-                                         SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId) {
+                                         SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
+                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
         String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
+        String repoName = pullRequestJsonObject.get("repo").getAsJsonObject().get("name").getAsString();
         String targetBranch = pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString();
         List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(gitRepoId);
 
@@ -580,77 +549,33 @@ public class ForceCIController {
                     }
                 }
             }
-
         }
 
-        createTempDirectoryForDeployment(access_token, sfdcConnectionDetail, emailId, userName, gitCloneURL, sourceBranch, targetBranch);
-    }
-
-    private static void createTempDirectoryForDeployment(String access_token, SFDCConnectionDetails sfdcConnectionDetail, String emailId, String userName, String gitCloneURL, String sourceBranch, String targetBranch) {
-        try {
-
-            System.out.println("inside start_deployment -> " + access_token);
-            System.out.println("inside start_deployment -> " + sfdcConnectionDetail);
-            Map<String, String> propertiesMap = new HashMap<>();
-            Path tempDirectory = Files.createTempDirectory(sourceBranch);
-
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            try {
-                InputStream buildXml = classLoader.getResourceAsStream("build/build.xml");
-                InputStream antSalesforce = classLoader.getResourceAsStream("build/ant-salesforce.jar");
-                InputStream createChanges = classLoader.getResourceAsStream("build/create_changes.sh");
-                InputStream generatePackageUnix = classLoader.getResourceAsStream("build/generate_package_unix.sh");
-                InputStream generatePackage = classLoader.getResourceAsStream("build/generate_package.sh");
-                InputStream gitClone = classLoader.getResourceAsStream("build/get_clone.sh");
-                InputStream gitDiffBeforeMerge = classLoader.getResourceAsStream("build/get_diff_branches.sh");
-                InputStream gitDiffAfterMerge = classLoader.getResourceAsStream("build/get_diff_commits.sh");
-                InputStream propertiesHelper = classLoader.getResourceAsStream("build/properties_helper.sh");
-                File buildFile = BuildUtils.stream2file(buildXml, "build", ".xml");
-                System.out.println(buildFile.getPath());
-                File antJar = BuildUtils.stream2file(antSalesforce, "ant-salesforce", ".jar");
-                File create_changes = BuildUtils.stream2file(createChanges, "create_changes", ".sh");
-                File generate_package_unix = BuildUtils.stream2file(generatePackageUnix, "generate_package_unix", ".sh");
-                File generate_package = BuildUtils.stream2file(generatePackage, "generate_package", ".sh");
-                File get_clone = BuildUtils.stream2file(gitClone, "get_clone", ".sh");
-                File get_diff_branches = BuildUtils.stream2file(gitDiffBeforeMerge, "get_diff_branches", ".sh");
-                File get_diff_commits = BuildUtils.stream2file(gitDiffAfterMerge, "get_diff_commits", ".sh");
-                File properties_helper = BuildUtils.stream2file(propertiesHelper, "properties_helper", ".sh");
-
-                propertiesMap.put("diffDir", tempDirectory.toFile().getPath() + "/deploy");
-                propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
-
-                propertiesMap.put("generatePackage", tempDirectory.toFile().getPath() + "/final.txt");
-                propertiesMap.put("scriptName", get_diff_branches.getName());
-                propertiesMap.put("gitClone", get_clone.getName());
-                propertiesMap.put("create_changes", create_changes.getName());
-                propertiesMap.put("generate_package", generate_package.getName());
-                propertiesMap.put("originURL", gitCloneURL);
-                propertiesMap.put("antPath", antJar.getPath());
-                // Only run on Merge
-                propertiesMap.put("get_diff_commits", get_diff_commits.getName());
-                propertiesMap.put("generate_package_unix", generate_package_unix.getName());
-                propertiesMap.put("userEmail", emailId);
-                propertiesMap.put("userName", userName);
-                propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
-                propertiesMap.put("sf.checkOnly", "true");
-                propertiesMap.put("sf.pollWaitMillis", "100000");
-                propertiesMap.put("sf.runAllTests", "false");
-                propertiesMap.put("target", targetBranch);
-                propertiesMap.put("sourceBranch", sourceBranch);
-                propertiesMap.put("sf.maxPoll", "100");
-                propertiesMap.put("sf.deploy.sessionId", sfdcConnectionDetail.getOauthToken());
-                propertiesMap.put("sf.logType", "None");
-                propertiesMap.put("targetName", targetBranch);
-
-                AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                FileUtils.deleteDirectory(tempDirectory.toFile());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(sfdcConnectionDetail == null){
+            return;
         }
+
+        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(targetBranch);
+        String queue_name = develop.getProperty("QUEUE_NAME");
+
+        // Create the object detail to be passed to RabbitMQ
+        DeploymentJob deploymentJob = new DeploymentJob();
+        deploymentJob.setAccess_token(access_token);
+        deploymentJob.setSfdcConnectionDetail(sfdcConnectionDetail);
+        deploymentJob.setEmailId(emailId);
+        deploymentJob.setUserName(userName);
+        deploymentJob.setGitCloneURL(gitCloneURL);
+        deploymentJob.setSourceBranch(sourceBranch);
+        deploymentJob.setTargetBranch(targetBranch);
+        rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
+        RabbitMqConsumer container = new RabbitMqConsumer();
+        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+        container.setQueueNames(queue_name);
+        container.setConcurrentConsumers(1);
+        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+        container.startConsumers();
+
+
     }
 
     private void process_deployment(JsonObject jsonObject, String access_token) {

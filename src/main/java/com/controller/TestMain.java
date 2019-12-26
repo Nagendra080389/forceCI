@@ -20,7 +20,7 @@ public class TestMain {
     public void execute() throws FileNotFoundException {
 
     }
-    public static void main(String[] args) throws IOException, GitAPIException {
+    /*public static void main(String[] args) throws IOException, GitAPIException {
 
         Map<String, String> propertiesMap  = new HashMap<>();
         Path tempDirectory = Files.createTempDirectory("TestMe");
@@ -87,5 +87,5 @@ public class TestMain {
         FileUtils.deleteDirectory(tempDirectory.toFile());
 
 
-    }
+    }*/
 }
