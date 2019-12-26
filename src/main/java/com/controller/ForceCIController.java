@@ -562,8 +562,13 @@ public class ForceCIController {
                     String payload = new String(m.getBody());
                     System.out.println(" message payload -> " + payload);
                     emitter.next(payload);
-
                 }
+
+                public void handleMessage(DeploymentJob deploymentJob){
+                    emitter.next("deploymentJob");
+                }
+
+
             });
 
             emitter.onRequest(new LongConsumer() {
