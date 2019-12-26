@@ -541,12 +541,20 @@ public class ForceCIController {
     @GetMapping(value = "/queue/{name}", produces = org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<?> receiveMessagesFromQueue(@PathVariable String name) throws Exception {
 
+
         RabbitMqConsumer container = new RabbitMqConsumer();
         container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
         container.setQueueNames(name);
         container.setConcurrentConsumers(1);
 
         Flux<String> f = Flux.<String> create(emitter -> {
+
+            container.setMessageListener(new MessageListenerAdapter(new Object(){
+
+                public void handleMessage(DeploymentJob deploymentJob){
+                    System.out.println(" deploymentJob receiveMessagesFromQueue -> " + deploymentJob) ;
+                }
+            }, new Jackson2JsonMessageConverter()));
 
             container.setupMessageListener(new MessageListenerAdapter() {
                 @Override
@@ -720,7 +728,4 @@ public class ForceCIController {
         }
     }
 
-    public void handleMessage(DeploymentJob deploymentJob){
-        System.out.println("deploymentJob");
-    }
 }
