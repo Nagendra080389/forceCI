@@ -204,15 +204,11 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
-    let ws = new SockJS("/connect2Deploy/socket");
-    let stompClient = Stomp.over(ws);
-    stompClient.connect({}, function(frame) {
-        stompClient.subscribe("/queue/master", (message) => {
-            if(message.body) {
-               debugger;
-            }
-        });
-    });
+    let webSocket = new WebSocket('ws://' + 'queues');
+    webSocket.onmessage  = function (data) {
+        let message = data.data;
+        debugger;
+    }
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
