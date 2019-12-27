@@ -1,6 +1,8 @@
 package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
+import com.webSocket.SocketTextHandler;
+import org.springframework.data.annotation.Id;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.Serializable;
@@ -15,7 +17,7 @@ public class DeploymentJob implements Serializable {
     private String targetBranch;
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private boolean boolCompleted;
 
     public String getAccess_token() {
         return access_token;
@@ -81,11 +83,11 @@ public class DeploymentJob implements Serializable {
         this.queueName = queueName;
     }
 
-    public SimpMessagingTemplate getSimpMessagingTemplate() {
-        return simpMessagingTemplate;
+    public boolean isBoolCompleted() {
+        return boolCompleted;
     }
 
-    public void setSimpMessagingTemplate(SimpMessagingTemplate simpMessagingTemplate) {
-        this.simpMessagingTemplate = simpMessagingTemplate;
+    public void setBoolCompleted(boolean boolCompleted) {
+        this.boolCompleted = boolCompleted;
     }
 }

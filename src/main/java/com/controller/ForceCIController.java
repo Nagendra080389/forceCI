@@ -15,6 +15,7 @@ import com.rabbitMQ.RabbitMqSenderConfig;
 import com.utils.AntExecutor;
 import com.utils.ApiSecurity;
 import com.utils.BuildUtils;
+import com.webSocket.SocketTextHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -37,6 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -102,10 +104,9 @@ public class ForceCIController {
     @Autowired
     private AmqpTemplate rabbitTemplate;
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-
     private static final String GITHUB_API = "https://api.github.com";
+
+    public static final List<SseEmitter> emitters = Collections.synchronizedList( new ArrayList<>());
 
     @RequestMapping(value = "/**/{[path:[^\\.]*}")
     public String redirect(ServletResponse response, ServletRequest
@@ -116,13 +117,15 @@ public class ForceCIController {
         return null;
     }
 
-    @RequestMapping(value = "/sendMessageToQueuesDevelop", method = RequestMethod.GET)
-    public void sendMessageToQueuesDevelop(ServletResponse response, ServletRequest
-            request) throws Exception {
+    @RequestMapping(path = "/stream", method = RequestMethod.GET)
+    public SseEmitter stream() throws IOException {
 
+        SseEmitter emitter = new SseEmitter();
 
+        emitters.add(emitter);
+        emitter.onCompletion(() -> emitters.remove(emitter));
 
-
+        return emitter;
     }
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
@@ -292,7 +295,7 @@ public class ForceCIController {
                     System.out.println("A pull request was created! A validation should start now...");
 
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate, simpMessagingTemplate);
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate);
                 }
                 break;
             case "push":
@@ -505,6 +508,12 @@ public class ForceCIController {
             rabbitMqSenderConfig.amqpAdmin().declareQueue(new Queue(sfdcConnectionDetails.getBranchConnectedTo(), true));
             System.out.println("byRepositoryRepositoryId.getRepository().getRepositoryName() -> "+byRepositoryRepositoryId.getRepository().getRepositoryName());
             rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(byRepositoryRepositoryId.getRepository().getRepositoryName())).withQueueName());
+            RabbitMqConsumer container = new RabbitMqConsumer();
+            container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+            container.setQueueNames(sfdcConnectionDetails.getBranchConnectedTo());
+            container.setConcurrentConsumers(1);
+            container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+            container.startConsumers();
         }
         sfdcConnectionDetails.setOauthSaved("true");
         SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
@@ -542,7 +551,7 @@ public class ForceCIController {
 
     private static void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                          SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
-                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate, SimpMessagingTemplate simpMessagingTemplate) throws Exception {
+                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
@@ -579,16 +588,7 @@ public class ForceCIController {
         deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
-        deploymentJob.setSimpMessagingTemplate(simpMessagingTemplate);
         rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
-        RabbitMqConsumer container = new RabbitMqConsumer();
-        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-        container.setQueueNames(queue_name);
-        container.setConcurrentConsumers(1);
-        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
-        container.startConsumers();
-
-
     }
 
     private void process_deployment(JsonObject jsonObject, String access_token) {

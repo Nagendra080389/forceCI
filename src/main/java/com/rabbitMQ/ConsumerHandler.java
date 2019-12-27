@@ -22,7 +22,6 @@ public class ConsumerHandler {
         System.out.println("deploymentJob -> "+deploymentJob);
         createTempDirectoryForDeployment(deploymentJob.getAccess_token(), deploymentJob.getSfdcConnectionDetail(),
                 deploymentJob.getEmailId(), deploymentJob.getUserName(), deploymentJob.getGitCloneURL(), deploymentJob.getSourceBranch(), deploymentJob.getTargetBranch());
-        deploymentJob.getSimpMessagingTemplate().convertAndSend("/queue/"+deploymentJob.getTargetBranch(),"Deployment Done");
     }
 
     private static void createTempDirectoryForDeployment(String access_token, SFDCConnectionDetails sfdcConnectionDetail, String emailId, String userName, String gitCloneURL, String sourceBranch, String targetBranch) {
