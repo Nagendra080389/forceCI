@@ -7,12 +7,12 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-@Configuration
-@EnableWebSocketMessageBroker
+/*@Configuration
+@EnableWebSocketMessageBroker*/
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 
-    @Value("${websocket.MQTT.hostName}")
+    /*@Value("${websocket.MQTT.hostName}")
     String hostname;
 
     @Value("${websocket.MQTT.port}")
@@ -33,6 +33,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/connect2Deploy/socket").setAllowedOrigins("*").withSockJS();
-    }
+    }*/
 
 }
