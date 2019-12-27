@@ -47,7 +47,7 @@ public class RabbitMqSenderConfig {
     }
 
     @Bean
-    public AmqpTemplate rabbitTemplate() throws URISyntaxException {
+    public AmqpTemplate rabbitTemplateCustomAdmin() throws URISyntaxException {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
         return rabbitTemplate;

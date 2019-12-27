@@ -92,7 +92,7 @@ public class ForceCIController {
     private RabbitMqSenderConfig rabbitMqSenderConfig;
 
     @Autowired
-    private AmqpTemplate rabbitTemplate;
+    private AmqpTemplate rabbitTemplateCustomAdmin;
 
     @Autowired
     private SocketHandler socketHandler;
@@ -277,7 +277,7 @@ public class ForceCIController {
                     System.out.println("A pull request was created! A validation should start now...");
 
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate, socketHandler);
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin, socketHandler);
                 }
                 break;
             case "push":
