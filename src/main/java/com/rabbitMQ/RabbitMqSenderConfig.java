@@ -29,8 +29,7 @@ public class RabbitMqSenderConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() throws URISyntaxException {
-        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(new URI(addressURL));
-        return cachingConnectionFactory;
+        return new CachingConnectionFactory(new URI(addressURL));
     }
 
     /**
@@ -47,7 +46,7 @@ public class RabbitMqSenderConfig {
     }
 
     @Bean
-    public AmqpTemplate rabbitTemplateCustomAdmin() throws URISyntaxException {
+    public AmqpTemplate rabbitTemplate() throws URISyntaxException {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
         return rabbitTemplate;

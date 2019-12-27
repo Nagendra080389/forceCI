@@ -486,7 +486,7 @@ public class ForceCIController {
             // Do nothing
         } else {
             RepositoryWrapper byRepositoryRepositoryId = repositoryWrapperMongoRepository.findByRepositoryRepositoryId(sfdcConnectionDetails.getGitRepoId());
-            Queue queue = QueueBuilder.durable(sfdcConnectionDetails.getBranchConnectedTo()).singleActiveConsumer().build();
+            Queue queue = new Queue(sfdcConnectionDetails.getBranchConnectedTo(), true);
             rabbitMqSenderConfig.amqpAdmin().declareQueue(queue);
             System.out.println("byRepositoryRepositoryId.getRepository().getRepositoryName() -> "+byRepositoryRepositoryId.getRepository().getRepositoryName());
             rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(byRepositoryRepositoryId.getRepository().getRepositoryName())).withQueueName());
