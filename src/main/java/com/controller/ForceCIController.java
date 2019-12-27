@@ -101,14 +101,14 @@ public class ForceCIController {
 
     public static final List<SseEmitter> emitters = Collections.synchronizedList( new ArrayList<>());
 
-    @RequestMapping(value = "/**/{[path:[^\\.]*}")
-    public String redirect(ServletResponse response, ServletRequest
+    //@RequestMapping(value = "/**/{[path:[^\\.]*}")
+    /*public String redirect(ServletResponse response, ServletRequest
             request) throws IOException {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         // Forward to home page so that route is preserved.
         httpResponse.sendRedirect("/");
         return null;
-    }
+    }*/
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
     public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
