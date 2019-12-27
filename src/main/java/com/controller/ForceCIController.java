@@ -33,6 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import reactor.core.publisher.Flux;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -43,6 +44,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.*;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -101,17 +104,6 @@ public class ForceCIController {
         // Forward to home page so that route is preserved.
         httpResponse.sendRedirect("/");
         return null;
-    }
-
-    @RequestMapping(path = "/stream", method = RequestMethod.GET)
-    public SseEmitter stream() throws IOException {
-
-        SseEmitter emitter = new SseEmitter();
-
-        emitters.add(emitter);
-        emitter.onCompletion(() -> emitters.remove(emitter));
-
-        return emitter;
     }
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
