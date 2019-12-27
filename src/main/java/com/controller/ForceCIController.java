@@ -407,6 +407,7 @@ public class ForceCIController {
             status = httpClient.executeMethod(deleteWebHook);
             if (status == 204) {
                 try {
+                    consumerMap.remove(repositoryId);
                     rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryName);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
@@ -548,6 +549,12 @@ public class ForceCIController {
             request) throws IOException {
         Gson gson = new Gson();
         try {
+            Optional<SFDCConnectionDetails> byId = sfdcConnectionDetailsMongoRepository.findById(sfdcDetailsId);
+            rabbitMqSenderConfig.amqpAdmin().deleteQueue(byId.get().getBranchConnectedTo());
+            Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byId.get().getGitRepoId());
+            if(rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty() && rabbitMqConsumerMap.get(byId.get().getBranchConnectedTo()) != null){
+                rabbitMqConsumerMap.remove(byId.get().getBranchConnectedTo());
+            }
             sfdcConnectionDetailsMongoRepository.deleteById(sfdcDetailsId);
             return gson.toJson("Success");
         } catch (Exception e){

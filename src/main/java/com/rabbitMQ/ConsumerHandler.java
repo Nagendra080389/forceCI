@@ -25,7 +25,6 @@ public class ConsumerHandler {
                 deploymentJob.getEmailId(), deploymentJob.getUserName(), deploymentJob.getGitCloneURL(), deploymentJob.getSourceBranch(), deploymentJob.getTargetBranch());
         try {
             System.out.println("deploymentJob.getSocketHandler().getSessions() -> "+deploymentJob.getSocketHandler().getSessions());
-            deploymentJob.getSocketHandler().getSessions().sendMessage(new TextMessage("He He Haha"));
         } catch (Exception e) {
             e.printStackTrace();
         }
