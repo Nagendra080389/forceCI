@@ -29,7 +29,8 @@ public class RabbitMqSenderConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() throws URISyntaxException {
-        return new CachingConnectionFactory(new URI(addressURL));
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(new URI(addressURL));
+        return cachingConnectionFactory;
     }
 
     /**

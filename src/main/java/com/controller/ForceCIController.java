@@ -12,6 +12,7 @@ import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
+import com.rabbitmq.client.*;
 import com.utils.ApiSecurity;
 import com.webSocket.SocketHandler;
 import org.apache.commons.httpclient.HttpClient;
@@ -22,10 +23,9 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;
 import org.kohsuke.github.*;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.ConsumerChannelRegistry;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -486,8 +486,8 @@ public class ForceCIController {
             // Do nothing
         } else {
             RepositoryWrapper byRepositoryRepositoryId = repositoryWrapperMongoRepository.findByRepositoryRepositoryId(sfdcConnectionDetails.getGitRepoId());
-            Queue queue = new Queue(sfdcConnectionDetails.getBranchConnectedTo(), true);
-            rabbitMqSenderConfig.amqpAdmin().declareQueue(new Queue(sfdcConnectionDetails.getBranchConnectedTo(), true));
+            Queue queue = QueueBuilder.durable(sfdcConnectionDetails.getBranchConnectedTo()).singleActiveConsumer().build();
+            rabbitMqSenderConfig.amqpAdmin().declareQueue(queue);
             System.out.println("byRepositoryRepositoryId.getRepository().getRepositoryName() -> "+byRepositoryRepositoryId.getRepository().getRepositoryName());
             rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(byRepositoryRepositoryId.getRepository().getRepositoryName())).withQueueName());
             RabbitMqConsumer container = new RabbitMqConsumer();
@@ -573,6 +573,26 @@ public class ForceCIController {
         System.out.println("socketHandler -> "+socketHandler);
         deploymentJob.setSocketHandler(socketHandler);
         rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
+        RabbitMqConsumer container = new RabbitMqConsumer();
+        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+        container.setQueueNames(queue_name);
+        container.setConcurrentConsumers(1);
+        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+        container.startConsumers();
+        Channel consumerChannel = ConsumerChannelRegistry.getConsumerChannel(rabbitMqSenderConfig.connectionFactory());
+        if(consumerChannel != null) {
+            System.out.println("consumerChannel -> " + consumerChannel);
+            consumerChannel.addReturnListener(new ReturnCallback() {
+                @Override
+                public void handle(Return aReturn) {
+                    try {
+                        System.out.println("return -> "+IOUtils.toString(aReturn.getBody(), StandardCharsets.UTF_8.name()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     private void process_deployment(JsonObject jsonObject, String access_token) {
