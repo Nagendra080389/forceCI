@@ -29,6 +29,12 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
 
 });
 
+let webSocket = new WebSocket('wss://' + location.host+'/queues');
+webSocket.onmessage  = function (data) {
+    let message = data.data;
+    debugger;
+};
+
 connect2Deploy.controller('indexController', function ($scope, $http, $location) {
     $scope.redirectJS = function () {
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
@@ -204,11 +210,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
-    let webSocket =  new WebSocket('wss://' + 'queues');
-    webSocket.onmessage  = function (data) {
-        let message = data.data;
-        debugger;
-    }
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
