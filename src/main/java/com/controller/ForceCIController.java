@@ -13,6 +13,7 @@ import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.utils.ApiSecurity;
+import com.webSocket.SocketHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -92,6 +93,9 @@ public class ForceCIController {
 
     @Autowired
     private AmqpTemplate rabbitTemplate;
+
+    @Autowired
+    private SocketHandler socketHandler;
 
     private static final String GITHUB_API = "https://api.github.com";
 
@@ -273,7 +277,7 @@ public class ForceCIController {
                     System.out.println("A pull request was created! A validation should start now...");
 
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate);
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate, socketHandler);
                 }
                 break;
             case "push":
@@ -529,7 +533,7 @@ public class ForceCIController {
 
     private static void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                          SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
-                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
+                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate, SocketHandler socketHandler) throws Exception {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
@@ -566,6 +570,8 @@ public class ForceCIController {
         deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
+        System.out.println("socketHandler -> "+socketHandler);
+        deploymentJob.setSocketHandler(socketHandler);
         rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
     }
 

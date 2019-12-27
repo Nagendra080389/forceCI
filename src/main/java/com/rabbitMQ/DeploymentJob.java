@@ -1,6 +1,7 @@
 package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
+import com.webSocket.SocketHandler;
 
 import java.io.Serializable;
 
@@ -15,6 +16,7 @@ public class DeploymentJob implements Serializable {
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
     private boolean boolCompleted;
+    private SocketHandler socketHandler;
 
     public String getAccess_token() {
         return access_token;
@@ -86,5 +88,13 @@ public class DeploymentJob implements Serializable {
 
     public void setBoolCompleted(boolean boolCompleted) {
         this.boolCompleted = boolCompleted;
+    }
+
+    public SocketHandler getSocketHandler() {
+        return socketHandler;
+    }
+
+    public void setSocketHandler(SocketHandler socketHandler) {
+        this.socketHandler = socketHandler;
     }
 }

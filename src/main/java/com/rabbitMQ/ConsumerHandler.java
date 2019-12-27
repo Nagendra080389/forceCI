@@ -6,6 +6,7 @@ import com.utils.BuildUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.socket.TextMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +23,11 @@ public class ConsumerHandler {
         System.out.println("deploymentJob -> "+deploymentJob);
         createTempDirectoryForDeployment(deploymentJob.getAccess_token(), deploymentJob.getSfdcConnectionDetail(),
                 deploymentJob.getEmailId(), deploymentJob.getUserName(), deploymentJob.getGitCloneURL(), deploymentJob.getSourceBranch(), deploymentJob.getTargetBranch());
+        try {
+            deploymentJob.getSocketHandler().getSessions().sendMessage(new TextMessage("He He Haha"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void createTempDirectoryForDeployment(String access_token, SFDCConnectionDetails sfdcConnectionDetail, String emailId, String userName, String gitCloneURL, String sourceBranch, String targetBranch) {

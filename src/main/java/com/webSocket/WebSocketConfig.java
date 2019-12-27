@@ -8,8 +8,7 @@ import org.springframework.web.socket.config.annotation.*;
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
-
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketTextHandler(), "/queues").setAllowedOrigins("*");;
+        registry.addHandler(new SocketHandler(), "/connect2Deploy");
     }
 }
