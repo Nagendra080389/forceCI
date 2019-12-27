@@ -204,7 +204,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
-    let webSocket = new WebSocket('ws://' + 'queues');
+    let webSocket =  new WebSocket('wss://' + 'queues');
     webSocket.onmessage  = function (data) {
         let message = data.data;
         debugger;
