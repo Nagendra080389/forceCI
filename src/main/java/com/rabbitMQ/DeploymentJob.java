@@ -1,9 +1,6 @@
 package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
-import com.webSocket.SocketTextHandler;
-import org.springframework.data.annotation.Id;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.Serializable;
 
