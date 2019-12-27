@@ -204,6 +204,15 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
+    let ws = new SockJS("/connect2Deploy/socket");
+    let stompClient = Stomp.over(ws);
+    stompClient.connect({}, function(frame) {
+        stompClient.subscribe("/queue/master", (message) => {
+            if(message.body) {
+               debugger;
+            }
+        });
+    });
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
@@ -268,12 +277,6 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     $http.get("/showSfdcConnectionDetails?gitRepoId=" + $scope.repoId).then(function (response) {
         $scope.lstSFDCConnectionDetails = response.data;
-    }, function (error) {
-        console.log(error);
-    });
-
-    $http.get("/queue/master").then(function (response) {
-        console.log(response.data);
     }, function (error) {
         console.log(error);
     });

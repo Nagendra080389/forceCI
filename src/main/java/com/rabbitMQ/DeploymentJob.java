@@ -1,6 +1,7 @@
 package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.Serializable;
 
@@ -13,6 +14,8 @@ public class DeploymentJob implements Serializable {
     private String sourceBranch;
     private String targetBranch;
     private SFDCConnectionDetails sfdcConnectionDetail;
+    private String queueName;
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     public String getAccess_token() {
         return access_token;
@@ -68,5 +71,21 @@ public class DeploymentJob implements Serializable {
 
     public void setSfdcConnectionDetail(SFDCConnectionDetails sfdcConnectionDetail) {
         this.sfdcConnectionDetail = sfdcConnectionDetail;
+    }
+
+    public String getQueueName() {
+        return queueName;
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
+    }
+
+    public SimpMessagingTemplate getSimpMessagingTemplate() {
+        return simpMessagingTemplate;
+    }
+
+    public void setSimpMessagingTemplate(SimpMessagingTemplate simpMessagingTemplate) {
+        this.simpMessagingTemplate = simpMessagingTemplate;
     }
 }

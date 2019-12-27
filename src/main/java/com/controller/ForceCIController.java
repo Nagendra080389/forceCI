@@ -34,11 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -56,6 +54,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.LongConsumer;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
@@ -102,6 +101,9 @@ public class ForceCIController {
 
     @Autowired
     private AmqpTemplate rabbitTemplate;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     private static final String GITHUB_API = "https://api.github.com";
 
@@ -290,7 +292,7 @@ public class ForceCIController {
                     System.out.println("A pull request was created! A validation should start now...");
 
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate);
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplate, simpMessagingTemplate);
                 }
                 break;
             case "push":
@@ -538,61 +540,9 @@ public class ForceCIController {
     }
 
 
-    @GetMapping(value = "/queue/{name}", produces = org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<?> receiveMessagesFromQueue(@PathVariable String name) throws Exception {
-
-
-        RabbitMqConsumer container = new RabbitMqConsumer();
-        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-        container.setQueueNames(name);
-        container.setConcurrentConsumers(1);
-
-        Flux<String> f = Flux.<String> create(emitter -> {
-
-            container.setMessageListener(new MessageListenerAdapter(new Object(){
-
-                public void handleMessage(DeploymentJob deploymentJob){
-                    emitter.next("deploymentJob");
-                    System.out.println(" deploymentJob receiveMessagesFromQueue -> " + deploymentJob) ;
-                }
-            }, new Jackson2JsonMessageConverter()));
-
-            emitter.onRequest(new LongConsumer() {
-                @Override
-                public void accept(long v) {
-                    container.start();
-                }
-            });
-
-            emitter.onDispose(new Disposable() {
-                @Override
-                public void dispose() {
-                    container.stop();
-                }
-            });
-            /*try {
-                container.startConsumers();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
-
-
-        });
-
-
-        return Flux.interval(Duration.ofSeconds(5))
-                .map(v -> {
-                    return "No news is good news";
-                })
-                .mergeWith(f);
-
-
-
-    }
-
     private static void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                          SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
-                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
+                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate, SimpMessagingTemplate simpMessagingTemplate) throws Exception {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
@@ -628,13 +578,15 @@ public class ForceCIController {
         deploymentJob.setGitCloneURL(gitCloneURL);
         deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
+        deploymentJob.setQueueName(queue_name);
+        deploymentJob.setSimpMessagingTemplate(simpMessagingTemplate);
         rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
-        /*RabbitMqConsumer container = new RabbitMqConsumer();
+        RabbitMqConsumer container = new RabbitMqConsumer();
         container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
         container.setQueueNames(queue_name);
         container.setConcurrentConsumers(1);
         container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
-        container.startConsumers();*/
+        container.startConsumers();
 
 
     }
