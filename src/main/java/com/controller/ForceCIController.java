@@ -97,9 +97,6 @@ public class ForceCIController {
     @Autowired
     private AmqpTemplate rabbitTemplateCustomAdmin;
 
-    @Autowired
-    private SocketHandler socketHandler;
-
     private static final String GITHUB_API = "https://api.github.com";
 
     public static final List<SseEmitter> emitters = Collections.synchronizedList( new ArrayList<>());
@@ -281,7 +278,7 @@ public class ForceCIController {
 
 
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin, socketHandler);
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin);
                 }
                 break;
             case "push":
@@ -566,7 +563,7 @@ public class ForceCIController {
 
     private void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                          SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
-                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate, SocketHandler socketHandler) throws Exception {
+                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
@@ -603,8 +600,7 @@ public class ForceCIController {
         deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
-        System.out.println("socketHandler -> "+socketHandler);
-        deploymentJob.setSocketHandler(socketHandler);
+        deploymentJob.setWebSocketSession(SocketHandler.sessions);
         rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
         if(consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())){
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(sfdcConnectionDetail.getGitRepoId());

@@ -16,16 +16,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class SocketHandler extends TextWebSocketHandler {
 
-    private WebSocketSession sessions = null;
+    public static WebSocketSession sessions = null;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Socket Connected - > "+session);
         //the messages will be broadcasted to all users.
         sessions = session;
-    }
-
-    public WebSocketSession getSessions() {
-        return sessions;
     }
 }

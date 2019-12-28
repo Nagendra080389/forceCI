@@ -24,7 +24,10 @@ public class ConsumerHandler {
         createTempDirectoryForDeployment(deploymentJob.getAccess_token(), deploymentJob.getSfdcConnectionDetail(),
                 deploymentJob.getEmailId(), deploymentJob.getUserName(), deploymentJob.getGitCloneURL(), deploymentJob.getSourceBranch(), deploymentJob.getTargetBranch());
         try {
-            System.out.println("deploymentJob.getSocketHandler().getSessions() -> "+deploymentJob.getSocketHandler().getSessions());
+            System.out.println("deploymentJob.getSocketHandler().getSessions() -> "+deploymentJob.getWebSocketSession());
+            if(deploymentJob.getWebSocketSession() != null) {
+                deploymentJob.getWebSocketSession().sendMessage(new TextMessage("test me"));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
