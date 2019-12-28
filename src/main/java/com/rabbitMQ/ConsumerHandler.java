@@ -3,6 +3,7 @@ package com.rabbitMQ;
 import com.model.SFDCConnectionDetails;
 import com.utils.AntExecutor;
 import com.utils.BuildUtils;
+import com.webSocket.SocketHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -24,9 +25,9 @@ public class ConsumerHandler {
         createTempDirectoryForDeployment(deploymentJob.getAccess_token(), deploymentJob.getSfdcConnectionDetail(),
                 deploymentJob.getEmailId(), deploymentJob.getUserName(), deploymentJob.getGitCloneURL(), deploymentJob.getSourceBranch(), deploymentJob.getTargetBranch());
         try {
-            System.out.println("deploymentJob.getSocketHandler().getSessions() -> "+deploymentJob.getWebSocketSession());
-            if(deploymentJob.getWebSocketSession() != null) {
-                deploymentJob.getWebSocketSession().sendMessage(new TextMessage("test me"));
+            System.out.println("deploymentJob.getSocketHandler().getSessions() -> "+SocketHandler.sessions);
+            if(SocketHandler.sessions != null) {
+                SocketHandler.sessions.sendMessage(new TextMessage("test me"));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -600,7 +600,6 @@ public class ForceCIController {
         deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
-        deploymentJob.setWebSocketSession(SocketHandler.sessions);
         rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
         if(consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())){
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(sfdcConnectionDetail.getGitRepoId());
