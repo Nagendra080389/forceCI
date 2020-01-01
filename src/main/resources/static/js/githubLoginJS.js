@@ -1,4 +1,5 @@
 var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect']);
+let webSocket;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
         .when('/index', {
@@ -24,16 +25,7 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             redirectTo: '/index'
         });
 
-    // use the HTML5 History API
-    $locationProvider.html5Mode(true);
-
 });
-
-let webSocket = new WebSocket('wss://' + location.host+'/connect2Deploy');
-webSocket.onmessage  = function (data) {
-    let message = data.data;
-    debugger;
-};
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location) {
     $scope.redirectJS = function () {
@@ -57,6 +49,11 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             $scope.avatar_url = response.data.avatar_url;
             localStorage.setItem('githubOwner', response.data.login);
             localStorage.setItem('avatar_url', response.data.avatar_url);
+            webSocket = new WebSocket('wss://' + location.host+'/connect2Deploy/'+$scope.userName);
+            webSocket.onmessage  = function (data) {
+                let message = data.data;
+                debugger;
+            };
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 $scope.lstRepositoryData = [];
                 if (response.data.length > 0) {
@@ -155,11 +152,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     };
 
     function checkIfInValid(objData) {
-        if (objData === undefined || objData === null || objData === '') {
-            return true;
-        } else {
-            return false;
-        }
+        return objData === undefined || objData === null || objData === '';
     }
 
     // Toggle the side navigation
