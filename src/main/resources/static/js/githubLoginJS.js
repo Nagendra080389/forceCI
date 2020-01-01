@@ -49,7 +49,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             $scope.avatar_url = response.data.avatar_url;
             localStorage.setItem('githubOwner', response.data.login);
             localStorage.setItem('avatar_url', response.data.avatar_url);
-            webSocket = new WebSocket('wss://' + location.host+'/connect2Deploy/'+$scope.userName);
+            webSocket = new WebSocket('wss://' + location.host+'/webSocket/connect2Deploy/'+$scope.userName);
             webSocket.onmessage  = function (data) {
                 let message = data.data;
                 debugger;
