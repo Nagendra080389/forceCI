@@ -22,21 +22,17 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        System.out.println("session - > "+session.getId());
-        System.out.println("session - > "+session.getAcceptedProtocol());
-        for (Map.Entry<String, Object> stringObjectEntry : session.getAttributes().entrySet()) {
-            System.out.println("session m - > "+stringObjectEntry.getValue() + " -- " + stringObjectEntry.getKey());
-        }
-        System.out.println("session - > "+session.getHandshakeHeaders());
-        System.out.println("session - > "+session.getLocalAddress().getHostName());
-        System.out.println("session - > "+session.getLocalAddress().getHostString());
-        System.out.println("session - > "+session.getLocalAddress().getAddress());
+        String userName = (String) session.getAttributes().get("userName");
+        System.out.println("WebSocket start -> "+userName);
+        sessions.put(userName, session);
         super.afterConnectionEstablished(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        sessions = null;
+        String userName = (String) session.getAttributes().get("userName");
+        System.out.println("WebSocket stop -> "+userName);
+        sessions.remove(userName);
         super.afterConnectionClosed(session, status);
     }
 }
