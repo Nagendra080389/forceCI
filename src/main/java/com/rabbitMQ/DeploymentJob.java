@@ -2,12 +2,16 @@ package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
 import com.webSocket.SocketHandler;
+import org.springframework.data.annotation.Id;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.Serializable;
 
 public class DeploymentJob implements Serializable {
 
+    @Id
+    private String id;
+    private String jobId;
     private String access_token;
     private String emailId;
     private String userName;
@@ -17,6 +21,8 @@ public class DeploymentJob implements Serializable {
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
     private boolean boolCompleted;
+    private boolean boolSfdcValidationSuccess;
+    private boolean boolCodeReviewValidationSuccess;
 
     public String getAccess_token() {
         return access_token;
@@ -90,4 +96,27 @@ public class DeploymentJob implements Serializable {
         this.boolCompleted = boolCompleted;
     }
 
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public boolean isBoolSfdcValidationSuccess() {
+        return boolSfdcValidationSuccess;
+    }
+
+    public void setBoolSfdcValidationSuccess(boolean boolSfdcValidationSuccess) {
+        this.boolSfdcValidationSuccess = boolSfdcValidationSuccess;
+    }
+
+    public boolean isBoolCodeReviewValidationSuccess() {
+        return boolCodeReviewValidationSuccess;
+    }
+
+    public void setBoolCodeReviewValidationSuccess(boolean boolCodeReviewValidationSuccess) {
+        this.boolCodeReviewValidationSuccess = boolCodeReviewValidationSuccess;
+    }
 }
