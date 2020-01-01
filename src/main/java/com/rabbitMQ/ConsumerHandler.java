@@ -27,7 +27,7 @@ public class ConsumerHandler {
         try {
             System.out.println("deploymentJob.getSocketHandler().getSessions() -> "+SocketHandler.sessions);
             if(SocketHandler.sessions != null) {
-                SocketHandler.sessions.sendMessage(new TextMessage("test me"));
+                //SocketHandler.sessions.sendMessage(new TextMessage("test me"));
             }
         } catch (Exception e) {
             e.printStackTrace();
