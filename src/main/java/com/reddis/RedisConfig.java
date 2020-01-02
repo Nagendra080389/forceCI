@@ -21,7 +21,6 @@ public class RedisConfig {
         JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
         connectionFactory.setHostName(redisUri.getHost());
         connectionFactory.setPort(redisUri.getPort());
-        System.out.println("redisUri.getUserInfo().substring(redisUri.getUserInfo().indexOf(\":\")+1 - > "+redisUri.getUserInfo().substring(redisUri.getUserInfo().indexOf(":")+1));
         connectionFactory.setPassword(redisUri.getUserInfo().substring(redisUri.getUserInfo().indexOf(":")+1));
         return connectionFactory;
     }

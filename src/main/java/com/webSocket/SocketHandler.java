@@ -20,16 +20,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class SocketHandler extends TextWebSocketHandler {
 
-    @Autowired
     private RedisWebSocketSessionRepository redisWebSocketSessionRepository;
 
     public static Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
+    public SocketHandler(RedisWebSocketSessionRepository redisWebSocketSessionRepository){
+        this.redisWebSocketSessionRepository = redisWebSocketSessionRepository;
+    }
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        String userName = (String) session.getAttributes().get("userName");
-        System.out.println("WebSocket start -> "+userName);
-        System.out.println("WebSocket start -> "+redisWebSocketSessionRepository);
         redisWebSocketSessionRepository.save(session);
         super.afterConnectionEstablished(session);
     }
@@ -37,7 +37,6 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         String userName = (String) session.getAttributes().get("userName");
-        System.out.println("WebSocket stop -> "+userName);
         redisWebSocketSessionRepository.delete(userName);
         super.afterConnectionClosed(session, status);
     }

@@ -1,5 +1,7 @@
 package com.webSocket;
 
+import com.reddis.RedisWebSocketSessionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +17,12 @@ import java.util.Map;
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
+
+    @Autowired
+    private RedisWebSocketSessionRepository redisWebSocketSessionRepository;
+
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketHandler(), "/webSocket/connect2Deploy/*").addInterceptors(auctionInterceptor());;
+        registry.addHandler(new SocketHandler(redisWebSocketSessionRepository), "/webSocket/connect2Deploy/*").addInterceptors(auctionInterceptor());;
     }
 
     @Bean
