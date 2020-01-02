@@ -528,6 +528,8 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 });
 
 connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams) {
+    $scope.userName = localStorage.githubOwner;
+    $scope.avatar_url = localStorage.avatar_url;
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
