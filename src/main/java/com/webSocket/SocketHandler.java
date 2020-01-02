@@ -29,6 +29,7 @@ public class SocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String userName = (String) session.getAttributes().get("userName");
         System.out.println("WebSocket start -> "+userName);
+        System.out.println("WebSocket start -> "+redisWebSocketSessionRepository);
         redisWebSocketSessionRepository.save(session);
         super.afterConnectionEstablished(session);
     }
