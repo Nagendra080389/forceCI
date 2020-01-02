@@ -14,6 +14,10 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             templateUrl: './html/repoDetails.html',
             controller: 'repoController',
         })
+        .when('/apps/dashboard/app/:repoName/:repoId/:branchConnectedTo', {
+            templateUrl: './html/deploymentDetails.html',
+            controller: 'deploymentController',
+        })
         .when('/apps/dashboard/createApp', {
             templateUrl: './html/addApp.html',
             controller: 'appPageRepoController',
@@ -520,5 +524,13 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
             }
         );
     }
+
+});
+
+connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams) {
+    $scope.repoId = $routeParams.repoId;
+    $scope.repoName = $routeParams.repoName;
+    $scope.branchConnectedTo = $routeParams.branchConnectedTo;
+    console.log('Test me');
 
 });

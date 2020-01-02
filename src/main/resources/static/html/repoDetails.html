@@ -153,9 +153,6 @@
                     <li class="nav-item">
                         <a class="nav-link" id="connections-tab" data-toggle="tab" data-target="#connections" role="tab" aria-controls="connections" aria-selected="false">SFDC Connections</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="builds-tab" data-toggle="tab" data-target="#builds" role="tab" aria-controls="builds" aria-selected="false">Builds</a>
-                    </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="activity" role="tabpanel" aria-labelledby="home-tab">
@@ -256,6 +253,9 @@
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800 display-1" ng-hide="true">
                                                             <input type="text" ng-disabled="true" ng-model="eachSFDCData.id"/>
                                                         </div>
+                                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                            <a href="#!apps/dashboard/app/{{repoName}}/{{repoId}}/{{eachSFDCData.branchConnectedTo}}" class="btn btn-primary">Deployments</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -265,11 +265,6 @@
                             </div>
                         </div>
 
-                    </div>
-                    <div class="tab-pane fade" id="builds" role="tabpanel" aria-labelledby="contact-tab">
-                        <div class="card-body">
-                            Builds
-                        </div>
                     </div>
                 </div>
 
