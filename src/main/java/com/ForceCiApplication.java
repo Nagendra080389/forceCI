@@ -6,12 +6,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.net.URI;
 
 @SpringBootApplication
 @EnableMongoRepositories(basePackages = "com.dao")
+@EnableRedisRepositories(basePackages = "com.reddis")
 public class ForceCiApplication {
 
     @Bean
@@ -22,6 +24,7 @@ public class ForceCiApplication {
         JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
         connectionFactory.setHostName(redisUri.getHost());
         connectionFactory.setPort(redisUri.getPort());
+        connectionFactory.setPassword(redisUri.getUserInfo().substring(redisUri.getUserInfo().indexOf(":")+1));
         return connectionFactory;
     }
 
