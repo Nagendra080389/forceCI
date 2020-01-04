@@ -118,7 +118,7 @@
 		            serverurl="${sf.deploy.serverurl}" sessionId="${sf.deploy.sessionId}"
 		            deployRoot="${diffDir}/src" maxPoll="${sf.maxPoll}"
 		            pollWaitMillis="${sf.pollWaitMillis}" checkOnly="${sf.checkOnly}"
-		            runAllTests="${sf.runAllTests}" logType="${sf.logType}" testLevel="RunAllTestsInOrg"
+		            runAllTests="${sf.runAllTests}" logType="${sf.logType}" testLevel="${sf.testRun}"
 		/>
 	</target>
 

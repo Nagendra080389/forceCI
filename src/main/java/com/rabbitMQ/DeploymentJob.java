@@ -2,10 +2,14 @@ package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
 import com.webSocket.SocketHandler;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 public class DeploymentJob implements Serializable {
 
@@ -20,9 +24,19 @@ public class DeploymentJob implements Serializable {
     private String targetBranch;
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
-    private boolean boolCompleted;
+    private List<String> lstBuildLines;
+    private boolean boolSFDCCompleted;
+    private boolean boolCodeScanCompleted;
     private boolean boolSfdcValidationSuccess;
     private boolean boolCodeReviewValidationSuccess;
+    @CreatedDate
+    private Date createdDate;
+    @LastModifiedDate
+    private Date lastModifiedDate;
+
+    public String getId() {
+        return id;
+    }
 
     public String getAccess_token() {
         return access_token;
@@ -88,12 +102,20 @@ public class DeploymentJob implements Serializable {
         this.queueName = queueName;
     }
 
-    public boolean isBoolCompleted() {
-        return boolCompleted;
+    public boolean isBoolSFDCCompleted() {
+        return boolSFDCCompleted;
     }
 
-    public void setBoolCompleted(boolean boolCompleted) {
-        this.boolCompleted = boolCompleted;
+    public void setBoolSFDCCompleted(boolean boolSFDCCompleted) {
+        this.boolSFDCCompleted = boolSFDCCompleted;
+    }
+
+    public boolean isBoolCodeScanCompleted() {
+        return boolCodeScanCompleted;
+    }
+
+    public void setBoolCodeScanCompleted(boolean boolCodeScanCompleted) {
+        this.boolCodeScanCompleted = boolCodeScanCompleted;
     }
 
     public String getJobId() {
@@ -118,5 +140,21 @@ public class DeploymentJob implements Serializable {
 
     public void setBoolCodeReviewValidationSuccess(boolean boolCodeReviewValidationSuccess) {
         this.boolCodeReviewValidationSuccess = boolCodeReviewValidationSuccess;
+    }
+
+    public List<String> getLstBuildLines() {
+        return lstBuildLines;
+    }
+
+    public void setLstBuildLines(List<String> lstBuildLines) {
+        this.lstBuildLines = lstBuildLines;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
     }
 }

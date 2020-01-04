@@ -1,11 +1,13 @@
 package com.utils;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DefaultLogger;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.ProjectHelper;
+import org.apache.commons.io.IOUtils;
+import org.apache.tools.ant.*;
+import org.springframework.util.StringUtils;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class AntExecutor {
@@ -14,7 +16,7 @@ public class AntExecutor {
      *
      * @param buildXmlFileFullPath
      */
-    public static boolean executeAntTask(String buildXmlFileFullPath) {
+    public static List<String> executeAntTask(String buildXmlFileFullPath) throws IOException {
         return executeAntTask(buildXmlFileFullPath, null, null);
     }
 
@@ -24,10 +26,10 @@ public class AntExecutor {
      * @param buildXmlFileFullPath
      * @param target
      */
-    public static boolean executeAntTask(String buildXmlFileFullPath, String target, Map<String, String> propertiesMap) {
+    public static List<String> executeAntTask(String buildXmlFileFullPath, String target, Map<String, String> propertiesMap) throws IOException {
         boolean success = false;
-        DefaultLogger consoleLogger = getConsoleLogger();
 
+        List<String> consoleLogs = new ArrayList<>();
         // Prepare Ant project
         Project project = new Project();
         File buildFile = new File(buildXmlFileFullPath);
@@ -39,7 +41,46 @@ public class AntExecutor {
             }
         }
 
-        project.addBuildListener(consoleLogger);
+        project.addBuildListener(new BuildListener() {
+            @Override
+            public void buildStarted(BuildEvent buildEvent) {
+
+            }
+
+            @Override
+            public void buildFinished(BuildEvent buildEvent) {
+                if(buildEvent.getException()  != null && StringUtils.hasText(buildEvent.getException().getMessage())){
+                    consoleLogs.add(buildEvent.getException().getMessage());
+                }
+            }
+
+            @Override
+            public void targetStarted(BuildEvent buildEvent) {
+
+            }
+
+            @Override
+            public void targetFinished(BuildEvent buildEvent) {
+
+            }
+
+            @Override
+            public void taskStarted(BuildEvent buildEvent) {
+
+            }
+
+            @Override
+            public void taskFinished(BuildEvent buildEvent) {
+
+            }
+
+            @Override
+            public void messageLogged(BuildEvent buildEvent) {
+                if(StringUtils.hasText(buildEvent.getMessage())) {
+                    consoleLogs.add(buildEvent.getMessage());
+                }
+            }
+        });
 
         // Capture event for Ant script build start / stop / failure
         try {
@@ -53,27 +94,12 @@ public class AntExecutor {
             String targetToExecute = (target != null && target.trim().length() > 0) ? target.trim() : project.getDefaultTarget();
             project.executeTarget(targetToExecute);
             project.fireBuildFinished(null);
-            success = true;
         } catch (BuildException buildException) {
             project.fireBuildFinished(buildException);
-            throw new RuntimeException("!!! Unable to restart the IEHS App !!!", buildException);
         }
 
-        return success;
+        return consoleLogs;
     }
 
-    /**
-     * Logger to log output generated while executing ant script in console
-     *
-     * @return
-     */
-    private static DefaultLogger getConsoleLogger() {
-        DefaultLogger consoleLogger = new DefaultLogger();
-        consoleLogger.setErrorPrintStream(System.err);
-        consoleLogger.setOutputPrintStream(System.out);
-        consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
-
-        return consoleLogger;
-    }
 
 }

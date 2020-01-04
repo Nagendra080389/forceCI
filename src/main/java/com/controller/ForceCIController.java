@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.dao.DeploymentJobMongoRepository;
 import com.dao.RepositoryWrapperMongoRepository;
 import com.dao.SFDCConnectionDetailsMongoRepository;
 import com.dao.UserWrapperMongoRepository;
@@ -97,6 +98,9 @@ public class ForceCIController {
     @Autowired
     private AmqpTemplate rabbitTemplateCustomAdmin;
 
+    @Autowired
+    private DeploymentJobMongoRepository deploymentJobMongoRepository;
+
     private static final String GITHUB_API = "https://api.github.com";
 
     public static final List<SseEmitter> emitters = Collections.synchronizedList( new ArrayList<>());
@@ -180,7 +184,7 @@ public class ForceCIController {
 
         httpClient.executeMethod(post);
         String responseBody = post.getResponseBodyAsString();
-
+        System.out.println("responseBody - > "+responseBody);
         String accessToken = null;
         String issuedAt = null;
         String signature = null;
@@ -600,7 +604,9 @@ public class ForceCIController {
         deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
-        rabbitTemplate.convertAndSend(repoName, queue_name, deploymentJob);
+        deploymentJob.setBoolSFDCCompleted(false);
+        DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
+        rabbitTemplate.convertAndSend(repoName, queue_name, savedDeploymentJob);
         if(consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())){
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(sfdcConnectionDetail.getGitRepoId());
             if((rabbitMqConsumerMap != null && !rabbitMqConsumerMap.containsKey(queue_name))) {
