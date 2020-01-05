@@ -315,6 +315,11 @@ public class ForceCIController {
                 List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
                 repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                 newLstRepositoryWrapper.add(repositoryWrapper);
+                for (Map.Entry<String, Map<String, RabbitMqConsumer>> stringMapEntry : consumerMap.entrySet()) {
+                    System.out.println("consumerMap stringMapEntry -> "+stringMapEntry.getKey());
+                }
+
+
                 if(consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())){
                     Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
