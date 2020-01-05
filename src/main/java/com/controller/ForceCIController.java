@@ -186,9 +186,7 @@ public class ForceCIController {
         String responseBody = post.getResponseBodyAsString();
         System.out.println("responseBody - > "+responseBody);
         String accessToken = null;
-        String issuedAt = null;
-        String signature = null;
-        String id_token = null;
+        String refresh_token = null;
         String instance_url = null;
         String useridURL = null;
         String username = null;
@@ -201,6 +199,7 @@ public class ForceCIController {
             accessToken = jsonObject.get("access_token").getAsString();
             instance_url = jsonObject.get("instance_url").getAsString();
             useridURL = jsonObject.get("id").getAsString();
+            refresh_token = jsonObject.get("refresh_token").getAsString();
 
             GetMethod getMethod = new GetMethod(useridURL);
             getMethod.addRequestHeader("Authorization", "Bearer " + accessToken);
@@ -227,12 +226,15 @@ public class ForceCIController {
             Cookie accessTokenCookie = new Cookie("SFDC_ACCESS_TOKEN", accessToken);
             Cookie userNameCookie = new Cookie("SFDC_USER_NAME", username);
             Cookie instanceURLCookie = new Cookie("SFDC_INSTANCE_URL", instance_url);
+            Cookie refreshTokenCookie = new Cookie("SFDC_REFRESH_TOKEN", refresh_token);
             httpResponse.addCookie(accessTokenCookie);
             httpResponse.addCookie(userNameCookie);
             httpResponse.addCookie(instanceURLCookie);
+            httpResponse.addCookie(refreshTokenCookie);
             accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
             userNameCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
             instanceURLCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            refreshTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
             httpResponse.sendRedirect("/html/success.html");
         } else {
             httpResponse.sendRedirect("/html/error.html");
@@ -605,6 +607,7 @@ public class ForceCIController {
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
         deploymentJob.setBoolSFDCCompleted(false);
+        deploymentJob.setBoolCodeReviewValidationSuccess(false);
         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
         rabbitTemplate.convertAndSend(repoName, queue_name, savedDeploymentJob);
         if(consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())){

@@ -231,6 +231,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
     let sfdcInstanceFromExternalPage;
+    let sfdcRefreshTokenFromExternalPage;
 
 
     window.addEventListener('message', function (objEvent) {
@@ -241,6 +242,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
                 sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
                 sfdcInstanceFromExternalPage = objEvent.data.sfdcInstanceURL;
+                sfdcRefreshTokenFromExternalPage = objEvent.data.sfdcRefreshToken;
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
@@ -257,6 +259,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 sfdcAccessTokenFromExternalPage = '';
                 sfdcUserNameFromExternalPage = '';
                 sfdcInstanceFromExternalPage = '';
+                sfdcRefreshTokenFromExternalPage = '';
                 if (objWindow !== undefined && objWindow !== null) {
                     objWindow.close();
                 }
@@ -290,6 +293,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
         $.removeCookie('SFDC_USER_NAME', {path: '/'});
         $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+        $.removeCookie('SFDC_REFRESH_TOKEN', {path: '/'});
         $scope.sfdcOrg = {
             id: '',
             orgName: '',
@@ -310,6 +314,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         sfdcAccessTokenFromExternalPage = '';
         sfdcUserNameFromExternalPage = '';
         sfdcInstanceFromExternalPage = '';
+        sfdcRefreshTokenFromExternalPage = '';
     };
 
 
@@ -354,6 +359,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             oauthFailed: sfdcOrg.oauthFailed,
             oauthSaved: sfdcOrg.oauthSaved,
             oauthToken: sfdcOrg.oauthToken,
+            refreshToken: sfdcOrg.refreshToken,
             disabledForm: 'true',
             gitRepoId: sfdcOrg.gitRepoId,
             branchConnectedTo: sfdcOrg.branchConnectedTo,
@@ -369,6 +375,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             environment: sfdcOrg.environment,
             userName: sfdcOrg.userName,
             instanceURL: checkIfInValid(sfdcOrg.instanceURL) ? sfdcInstanceFromExternalPage : sfdcOrg.instanceURL,
+            refreshToken: checkIfInValid(sfdcOrg.refreshToken) ? sfdcRefreshTokenFromExternalPage : sfdcOrg.refreshToken,
             authorize: sfdcOrg.authorize,
             save: sfdcOrg.save,
             testConnection: sfdcOrg.testConnection,
@@ -395,6 +402,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
                 $.removeCookie('SFDC_USER_NAME', {path: '/'});
                 $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
+                $.removeCookie('SFDC_REFRESH_TOKEN', {path: '/'});
                 $scope.lstSFDCConnectionDetails = [];
                 const gitRepoId = response.data.gitRepoId;
                 fetchDetailsFromDB(gitRepoId);

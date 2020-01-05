@@ -1,20 +1,28 @@
 package com.rabbitMQ;
 
 import com.dao.DeploymentJobMongoRepository;
+import com.dao.SFDCConnectionDetailsMongoRepository;
+import com.google.common.collect.Lists;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.model.SFDCConnectionDetails;
 import com.utils.AntExecutor;
 import com.utils.BuildUtils;
 import com.webSocket.SocketHandler;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.socket.TextMessage;
 
+import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,16 +33,18 @@ public class ConsumerHandler {
     @Autowired
     private DeploymentJobMongoRepository deploymentJobMongoRepository;
 
+    @Autowired
+    private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
+
     public void handleMessage(DeploymentJob deploymentJob) {
-        System.out.println("deploymentJob -> "+deploymentJob);
+        System.out.println("deploymentJob -> " + deploymentJob);
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
-        if(optionalDeploymentJob.isPresent()){
+        if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
-            List<String> consoleLog = createTempDirectoryForDeployment(deploymentJob);
-            deploymentJob.setLstBuildLines(consoleLog);
+            createTempDirectoryForDeployment(deploymentJob);
             try {
-                System.out.println("deploymentJob.getSocketHandler().getSessions() -> "+SocketHandler.sessions);
-                if(SocketHandler.sessions != null) {
+                System.out.println("deploymentJob.getSocketHandler().getSessions() -> " + SocketHandler.sessions);
+                if (SocketHandler.sessions != null) {
                     //SocketHandler.sessions.sendMessage(new TextMessage("test me"));
                 }
             } catch (Exception e) {
@@ -44,7 +54,7 @@ public class ConsumerHandler {
 
     }
 
-    private static List<String> createTempDirectoryForDeployment(DeploymentJob deploymentJob) {
+    private List<String> createTempDirectoryForDeployment(DeploymentJob deploymentJob) {
         List<String> lstFileLines = new ArrayList<>();
         try {
             SFDCConnectionDetails sfdcConnectionDetail = deploymentJob.getSfdcConnectionDetail();
@@ -109,14 +119,65 @@ public class ConsumerHandler {
                 AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
                 List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
                 for (String eachLine : sf_build) {
-                    if(!(eachLine.startsWith("Finding class") || eachLine.startsWith("Loaded from") || eachLine.startsWith("Class ") ||
+                    if (!(eachLine.startsWith("Finding class") || eachLine.startsWith("Loaded from") || eachLine.startsWith("Class ") ||
                             eachLine.startsWith("+Datatype ") || eachLine.startsWith("Note: ") || eachLine.startsWith(" +Datatype ") ||
                             eachLine.startsWith(" +Target: ") || eachLine.startsWith("Setting project") || eachLine.startsWith("Adding reference") ||
                             eachLine.startsWith("Detected ") || eachLine.startsWith("Setting ro project ") || eachLine.startsWith("Condition "))) {
                         lstFileLines.add(eachLine);
                     }
                 }
+                deploymentJob.setLstBuildLines(lstFileLines);
+                for (String eachBuildLine : Lists.reverse(lstFileLines)) {
+                    if (eachBuildLine.contains("Failed to login: INVALID_SESSION_ID")) {
+                        // try to get proper access token again
+                        String refreshToken = sfdcConnectionDetail.getRefreshToken();
+                        String environment = sfdcConnectionDetail.getEnvironment();
+                        String instanceURL = sfdcConnectionDetail.getInstanceURL();
+                        String clientId = System.getenv("SFDC_CLIENTID");
+                        String clientSecret = System.getenv("SFDC_CLIENTSECRET");
+                        String url = "";
+                        if (environment.equals("0")) {
+                            url = "https://login.salesforce.com/grant_type=refresh_token&" +
+                                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
+                                    "&refresh_token=" + refreshToken;
+                        } else if (environment.equals("1")) {
+                            url = "https://test.salesforce.com/grant_type=refresh_token&" +
+                                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
+                                    "&refresh_token=" + refreshToken;
+                        } else {
+                            url = "https://" + instanceURL + "/grant_type=refresh_token&" +
+                                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
+                                    "&refresh_token=" + refreshToken;
+                        }
+                        System.out.println("url -> " + url);
 
+                        HttpClient httpClient = new HttpClient();
+                        PostMethod post = new PostMethod(environment);
+                        httpClient.executeMethod(post);
+                        String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
+                        JsonParser parser = new JsonParser();
+                        JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
+                        String accessToken = jsonObject.get("access_token").getAsString();
+                        sfdcConnectionDetail.setOauthToken(accessToken);
+                        sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetail);
+
+
+                        break;
+                    } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
+                        deploymentJob.setBoolSFDCCompleted(true);
+                        deploymentJob.setBoolSfdcValidationSuccess(true);
+                        deploymentJob.setBoolCodeScanCompleted(false);
+                        break;
+                    } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
+                        deploymentJob.setBoolSFDCCompleted(true);
+                        deploymentJob.setBoolSfdcValidationSuccess(false);
+                        deploymentJob.setBoolCodeScanCompleted(false);
+                        break;
+                    }
+                }
+
+                deploymentJobMongoRepository.save(deploymentJob);
+                handleMessage(deploymentJob);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

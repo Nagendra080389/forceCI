@@ -23,6 +23,7 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthFailed;
     private String oauthSaved;
     private String oauthToken;
+    private String refreshToken;
     private String gitRepoId;
     private String branchConnectedTo;
     private boolean boolActive;
@@ -153,5 +154,13 @@ public class SFDCConnectionDetails implements Serializable {
 
     public void setBoolActive(boolean boolActive) {
         this.boolActive = boolActive;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
