@@ -3,6 +3,7 @@ package com.rabbitMQ;
 import com.dao.DeploymentJobMongoRepository;
 import com.dao.SFDCConnectionDetailsMongoRepository;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.model.SFDCConnectionDetails;
@@ -46,8 +47,10 @@ public class ConsumerHandler {
             createTempDirectoryForDeployment(deploymentJob);
             try {
                 System.out.println("deploymentJob.getSocketHandler().getSessions() -> " + SocketHandler.sessions);
-                if (SocketHandler.sessions != null) {
-                    //SocketHandler.sessions.sendMessage(new TextMessage("test me"));
+                if (SocketHandler.sessions != null && SocketHandler.sessions.get(deploymentJob.getUserName()) != null) {
+                    Gson gson = new Gson();
+                    DeploymentJob deploymentJobWithoutLogs = optionalDeploymentJob.get();
+                    SocketHandler.sessions.get(deploymentJob.getUserName()).sendMessage(new TextMessage(gson.toJson(deploymentJobWithoutLogs)));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
