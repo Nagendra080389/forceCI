@@ -41,7 +41,7 @@ public class AntExecutor {
             }
         }
 
-        /*project.addBuildListener(new BuildListener() {
+        project.addBuildListener(new BuildListener() {
             @Override
             public void buildStarted(BuildEvent buildEvent) {
 
@@ -80,9 +80,7 @@ public class AntExecutor {
                     consoleLogs.add(buildEvent.getMessage());
                 }
             }
-        });*/
-
-        project.addBuildListener(getConsoleLogger());
+        });
 
         // Capture event for Ant script build start / stop / failure
         try {
@@ -101,15 +99,6 @@ public class AntExecutor {
         }
 
         return consoleLogs;
-    }
-
-    private static DefaultLogger getConsoleLogger() {
-        DefaultLogger consoleLogger = new DefaultLogger();
-        consoleLogger.setErrorPrintStream(System.err);
-        consoleLogger.setOutputPrintStream(System.out);
-        consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
-
-        return consoleLogger;
     }
 
 
