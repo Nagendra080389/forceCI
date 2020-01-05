@@ -30,14 +30,17 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        redisWebSocketSessionRepository.save(session);
+        //redisWebSocketSessionRepository.save(session);
+        String userName = (String) session.getAttributes().get("userName");
+        sessions.put(userName, session);
         super.afterConnectionEstablished(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         String userName = (String) session.getAttributes().get("userName");
-        redisWebSocketSessionRepository.delete(userName);
+        //redisWebSocketSessionRepository.delete(userName);
+        sessions.remove(userName);
         super.afterConnectionClosed(session, status);
     }
 }
