@@ -119,9 +119,8 @@ public class ConsumerHandler {
                 propertiesMap.put("sf.testRun", "NoTestRun");
                 propertiesMap.put("targetName", targetBranch);
 
-                AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
                 List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
-                /*for (String eachLine : sf_build) {
+                for (String eachLine : sf_build) {
                     if (!(eachLine.startsWith("Finding class") || eachLine.startsWith("Loaded from") || eachLine.startsWith("Class ") ||
                             eachLine.startsWith("+Datatype ") || eachLine.startsWith("Note: ") || eachLine.startsWith(" +Datatype ") ||
                             eachLine.startsWith(" +Target: ") || eachLine.startsWith("Setting project") || eachLine.startsWith("Adding reference") ||
@@ -180,7 +179,7 @@ public class ConsumerHandler {
                     }
                 }
 
-                deploymentJobMongoRepository.save(deploymentJob);*/
+                deploymentJobMongoRepository.save(deploymentJob);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
