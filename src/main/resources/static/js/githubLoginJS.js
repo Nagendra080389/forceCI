@@ -56,7 +56,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             webSocket = new WebSocket('wss://' + location.host+'/webSocket/connect2Deploy/'+$scope.userName);
             webSocket.onmessage  = function (data) {
                 let message = data.data;
-                debugger;
+
             };
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 $scope.lstRepositoryData = [];

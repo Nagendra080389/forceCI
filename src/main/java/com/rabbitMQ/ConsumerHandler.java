@@ -8,17 +8,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.model.SFDCConnectionDetails;
 import com.utils.AntExecutor;
-import com.utils.BuildUtils;
 import com.webSocket.SocketHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.socket.TextMessage;
 
-import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +46,7 @@ public class ConsumerHandler {
                 if (SocketHandler.sessions != null && SocketHandler.sessions.get(deploymentJob.getUserName()) != null) {
                     Gson gson = new Gson();
                     DeploymentJob deploymentJobWithoutLogs = optionalDeploymentJob.get();
+                    deploymentJobWithoutLogs.setLstBuildLines(new ArrayList<>());
                     SocketHandler.sessions.get(deploymentJob.getUserName()).sendMessage(new TextMessage(gson.toJson(deploymentJobWithoutLogs)));
                 }
             } catch (Exception e) {

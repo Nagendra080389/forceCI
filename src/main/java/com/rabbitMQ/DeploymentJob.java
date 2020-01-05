@@ -1,15 +1,14 @@
 package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
-import com.webSocket.SocketHandler;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class DeploymentJob implements Serializable {
 
@@ -157,4 +156,34 @@ public class DeploymentJob implements Serializable {
     public Date getLastModifiedDate() {
         return lastModifiedDate;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeploymentJob that = (DeploymentJob) o;
+        return boolSFDCCompleted == that.boolSFDCCompleted &&
+                boolCodeScanCompleted == that.boolCodeScanCompleted &&
+                boolSfdcValidationSuccess == that.boolSfdcValidationSuccess &&
+                boolCodeReviewValidationSuccess == that.boolCodeReviewValidationSuccess &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(jobId, that.jobId) &&
+                Objects.equals(access_token, that.access_token) &&
+                Objects.equals(emailId, that.emailId) &&
+                Objects.equals(userName, that.userName) &&
+                Objects.equals(gitCloneURL, that.gitCloneURL) &&
+                Objects.equals(sourceBranch, that.sourceBranch) &&
+                Objects.equals(targetBranch, that.targetBranch) &&
+                Objects.equals(sfdcConnectionDetail, that.sfdcConnectionDetail) &&
+                Objects.equals(queueName, that.queueName) &&
+                Objects.equals(createdDate, that.createdDate) &&
+                Objects.equals(lastModifiedDate, that.lastModifiedDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, jobId, access_token, emailId, userName, gitCloneURL, sourceBranch, targetBranch, sfdcConnectionDetail, queueName, boolSFDCCompleted, boolCodeScanCompleted, boolSfdcValidationSuccess, boolCodeReviewValidationSuccess, createdDate, lastModifiedDate);
+    }
 }
+
+
