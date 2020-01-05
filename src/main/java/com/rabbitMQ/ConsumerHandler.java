@@ -121,7 +121,7 @@ public class ConsumerHandler {
 
                 AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
                 List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
-                for (String eachLine : sf_build) {
+                /*for (String eachLine : sf_build) {
                     if (!(eachLine.startsWith("Finding class") || eachLine.startsWith("Loaded from") || eachLine.startsWith("Class ") ||
                             eachLine.startsWith("+Datatype ") || eachLine.startsWith("Note: ") || eachLine.startsWith(" +Datatype ") ||
                             eachLine.startsWith(" +Target: ") || eachLine.startsWith("Setting project") || eachLine.startsWith("Adding reference") ||
@@ -180,7 +180,7 @@ public class ConsumerHandler {
                     }
                 }
 
-                deploymentJobMongoRepository.save(deploymentJob);
+                deploymentJobMongoRepository.save(deploymentJob);*/
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -204,13 +204,7 @@ public class ConsumerHandler {
     }
 
     public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
-        File tempFile = File.createTempFile(prefix, suffix);
-        try{
-            Files.deleteIfExists(tempFile.toPath());
-        } catch (Exception e){
-
-        }
-        tempFile = File.createTempFile(prefix, suffix);
+        final File tempFile = File.createTempFile(prefix, suffix);
         tempFile.deleteOnExit();
         try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
             IOUtils.copy(in, out);
