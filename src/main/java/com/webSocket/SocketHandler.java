@@ -20,17 +20,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class SocketHandler extends TextWebSocketHandler {
 
-    private RedisWebSocketSessionRepository redisWebSocketSessionRepository;
-
     public static Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-
-    public SocketHandler(RedisWebSocketSessionRepository redisWebSocketSessionRepository){
-        this.redisWebSocketSessionRepository = redisWebSocketSessionRepository;
-    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        //redisWebSocketSessionRepository.save(session);
+        System.out.println("session -> "+session);
         String userName = (String) session.getAttributes().get("userName");
         sessions.put(userName, session);
         super.afterConnectionEstablished(session);

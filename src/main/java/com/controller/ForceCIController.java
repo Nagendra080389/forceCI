@@ -122,7 +122,6 @@ public class ForceCIController {
         String environment = "https://github.com/login/oauth/access_token";
         HttpClient httpClient = new HttpClient();
 
-        System.out.println("code - > " + code);
         PostMethod post = new PostMethod(environment);
         post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
         post.addParameter("code", code);
@@ -134,7 +133,6 @@ public class ForceCIController {
         httpClient.executeMethod(post);
         String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
-        System.out.println("responseBody - > " + responseBody);
         String accessToken = null;
         String token_type = null;
         JsonParser parser = new JsonParser();
@@ -163,7 +161,6 @@ public class ForceCIController {
     public void sfdcAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest request) throws Exception {
 
         String environment = null;
-        System.out.println(" state -> " + state);
         if (state.equals("0")) {
             environment = "https://login.salesforce.com/services/oauth2/token";
         } else if (state.contains("2")) {
@@ -172,7 +169,6 @@ public class ForceCIController {
             environment = "https://test.salesforce.com/services/oauth2/token";
         }
 
-        System.out.println("environment -> " + environment);
         HttpClient httpClient = new HttpClient();
 
         PostMethod post = new PostMethod(environment);
@@ -183,8 +179,7 @@ public class ForceCIController {
         post.addParameter("client_secret", sfdcClientSecret);
 
         httpClient.executeMethod(post);
-        String responseBody = post.getResponseBodyAsString();
-        System.out.println("responseBody - > "+responseBody);
+        String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
         String accessToken = null;
         String refresh_token = null;
         String instance_url = null;
@@ -268,7 +263,6 @@ public class ForceCIController {
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String access_token = fetchCookies(request);
         String emailId = null;
-        System.out.println("githubEvent -> " + githubEvent);
         SFDCConnectionDetails sfdcConnectionDetails = null;
         switch (githubEvent) {
             case "pull_request":
@@ -281,14 +275,11 @@ public class ForceCIController {
                 if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
-
-
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
                             sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin);
                 }
                 break;
             case "push":
-                System.out.println(jsonObject);
                 break;
             case "deployment":
                 if (!StringUtils.hasText(access_token)) {
@@ -298,8 +289,6 @@ public class ForceCIController {
                 process_deployment(jsonObject, access_token);
                 break;
         }
-        System.out.println("access_token -> " + access_token);
-
         return gson.toJson("");
     }
 
@@ -315,11 +304,6 @@ public class ForceCIController {
                 List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
                 repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                 newLstRepositoryWrapper.add(repositoryWrapper);
-                for (Map.Entry<String, Map<String, RabbitMqConsumer>> stringMapEntry : consumerMap.entrySet()) {
-                    System.out.println("consumerMap stringMapEntry -> "+stringMapEntry.getKey());
-                }
-
-
                 if(consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())){
                     Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
@@ -633,9 +617,6 @@ public class ForceCIController {
         String payload_str = jsonObject.get("deployment").getAsJsonObject().get("payload").getAsString();
         Map payload = new Gson().fromJson(payload_str, Map.class);
 
-        System.out.println("Processing " + jsonObject.get("deployment").getAsJsonObject().get("description").getAsString() +
-                " for " + payload.<String>get("deploy_user") + " to " + payload.<String>get("environment"));
-
         try {
             Thread.sleep(2000L);
             GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
@@ -647,7 +628,6 @@ public class ForceCIController {
 
             List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(String.valueOf(repository.getId()));
 
-            System.out.println(" byGitRepoId-> " + byGitRepoId);
             Thread.sleep(20000L);
 
             // This will happen only after validation is success

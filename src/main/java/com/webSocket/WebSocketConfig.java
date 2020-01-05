@@ -18,11 +18,8 @@ import java.util.Map;
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    @Autowired
-    private RedisWebSocketSessionRepository redisWebSocketSessionRepository;
-
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new SocketHandler(redisWebSocketSessionRepository), "/webSocket/connect2Deploy/*").addInterceptors(auctionInterceptor());;
+        registry.addHandler(new SocketHandler(), "/webSocket/connect2Deploy/*").addInterceptors(auctionInterceptor());;
     }
 
     @Bean

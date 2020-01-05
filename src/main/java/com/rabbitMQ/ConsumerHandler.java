@@ -40,7 +40,6 @@ public class ConsumerHandler {
     }
 
     public void handleMessage(DeploymentJob deploymentJob) {
-        System.out.println("deploymentJob -> " + deploymentJob);
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
@@ -82,7 +81,6 @@ public class ConsumerHandler {
                 InputStream gitDiffAfterMerge = classLoader.getResourceAsStream("build/get_diff_commits.sh");
                 InputStream propertiesHelper = classLoader.getResourceAsStream("build/properties_helper.sh");
                 File buildFile = stream2file(buildXml, "build", ".xml");
-                System.out.println(buildFile.getPath());
                 File antJar = stream2file(antSalesforce, "ant-salesforce", ".jar");
                 File create_changes = stream2file(createChanges, "create_changes", ".sh");
                 File generate_package_unix = stream2file(generatePackageUnix, "generate_package_unix", ".sh");
@@ -130,7 +128,6 @@ public class ConsumerHandler {
                 }
                 deploymentJob.setLstBuildLines(lstFileLines);
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
-                    System.out.println("eachBuildLine -> "+eachBuildLine);
                     if (eachBuildLine.contains("Failed to login: INVALID_SESSION_ID")) {
                         // try to get proper access token again
                         String refreshToken = sfdcConnectionDetail.getRefreshToken();
@@ -148,14 +145,13 @@ public class ConsumerHandler {
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         } else {
-                            url = "https://" + instanceURL + "/grant_type=refresh_token&" +
+                            url = instanceURL + "/grant_type=refresh_token&" +
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         }
-                        System.out.println("url -> " + url);
 
                         HttpClient httpClient = new HttpClient();
-                        PostMethod post = new PostMethod(environment);
+                        PostMethod post = new PostMethod(url);
                         httpClient.executeMethod(post);
                         String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
                         JsonParser parser = new JsonParser();
