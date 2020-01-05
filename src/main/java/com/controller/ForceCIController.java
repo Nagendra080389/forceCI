@@ -327,7 +327,7 @@ public class ForceCIController {
                         container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
                         container.setQueueNames(sfdcConnectionDetails.getBranchConnectedTo());
                         container.setConcurrentConsumers(1);
-                        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+                        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
                         container.startConsumers();
                         rabbitMqConsumerMap.put(sfdcConnectionDetails.getBranchConnectedTo(), container);
                     }
@@ -521,7 +521,7 @@ public class ForceCIController {
             container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
             container.setQueueNames(sfdcConnectionDetails.getBranchConnectedTo());
             container.setConcurrentConsumers(1);
-            container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+            container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
             container.startConsumers();
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byRepositoryRepositoryId.getRepository().getRepositoryId());
             if(rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty()){
@@ -621,7 +621,7 @@ public class ForceCIController {
                 container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
                 container.setQueueNames(queue_name);
                 container.setConcurrentConsumers(1);
-                container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(), new Jackson2JsonMessageConverter()));
+                container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
                 container.startConsumers();
                 rabbitMqConsumerMap.put(queue_name, container);
                 consumerMap.put(sfdcConnectionDetail.getGitRepoId(), rabbitMqConsumerMap);

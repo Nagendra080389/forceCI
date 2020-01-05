@@ -30,11 +30,14 @@ import java.util.*;
 
 public class ConsumerHandler {
 
-    @Autowired
     private DeploymentJobMongoRepository deploymentJobMongoRepository;
 
-    @Autowired
     private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
+
+    public ConsumerHandler(DeploymentJobMongoRepository deploymentJobMongoRepository , SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository){
+        this.deploymentJobMongoRepository = deploymentJobMongoRepository;
+        this.sfdcConnectionDetailsMongoRepository = sfdcConnectionDetailsMongoRepository;
+    }
 
     public void handleMessage(DeploymentJob deploymentJob) {
         System.out.println("deploymentJob -> " + deploymentJob);
