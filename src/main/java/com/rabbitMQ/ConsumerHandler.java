@@ -136,6 +136,11 @@ public class ConsumerHandler {
                         String clientId = System.getenv("SFDC_CLIENTID");
                         String clientSecret = System.getenv("SFDC_CLIENTSECRET");
                         String url = "";
+                        System.out.println("refreshToken -> "+refreshToken);
+                        System.out.println("environment -> "+environment);
+                        System.out.println("instanceURL -> "+instanceURL);
+                        System.out.println("clientId -> "+clientId);
+                        System.out.println("clientSecret -> "+clientSecret);
                         if (environment.equals("0")) {
                             url = "https://login.salesforce.com/grant_type=refresh_token&" +
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
@@ -149,11 +154,12 @@ public class ConsumerHandler {
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         }
-
+                        System.out.println("url -> "+url);
                         HttpClient httpClient = new HttpClient();
                         PostMethod post = new PostMethod(url);
                         httpClient.executeMethod(post);
                         String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
+                        System.out.println("responseBody -> "+responseBody);
                         JsonParser parser = new JsonParser();
                         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
                         String accessToken = jsonObject.get("access_token").getAsString();
