@@ -142,15 +142,15 @@ public class ConsumerHandler {
                         System.out.println("clientId -> "+clientId);
                         System.out.println("clientSecret -> "+clientSecret);
                         if (environment.equals("0")) {
-                            url = "https://login.salesforce.com/grant_type=refresh_token&" +
+                            url = "https://login.salesforce.com/services/oauth2/token?" +
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         } else if (environment.equals("1")) {
-                            url = "https://test.salesforce.com/grant_type=refresh_token&" +
+                            url = "https://test.salesforce.com/services/oauth2/token?" +
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         } else {
-                            url = instanceURL + "/grant_type=refresh_token&" +
+                            url = instanceURL + "/services/oauth2/token?" +
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         }
