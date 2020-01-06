@@ -128,6 +128,7 @@ public class ConsumerHandler {
                 }
                 deploymentJob.setLstBuildLines(lstFileLines);
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
+                    System.out.println("eachBuildLine -> "+eachBuildLine);
                     if (eachBuildLine.contains("Failed to login: INVALID_SESSION_ID")) {
                         // try to get proper access token again
                         String refreshToken = sfdcConnectionDetail.getRefreshToken();
@@ -164,8 +165,10 @@ public class ConsumerHandler {
                         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
                         String accessToken = jsonObject.get("access_token").getAsString();
                         sfdcConnectionDetail.setOauthToken(accessToken);
-                        sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetail);
-                        handleMessage(deploymentJob);
+                        SFDCConnectionDetails newSfdcConnection = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetail);
+                        deploymentJob.setSfdcConnectionDetail(newSfdcConnection);
+                        DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
+                        handleMessage(savedDeploymentJob);
 
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
