@@ -68,7 +68,7 @@ public class TestMain {
             propertiesMap.put("target", "master");
             propertiesMap.put("sourceBranch", "Nagendra080389-patch-9");
             propertiesMap.put("sf.maxPoll", "100");
-            propertiesMap.put("sf.deploy.sessionId", "00D7F00000027wN!AQ4AQIN4FCRiy4zEj1T5KMGCUutsjUNpHibiChvTLoOKqFyJq.Ndk.FRtlQv.14gQsocZJJLY2DGItguDI8YuHhgi6l3Hg3r");
+            propertiesMap.put("sf.deploy.sessionId", "00D7F00000027wN!.Ndk.FRtlQv.14gQsocZJJLY2DGItguDI8YuHhgi6l3Hg3r");
             propertiesMap.put("sf.logType", "None");
             propertiesMap.put("targetName", "master");
 
