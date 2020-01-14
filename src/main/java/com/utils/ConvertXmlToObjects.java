@@ -3,7 +3,6 @@ package com.utils;
 import com.model.configurationJenkins.ObjectFactory;
 import com.model.configurationJenkins.ProjectType;
 import com.rabbitMQ.ConsumerHandler;
-import com.rabbitMQ.DeploymentJob;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.*;

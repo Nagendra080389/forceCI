@@ -31,12 +31,12 @@
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="javascript:;" data-toggle="collapse" data-target="#collapseTwo"
-               aria-expanded="true" aria-controls="collapseTwo">
+            <a aria-controls="collapseTwo" aria-expanded="true" class="nav-link collapsed" data-target="#collapseTwo"
+               data-toggle="collapse" href="javascript:;">
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Apps</span>
             </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div aria-labelledby="headingTwo" class="collapse" data-parent="#accordionSidebar" id="collapseTwo">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Custom Components:</h6>
                     <a class="collapse-item" href="#!apps/dashboard/createApp">Manage Apps</a>
@@ -58,7 +58,7 @@
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+    <div class="d-flex flex-column" id="content-wrapper">
 
         <!-- Main Content -->
         <div id="content">
@@ -67,15 +67,15 @@
             <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                 <!-- Sidebar Toggle (Topbar) -->
-                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                <button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop">
                     <i class="fa fa-bars"></i>
                 </button>
 
                 <!-- Topbar Search -->
                 <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                     <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                               aria-label="Search" aria-describedby="basic-addon2">
+                        <input aria-describedby="basic-addon2" aria-label="Search" class="form-control bg-light border-0 small"
+                               placeholder="Search for..." type="text">
                         <div class="input-group-append">
                             <button class="btn btn-primary" type="button">
                                 <i class="fas fa-search fa-sm"></i>
@@ -89,18 +89,18 @@
 
                     <!-- Nav Item - Search Dropdown (Visible Only XS) -->
                     <li class="nav-item dropdown no-arrow d-sm-none">
-                        <a class="nav-link dropdown-toggle" href="javascript:;" id="searchDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown"
+                           href="javascript:;" id="searchDropdown" role="button">
                             <i class="fas fa-search fa-fw"></i>
                         </a>
                         <!-- Dropdown - Messages -->
-                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                             aria-labelledby="searchDropdown">
+                        <div aria-labelledby="searchDropdown"
+                             class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in">
                             <form class="form-inline mr-auto w-100 navbar-search">
                                 <div class="input-group">
-                                    <input type="text" class="form-control bg-light border-0 small"
-                                           placeholder="Search for..." aria-label="Search"
-                                           aria-describedby="basic-addon2">
+                                    <input aria-describedby="basic-addon2" aria-label="Search"
+                                           class="form-control bg-light border-0 small" placeholder="Search for..."
+                                           type="text">
                                     <div class="input-group-append">
                                         <button class="btn btn-primary" type="button">
                                             <i class="fas fa-search fa-sm"></i>
@@ -115,20 +115,20 @@
 
                     <!-- Nav Item - User Information -->
                     <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="javascript:;" id="userDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown"
+                           href="javascript:;" id="userDropdown" role="button">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{userName}}</span>
                             <img class="img-profile rounded-circle" src="{{avatar_url}}">
                         </a>
                         <!-- Dropdown - User Information -->
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="userDropdown">
+                        <div aria-labelledby="userDropdown"
+                             class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
                             <a class="dropdown-item" href="javascript:;">
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Profile
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="javascript:;" data-toggle="modal" data-target="#logoutModal">
+                            <a class="dropdown-item" data-target="#logoutModal" data-toggle="modal" href="javascript:;">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
                             </a>
@@ -148,43 +148,46 @@
                 <!-- Basic Card Example -->
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" id="activity-tab" data-toggle="tab" data-target="#activity" role="tab" aria-controls="activity" aria-selected="true">Recent Activity</a>
+                        <a aria-controls="activity" aria-selected="true" class="nav-link active" data-target="#activity" data-toggle="tab" id="activity-tab" role="tab">Recent
+                            Activity</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="connections-tab" data-toggle="tab" data-target="#connections" role="tab" aria-controls="connections" aria-selected="false">SFDC Connections</a>
+                        <a aria-controls="connections" aria-selected="false" class="nav-link" data-target="#connections" data-toggle="tab" id="connections-tab" role="tab">SFDC
+                            Connections</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="activity" role="tabpanel" aria-labelledby="home-tab">
+                    <div aria-labelledby="home-tab" class="tab-pane fade show active" id="activity" role="tabpanel">
                         <div class="card-body">
                             Recent Activities comes here
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="connections" role="tabpanel" aria-labelledby="profile-tab">
+                    <div aria-labelledby="profile-tab" class="tab-pane fade" id="connections" role="tabpanel">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3">
                                 <h6 class="m-0 font-weight-bold text-primary">Connections available</h6>
                             </div>
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <a href="javascript:;" class="btn btn-primary" ng-click="createNewConnection();">
+                                    <a class="btn btn-primary" href="javascript:;" ng-click="createNewConnection();">
                                         <span class="text">Create Connections</span>
                                     </a>
                                 </div>
                                 <div class="col-12 col-sm-6 col-md-8">
                                     <form>
                                         <div class="form-group row">
-                                            <label for="inputorgNamel3" class="col-sm-2 col-form-label required">Name</label>
+                                            <label class="col-sm-2 col-form-label required" for="inputorgNamel3">Name</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="inputorgNamel3" placeholder="Name" ng-model="sfdcOrg.orgName" ng-disabled="sfdcOrg.disabledForm == 'true'">
+                                                <input class="form-control" id="inputorgNamel3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.orgName" placeholder="Name"
+                                                       type="text">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label for="inputenvironment3" class="col-sm-2 col-form-label required">Environment</label>
+                                            <label class="col-sm-2 col-form-label required" for="inputenvironment3">Environment</label>
                                             <div class="col-sm-10">
                                                 <div class="dropdown bootstrap-select">
-                                                    <select class="form-control" id="inputenvironment3" ng-model="sfdcOrg.environment" ng-disabled="sfdcOrg.disabledForm == 'true'">
-                                                        <option value="0" selected>Production/Developer</option>
+                                                    <select class="form-control" id="inputenvironment3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.environment">
+                                                        <option selected value="0">Production/Developer</option>
                                                         <option value="1">Sandbox</option>
                                                         <option value="2">Custom Org</option>
                                                     </select>
@@ -192,43 +195,43 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label for="salesforceLoginl3" class="col-sm-2 col-form-label required">Salesforce Login</label>
+                                            <label class="col-sm-2 col-form-label required" for="salesforceLoginl3">Salesforce Login</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="salesforceLoginl3" placeholder="Salesforce userName"
-                                                       ng-model="sfdcOrg.userName" ng-disabled="sfdcOrg.disabledForm == 'true'">
+                                                <input class="form-control" id="salesforceLoginl3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.userName"
+                                                       placeholder="Salesforce userName" type="text">
                                             </div>
                                         </div>
                                         <div class="form-group row" ng-show="sfdcOrg.environment === '2'">
-                                            <label for="salesforceinstanceURLl3" class="col-sm-2 col-form-label required">Instance Url</label>
+                                            <label class="col-sm-2 col-form-label required" for="salesforceinstanceURLl3">Instance Url</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="salesforceinstanceURLl3" placeholder="Salesforce Instance Url"
-                                                       ng-model="sfdcOrg.instanceURL" ng-disabled="sfdcOrg.disabledForm == 'true'">
+                                                <input class="form-control" id="salesforceinstanceURLl3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.instanceURL"
+                                                       placeholder="Salesforce Instance Url" type="text">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label for="branchNamel3" class="col-sm-2 col-form-label">Branch Name</label>
+                                            <label class="col-sm-2 col-form-label" for="branchNamel3">Branch Name</label>
                                             <div class="col-sm-10">
-                                                <input id="branchNamel3" ng-model="sfdcOrg.branchConnectedTo" class="form-control" ng-keyup="complete()"/>
+                                                <input class="form-control" id="branchNamel3" ng-keyup="complete()" ng-model="sfdcOrg.branchConnectedTo"/>
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label for="isActive" class="col-sm-2 col-form-label">Is Active</label>
+                                            <label class="col-sm-2 col-form-label" for="isActive">Is Active</label>
                                             <div class="col-sm-10">
-                                                <input id="isActive" type="checkbox" ng-model="sfdcOrg.boolActive" class="form-check-input" style="margin-left: 0 !important;">
+                                                <input class="form-check-input" id="isActive" ng-model="sfdcOrg.boolActive" style="margin-left: 0 !important;" type="checkbox">
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <div class="form-group">
                                                 <div class="col-sm-12">
-                                                    <button type="button" class="btn btn-primary" ng-click="authorize(sfdcOrg);">{{sfdcOrg.authorize}}</button>
-                                                    <button type="button" class="btn btn-primary" ng-click="saveConnection(sfdcOrg);"
-                                                            ng-disabled="sfdcOrg.oauthSuccess === 'false'">{{sfdcOrg.save}}
+                                                    <button class="btn btn-primary" ng-click="authorize(sfdcOrg);" type="button">{{sfdcOrg.authorize}}</button>
+                                                    <button class="btn btn-primary" ng-click="saveConnection(sfdcOrg);" ng-disabled="sfdcOrg.oauthSuccess === 'false'"
+                                                            type="button">{{sfdcOrg.save}}
                                                     </button>
-                                                    <button type="button" class="btn btn-primary" ng-click="testConnection(sfdcOrg);"
-                                                            ng-disabled="sfdcOrg.oauthSuccess === 'false'">{{sfdcOrg.testConnection}}
+                                                    <button class="btn btn-primary" ng-click="testConnection(sfdcOrg);" ng-disabled="sfdcOrg.oauthSuccess === 'false'"
+                                                            type="button">{{sfdcOrg.testConnection}}
                                                     </button>
-                                                    <button type="button" class="btn btn-primary" ng-click="deleteConnection(sfdcOrg);"
-                                                            ng-disabled="sfdcOrg.oauthSaved === 'false'">{{sfdcOrg.delete}}
+                                                    <button class="btn btn-primary" ng-click="deleteConnection(sfdcOrg);" ng-disabled="sfdcOrg.oauthSaved === 'false'"
+                                                            type="button">{{sfdcOrg.delete}}
                                                     </button>
                                                 </div>
 
@@ -238,7 +241,7 @@
                                 </div>
                                 <div class="row ">
                                     <div class="col-xl-3 col-md-6 mb-4" ng-repeat="eachSFDCData in lstSFDCConnectionDetails">
-                                        <div class="card border-left-primary shadow h-100 py-2" style="cursor: pointer;" ng-click="showDataOnForm(eachSFDCData)">
+                                        <div class="card border-left-primary shadow h-100 py-2" ng-click="showDataOnForm(eachSFDCData)" style="cursor: pointer;">
                                             <div class="card-body">
                                                 <div class="row no-gutters align-items-center">
                                                     <div class="col mr-2">
@@ -248,13 +251,13 @@
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{eachSFDCData.userName}}</div>
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{eachSFDCData.branchConnectedTo}}</div>
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                            <input type="checkbox" ng-disabled="true" ng-model="eachSFDCData.boolActive"/>
+                                                            <input ng-disabled="true" ng-model="eachSFDCData.boolActive" type="checkbox"/>
                                                         </div>
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800 display-1" ng-hide="true">
-                                                            <input type="text" ng-disabled="true" ng-model="eachSFDCData.id"/>
+                                                            <input ng-disabled="true" ng-model="eachSFDCData.id" type="text"/>
                                                         </div>
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                            <a href="#!apps/dashboard/app/{{repoName}}/{{repoId}}/{{eachSFDCData.branchConnectedTo}}" class="btn btn-primary">Deployments</a>
+                                                            <a class="btn btn-primary" href="#!apps/dashboard/app/{{repoName}}/{{repoId}}/{{eachSFDCData.branchConnectedTo}}">Deployments</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -289,24 +292,24 @@
     <!-- End of Content Wrapper -->
 
     <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="javascript:;" data-href="#page-top">
+    <a class="scroll-to-top rounded" data-href="#page-top" href="javascript:;">
         <i class="fas fa-angle-up"></i>
     </a>
 
 
     <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade" id="logoutModal" role="dialog" tabindex="-1">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
                     <a class="btn btn-primary" href="javascript:;">Logout</a>
                 </div>
             </div>

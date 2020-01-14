@@ -2,7 +2,7 @@ package com.model;
 
 import java.io.Serializable;
 
-public class GitBranches  implements Serializable {
+public class GitBranches implements Serializable {
 
     private String name;
 

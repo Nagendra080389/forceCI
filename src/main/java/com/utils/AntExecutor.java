@@ -1,11 +1,10 @@
 package com.utils;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.*;
 import org.springframework.util.StringUtils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class AntExecutor {
         File buildFile = new File(buildXmlFileFullPath);
         project.setUserProperty("ant.file", buildFile.getAbsolutePath());
 
-        if(propertiesMap != null && !propertiesMap.isEmpty()) {
+        if (propertiesMap != null && !propertiesMap.isEmpty()) {
             for (Map.Entry<String, String> entrySet : propertiesMap.entrySet()) {
                 project.setProperty(entrySet.getKey(), entrySet.getValue());
             }
@@ -49,7 +48,7 @@ public class AntExecutor {
 
             @Override
             public void buildFinished(BuildEvent buildEvent) {
-                if(buildEvent.getException()  != null && StringUtils.hasText(buildEvent.getException().getMessage())){
+                if (buildEvent.getException() != null && StringUtils.hasText(buildEvent.getException().getMessage())) {
                     consoleLogs.add(buildEvent.getException().getMessage());
                 }
             }
@@ -76,7 +75,7 @@ public class AntExecutor {
 
             @Override
             public void messageLogged(BuildEvent buildEvent) {
-                if(StringUtils.hasText(buildEvent.getMessage())) {
+                if (StringUtils.hasText(buildEvent.getMessage())) {
                     consoleLogs.add(buildEvent.getMessage());
                 }
             }

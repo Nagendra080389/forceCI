@@ -3,17 +3,14 @@ package com.rabbitMQ;
 import com.dao.DeploymentJobMongoRepository;
 import com.dao.SFDCConnectionDetailsMongoRepository;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.model.SFDCConnectionDetails;
 import com.utils.AntExecutor;
-import com.webSocket.SocketHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.web.socket.TextMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +28,31 @@ public class ConsumerHandler {
 
     private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
 
-    public ConsumerHandler(DeploymentJobMongoRepository deploymentJobMongoRepository , SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository){
+    public ConsumerHandler(DeploymentJobMongoRepository deploymentJobMongoRepository, SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository) {
         this.deploymentJobMongoRepository = deploymentJobMongoRepository;
         this.sfdcConnectionDetailsMongoRepository = sfdcConnectionDetailsMongoRepository;
+    }
+
+    public static File stream2file(InputStream in) throws IOException {
+        final File tempFile = File.createTempFile("build", ".xml");
+        tempFile.deleteOnExit();
+        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
+            IOUtils.copy(in, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempFile;
+    }
+
+    public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
+        final File tempFile = File.createTempFile(prefix, suffix);
+        tempFile.deleteOnExit();
+        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
+            IOUtils.copy(in, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempFile;
     }
 
     public void handleMessage(DeploymentJob deploymentJob) {
@@ -42,13 +61,8 @@ public class ConsumerHandler {
             deploymentJob = optionalDeploymentJob.get();
             createTempDirectoryForDeployment(deploymentJob);
             try {
-                System.out.println("deploymentJob.getSocketHandler().getSessions() -> " + SocketHandler.sessions);
-                if (SocketHandler.sessions != null && SocketHandler.sessions.get(deploymentJob.getUserName()) != null) {
-                    Gson gson = new Gson();
-                    DeploymentJob deploymentJobWithoutLogs = optionalDeploymentJob.get();
-                    deploymentJobWithoutLogs.setLstBuildLines(new ArrayList<>());
-                    SocketHandler.sessions.get(deploymentJob.getUserName()).sendMessage(new TextMessage(gson.toJson(deploymentJobWithoutLogs)));
-                }
+                DeploymentJob deploymentJobWithoutLogs = optionalDeploymentJob.get();
+                deploymentJobWithoutLogs.setLstBuildLines(new ArrayList<>());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -128,7 +142,7 @@ public class ConsumerHandler {
                 }
                 deploymentJob.setLstBuildLines(lstFileLines);
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
-                    System.out.println("eachBuildLine -> "+eachBuildLine);
+                    System.out.println("eachBuildLine -> " + eachBuildLine);
                     if (eachBuildLine.contains("Failed to login: INVALID_SESSION_ID")) {
                         // try to get proper access token again
                         String refreshToken = sfdcConnectionDetail.getRefreshToken();
@@ -137,11 +151,6 @@ public class ConsumerHandler {
                         String clientId = System.getenv("SFDC_CLIENTID");
                         String clientSecret = System.getenv("SFDC_CLIENTSECRET");
                         String url = "";
-                        System.out.println("refreshToken -> "+refreshToken);
-                        System.out.println("environment -> "+environment);
-                        System.out.println("instanceURL -> "+instanceURL);
-                        System.out.println("clientId -> "+clientId);
-                        System.out.println("clientSecret -> "+clientSecret);
                         if (environment.equals("0")) {
                             url = "https://login.salesforce.com/services/oauth2/token?" +
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
@@ -155,12 +164,12 @@ public class ConsumerHandler {
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         }
-                        System.out.println("url -> "+url);
+                        System.out.println("url -> " + url);
                         HttpClient httpClient = new HttpClient();
                         PostMethod post = new PostMethod(url);
                         httpClient.executeMethod(post);
                         String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
-                        System.out.println("responseBody -> "+responseBody);
+                        System.out.println("responseBody -> " + responseBody);
                         JsonParser parser = new JsonParser();
                         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
                         String accessToken = jsonObject.get("access_token").getAsString();
@@ -194,27 +203,5 @@ public class ConsumerHandler {
             e.printStackTrace();
         }
         return lstFileLines;
-    }
-
-    public static File stream2file(InputStream in) throws IOException {
-        final File tempFile = File.createTempFile("build", ".xml");
-        tempFile.deleteOnExit();
-        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
-            IOUtils.copy(in, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tempFile;
-    }
-
-    public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
-        final File tempFile = File.createTempFile(prefix, suffix);
-        tempFile.deleteOnExit();
-        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
-            IOUtils.copy(in, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tempFile;
     }
 }

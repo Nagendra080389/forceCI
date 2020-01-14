@@ -13,10 +13,10 @@
             let sfdcRefreshToken = $.cookie("SFDC_REFRESH_TOKEN");
             const objOauth = {
                 strDestinationId: 'OauthPayload',
-                sfdcAccessToken : sfdcAccessToken,
-                sfdcUserName : sfdcUserName,
-                sfdcInstanceURL : sfdcInstanceURL,
-                sfdcRefreshToken : sfdcRefreshToken
+                sfdcAccessToken: sfdcAccessToken,
+                sfdcUserName: sfdcUserName,
+                sfdcInstanceURL: sfdcInstanceURL,
+                sfdcRefreshToken: sfdcRefreshToken
             };
             window.opener.postMessage(objOauth, window.location.origin);
         })

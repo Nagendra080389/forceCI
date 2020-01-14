@@ -1,6 +1,5 @@
 package com.rabbitMQ;
 
-import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 
 public class RabbitMqConsumer extends SimpleMessageListenerContainer {

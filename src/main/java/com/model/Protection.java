@@ -2,7 +2,7 @@ package com.model;
 
 import java.io.Serializable;
 
-public class Protection  implements Serializable {
+public class Protection implements Serializable {
     private Required_status_checks required_status_checks;
 
     private String enabled;

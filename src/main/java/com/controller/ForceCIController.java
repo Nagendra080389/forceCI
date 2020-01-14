@@ -13,10 +13,7 @@ import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
-import com.rabbitmq.client.*;
 import com.utils.ApiSecurity;
-import com.webSocket.SocketHandler;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -25,9 +22,10 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;
 import org.kohsuke.github.*;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.connection.ConsumerChannelRegistry;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import reactor.core.publisher.Flux;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -47,10 +44,10 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.kohsuke.github.GHDeploymentState.PENDING;
 
@@ -59,51 +56,36 @@ public class ForceCIController {
 
     public static final int HTTP_STATUS_OK = 200;
     public static final int HTTP_STATUS_FAILED = 401;
-    private Map<String, Map<String, RabbitMqConsumer>> consumerMap = new ConcurrentHashMap<>();
+    public static final List<SseEmitter> emitters = Collections.synchronizedList(new ArrayList<>());
+    private final static List<Integer> LIST_VALID_RESPONSE_CODES = Arrays.asList(200, 201, 204, 207);
+    private static final String GITHUB_API = "https://api.github.com";
     @Value("${github.clientId}")
     String githubClientId;
-
     @Value("${github.clientSecret}")
     String githubClientSecret;
-
     @Value("${application.redirectURI}")
     String redirectURI;
-
     @Value("${sfdc.clientId}")
     String sfdcClientId;
-
     @Value("${sfdc.clientSecret}")
     String sfdcClientSecret;
-
     @Value("${sfdc.redirectURI}")
     String sfdcRedirectURI;
-
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
-
-    private final static List<Integer> LIST_VALID_RESPONSE_CODES = Arrays.asList(200, 201, 204, 207);
-
+    private Map<String, Map<String, RabbitMqConsumer>> consumerMap = new ConcurrentHashMap<>();
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
-
     @Autowired
     private UserWrapperMongoRepository userWrapperMongoRepository;
-
     @Autowired
     private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
-
     @Autowired
     private RabbitMqSenderConfig rabbitMqSenderConfig;
-
     @Autowired
     private AmqpTemplate rabbitTemplateCustomAdmin;
-
     @Autowired
     private DeploymentJobMongoRepository deploymentJobMongoRepository;
-
-    private static final String GITHUB_API = "https://api.github.com";
-
-    public static final List<SseEmitter> emitters = Collections.synchronizedList( new ArrayList<>());
 
     //@RequestMapping(value = "/**/{[path:[^\\.]*}")
     /*public String redirect(ServletResponse response, ServletRequest
@@ -113,6 +95,52 @@ public class ForceCIController {
         httpResponse.sendRedirect("/");
         return null;
     }*/
+
+    private static void update_deployment_status(JsonObject jsonObject) {
+        System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
+                " is " + jsonObject.get("deployment_status").getAsJsonObject().get("state").getAsString());
+    }
+
+    private static String fetchCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String accessToken = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("ACCESS_TOKEN")) {
+                    accessToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return accessToken;
+    }
+
+    @GetMapping("/asyncDeployments")
+    public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoName, @RequestParam String branchName) {
+        final SseEmitter emitter = new SseEmitter();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        executor.execute(() -> {
+            try {
+                /*if (StringUtils.hasText(eventName) && StringUtils.hasText(userId) && redisEventDataRepository != null) {
+                    String bySchemaName = redisEventDataRepository.findByUserId(userId);
+                    System.out.println("bySchemaName -> "+bySchemaName);
+                    System.out.println("userId -> "+userId);
+                    if (bySchemaName != null) {
+                        emitter.send(bySchemaName);
+                    }
+                }*/
+                emitter.complete();
+                //redisEventDataRepository.delete(userId);
+
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        });
+        executor.shutdown();
+
+        return emitter;
+    }
 
     @RequestMapping(value = "/gitAuth", method = RequestMethod.GET, params = {"code", "state"})
     public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
@@ -155,7 +183,6 @@ public class ForceCIController {
         }
         httpResponse.sendRedirect("/index.html");
     }
-
 
     @RequestMapping(value = "/sfdcAuth", method = RequestMethod.GET, params = {"code", "state"})
     public void sfdcAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest request) throws Exception {
@@ -292,7 +319,6 @@ public class ForceCIController {
         return gson.toJson("");
     }
 
-
     @RequestMapping(value = "/fetchRepositoryInDB", method = RequestMethod.GET)
     public String getRepositoryList(@RequestParam String gitHubUser, HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
@@ -304,7 +330,7 @@ public class ForceCIController {
                 List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
                 repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                 newLstRepositoryWrapper.add(repositoryWrapper);
-                if(consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())){
+                if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
                     Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
                         RabbitMqConsumer container = new RabbitMqConsumer();
@@ -452,7 +478,7 @@ public class ForceCIController {
                 GHRepository repositoryFromLib = gitHub.getRepositoryById(repository.getRepositoryId());
                 Map<String, GHBranch> branches = repositoryFromLib.getBranches();
                 List<String> lstBranchesInRepo = new ArrayList<>();
-                if(!branches.isEmpty()) {
+                if (!branches.isEmpty()) {
                     for (String eachKey : branches.keySet()) {
                         lstBranchesInRepo.add(branches.get(eachKey).getName());
                     }
@@ -479,7 +505,6 @@ public class ForceCIController {
         return returnResponse;
     }
 
-
     @RequestMapping(value = "/saveSfdcConnectionDetails", method = RequestMethod.POST)
     public String saveSfdcConnectionDetails(@RequestBody SFDCConnectionDetails sfdcConnectionDetails, HttpServletResponse response, HttpServletRequest
             request) throws Exception {
@@ -494,7 +519,7 @@ public class ForceCIController {
         }
         Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(sfdcConnectionDetails.getBranchConnectedTo());
 
-        if(develop != null && develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
+        if (develop != null && develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
             // Do nothing
         } else {
             RepositoryWrapper byRepositoryRepositoryId = repositoryWrapperMongoRepository.findByRepositoryRepositoryId(sfdcConnectionDetails.getGitRepoId());
@@ -508,7 +533,7 @@ public class ForceCIController {
             container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
             container.startConsumers();
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byRepositoryRepositoryId.getRepository().getRepositoryId());
-            if(rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty()){
+            if (rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty()) {
 
             } else {
                 rabbitMqConsumerMap = new ConcurrentHashMap<>();
@@ -543,21 +568,20 @@ public class ForceCIController {
             Optional<SFDCConnectionDetails> byId = sfdcConnectionDetailsMongoRepository.findById(sfdcDetailsId);
             rabbitMqSenderConfig.amqpAdmin().deleteQueue(byId.get().getBranchConnectedTo());
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byId.get().getGitRepoId());
-            if(rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty() && rabbitMqConsumerMap.get(byId.get().getBranchConnectedTo()) != null){
+            if (rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty() && rabbitMqConsumerMap.get(byId.get().getBranchConnectedTo()) != null) {
                 rabbitMqConsumerMap.remove(byId.get().getBranchConnectedTo());
             }
             sfdcConnectionDetailsMongoRepository.deleteById(sfdcDetailsId);
             return gson.toJson("Success");
-        } catch (Exception e){
+        } catch (Exception e) {
             return gson.toJson("Error");
         }
 
     }
 
-
     private void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
-                                         SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
-                                         RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
+                                  SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
+                                  RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
@@ -577,7 +601,7 @@ public class ForceCIController {
             }
         }
 
-        if(sfdcConnectionDetail == null){
+        if (sfdcConnectionDetail == null) {
             return;
         }
 
@@ -598,9 +622,9 @@ public class ForceCIController {
         deploymentJob.setBoolCodeReviewValidationSuccess(false);
         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
         rabbitTemplate.convertAndSend(repoName, queue_name, savedDeploymentJob);
-        if(consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())){
+        if (consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())) {
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(sfdcConnectionDetail.getGitRepoId());
-            if((rabbitMqConsumerMap != null && !rabbitMqConsumerMap.containsKey(queue_name))) {
+            if ((rabbitMqConsumerMap != null && !rabbitMqConsumerMap.containsKey(queue_name))) {
                 RabbitMqConsumer container = new RabbitMqConsumer();
                 container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
                 container.setQueueNames(queue_name);
@@ -638,26 +662,6 @@ public class ForceCIController {
             e.printStackTrace();
         }
 
-    }
-
-
-    private static void update_deployment_status(JsonObject jsonObject) {
-        System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
-                " is " + jsonObject.get("deployment_status").getAsJsonObject().get("state").getAsString());
-    }
-
-    private static String fetchCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        String accessToken = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("ACCESS_TOKEN")) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        return accessToken;
     }
 
     private class FinalResult {

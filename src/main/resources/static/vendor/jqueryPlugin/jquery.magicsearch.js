@@ -1,6 +1,15 @@
 'use strict';
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+        for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+            arr2[i] = arr[i];
+        }
+        return arr2;
+    } else {
+        return Array.from(arr);
+    }
+}
 
 /*!
  * MagicSearch - An input plugin based on jquery
@@ -302,7 +311,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                     error: function error() {
                         console.error('magicsearch: Error with xhr.Index: ' + window.MagicSearch.index);
                     },
-                    success: function success(data) {}
+                    success: function success(data) {
+                    }
                 };
                 ajaxOptions = $.extend({}, ajaxOptions, this.options.ajaxOptions);
                 var success = ajaxOptions.success;
@@ -635,7 +645,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                     if (inputVals[_i3] === '') {
                         continue;
                     }
-                    inputData.push({ value: inputVals[_i3], flag: false });
+                    inputData.push({value: inputVals[_i3], flag: false});
                 }
                 //search match data
                 for (var _i4 = 0; _i4 < dataJson.length; _i4++) {
@@ -719,12 +729,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                                     }
                                     length++;
                                     if (_i8 === 0) {
-                                        tmpPosArr.push({ start: start, length: length });
+                                        tmpPosArr.push({start: start, length: length});
                                     }
                                 } else {
                                     if (hasStarted) {
                                         hasStarted = false;
-                                        tmpPosArr.push({ start: start, length: length });
+                                        tmpPosArr.push({start: start, length: length});
                                         length = 0;
                                     }
                                 }
@@ -977,7 +987,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
                 }
             }).on('keydown', function (e) {
                 var $_this = $(this);
-                if (e.which == KEY.ESC) {} else if (e.which == KEY.UP) {
+                if (e.which == KEY.ESC) {
+                } else if (e.which == KEY.UP) {
                     return false;
                 } else if (e.which == KEY.DOWN) {
                     return false;

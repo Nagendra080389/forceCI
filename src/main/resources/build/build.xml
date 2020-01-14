@@ -1,95 +1,95 @@
-<project name="ANT Jobs" basedir="." xmlns:sf="antlib:com.salesforce">
-	<tstamp>
-		<format property="BUILD_DATE"
-		        pattern="yyyyMMdd" />
-	</tstamp>
-	<condition property="sf.deploy.username" value="">
-		<not>
-			<isset property="sf.deploy.username" />
-		</not>
-	</condition>
-	<condition property="sf.deploy.password" value="">
-		<not>
-			<isset property="sf.deploy.password" />
-		</not>
-	</condition>
-	<condition property="sf.deploy.sessionId" value="">
-		<not>
-			<isset property="sf.deploy.sessionId" />
-		</not>
-	</condition>
-	<taskdef resource="com/salesforce/antlib.xml" uri="antlib:com.salesforce">
-		<classpath>
-			<pathelement location="${antPath}" />
-		</classpath>
-	</taskdef>
-	<!-- ========================================== -->
-	<!-- Deployment targets                         -->
-	<!-- ========================================== -->
-	<target name="sf_prepare_deployment">
-		<echo message="START: Create diff dir" />
-		<echo message="Checking against target: ${target}" />
+<project xmlns:sf="antlib:com.salesforce" name="ANT Jobs" basedir=".">
+    <tstamp>
+        <format property="BUILD_DATE"
+                pattern="yyyyMMdd"/>
+    </tstamp>
+    <condition property="sf.deploy.username" value="">
+        <not>
+            <isset property="sf.deploy.username"/>
+        </not>
+    </condition>
+    <condition property="sf.deploy.password" value="">
+        <not>
+            <isset property="sf.deploy.password"/>
+        </not>
+    </condition>
+    <condition property="sf.deploy.sessionId" value="">
+        <not>
+            <isset property="sf.deploy.sessionId"/>
+        </not>
+    </condition>
+    <taskdef resource="com/salesforce/antlib.xml" uri="antlib:com.salesforce">
+        <classpath>
+            <pathelement location="${antPath}"/>
+        </classpath>
+    </taskdef>
+    <!-- ========================================== -->
+    <!-- Deployment targets                         -->
+    <!-- ========================================== -->
+    <target name="sf_prepare_deployment">
+        <echo message="START: Create diff dir"/>
+        <echo message="Checking against target: ${target}"/>
 
-		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows" failonerror="true">
-			<arg value="${gitClone}" />
-			<arg value="${diffDirUpLevel}" />
-			<arg value="${originURL}" />
-			<arg value="${userEmail}" />
-			<arg value="${userName}" />
-		</exec>
-		<exec executable="/bin/bash" osfamily="unix" failonerror="true">
-			<arg value="${gitClone}" />
-			<arg value="${diffDirUpLevel}" />
-			<arg value="${originURL}" />
-			<arg value="${userEmail}" />
-			<arg value="${userName}" />
-		</exec>
+        <exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows" failonerror="true">
+            <arg value="${gitClone}"/>
+            <arg value="${diffDirUpLevel}"/>
+            <arg value="${originURL}"/>
+            <arg value="${userEmail}"/>
+            <arg value="${userName}"/>
+        </exec>
+        <exec executable="/bin/bash" osfamily="unix" failonerror="true">
+            <arg value="${gitClone}"/>
+            <arg value="${diffDirUpLevel}"/>
+            <arg value="${originURL}"/>
+            <arg value="${userEmail}"/>
+            <arg value="${userName}"/>
+        </exec>
 
-		<mkdir dir="${diffDir}" />
-		<mkdir dir="${diffDir}/src" />
-		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows" failonerror="true">
-			<arg value="${scriptName}" />
-			<arg value="${target}" />
-			<arg value="${targetName}" />
-			<arg value="${sourceBranch}" />
-			<arg value="${diffDirUpLevel}" />
-		</exec>
-		<exec executable="/bin/bash" osfamily="unix" failonerror="true">
-			<arg value="${scriptName}" />
-			<arg value="${target}" />
-			<arg value="${targetName}" />
-			<arg value="${sourceBranch}" />
-			<arg value="${diffDirUpLevel}" />
-		</exec>
-		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
-			<arg value="${create_changes}" />
-			<arg value="${diffDir}" />
-			<arg value="${diffDirUpLevel}" />
-		</exec>
+        <mkdir dir="${diffDir}"/>
+        <mkdir dir="${diffDir}/src"/>
+        <exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows" failonerror="true">
+            <arg value="${scriptName}"/>
+            <arg value="${target}"/>
+            <arg value="${targetName}"/>
+            <arg value="${sourceBranch}"/>
+            <arg value="${diffDirUpLevel}"/>
+        </exec>
+        <exec executable="/bin/bash" osfamily="unix" failonerror="true">
+            <arg value="${scriptName}"/>
+            <arg value="${target}"/>
+            <arg value="${targetName}"/>
+            <arg value="${sourceBranch}"/>
+            <arg value="${diffDirUpLevel}"/>
+        </exec>
+        <exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
+            <arg value="${create_changes}"/>
+            <arg value="${diffDir}"/>
+            <arg value="${diffDirUpLevel}"/>
+        </exec>
 
-		<exec executable="/bin/bash" osfamily="unix">
-			<arg value="${create_changes}" />
-			<arg value="${diffDir}" />
-			<arg value="${diffDirUpLevel}" />
-		</exec>
-		<echo message="Generating package.xml" />
+        <exec executable="/bin/bash" osfamily="unix">
+            <arg value="${create_changes}"/>
+            <arg value="${diffDir}"/>
+            <arg value="${diffDirUpLevel}"/>
+        </exec>
+        <echo message="Generating package.xml"/>
 
-		<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
-			<arg value="${generate_package}" />
-			<arg value="${generatePackage}" />
-			<arg value="package" />
-			<arg value="${diffDir}/src" />
-		</exec>
+        <exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
+            <arg value="${generate_package}"/>
+            <arg value="${generatePackage}"/>
+            <arg value="package"/>
+            <arg value="${diffDir}/src"/>
+        </exec>
 
-		<exec executable="/bin/bash" osfamily="unix">
-			<arg value="${generate_package_unix}" />
-			<arg value="${generatePackage}" />
-			<arg value="package" />
-			<arg value="${diffDir}/src" />
-		</exec>
-		<echo message="Package generated." />
+        <exec executable="/bin/bash" osfamily="unix">
+            <arg value="${generate_package_unix}"/>
+            <arg value="${generatePackage}"/>
+            <arg value="package"/>
+            <arg value="${diffDir}/src"/>
+        </exec>
+        <echo message="Package generated."/>
 
-		<!--
+        <!--
                 <echo message="Adding properties if applicable" />
             <exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
                     <arg value="properties_helper.sh" />
@@ -103,61 +103,61 @@
                     <arg value="${diffDir}/src" />
                 </exec>
                 <echo message="Properties added. Finished." />-->
-	</target>
+    </target>
 
-	<target name="sf_prepare_full_deployment">
-		<echo message="START: Copying deployment files" />
-		<copy todir="${diffDir}/src">
-			<fileset dir="../src" excludes="**/staticresources/**" />
-		</copy>
-	</target>
-	<target name="sf_build" depends="sf_prepare_deployment">
-		<echo message="START: SFDC Deployment" />
-		<echo message="${diffDir}/src" />
-		<sf:deploy  username="${sf.deploy.username}" password="${sf.deploy.password}"
-		            serverurl="${sf.deploy.serverurl}" sessionId="${sf.deploy.sessionId}"
-		            deployRoot="${diffDir}/src" maxPoll="${sf.maxPoll}"
-		            pollWaitMillis="${sf.pollWaitMillis}" checkOnly="${sf.checkOnly}"
-		            runAllTests="${sf.runAllTests}" logType="${sf.logType}" testLevel="${sf.testRun}"
-		/>
-	</target>
+    <target name="sf_prepare_full_deployment">
+        <echo message="START: Copying deployment files"/>
+        <copy todir="${diffDir}/src">
+            <fileset dir="../src" excludes="**/staticresources/**"/>
+        </copy>
+    </target>
+    <target name="sf_build" depends="sf_prepare_deployment">
+        <echo message="START: SFDC Deployment"/>
+        <echo message="${diffDir}/src"/>
+        <sf:deploy username="${sf.deploy.username}" password="${sf.deploy.password}"
+                   serverurl="${sf.deploy.serverurl}" sessionId="${sf.deploy.sessionId}"
+                   deployRoot="${diffDir}/src" maxPoll="${sf.maxPoll}"
+                   pollWaitMillis="${sf.pollWaitMillis}" checkOnly="${sf.checkOnly}"
+                   runAllTests="${sf.runAllTests}" logType="${sf.logType}" testLevel="${sf.testRun}"
+        />
+    </target>
 
-	<target name="sf_CopyBuildForUCD" depends="sf_prepare_deployment">
-		<echo message="START: Copy to UCD Deployment Folder" />
-		<mkdir dir="${destDir}" />
-		<copy todir="${destDir}" >
-			<fileset dir="${diffDir}/src" includes="**"/>
-		</copy>
-	</target>
+    <target name="sf_CopyBuildForUCD" depends="sf_prepare_deployment">
+        <echo message="START: Copy to UCD Deployment Folder"/>
+        <mkdir dir="${destDir}"/>
+        <copy todir="${destDir}">
+            <fileset dir="${diffDir}/src" includes="**"/>
+        </copy>
+    </target>
 
-	<target name="sf_build_independent" depends="sf_prepare_full_deployment">
-		<echo message="Adding properties if applicable" />
-		<exec executable="/bin/bash" osfamily="unix">
-			<arg value="properties_helper.sh" />
-			<arg value="${propsEnv}" />
-			<arg value="${diffDir}/src" />
-		</exec>
-		<echo message="Properties added. Finished." />
-		<echo message="START: SFDC Deployment" />
-		<echo message="${diffDir}/src" />
-		<sf:deploy  username="${sf.deploy.username}" password="${sf.deploy.password}"
-		            serverurl="${sf.deploy.serverurl}" sessionId="${sf.deploy.sessionId}"
-		            deployRoot="${diffDir}/src" maxPoll="${sf.maxPoll}"
-		            pollWaitMillis="${sf.pollWaitMillis}" checkOnly="${sf.checkOnly}"
-		            runAllTests="${sf.runAllTests}" logType="${sf.logType}"
-		/>
-	</target>
-	<target name="git_tag">
-		<echo message="Build date is: ${BUILD_DATE}" />
-		<echo message="Build number: ${BUILD_NUMBER}" />
-		<echo message="Build tag name will be: ${ENV}_${BUILD_DATE}_${BUILD_NUMBER}" />
-		<echo message="Creating tag on current repository" />
-		<exec executable="/bin/bash" osfamily="unix">
-			<arg value="create_tag.sh" />
-			<arg value=".." />
-			<arg value="${ENV}_${BUILD_DATE}_${BUILD_NUMBER}" />
-			<arg value="${REPO_PASS}" />
-		</exec>
-	</target>
+    <target name="sf_build_independent" depends="sf_prepare_full_deployment">
+        <echo message="Adding properties if applicable"/>
+        <exec executable="/bin/bash" osfamily="unix">
+            <arg value="properties_helper.sh"/>
+            <arg value="${propsEnv}"/>
+            <arg value="${diffDir}/src"/>
+        </exec>
+        <echo message="Properties added. Finished."/>
+        <echo message="START: SFDC Deployment"/>
+        <echo message="${diffDir}/src"/>
+        <sf:deploy username="${sf.deploy.username}" password="${sf.deploy.password}"
+                   serverurl="${sf.deploy.serverurl}" sessionId="${sf.deploy.sessionId}"
+                   deployRoot="${diffDir}/src" maxPoll="${sf.maxPoll}"
+                   pollWaitMillis="${sf.pollWaitMillis}" checkOnly="${sf.checkOnly}"
+                   runAllTests="${sf.runAllTests}" logType="${sf.logType}"
+        />
+    </target>
+    <target name="git_tag">
+        <echo message="Build date is: ${BUILD_DATE}"/>
+        <echo message="Build number: ${BUILD_NUMBER}"/>
+        <echo message="Build tag name will be: ${ENV}_${BUILD_DATE}_${BUILD_NUMBER}"/>
+        <echo message="Creating tag on current repository"/>
+        <exec executable="/bin/bash" osfamily="unix">
+            <arg value="create_tag.sh"/>
+            <arg value=".."/>
+            <arg value="${ENV}_${BUILD_DATE}_${BUILD_NUMBER}"/>
+            <arg value="${REPO_PASS}"/>
+        </exec>
+    </target>
 
 </project>
