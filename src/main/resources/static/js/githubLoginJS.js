@@ -53,11 +53,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             $scope.avatar_url = response.data.avatar_url;
             localStorage.setItem('githubOwner', response.data.login);
             localStorage.setItem('avatar_url', response.data.avatar_url);
-            webSocket = new WebSocket('wss://' + location.host + '/webSocket/connect2Deploy/' + $scope.userName);
-            webSocket.onmessage = function (data) {
-                let message = data.data;
-
-            };
             $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 $scope.lstRepositoryData = [];
                 if (response.data.length > 0) {
@@ -536,18 +531,23 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 });
 
 connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams) {
-    $scope.userName = 'localStorage.githubOwner';
+    $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
+    $scope.branchName = $routeParams.branchConnectedTo;
 
     // table headers that we need to show
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Salesforce Validation', 'CodeReview Validation'];
 
     $scope.lstDeployments = [];
-    $scope.lstDeployments.push(objDeployment);
 
+
+    const sse = new EventSource('/asyncDeployments?userName='+$scope.userName+'&repoId='+$scope.repoId+'&branchName='+$scope.branchName);
+    sse.addEventListener("message", function(e) {
+        console.log(e.data)
+    })
 
 
 });
