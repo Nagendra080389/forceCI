@@ -1,4 +1,4 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect','ngSanitize']);
 let webSocket;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
@@ -542,104 +542,51 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.repoName = $routeParams.repoName;
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
 
-    let lstDeploymentsInfo = [];
-    const deployment = {
-        "access_token": "b0b35870bd6d0ce5848644c1dc32ba59e17522c4",
-        "emailId": "nagendra080389@gmail.com",
-        "userName": "Nagendra080389",
-        "gitCloneURL": "https://github.com/Nagendra080389/trailheadOrgCommitLevel.git",
-        "sourceBranch": "Nagendra080389-patch-10",
-        "targetBranch": "master",
-        "sfdcConnectionDetail": {
-            "_id": {
-                "$oid": "5e11a70439258c0004a8d03e"
-            },
-            "orgName": "trailhead-master",
-            "environment": "0",
-            "userName": "nagendra@deloitte.com",
-            "instanceURL": "https://nagesingh-dev-ed.my.salesforce.com",
-            "authorize": "Authorize",
-            "save": "Save",
-            "testConnection": "Test Connection",
-            "delete": "Delete",
-            "oauthSuccess": "true",
-            "oauthFailed": "false",
-            "oauthSaved": "true",
-            "oauthToken": "00D7F00000027wN!AQ4AQIkT6E0xO59MT1iTTsnaZLiah4qPmYU_If4qyx6POuE4hVYW0Lbl9FrOaiddiZSnmf_rowqHTY1iw_uIXzArV1ncxz5z",
-            "refreshToken": "5Aep8613hy0tHCYdhyAffQJ6vvc5k7GTfrP7W70Y.iRvPAWUD_DKS55PPJjZ.ZDyNnZ_AteJqTVDFO1tAUSlUq1",
-            "gitRepoId": "182022017",
-            "branchConnectedTo": "master",
-            "boolActive": true
-        },
-        "queueName": "master",
-        "boolSFDCCompleted": false,
-        "boolCodeScanCompleted": false,
-        "boolSfdcValidationSuccess": false,
-        "boolCodeReviewValidationSuccess": false
+    // table headers that we need to show
+    $scope.tableHeaders = ['Job No.', 'PR No.', 'Salesforce Validation', 'CodeReview Validation'];
+
+    const objDeployment = {
+        jobNo : 1,
+        prNumber : 112,
+        boolSfdcValidationRunning : false,
+        boolSfdcValidationPass : true,
+        boolSfdcValidationFail : false,
+        sfdcValidationRunning : 'validationRunning',
+        sfdcValidationPass : 'validationPass',
+        sfdcValidationFail : 'validationFail',
+        boolCodeReviewValidationRunning : false,
+        boolCodeReviewValidationPass : false,
+        boolCodeReviewValidationFail : true,
+        codeReviewValidationRunning : 'validationRunning',
+        codeReviewValidationPass : 'validationPass',
+        codeReviewValidationFail : 'validationFail'
     };
-    lstDeploymentsInfo.push(deployment);
 
-    var objDataTableConfig = {
-        info: false,
-        ordering: true,
-        paging: true,
-        searching: false,
-        order: [1, "desc"],
-        data: lstDeploymentsInfo,
-        columns: [
-            {data: "Title__c", "defaultContent": ""},
-            {
-                "data": "Uploaded_Date__c",
-                "render": function (data, type, row, meta) {
-                    if (type === 'display') {
-                        let dataValue = data;
-                        var uploadedDate = new Date(dataValue);
-                        var yesterdayDate = new Date(new Date().getTime() - (24 * 60 * 60 * 1000));
-                        var boolShowRemove = uploadedDate > yesterdayDate;
-                        let formattedDate = formatDate(uploadedDate);
-                        data = '<div class="dateClass" data-ShowRemove="' + boolShowRemove + '">' + formattedDate + '</div>';
-                    }
-
-                    return data;
-                },
-                "defaultContent": ""
-            },
-            {data: "Uploaded_By__c", "defaultContent": "", visible: false},
-            {
-                "data": "Uploaded_By__r.Name",
-                "render": function (data, type, row, meta) {
-                    if (type === 'display') {
-                        let dataValue = data;
-                        data = '<div class="userClass" data-UserId="' + row.Uploaded_By__c + '">' + dataValue + '</div>';
-                    }
-
-                    return data;
-                },
-                "defaultContent": ""
-            },
-            {data: "Content_Type__c", "defaultContent": ""},
-            {
-                "data": "ObjectId__c",
-                "render": function (data, type, row, meta) {
-                    if (type === 'display') {
-                        let title = row.Title__c;
-                        let dataValue = '\'' + data + '\'';
-                        data = '<a href="javascript:void(0)" class="viewDownloadLink" title="' + title + '" onclick="onViewRecord(event, ' + dataValue + ')">View & Download</a>' + ' / ' +
-                            '<a href="javascript:void(0)" class="removeLink" onclick="onDeleteRecord(' +
-                            dataValue +
-                            ')">Remove</a>';
-                    }
-
-                    return data;
-                },
-                "defaultContent": "",
-                sortable: false
-
-            }
-        ]
-
+    const objDeployment1 = {
+        jobNo : 1,
+        prNumber : 112,
+        boolSfdcValidationRunning : true,
+        boolSfdcValidationPass : false,
+        boolSfdcValidationFail : false,
+        sfdcValidationRunning : 'validationRunning',
+        sfdcValidationPass : 'validationPass',
+        sfdcValidationFail : 'validationFail',
+        boolCodeReviewValidationRunning : false,
+        boolCodeReviewValidationPass : false,
+        boolCodeReviewValidationFail : true,
+        codeReviewValidationRunning : 'validationRunning',
+        codeReviewValidationPass : 'validationPass',
+        codeReviewValidationFail : 'validationFail'
     };
-    $('#deploymentTable').dataTable(objDataTableConfig);
+
+    $scope.lstDeployments = [];
+    $scope.lstDeployments.push(objDeployment);
+
+
+    setTimeout(function () {
+        $scope.lstDeployments.push(objDeployment1);
+        $scope.$apply();
+    }, 10000)
 
 
 });

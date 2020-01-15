@@ -10,4 +10,5 @@ public interface DeploymentJobMongoRepository extends MongoRepository<Deployment
     Long countByTargetBranch(String targetBranch);
 
     List<DeploymentJob> findByTargetBranch(String targetBranch);
+
 }

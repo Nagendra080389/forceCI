@@ -24,10 +24,17 @@ public class DeploymentJob implements Serializable {
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
     private List<String> lstBuildLines;
-    private boolean boolSFDCCompleted;
-    private boolean boolCodeScanCompleted;
-    private boolean boolSfdcValidationSuccess;
-    private boolean boolCodeReviewValidationSuccess;
+    private boolean boolSfdcCompleted;
+    private boolean boolSfdcRunning;
+    private boolean boolSfdcPass;
+    private boolean boolSfdcFail;
+    private boolean boolCodeReviewCompleted;
+    private boolean boolCodeReviewRunning;
+    private boolean boolCodeReviewPass;
+    private boolean boolCodeReviewFail;
+    private String pullRequestNumber;
+    private String pullRequestTitle;
+    private String pullRequestHtmlUrl;
     @CreatedDate
     private Date createdDate;
     @LastModifiedDate
@@ -101,44 +108,12 @@ public class DeploymentJob implements Serializable {
         this.queueName = queueName;
     }
 
-    public boolean isBoolSFDCCompleted() {
-        return boolSFDCCompleted;
-    }
-
-    public void setBoolSFDCCompleted(boolean boolSFDCCompleted) {
-        this.boolSFDCCompleted = boolSFDCCompleted;
-    }
-
-    public boolean isBoolCodeScanCompleted() {
-        return boolCodeScanCompleted;
-    }
-
-    public void setBoolCodeScanCompleted(boolean boolCodeScanCompleted) {
-        this.boolCodeScanCompleted = boolCodeScanCompleted;
-    }
-
     public String getJobId() {
         return jobId;
     }
 
     public void setJobId(String jobId) {
         this.jobId = jobId;
-    }
-
-    public boolean isBoolSfdcValidationSuccess() {
-        return boolSfdcValidationSuccess;
-    }
-
-    public void setBoolSfdcValidationSuccess(boolean boolSfdcValidationSuccess) {
-        this.boolSfdcValidationSuccess = boolSfdcValidationSuccess;
-    }
-
-    public boolean isBoolCodeReviewValidationSuccess() {
-        return boolCodeReviewValidationSuccess;
-    }
-
-    public void setBoolCodeReviewValidationSuccess(boolean boolCodeReviewValidationSuccess) {
-        this.boolCodeReviewValidationSuccess = boolCodeReviewValidationSuccess;
     }
 
     public List<String> getLstBuildLines() {
@@ -157,17 +132,117 @@ public class DeploymentJob implements Serializable {
         return lastModifiedDate;
     }
 
+    public boolean isBoolSfdcCompleted() {
+        return boolSfdcCompleted;
+    }
+
+    public void setBoolSfdcCompleted(boolean boolSfdcCompleted) {
+        this.boolSfdcCompleted = boolSfdcCompleted;
+    }
+
+    public boolean isBoolSfdcRunning() {
+        return boolSfdcRunning;
+    }
+
+    public void setBoolSfdcRunning(boolean boolSfdcRunning) {
+        this.boolSfdcRunning = boolSfdcRunning;
+    }
+
+    public boolean isBoolSfdcPass() {
+        return boolSfdcPass;
+    }
+
+    public void setBoolSfdcPass(boolean boolSfdcPass) {
+        this.boolSfdcPass = boolSfdcPass;
+    }
+
+    public boolean isBoolSfdcFail() {
+        return boolSfdcFail;
+    }
+
+    public void setBoolSfdcFail(boolean boolSfdcFail) {
+        this.boolSfdcFail = boolSfdcFail;
+    }
+
+    public boolean isBoolCodeReviewCompleted() {
+        return boolCodeReviewCompleted;
+    }
+
+    public void setBoolCodeReviewCompleted(boolean boolCodeReviewCompleted) {
+        this.boolCodeReviewCompleted = boolCodeReviewCompleted;
+    }
+
+    public boolean isBoolCodeReviewRunning() {
+        return boolCodeReviewRunning;
+    }
+
+    public void setBoolCodeReviewRunning(boolean boolCodeReviewRunning) {
+        this.boolCodeReviewRunning = boolCodeReviewRunning;
+    }
+
+    public boolean isBoolCodeReviewPass() {
+        return boolCodeReviewPass;
+    }
+
+    public void setBoolCodeReviewPass(boolean boolCodeReviewPass) {
+        this.boolCodeReviewPass = boolCodeReviewPass;
+    }
+
+    public boolean isBoolCodeReviewFail() {
+        return boolCodeReviewFail;
+    }
+
+    public void setBoolCodeReviewFail(boolean boolCodeReviewFail) {
+        this.boolCodeReviewFail = boolCodeReviewFail;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getPullRequestNumber() {
+        return pullRequestNumber;
+    }
+
+    public void setPullRequestNumber(String pullRequestNumber) {
+        this.pullRequestNumber = pullRequestNumber;
+    }
+
+    public String getPullRequestTitle() {
+        return pullRequestTitle;
+    }
+
+    public void setPullRequestTitle(String pullRequestTitle) {
+        this.pullRequestTitle = pullRequestTitle;
+    }
+
+    public String getPullRequestHtmlUrl() {
+        return pullRequestHtmlUrl;
+    }
+
+    public void setPullRequestHtmlUrl(String pullRequestHtmlUrl) {
+        this.pullRequestHtmlUrl = pullRequestHtmlUrl;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeploymentJob that = (DeploymentJob) o;
-        return boolSFDCCompleted == that.boolSFDCCompleted &&
-                boolCodeScanCompleted == that.boolCodeScanCompleted &&
-                boolSfdcValidationSuccess == that.boolSfdcValidationSuccess &&
-                boolCodeReviewValidationSuccess == that.boolCodeReviewValidationSuccess &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(jobId, that.jobId) &&
+        return boolSfdcCompleted == that.boolSfdcCompleted &&
+                boolSfdcRunning == that.boolSfdcRunning &&
+                boolSfdcPass == that.boolSfdcPass &&
+                boolSfdcFail == that.boolSfdcFail &&
+                boolCodeReviewCompleted == that.boolCodeReviewCompleted &&
+                boolCodeReviewRunning == that.boolCodeReviewRunning &&
+                boolCodeReviewPass == that.boolCodeReviewPass &&
+                boolCodeReviewFail == that.boolCodeReviewFail &&
+                id.equals(that.id) &&
+                jobId.equals(that.jobId) &&
                 Objects.equals(access_token, that.access_token) &&
                 Objects.equals(emailId, that.emailId) &&
                 Objects.equals(userName, that.userName) &&
@@ -176,13 +251,14 @@ public class DeploymentJob implements Serializable {
                 Objects.equals(targetBranch, that.targetBranch) &&
                 Objects.equals(sfdcConnectionDetail, that.sfdcConnectionDetail) &&
                 Objects.equals(queueName, that.queueName) &&
+                Objects.equals(lstBuildLines, that.lstBuildLines) &&
                 Objects.equals(createdDate, that.createdDate) &&
                 Objects.equals(lastModifiedDate, that.lastModifiedDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, jobId, access_token, emailId, userName, gitCloneURL, sourceBranch, targetBranch, sfdcConnectionDetail, queueName, boolSFDCCompleted, boolCodeScanCompleted, boolSfdcValidationSuccess, boolCodeReviewValidationSuccess, createdDate, lastModifiedDate);
+        return Objects.hash(id, jobId, access_token, emailId, userName, gitCloneURL, sourceBranch, targetBranch, sfdcConnectionDetail, queueName, lstBuildLines, boolSfdcCompleted, boolSfdcRunning, boolSfdcPass, boolSfdcFail, boolCodeReviewCompleted, boolCodeReviewRunning, boolCodeReviewPass, boolCodeReviewFail, createdDate, lastModifiedDate);
     }
 }
 

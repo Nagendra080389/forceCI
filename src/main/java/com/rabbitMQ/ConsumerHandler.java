@@ -164,12 +164,10 @@ public class ConsumerHandler {
                                     "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
                                     "&refresh_token=" + refreshToken;
                         }
-                        System.out.println("url -> " + url);
                         HttpClient httpClient = new HttpClient();
                         PostMethod post = new PostMethod(url);
                         httpClient.executeMethod(post);
                         String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
-                        System.out.println("responseBody -> " + responseBody);
                         JsonParser parser = new JsonParser();
                         JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
                         String accessToken = jsonObject.get("access_token").getAsString();
@@ -181,17 +179,19 @@ public class ConsumerHandler {
 
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
-                        deploymentJob.setBoolSFDCCompleted(true);
-                        deploymentJob.setBoolSfdcValidationSuccess(true);
-                        deploymentJob.setBoolCodeScanCompleted(false);
+                        deploymentJob.setBoolSfdcCompleted(true);
+                        deploymentJob.setBoolSfdcPass(true);
+                        deploymentJob.setBoolCodeReviewCompleted(false);
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
-                        deploymentJob.setBoolSFDCCompleted(true);
-                        deploymentJob.setBoolSfdcValidationSuccess(false);
-                        deploymentJob.setBoolCodeScanCompleted(false);
+                        deploymentJob.setBoolSfdcCompleted(true);
+                        deploymentJob.setBoolSfdcFail(false);
+                        deploymentJob.setBoolCodeReviewCompleted(false);
                         break;
                     }
                 }
+
+                deploymentJob.setLastModifiedDate(new Date());
 
                 deploymentJobMongoRepository.save(deploymentJob);
             } catch (Exception e) {

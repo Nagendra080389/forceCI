@@ -1,4 +1,5 @@
 <script src="../vendor/angular/angular.min.js"></script>
+<script src="../vendor/angular/angular-sanitize.min.js"></script>
 <script src="../vendor/angular/angular-route.min.js"></script>
 <script src="../vendor/jquery/jquery.js"></script>
 <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -172,7 +173,37 @@
 
                 <!-- Content Row -->
                 <div class="row">
-                    <table id="deploymentTable"></table>
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th ng-repeat="header in tableHeaders">{{header}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="row in lstDeployments">
+                            <td>{{row.jobNo}}</td>
+                            <td>{{row.prNumber}}</td>
+                            <td ng-show="row.boolSfdcValidationRunning === true">
+                                <div class="{{row.sfdcValidationRunning}}"></div>
+                            </td>
+                            <td ng-show="row.boolSfdcValidationFail === true">
+                                <div class="{{row.sfdcValidationFail}}"></div>
+                            </td>
+                            <td ng-show="row.boolSfdcValidationPass === true">
+                                <div class="{{row.sfdcValidationPass}}"></div>
+                            </td>
+                            <td ng-show="row.boolCodeReviewValidationRunning === true">
+                                <div class="{{row.codeReviewValidationRunning}}"></div>
+                            </td>
+                            <td ng-show="row.boolCodeReviewValidationFail === true">
+                                <div class="{{row.codeReviewValidationFail}}"></div>
+                            </td>
+                            <td ng-show="row.boolCodeReviewValidationPass === true">
+                                <div class="{{row.codeReviewValidationPass}}"></div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
 

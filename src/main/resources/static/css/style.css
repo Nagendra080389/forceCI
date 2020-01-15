@@ -2,3 +2,45 @@ a.btn.btn-github.btn-user.btn-block {
     background-color: black;
     color: white;
 }
+
+
+@-moz-keyframes blink {0%{opacity:1;} 50%{opacity:0.5;} 100%{opacity:1;}} /* Firefox */
+@-webkit-keyframes blink {0%{opacity:1;} 50%{opacity:0.5;} 100%{opacity:1;}} /* Webkit */
+@-ms-keyframes blink {0%{opacity:1;} 50%{opacity:0.5;} 100%{opacity:1;}} /* IE */
+@keyframes blink {0%{opacity:1;} 50%{opacity:0.5;} 100%{opacity:1;}} /* Opera */
+
+.validationRunning {
+    background-color: #a9b2b5;
+    padding: 15px 15px 15px 15px;
+    text-align:center;
+    margin-bottom: 4px;
+    font-size: 24px;
+    border-radius: 5px;
+    -moz-transition:all 0.5s ease-in-out;
+    -webkit-transition:all 0.5s ease-in-out;
+    -o-transition:all 0.5s ease-in-out;
+    -ms-transition:all 0.5s ease-in-out;
+    transition:all 0.5s ease-in-out;
+    -moz-animation:blink normal 1.5s infinite ease-in-out; /* Firefox */
+    -webkit-animation:blink normal 1.5s infinite ease-in-out; /* Webkit */
+    -ms-animation:blink normal 1.5s infinite ease-in-out; /* IE */
+    animation:blink normal 1.5s infinite ease-in-out; /* Opera */
+}
+
+.validationPass {
+    background-color: #61da5f;
+    padding: 15px 15px 15px 15px;
+    text-align:center;
+    margin-bottom: 4px;
+    font-size: 24px;
+    border-radius: 5px;
+}
+
+.validationFail {
+    background-color: #f12929;
+    padding: 15px 15px 15px 15px;
+    text-align:center;
+    margin-bottom: 4px;
+    font-size: 24px;
+    border-radius: 5px;
+}
