@@ -116,22 +116,27 @@ public class ForceCIController {
     }
 
     @GetMapping("/asyncDeployments")
-    public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoName, @RequestParam String branchName) {
+    public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoId, @RequestParam String branchName) {
         final SseEmitter emitter = new SseEmitter();
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
         executor.execute(() -> {
             try {
-                /*if (StringUtils.hasText(eventName) && StringUtils.hasText(userId) && redisEventDataRepository != null) {
-                    String bySchemaName = redisEventDataRepository.findByUserId(userId);
-                    System.out.println("bySchemaName -> "+bySchemaName);
-                    System.out.println("userId -> "+userId);
-                    if (bySchemaName != null) {
-                        emitter.send(bySchemaName);
+                if (StringUtils.hasText(userName) && StringUtils.hasText(repoId) && StringUtils.hasText(branchName)) {
+                    List<DeploymentJob> byTargetBranch = deploymentJobMongoRepository.findByRepoId(repoId);
+                    List<DeploymentJobWrapper> jobWrapperList = new ArrayList<>();
+                    if(byTargetBranch != null && !byTargetBranch.isEmpty()){
+                        for (DeploymentJob targetBranch : byTargetBranch) {
+                            DeploymentJobWrapper deploymentJobWrapper = new DeploymentJobWrapper();
+                            deploymentJobWrapper.setId(targetBranch.getId());
+                            deploymentJobWrapper.setJobNo(targetBranch.getJobId());
+                            deploymentJobWrapper.setPrNumber(targetBranch.getPullRequestNumber());
+                            jobWrapperList.add(deploymentJobWrapper);
+                        }
+                        emitter.send(jobWrapperList);
                     }
-                }*/
+                }
                 emitter.complete();
-                //redisEventDataRepository.delete(userId);
 
             } catch (Exception e) {
                 emitter.completeWithError(e);
@@ -611,13 +616,14 @@ public class ForceCIController {
         Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(targetBranch);
         String queue_name = develop.getProperty("QUEUE_NAME");
 
-        Long aLong = deploymentJobMongoRepository.countByTargetBranch(targetBranch);
+        Long aLong = deploymentJobMongoRepository.countByRepoId(gitRepoId);
         System.out.println("aLong -> "+aLong);
         // Create the object detail to be passed to RabbitMQ
         DeploymentJob deploymentJob = new DeploymentJob();
         if(aLong != null) {
             deploymentJob.setJobId(String.valueOf(aLong.intValue() + 1));
         }
+        deploymentJob.setRepoId(gitRepoId);
         deploymentJob.setPullRequestNumber(prNumber);
         deploymentJob.setPullRequestHtmlUrl(prHtmlURL);
         deploymentJob.setPullRequestTitle(prTitle);

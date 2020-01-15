@@ -110,7 +110,8 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                                     title: 'OK',
                                     message: 'App deleted successfully'
                                 });
-                                $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
+                                let gitHubOwner = localStorage.getItem('githubOwner');
+                                $http.get("/fetchRepositoryInDB?gitHubUser=" + gitHubOwner).then(function (response) {
                                     $scope.lstRepositoryData = [];
                                     if (response.data.length > 0) {
                                         for (let i = 0; i < response.data.length; i++) {

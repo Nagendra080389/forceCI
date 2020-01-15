@@ -23,6 +23,7 @@ public class DeploymentJob implements Serializable {
     private String targetBranch;
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
+    private String repoId;
     private List<String> lstBuildLines;
     private boolean boolSfdcCompleted;
     private boolean boolSfdcRunning;
@@ -226,6 +227,14 @@ public class DeploymentJob implements Serializable {
 
     public void setPullRequestHtmlUrl(String pullRequestHtmlUrl) {
         this.pullRequestHtmlUrl = pullRequestHtmlUrl;
+    }
+
+    public String getRepoId() {
+        return repoId;
+    }
+
+    public void setRepoId(String repoId) {
+        this.repoId = repoId;
     }
 
     @Override
