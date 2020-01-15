@@ -545,48 +545,9 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     // table headers that we need to show
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Salesforce Validation', 'CodeReview Validation'];
 
-    const objDeployment = {
-        jobNo : 1,
-        prNumber : 112,
-        boolSfdcValidationRunning : false,
-        boolSfdcValidationPass : true,
-        boolSfdcValidationFail : false,
-        sfdcValidationRunning : 'validationRunning',
-        sfdcValidationPass : 'validationPass',
-        sfdcValidationFail : 'validationFail',
-        boolCodeReviewValidationRunning : false,
-        boolCodeReviewValidationPass : false,
-        boolCodeReviewValidationFail : true,
-        codeReviewValidationRunning : 'validationRunning',
-        codeReviewValidationPass : 'validationPass',
-        codeReviewValidationFail : 'validationFail'
-    };
-
-    const objDeployment1 = {
-        jobNo : 1,
-        prNumber : 112,
-        boolSfdcValidationRunning : true,
-        boolSfdcValidationPass : false,
-        boolSfdcValidationFail : false,
-        sfdcValidationRunning : 'validationRunning',
-        sfdcValidationPass : 'validationPass',
-        sfdcValidationFail : 'validationFail',
-        boolCodeReviewValidationRunning : false,
-        boolCodeReviewValidationPass : false,
-        boolCodeReviewValidationFail : true,
-        codeReviewValidationRunning : 'validationRunning',
-        codeReviewValidationPass : 'validationPass',
-        codeReviewValidationFail : 'validationFail'
-    };
-
     $scope.lstDeployments = [];
     $scope.lstDeployments.push(objDeployment);
 
-
-    setTimeout(function () {
-        $scope.lstDeployments.push(objDeployment1);
-        $scope.$apply();
-    }, 10000)
 
 
 });
