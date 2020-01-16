@@ -589,9 +589,9 @@ public class ForceCIController {
                                   RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
         String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
-        String prHtmlURL = repositoryJsonObject.get("html_url").getAsString();
-        String prNumber = repositoryJsonObject.get("number").getAsString();
-        String prTitle = repositoryJsonObject.get("title").getAsString();
+        String prHtmlURL = pullRequestJsonObject.get("html_url").getAsString();
+        String prNumber = pullRequestJsonObject.get("number").getAsString();
+        String prTitle = pullRequestJsonObject.get("title").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
         String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
         String repoName = pullRequestJsonObject.get("base").getAsJsonObject().get("repo").getAsJsonObject().get("name").getAsString();
