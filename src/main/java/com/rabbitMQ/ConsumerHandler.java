@@ -57,6 +57,7 @@ public class ConsumerHandler {
 
     public void handleMessage(DeploymentJob deploymentJob) {
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
+        System.out.println("deploymentJob handleMessage -> "+deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
             createTempDirectoryForDeployment(deploymentJob);
@@ -192,7 +193,7 @@ public class ConsumerHandler {
                 }
 
                 deploymentJob.setLastModifiedDate(new Date());
-
+                System.out.println("deploymentJob before save -> "+deploymentJob.getId());
                 deploymentJobMongoRepository.save(deploymentJob);
             } catch (Exception e) {
                 e.printStackTrace();
