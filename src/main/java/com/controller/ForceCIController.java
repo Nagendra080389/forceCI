@@ -132,6 +132,7 @@ public class ForceCIController {
                             deploymentJobWrapper.setId(targetBranch.getId());
                             deploymentJobWrapper.setJobNo(targetBranch.getJobId());
                             deploymentJobWrapper.setPrNumber(targetBranch.getPullRequestNumber());
+                            deploymentJobWrapper.setPrHtml(targetBranch.getPullRequestHtmlUrl());
                             if(targetBranch.isBoolSfdcRunning()){
                                 deploymentJobWrapper.setBoolSfdcValidationRunning(true);
                                 deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());

@@ -6,6 +6,7 @@ public class DeploymentJobWrapper implements Serializable {
     private String id;
     private String jobNo;
     private String prNumber;
+    private String prHtml;
     private boolean boolSfdcValidationRunning;
     private boolean boolSfdcValidationPass;
     private boolean boolSfdcValidationFail;
@@ -18,6 +19,14 @@ public class DeploymentJobWrapper implements Serializable {
     private String codeReviewValidationRunning;
     private String codeReviewValidationPass;
     private String codeReviewValidationFail;
+
+    public String getPrHtml() {
+        return prHtml;
+    }
+
+    public void setPrHtml(String prHtml) {
+        this.prHtml = prHtml;
+    }
 
     public String getId() {
         return id;

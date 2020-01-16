@@ -155,7 +155,7 @@
                         <tbody>
                         <tr ng-repeat="row in lstDeployments">
                             <td>{{row.jobNo}}</td>
-                            <td>{{row.prNumber}}</td>
+                            <td><a href="{{row.prHtml}}" target="_blank">{{row.prNumber}}</a></td>
                             <td ng-show="row.boolSfdcValidationRunning === true">
                                 <div class="{{row.sfdcValidationRunning}}"></div>
                             </td>
