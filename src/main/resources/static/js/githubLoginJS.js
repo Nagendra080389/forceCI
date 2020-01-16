@@ -547,7 +547,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 
     const sse = new EventSource('/asyncDeployments?userName='+$scope.userName+'&repoId='+$scope.repoId+'&branchName='+$scope.branchName);
     sse.addEventListener("message", function(e) {
-        console.log(e.data)
+        $scope.lstDeployments(JSON.parse(e.data))
     })
 
 
