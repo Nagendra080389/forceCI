@@ -14,6 +14,7 @@ import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.utils.ApiSecurity;
+import com.utils.ValidationStatus;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -131,6 +132,18 @@ public class ForceCIController {
                             deploymentJobWrapper.setId(targetBranch.getId());
                             deploymentJobWrapper.setJobNo(targetBranch.getJobId());
                             deploymentJobWrapper.setPrNumber(targetBranch.getPullRequestNumber());
+                            if(targetBranch.isBoolSfdcRunning()){
+                                deploymentJobWrapper.setBoolSfdcValidationRunning(true);
+                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
+                            }
+                            if(targetBranch.isBoolSfdcPass()) {
+                                deploymentJobWrapper.setBoolSfdcValidationPass(true);
+                                deploymentJobWrapper.setSfdcValidationPass(ValidationStatus.VALIDATION_PASS.getText());
+                            }
+                            if(targetBranch.isBoolSfdcFail()) {
+                                deploymentJobWrapper.setBoolSfdcValidationFail(true);
+                                deploymentJobWrapper.setSfdcValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
+                            }
                             jobWrapperList.add(deploymentJobWrapper);
                         }
                         emitter.send(jobWrapperList);
