@@ -180,12 +180,14 @@ public class ConsumerHandler {
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
                         deploymentJob.setBoolSfdcCompleted(true);
+                        deploymentJob.setBoolSfdcRunning(false);
                         deploymentJob.setBoolSfdcPass(true);
                         deploymentJob.setBoolCodeReviewCompleted(false);
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
                         deploymentJob.setBoolSfdcCompleted(true);
-                        deploymentJob.setBoolSfdcFail(false);
+                        deploymentJob.setBoolSfdcRunning(false);
+                        deploymentJob.setBoolSfdcFail(true);
                         deploymentJob.setBoolCodeReviewCompleted(false);
                         break;
                     }
