@@ -147,8 +147,8 @@ public class ForceCIController {
                             }
                             jobWrapperList.add(deploymentJobWrapper);
                         }
-                        emitter.send(jobWrapperList);
                     }
+                    emitter.send(jobWrapperList);
                 }
                 emitter.complete();
 
