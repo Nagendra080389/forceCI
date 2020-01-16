@@ -57,7 +57,6 @@ public class ConsumerHandler {
 
     public void handleMessage(DeploymentJob deploymentJob) {
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
-        System.out.println("deploymentJob handleMessage -> "+optionalDeploymentJob.get().getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
             createTempDirectoryForDeployment(deploymentJob);
@@ -141,7 +140,6 @@ public class ConsumerHandler {
                         lstFileLines.add(eachLine);
                     }
                 }
-                System.out.println("lstFileLines -> "+lstFileLines.get(0));
                 deploymentJob.setLstBuildLines(lstFileLines);
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
                     System.out.println("eachBuildLine -> " + eachBuildLine);
@@ -177,10 +175,7 @@ public class ConsumerHandler {
                         SFDCConnectionDetails newSfdcConnection = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetail);
                         deploymentJob.setSfdcConnectionDetail(newSfdcConnection);
                         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
-                        System.out.println("deploymentJob savedDeploymentJob save -> "+savedDeploymentJob.getId());
-                        System.out.println("deploymentJob savedDeploymentJob isBoolSfdcRunning -> "+savedDeploymentJob.isBoolSfdcRunning());
-                        System.out.println("deploymentJob savedDeploymentJob isBoolSfdcPass -> "+savedDeploymentJob.isBoolSfdcPass());
-                        handleMessage(savedDeploymentJob);
+                        createTempDirectoryForDeployment(savedDeploymentJob);
 
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
@@ -197,9 +192,6 @@ public class ConsumerHandler {
                 }
 
                 deploymentJob.setLastModifiedDate(new Date());
-                System.out.println("deploymentJob before save -> "+deploymentJob.getId());
-                System.out.println("deploymentJob before isBoolSfdcRunning -> "+deploymentJob.isBoolSfdcRunning());
-                System.out.println("deploymentJob before isBoolSfdcPass -> "+deploymentJob.isBoolSfdcPass());
                 deploymentJobMongoRepository.save(deploymentJob);
             } catch (Exception e) {
                 e.printStackTrace();
