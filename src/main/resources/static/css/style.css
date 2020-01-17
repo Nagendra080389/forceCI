@@ -15,7 +15,9 @@ a.btn.btn-github.btn-user.btn-block {
     text-align:center;
     margin-bottom: 4px;
     font-size: 24px;
-    border-radius: 5px;
+    border-radius: 15px;
+    width: 1rem;
+    height: 1rem;
     -moz-transition:all 0.5s ease-in-out;
     -webkit-transition:all 0.5s ease-in-out;
     -o-transition:all 0.5s ease-in-out;
@@ -33,7 +35,9 @@ a.btn.btn-github.btn-user.btn-block {
     text-align:center;
     margin-bottom: 4px;
     font-size: 24px;
-    border-radius: 5px;
+    border-radius: 15px;
+    width: 1rem;
+    height: 1rem;
 }
 
 .validationFail {
@@ -42,5 +46,7 @@ a.btn.btn-github.btn-user.btn-block {
     text-align:center;
     margin-bottom: 4px;
     font-size: 24px;
-    border-radius: 5px;
+    border-radius: 15px;
+    width: 1rem;
+    height: 1rem;
 }
