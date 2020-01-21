@@ -1,6 +1,7 @@
 package com.rabbitMQ;
 
 import com.model.SFDCConnectionDetails;
+import com.pmd.PMDStructure;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -40,6 +41,7 @@ public class DeploymentJob implements Serializable {
     private Date createdDate;
     @LastModifiedDate
     private Date lastModifiedDate;
+    private List<PMDStructure> lstPmdStructures;
 
     public String getId() {
         return id;
@@ -235,6 +237,14 @@ public class DeploymentJob implements Serializable {
 
     public void setRepoId(String repoId) {
         this.repoId = repoId;
+    }
+
+    public List<PMDStructure> getLstPmdStructures() {
+        return lstPmdStructures;
+    }
+
+    public void setLstPmdStructures(List<PMDStructure> lstPmdStructures) {
+        this.lstPmdStructures = lstPmdStructures;
     }
 
     @Override

@@ -1,21 +1,22 @@
 package com.rabbitMQ;
 
+import com.controller.PmdReviewService;
 import com.dao.DeploymentJobMongoRepository;
 import com.dao.SFDCConnectionDetailsMongoRepository;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.model.SFDCConnectionDetails;
+import com.pmd.PMDStructure;
 import com.utils.AntExecutor;
+import net.sourceforge.pmd.*;
+import net.sourceforge.pmd.util.ResourceLoader;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -94,6 +95,7 @@ public class ConsumerHandler {
                 InputStream gitDiffBeforeMerge = classLoader.getResourceAsStream("build/get_diff_branches.sh");
                 InputStream gitDiffAfterMerge = classLoader.getResourceAsStream("build/get_diff_commits.sh");
                 InputStream propertiesHelper = classLoader.getResourceAsStream("build/properties_helper.sh");
+                InputStream ruleSetsInputStream = classLoader.getResourceAsStream("xml/ruleSet.xml");
                 File buildFile = stream2file(buildXml, "build", ".xml");
                 File antJar = stream2file(antSalesforce, "ant-salesforce", ".jar");
                 File create_changes = stream2file(createChanges, "create_changes", ".sh");
@@ -103,6 +105,7 @@ public class ConsumerHandler {
                 File get_diff_branches = stream2file(gitDiffBeforeMerge, "get_diff_branches", ".sh");
                 File get_diff_commits = stream2file(gitDiffAfterMerge, "get_diff_commits", ".sh");
                 File properties_helper = stream2file(propertiesHelper, "properties_helper", ".sh");
+                File ruleSet = ConsumerHandler.stream2file(ruleSetsInputStream, "ruleSet", ".xml");
 
                 propertiesMap.put("diffDir", tempDirectory.toFile().getPath() + "/deploy");
                 propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
@@ -182,18 +185,68 @@ public class ConsumerHandler {
                         deploymentJob.setBoolSfdcCompleted(true);
                         deploymentJob.setBoolSfdcRunning(false);
                         deploymentJob.setBoolSfdcPass(true);
+                        deploymentJob.setBoolSfdcFail(false);
                         deploymentJob.setBoolCodeReviewCompleted(false);
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
                         deploymentJob.setBoolSfdcCompleted(true);
                         deploymentJob.setBoolSfdcRunning(false);
                         deploymentJob.setBoolSfdcFail(true);
+                        deploymentJob.setBoolSfdcPass(false);
                         deploymentJob.setBoolCodeReviewCompleted(false);
                         break;
                     }
                 }
 
                 deploymentJob.setLastModifiedDate(new Date());
+                deploymentJob.setBoolCodeReviewRunning(true);
+                deploymentJobMongoRepository.save(deploymentJob);
+
+                PMDConfiguration pmdConfiguration = new PMDConfiguration();
+                pmdConfiguration.setReportFormat("text");
+                pmdConfiguration.setRuleSets(ruleSet.getPath());
+                pmdConfiguration.setThreads(4);
+
+                SourceCodeProcessor sourceCodeProcessor = new SourceCodeProcessor(pmdConfiguration);
+                RuleSetFactory ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(pmdConfiguration, new ResourceLoader());
+                RuleSets ruleSets = RulesetsFactoryUtils.getRuleSetsWithBenchmark(pmdConfiguration.getRuleSets(), ruleSetFactory);
+
+                PmdReviewService pmdReviewService = new PmdReviewService(sourceCodeProcessor, ruleSets);
+
+                Iterator<File> fileIterator = FileUtils.iterateFiles(new File(tempDirectory.toFile().getPath() + "/deploy"),null, true);
+                List<PMDStructure> pmdStructures = new ArrayList<>();
+                FileInputStream fileInputStream = null;
+                while(fileIterator.hasNext()){
+                    File next = fileIterator.next();
+                    fileInputStream = new FileInputStream(next);
+                    try {
+                        List<RuleViolation> review = pmdReviewService.review(fileInputStream, next);
+                        for (RuleViolation ruleViolation : review) {
+                            PMDStructure pmdStructure = new PMDStructure();
+                            pmdStructure.setReviewFeedback(ruleViolation.getDescription());
+                            pmdStructure.setLineNumber(ruleViolation.getBeginLine());
+                            pmdStructure.setName(next.getName());
+                            pmdStructure.setRuleName(ruleViolation.getRule().getName());
+                            pmdStructure.setRuleUrl(ruleViolation.getRule().getExternalInfoUrl());
+                            pmdStructure.setRulePriority(ruleViolation.getRule().getPriority().getPriority());
+                            pmdStructures.add(pmdStructure);
+                        }
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }finally {
+                        fileInputStream.close();
+                    }
+                }
+                if(!pmdStructures.isEmpty()){
+                    deploymentJob.setBoolCodeReviewRunning(false);
+                    deploymentJob.setBoolCodeReviewFail(true);
+                    deploymentJob.setBoolCodeReviewCompleted(true);
+                    deploymentJob.setLstPmdStructures(pmdStructures);
+                } else {
+                    deploymentJob.setBoolCodeReviewRunning(false);
+                    deploymentJob.setBoolCodeReviewPass(true);
+                    deploymentJob.setBoolCodeReviewCompleted(true);
+                }
                 deploymentJobMongoRepository.save(deploymentJob);
             } catch (Exception e) {
                 e.printStackTrace();
