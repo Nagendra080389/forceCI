@@ -172,9 +172,9 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
         if (Integer.parseInt(deploymentJobWrapper.getJobNo()) == Integer.parseInt(this.jobNo)) {
             return 0;
         } else if (Integer.parseInt(deploymentJobWrapper.getJobNo()) > Integer.parseInt(this.jobNo)) {
-            return -1;
-        } else {
             return 1;
+        } else {
+            return -1;
         }
     }
 }
