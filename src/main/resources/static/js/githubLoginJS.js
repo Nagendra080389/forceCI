@@ -1,4 +1,4 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect','ngSanitize']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize']);
 let webSocket;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
@@ -543,6 +543,11 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     // table headers that we need to show
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Validation Status', 'Deployment Status'];
 
+    const sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
+    sse.addEventListener("message", function (e) {
+        $scope.lstDeployments = JSON.parse(e.data);
+        $scope.$apply();
+    })
 
 
 });

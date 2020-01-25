@@ -135,19 +135,19 @@ public class ForceCIController {
                             deploymentJobWrapper.setPrHtml(targetBranch.getPullRequestHtmlUrl());
                             if(targetBranch.isBoolCodeReviewNotStarted()){
                                 deploymentJobWrapper.setBoolCodeReviewNotStarted(true);
-                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_NOTSTARTED.getText());
+                                deploymentJobWrapper.setCodeReviewValidationNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
                             }
                             if(targetBranch.isBoolCodeReviewPass()){
                                 deploymentJobWrapper.setBoolCodeReviewValidationPass(true);
-                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_PASS.getText());
+                                deploymentJobWrapper.setCodeReviewValidationPass(ValidationStatus.VALIDATION_PASS.getText());
                             }
                             if(targetBranch.isBoolCodeReviewRunning()){
                                 deploymentJobWrapper.setBoolCodeReviewValidationRunning(true);
-                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
+                                deploymentJobWrapper.setCodeReviewValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
                             }
                             if(targetBranch.isBoolCodeReviewFail()){
                                 deploymentJobWrapper.setBoolCodeReviewValidationFail(true);
-                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_FAIL.getText());
+                                deploymentJobWrapper.setCodeReviewValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
                             }
                             if(targetBranch.isBoolSfdcRunning()){
                                 deploymentJobWrapper.setBoolSfdcValidationRunning(true);
