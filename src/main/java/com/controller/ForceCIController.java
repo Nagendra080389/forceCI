@@ -701,27 +701,37 @@ public class ForceCIController {
             deploymentJob.setJobId(String.valueOf(aLong.intValue() + 1));
         }
         deploymentJob.setRepoId(gitRepoId);
-        deploymentJob.setPullRequestNumber(prNumber);
-        deploymentJob.setPullRequestHtmlUrl(prHtmlURL);
-        deploymentJob.setPullRequestTitle(prTitle);
+        if(StringUtils.hasText(prNumber)) {
+            deploymentJob.setPullRequestNumber(prNumber);
+        }
+        if(StringUtils.hasText(prHtmlURL)) {
+            deploymentJob.setPullRequestHtmlUrl(prHtmlURL);
+        }
+        if(StringUtils.hasText(prTitle)) {
+            deploymentJob.setPullRequestTitle(prTitle);
+        }
         deploymentJob.setAccess_token(access_token);
         deploymentJob.setSfdcConnectionDetail(sfdcConnectionDetail);
         deploymentJob.setEmailId(emailId);
         deploymentJob.setUserName(userName);
         deploymentJob.setGitCloneURL(gitCloneURL);
-        deploymentJob.setSourceBranch(sourceBranch);
+        if(StringUtils.hasText(sourceBranch)) {
+            deploymentJob.setSourceBranch(sourceBranch);
+        }
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
         deploymentJob.setBoolSfdcCompleted(false);
-        deploymentJob.setBoolSfdcRunning(true);
-        deploymentJob.setBoolMerge(false);
-        deploymentJob.setBoolSfdcDeploymentNotStarted(true);
-        deploymentJob.setBoolCodeReviewNotStarted(true);
         deploymentJob.setBaseSHA(baseSHA);
         if(merge) {
             deploymentJob.setBoolMerge(true);
             deploymentJob.setBoolSfdcDeploymentNotStarted(false);
             deploymentJob.setBoolSfdcDeploymentRunning(true);
+        } else {
+            deploymentJob.setBoolSfdcRunning(true);
+            deploymentJob.setBoolMerge(false);
+            deploymentJob.setBoolSfdcDeploymentNotStarted(true);
+            deploymentJob.setBoolCodeReviewNotStarted(true);
+
         }
         deploymentJob.setCreatedDate(new Date());
         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
