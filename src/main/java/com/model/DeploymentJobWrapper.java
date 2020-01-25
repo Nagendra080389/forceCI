@@ -2,7 +2,7 @@ package com.model;
 
 import java.io.Serializable;
 
-public class DeploymentJobWrapper implements Serializable {
+public class DeploymentJobWrapper implements Serializable, Comparable<DeploymentJobWrapper> {
     private String id;
     private String jobNo;
     private String prNumber;
@@ -167,4 +167,14 @@ public class DeploymentJobWrapper implements Serializable {
         this.boolCodeReviewNotStarted = boolCodeReviewNotStarted;
     }
 
+    @Override
+    public int compareTo(DeploymentJobWrapper deploymentJobWrapper) {
+        if (Integer.parseInt(deploymentJobWrapper.getJobNo()) == Integer.parseInt(this.jobNo)) {
+            return 0;
+        } else if (Integer.parseInt(deploymentJobWrapper.getJobNo()) > Integer.parseInt(this.jobNo)) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
 }
