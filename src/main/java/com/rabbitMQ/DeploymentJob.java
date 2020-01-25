@@ -34,6 +34,7 @@ public class DeploymentJob implements Serializable {
     private boolean boolCodeReviewRunning;
     private boolean boolCodeReviewPass;
     private boolean boolCodeReviewFail;
+    private boolean boolMerge;
 
     public boolean isBoolCodeReviewNotStarted() {
         return boolCodeReviewNotStarted;
@@ -255,6 +256,14 @@ public class DeploymentJob implements Serializable {
 
     public void setLstPmdStructures(List<PMDStructure> lstPmdStructures) {
         this.lstPmdStructures = lstPmdStructures;
+    }
+
+    public boolean isBoolMerge() {
+        return boolMerge;
+    }
+
+    public void setBoolMerge(boolean boolMerge) {
+        this.boolMerge = boolMerge;
     }
 
     @Override

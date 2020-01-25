@@ -195,6 +195,19 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label required" for="inputTestLevel">Test Level</label>
+                                            <div class="col-sm-10">
+                                                <div class="dropdown bootstrap-select">
+                                                    <select class="form-control" id="inputTestLevel" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.testLevel">
+                                                        <option selected value="NoTestRun">NoTestRun</option>
+                                                        <option value="RunSpecifiedTests">RunSpecifiedTests</option>
+                                                        <option value="RunLocalTests">RunLocalTests</option>
+                                                        <option value="RunAllTestsInOrg">RunAllTestsInOrg</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
                                             <label class="col-sm-2 col-form-label required" for="salesforceLoginl3">Salesforce Login</label>
                                             <div class="col-sm-10">
                                                 <input class="form-control" id="salesforceLoginl3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.userName"

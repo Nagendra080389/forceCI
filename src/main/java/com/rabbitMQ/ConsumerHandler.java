@@ -34,28 +34,6 @@ public class ConsumerHandler {
         this.sfdcConnectionDetailsMongoRepository = sfdcConnectionDetailsMongoRepository;
     }
 
-    public static File stream2file(InputStream in) throws IOException {
-        final File tempFile = File.createTempFile("build", ".xml");
-        tempFile.deleteOnExit();
-        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
-            IOUtils.copy(in, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tempFile;
-    }
-
-    public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
-        final File tempFile = File.createTempFile(prefix, suffix);
-        tempFile.deleteOnExit();
-        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
-            IOUtils.copy(in, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tempFile;
-    }
-
     public void handleMessage(DeploymentJob deploymentJob) {
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
@@ -81,9 +59,15 @@ public class ConsumerHandler {
             String gitCloneURL = deploymentJob.getGitCloneURL();
             String sourceBranch = deploymentJob.getSourceBranch();
             String targetBranch = deploymentJob.getTargetBranch();
+            boolean merge = deploymentJob.isBoolMerge();
 
             Map<String, String> propertiesMap = new HashMap<>();
-            Path tempDirectory = Files.createTempDirectory(sourceBranch);
+            Path tempDirectory = null;
+            if(merge){
+                tempDirectory = Files.createTempDirectory(targetBranch);
+            } else {
+                tempDirectory = Files.createTempDirectory(sourceBranch);
+            }
 
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             try {
@@ -112,19 +96,26 @@ public class ConsumerHandler {
                 propertiesMap.put("diffDirUpLevel", tempDirectory.toFile().getPath());
 
                 propertiesMap.put("generatePackage", tempDirectory.toFile().getPath() + "/final.txt");
-                propertiesMap.put("scriptName", get_diff_branches.getName());
                 propertiesMap.put("gitClone", get_clone.getName());
                 propertiesMap.put("create_changes", create_changes.getName());
                 propertiesMap.put("generate_package", generate_package.getName());
                 propertiesMap.put("originURL", gitCloneURL);
                 propertiesMap.put("antPath", antJar.getPath());
                 // Only run on Merge
-                propertiesMap.put("get_diff_commits", get_diff_commits.getName());
+                if(merge) {
+                    propertiesMap.put("scriptName", get_diff_commits.getName());
+                } else {
+                    propertiesMap.put("scriptName", get_diff_branches.getName());
+                }
                 propertiesMap.put("generate_package_unix", generate_package_unix.getName());
                 propertiesMap.put("userEmail", emailId);
                 propertiesMap.put("userName", userName);
                 propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
-                propertiesMap.put("sf.checkOnly", "true");
+                if(merge){
+                    propertiesMap.put("sf.checkOnly", "false");
+                } else {
+                    propertiesMap.put("sf.checkOnly", "true");
+                }
                 propertiesMap.put("sf.pollWaitMillis", "100000");
                 propertiesMap.put("sf.runAllTests", "false");
                 propertiesMap.put("target", targetBranch);
@@ -132,7 +123,7 @@ public class ConsumerHandler {
                 propertiesMap.put("sf.maxPoll", "100");
                 propertiesMap.put("sf.deploy.sessionId", sfdcConnectionDetail.getOauthToken());
                 propertiesMap.put("sf.logType", "None");
-                propertiesMap.put("sf.testRun", "NoTestRun");
+                propertiesMap.put("sf.testRun", sfdcConnectionDetail.getTestLevel());
                 propertiesMap.put("targetName", targetBranch);
 
                 List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
@@ -146,7 +137,6 @@ public class ConsumerHandler {
                 }
                 deploymentJob.setLstBuildLines(lstFileLines);
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
-                    System.out.println("eachBuildLine -> " + eachBuildLine);
                     if (eachBuildLine.contains("Failed to login: INVALID_SESSION_ID")) {
                         // try to get proper access token again
                         String refreshToken = sfdcConnectionDetail.getRefreshToken();
@@ -203,7 +193,7 @@ public class ConsumerHandler {
                 deploymentJob.setLastModifiedDate(new Date());
                 deploymentJobMongoRepository.save(deploymentJob);
 
-                if(sfdcPass){
+                if(sfdcPass && !merge){
                     deploymentJob.setBoolCodeReviewRunning(true);
                     deploymentJob.setBoolCodeReviewNotStarted(false);
                     deploymentJobMongoRepository.save(deploymentJob);
@@ -264,5 +254,27 @@ public class ConsumerHandler {
             e.printStackTrace();
         }
         return lstFileLines;
+    }
+
+    public static File stream2file(InputStream in) throws IOException {
+        final File tempFile = File.createTempFile("build", ".xml");
+        tempFile.deleteOnExit();
+        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
+            IOUtils.copy(in, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempFile;
+    }
+
+    public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
+        final File tempFile = File.createTempFile(prefix, suffix);
+        tempFile.deleteOnExit();
+        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
+            IOUtils.copy(in, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempFile;
     }
 }

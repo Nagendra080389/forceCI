@@ -339,10 +339,19 @@ public class ForceCIController {
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
                     start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin);
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin, false);
                 }
                 break;
             case "push":
+                String pushUser = jsonObject.get("repository").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString();
+                UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(pushUser);
+                if (userWrapper != null) {
+                    access_token = userWrapper.getAccess_token();
+                    emailId = userWrapper.getEmail_Id();
+                }
+                System.out.println("A pull request was merged! Deployment start now...");
+                start_deployment(jsonObject, jsonObject.get("repository").getAsJsonObject(), access_token,
+                        sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin, true);
                 break;
             case "deployment":
                 if (!StringUtils.hasText(access_token)) {
@@ -616,17 +625,14 @@ public class ForceCIController {
     }
 
     private void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
-                                  SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository, SFDCConnectionDetails sfdcConnectionDetail, String emailId,
-                                  RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate) throws Exception {
-        String userName = pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString();
+                                  SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository,
+                                  SFDCConnectionDetails sfdcConnectionDetail, String emailId,
+                                  RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate, boolean merge) throws Exception {
+        String userName = repositoryJsonObject.get("owner").getAsJsonObject().get("login").getAsString();
         String gitCloneURL = repositoryJsonObject.get("clone_url").getAsString();
-        String prHtmlURL = pullRequestJsonObject.get("html_url").getAsString();
-        String prNumber = pullRequestJsonObject.get("number").getAsString();
-        String prTitle = pullRequestJsonObject.get("title").getAsString();
         String gitRepoId = repositoryJsonObject.get("id").getAsString();
-        String sourceBranch = pullRequestJsonObject.get("head").getAsJsonObject().get("ref").getAsString();
-        String repoName = pullRequestJsonObject.get("base").getAsJsonObject().get("repo").getAsJsonObject().get("name").getAsString();
-        String targetBranch = pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString();
+        String repoName = repositoryJsonObject.get("name").getAsString();
+        String targetBranch = pullRequestJsonObject.get("ref").getAsString().split("/")[2];
         List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(gitRepoId);
 
         if (byGitRepoId != null && !byGitRepoId.isEmpty()) {
@@ -655,24 +661,24 @@ public class ForceCIController {
             deploymentJob.setJobId(String.valueOf(aLong.intValue() + 1));
         }
         deploymentJob.setRepoId(gitRepoId);
-        deploymentJob.setPullRequestNumber(prNumber);
-        deploymentJob.setPullRequestHtmlUrl(prHtmlURL);
-        deploymentJob.setPullRequestTitle(prTitle);
         deploymentJob.setAccess_token(access_token);
         deploymentJob.setSfdcConnectionDetail(sfdcConnectionDetail);
         deploymentJob.setEmailId(emailId);
         deploymentJob.setUserName(userName);
         deploymentJob.setGitCloneURL(gitCloneURL);
-        deploymentJob.setSourceBranch(sourceBranch);
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
         deploymentJob.setBoolSfdcCompleted(false);
         deploymentJob.setBoolSfdcRunning(true);
-        deploymentJob.setBoolCodeReviewCompleted(false);
-        deploymentJob.setBoolCodeReviewRunning(false);
-        deploymentJob.setBoolCodeReviewFail(false);
-        deploymentJob.setBoolCodeReviewPass(false);
-        deploymentJob.setBoolCodeReviewNotStarted(true);
+        deploymentJob.setBoolMerge(false);
+        if(merge) {
+            deploymentJob.setBoolMerge(true);
+            deploymentJob.setBoolCodeReviewCompleted(false);
+            deploymentJob.setBoolCodeReviewRunning(false);
+            deploymentJob.setBoolCodeReviewFail(false);
+            deploymentJob.setBoolCodeReviewPass(false);
+            deploymentJob.setBoolCodeReviewNotStarted(true);
+        }
         deploymentJob.setCreatedDate(new Date());
         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
         rabbitTemplate.convertAndSend(repoName, queue_name, savedDeploymentJob);
