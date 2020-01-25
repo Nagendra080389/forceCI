@@ -697,7 +697,7 @@ public class ForceCIController {
             System.out.println("byRepoIdAndBaseSHA.get(0).getBaseSHA() -> "+byRepoIdAndBaseSHA.get(0).getBaseSHA());
             deploymentJob = byRepoIdAndBaseSHA.get(0);
         }
-        if(aLong != null) {
+        if(aLong != null && !merge) {
             deploymentJob.setJobId(String.valueOf(aLong.intValue() + 1));
         }
         deploymentJob.setRepoId(gitRepoId);

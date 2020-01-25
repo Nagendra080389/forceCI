@@ -42,6 +42,7 @@ public class ConsumerHandler {
             try {
                 DeploymentJob deploymentJobWithoutLogs = optionalDeploymentJob.get();
                 deploymentJobWithoutLogs.setLstBuildLines(new ArrayList<>());
+                deploymentJobWithoutLogs.setLstDeploymentBuildLines(new ArrayList<>());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -135,7 +136,11 @@ public class ConsumerHandler {
                         lstFileLines.add(eachLine);
                     }
                 }
-                deploymentJob.setLstBuildLines(lstFileLines);
+                if(merge){
+                    deploymentJob.setLstDeploymentBuildLines(lstFileLines);
+                } else {
+                    deploymentJob.setLstBuildLines(lstFileLines);
+                }
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
                     if (eachBuildLine.contains("Failed to login: INVALID_SESSION_ID")) {
                         // try to get proper access token again

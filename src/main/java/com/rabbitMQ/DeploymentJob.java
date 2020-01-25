@@ -27,6 +27,7 @@ public class DeploymentJob implements Serializable {
     private String repoId;
     private String baseSHA;
     private List<String> lstBuildLines;
+    private List<String> lstDeploymentBuildLines;
     private boolean boolSfdcCompleted;
     private boolean boolSfdcRunning;
     private boolean boolSfdcPass;
@@ -141,6 +142,14 @@ public class DeploymentJob implements Serializable {
 
     public void setJobId(String jobId) {
         this.jobId = jobId;
+    }
+
+    public List<String> getLstDeploymentBuildLines() {
+        return lstDeploymentBuildLines;
+    }
+
+    public void setLstDeploymentBuildLines(List<String> lstDeploymentBuildLines) {
+        this.lstDeploymentBuildLines = lstDeploymentBuildLines;
     }
 
     public List<String> getLstBuildLines() {
