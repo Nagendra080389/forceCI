@@ -34,6 +34,16 @@ public class DeploymentJob implements Serializable {
     private boolean boolCodeReviewRunning;
     private boolean boolCodeReviewPass;
     private boolean boolCodeReviewFail;
+
+    public boolean isBoolCodeReviewNotStarted() {
+        return boolCodeReviewNotStarted;
+    }
+
+    public void setBoolCodeReviewNotStarted(boolean boolCodeReviewNotStarted) {
+        this.boolCodeReviewNotStarted = boolCodeReviewNotStarted;
+    }
+
+    private boolean boolCodeReviewNotStarted;
     private String pullRequestNumber;
     private String pullRequestTitle;
     private String pullRequestHtmlUrl;

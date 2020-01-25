@@ -29,6 +29,18 @@ a.btn.btn-github.btn-user.btn-block {
     animation:blink normal 1.5s infinite ease-in-out; /* Opera */
 }
 
+
+.validationNotStarted {
+    background-color: #a9b2b5;
+    padding: 15px 15px 15px 15px;
+    text-align:center;
+    margin-bottom: 4px;
+    font-size: 24px;
+    border-radius: 15px;
+    width: 1rem;
+    height: 1rem;
+}
+
 .validationPass {
     background-color: #61da5f;
     padding: 15px 15px 15px 15px;

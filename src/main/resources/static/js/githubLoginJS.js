@@ -538,11 +538,12 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.repoName = $routeParams.repoName;
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
     $scope.branchName = $routeParams.branchConnectedTo;
+    $scope.lstDeployments = [];
 
     // table headers that we need to show
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Validation Status', 'Deployment Status'];
 
-    const objDeployment = {
+   /* const objDeployment = {
         jobNo : 1,
         prNumber : 112,
         boolSfdcValidationRunning : false,
@@ -558,21 +559,22 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
         sfdcDeploymentPass : 'validationPass',
         sfdcDeploymentFail : 'validationFail',
         boolCodeReviewValidationRunning : false,
+        boolCodeReviewValidationNotStarted : true,
         boolCodeReviewValidationPass : false,
-        boolCodeReviewValidationFail : true,
+        boolCodeReviewValidationFail : false,
         codeReviewValidationRunning : 'validationRunning',
         codeReviewValidationPass : 'validationPass',
-        codeReviewValidationFail : 'validationFail'
+        codeReviewValidationFail : 'validationFail',
+        codeReviewValidationNotStarted : 'validationNotStarted'
     };
 
-    $scope.lstDeployments = [];
-    $scope.lstDeployments.push(objDeployment);
+    $scope.lstDeployments.push(objDeployment);*/
 
-    // const sse = new EventSource('/asyncDeployments?userName='+$scope.userName+'&repoId='+$scope.repoId+'&branchName='+$scope.branchName);
-    // sse.addEventListener("message", function(e) {
-    //     $scope.lstDeployments = JSON.parse(e.data);
-    //     $scope.$apply();
-    // })
+     const sse = new EventSource('/asyncDeployments?userName='+$scope.userName+'&repoId='+$scope.repoId+'&branchName='+$scope.branchName);
+     sse.addEventListener("message", function(e) {
+         $scope.lstDeployments = JSON.parse(e.data);
+         $scope.$apply();
+     })
 
 
 });

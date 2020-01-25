@@ -16,9 +16,20 @@ public class DeploymentJobWrapper implements Serializable {
     private boolean boolCodeReviewValidationRunning;
     private boolean boolCodeReviewValidationPass;
     private boolean boolCodeReviewValidationFail;
+    private boolean boolCodeReviewNotStarted;
     private String codeReviewValidationRunning;
     private String codeReviewValidationPass;
     private String codeReviewValidationFail;
+
+    public String getCodeReviewValidationNotStarted() {
+        return codeReviewValidationNotStarted;
+    }
+
+    public void setCodeReviewValidationNotStarted(String codeReviewValidationNotStarted) {
+        this.codeReviewValidationNotStarted = codeReviewValidationNotStarted;
+    }
+
+    private String codeReviewValidationNotStarted;
 
     public String getPrHtml() {
         return prHtml;
@@ -147,4 +158,13 @@ public class DeploymentJobWrapper implements Serializable {
     public void setCodeReviewValidationFail(String codeReviewValidationFail) {
         this.codeReviewValidationFail = codeReviewValidationFail;
     }
+
+    public boolean isBoolCodeReviewNotStarted() {
+        return boolCodeReviewNotStarted;
+    }
+
+    public void setBoolCodeReviewNotStarted(boolean boolCodeReviewNotStarted) {
+        this.boolCodeReviewNotStarted = boolCodeReviewNotStarted;
+    }
+
 }

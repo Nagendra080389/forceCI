@@ -133,6 +133,22 @@ public class ForceCIController {
                             deploymentJobWrapper.setJobNo(targetBranch.getJobId());
                             deploymentJobWrapper.setPrNumber(targetBranch.getPullRequestNumber());
                             deploymentJobWrapper.setPrHtml(targetBranch.getPullRequestHtmlUrl());
+                            if(targetBranch.isBoolCodeReviewNotStarted()){
+                                deploymentJobWrapper.setBoolCodeReviewNotStarted(true);
+                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_NOTSTARTED.getText());
+                            }
+                            if(targetBranch.isBoolCodeReviewPass()){
+                                deploymentJobWrapper.setBoolCodeReviewValidationPass(true);
+                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_PASS.getText());
+                            }
+                            if(targetBranch.isBoolCodeReviewRunning()){
+                                deploymentJobWrapper.setBoolCodeReviewValidationRunning(true);
+                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
+                            }
+                            if(targetBranch.isBoolCodeReviewFail()){
+                                deploymentJobWrapper.setBoolCodeReviewValidationFail(true);
+                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_FAIL.getText());
+                            }
                             if(targetBranch.isBoolSfdcRunning()){
                                 deploymentJobWrapper.setBoolSfdcValidationRunning(true);
                                 deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
@@ -655,6 +671,7 @@ public class ForceCIController {
         deploymentJob.setBoolCodeReviewRunning(false);
         deploymentJob.setBoolCodeReviewFail(false);
         deploymentJob.setBoolCodeReviewPass(false);
+        deploymentJob.setBoolCodeReviewNotStarted(true);
         deploymentJob.setCreatedDate(new Date());
         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
         rabbitTemplate.convertAndSend(repoName, queue_name, savedDeploymentJob);

@@ -72,6 +72,7 @@ public class ConsumerHandler {
     }
 
     private List<String> createTempDirectoryForDeployment(DeploymentJob deploymentJob) {
+        boolean sfdcPass = false;
         List<String> lstFileLines = new ArrayList<>();
         try {
             SFDCConnectionDetails sfdcConnectionDetail = deploymentJob.getSfdcConnectionDetail();
@@ -187,6 +188,7 @@ public class ConsumerHandler {
                         deploymentJob.setBoolSfdcPass(true);
                         deploymentJob.setBoolSfdcFail(false);
                         deploymentJob.setBoolCodeReviewCompleted(false);
+                        sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
                         deploymentJob.setBoolSfdcCompleted(true);
@@ -199,55 +201,60 @@ public class ConsumerHandler {
                 }
 
                 deploymentJob.setLastModifiedDate(new Date());
-                deploymentJob.setBoolCodeReviewRunning(true);
                 deploymentJobMongoRepository.save(deploymentJob);
 
-                PMDConfiguration pmdConfiguration = new PMDConfiguration();
-                pmdConfiguration.setReportFormat("text");
-                pmdConfiguration.setRuleSets(ruleSet.getPath());
-                pmdConfiguration.setThreads(4);
+                if(sfdcPass){
+                    deploymentJob.setBoolCodeReviewRunning(true);
+                    deploymentJob.setBoolCodeReviewNotStarted(false);
+                    deploymentJobMongoRepository.save(deploymentJob);
+                    PMDConfiguration pmdConfiguration = new PMDConfiguration();
+                    pmdConfiguration.setReportFormat("text");
+                    pmdConfiguration.setRuleSets(ruleSet.getPath());
+                    pmdConfiguration.setThreads(4);
 
-                SourceCodeProcessor sourceCodeProcessor = new SourceCodeProcessor(pmdConfiguration);
-                RuleSetFactory ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(pmdConfiguration, new ResourceLoader());
-                RuleSets ruleSets = RulesetsFactoryUtils.getRuleSetsWithBenchmark(pmdConfiguration.getRuleSets(), ruleSetFactory);
+                    SourceCodeProcessor sourceCodeProcessor = new SourceCodeProcessor(pmdConfiguration);
+                    RuleSetFactory ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(pmdConfiguration, new ResourceLoader());
+                    RuleSets ruleSets = RulesetsFactoryUtils.getRuleSetsWithBenchmark(pmdConfiguration.getRuleSets(), ruleSetFactory);
 
-                PmdReviewService pmdReviewService = new PmdReviewService(sourceCodeProcessor, ruleSets);
+                    PmdReviewService pmdReviewService = new PmdReviewService(sourceCodeProcessor, ruleSets);
 
-                Iterator<File> fileIterator = FileUtils.iterateFiles(new File(tempDirectory.toFile().getPath() + "/deploy"),null, true);
-                List<PMDStructure> pmdStructures = new ArrayList<>();
-                FileInputStream fileInputStream = null;
-                while(fileIterator.hasNext()){
-                    File next = fileIterator.next();
-                    fileInputStream = new FileInputStream(next);
-                    try {
-                        List<RuleViolation> review = pmdReviewService.review(fileInputStream, next);
-                        for (RuleViolation ruleViolation : review) {
-                            PMDStructure pmdStructure = new PMDStructure();
-                            pmdStructure.setReviewFeedback(ruleViolation.getDescription());
-                            pmdStructure.setLineNumber(ruleViolation.getBeginLine());
-                            pmdStructure.setName(next.getName());
-                            pmdStructure.setRuleName(ruleViolation.getRule().getName());
-                            pmdStructure.setRuleUrl(ruleViolation.getRule().getExternalInfoUrl());
-                            pmdStructure.setRulePriority(ruleViolation.getRule().getPriority().getPriority());
-                            pmdStructures.add(pmdStructure);
+                    Iterator<File> fileIterator = FileUtils.iterateFiles(new File(tempDirectory.toFile().getPath() + "/deploy"),null, true);
+                    List<PMDStructure> pmdStructures = new ArrayList<>();
+                    FileInputStream fileInputStream = null;
+                    while(fileIterator.hasNext()){
+                        File next = fileIterator.next();
+                        fileInputStream = new FileInputStream(next);
+                        try {
+                            List<RuleViolation> review = pmdReviewService.review(fileInputStream, next);
+                            for (RuleViolation ruleViolation : review) {
+                                PMDStructure pmdStructure = new PMDStructure();
+                                pmdStructure.setReviewFeedback(ruleViolation.getDescription());
+                                pmdStructure.setLineNumber(ruleViolation.getBeginLine());
+                                pmdStructure.setName(next.getName());
+                                pmdStructure.setRuleName(ruleViolation.getRule().getName());
+                                pmdStructure.setRuleUrl(ruleViolation.getRule().getExternalInfoUrl());
+                                pmdStructure.setRulePriority(ruleViolation.getRule().getPriority().getPriority());
+                                pmdStructures.add(pmdStructure);
+                            }
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }finally {
+                            fileInputStream.close();
                         }
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }finally {
-                        fileInputStream.close();
                     }
+                    if(!pmdStructures.isEmpty()){
+                        deploymentJob.setBoolCodeReviewRunning(false);
+                        deploymentJob.setBoolCodeReviewFail(true);
+                        deploymentJob.setBoolCodeReviewCompleted(true);
+                        deploymentJob.setLstPmdStructures(pmdStructures);
+                    } else {
+                        deploymentJob.setBoolCodeReviewRunning(false);
+                        deploymentJob.setBoolCodeReviewFail(false);
+                        deploymentJob.setBoolCodeReviewPass(true);
+                        deploymentJob.setBoolCodeReviewCompleted(true);
+                    }
+                    deploymentJobMongoRepository.save(deploymentJob);
                 }
-                if(!pmdStructures.isEmpty()){
-                    deploymentJob.setBoolCodeReviewRunning(false);
-                    deploymentJob.setBoolCodeReviewFail(true);
-                    deploymentJob.setBoolCodeReviewCompleted(true);
-                    deploymentJob.setLstPmdStructures(pmdStructures);
-                } else {
-                    deploymentJob.setBoolCodeReviewRunning(false);
-                    deploymentJob.setBoolCodeReviewPass(true);
-                    deploymentJob.setBoolCodeReviewCompleted(true);
-                }
-                deploymentJobMongoRepository.save(deploymentJob);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
