@@ -223,7 +223,7 @@ public class ConsumerHandler {
                     FileInputStream fileInputStream = null;
                     while(fileIterator.hasNext()){
                         File next = fileIterator.next();
-                        System.out.println("next -> "+next);
+                        System.out.println("next -> "+next.getName());
                         fileInputStream = new FileInputStream(next);
                         try {
                             List<RuleViolation> review = pmdReviewService.review(fileInputStream, next);
