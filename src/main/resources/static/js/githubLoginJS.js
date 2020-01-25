@@ -570,11 +570,11 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 
     $scope.lstDeployments.push(objDeployment);*/
 
-     const sse = new EventSource('/asyncDeployments?userName='+$scope.userName+'&repoId='+$scope.repoId+'&branchName='+$scope.branchName);
+     /*const sse = new EventSource('/asyncDeployments?userName='+$scope.userName+'&repoId='+$scope.repoId+'&branchName='+$scope.branchName);
      sse.addEventListener("message", function(e) {
          $scope.lstDeployments = JSON.parse(e.data);
          $scope.$apply();
-     })
+     })*/
 
 
 });
