@@ -716,6 +716,7 @@ public class ForceCIController {
         deploymentJob.setBoolSfdcRunning(true);
         deploymentJob.setBoolMerge(false);
         deploymentJob.setBoolSfdcDeploymentNotStarted(true);
+        deploymentJob.setBoolCodeReviewNotStarted(false);
         deploymentJob.setBaseSHA(baseSHA);
         if(merge) {
             deploymentJob.setBoolMerge(true);
