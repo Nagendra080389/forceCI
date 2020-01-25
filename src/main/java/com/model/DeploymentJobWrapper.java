@@ -17,9 +17,83 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     private boolean boolCodeReviewValidationPass;
     private boolean boolCodeReviewValidationFail;
     private boolean boolCodeReviewNotStarted;
+    private boolean boolSFDCDeploymentRunning;
+    private boolean boolSFDCDeploymentPass;
+    private boolean boolSFDCDeploymentFail;
+    private boolean boolSFDCDeploymentNotStarted;
+    private String sfdcDeploymentRunning;
+    private String sfdcDeploymentPass;
+    private String sfdcDeploymentFail;
+    private String sfdcDeploymentNotStarted;
     private String codeReviewValidationRunning;
     private String codeReviewValidationPass;
     private String codeReviewValidationFail;
+    private String codeReviewValidationNotStarted;
+
+
+    public boolean isBoolSFDCDeploymentRunning() {
+        return boolSFDCDeploymentRunning;
+    }
+
+    public void setBoolSFDCDeploymentRunning(boolean boolSFDCDeploymentRunning) {
+        this.boolSFDCDeploymentRunning = boolSFDCDeploymentRunning;
+    }
+
+    public boolean isBoolSFDCDeploymentPass() {
+        return boolSFDCDeploymentPass;
+    }
+
+    public void setBoolSFDCDeploymentPass(boolean boolSFDCDeploymentPass) {
+        this.boolSFDCDeploymentPass = boolSFDCDeploymentPass;
+    }
+
+    public boolean isBoolSFDCDeploymentFail() {
+        return boolSFDCDeploymentFail;
+    }
+
+    public void setBoolSFDCDeploymentFail(boolean boolSFDCDeploymentFail) {
+        this.boolSFDCDeploymentFail = boolSFDCDeploymentFail;
+    }
+
+    public boolean isBoolSFDCDeploymentNotStarted() {
+        return boolSFDCDeploymentNotStarted;
+    }
+
+    public void setBoolSFDCDeploymentNotStarted(boolean boolSFDCDeploymentNotStarted) {
+        this.boolSFDCDeploymentNotStarted = boolSFDCDeploymentNotStarted;
+    }
+
+    public String getSfdcDeploymentRunning() {
+        return sfdcDeploymentRunning;
+    }
+
+    public void setSfdcDeploymentRunning(String sfdcDeploymentRunning) {
+        this.sfdcDeploymentRunning = sfdcDeploymentRunning;
+    }
+
+    public String getSfdcDeploymentPass() {
+        return sfdcDeploymentPass;
+    }
+
+    public void setSfdcDeploymentPass(String sfdcDeploymentPass) {
+        this.sfdcDeploymentPass = sfdcDeploymentPass;
+    }
+
+    public String getSfdcDeploymentFail() {
+        return sfdcDeploymentFail;
+    }
+
+    public void setSfdcDeploymentFail(String sfdcDeploymentFail) {
+        this.sfdcDeploymentFail = sfdcDeploymentFail;
+    }
+
+    public String getSfdcDeploymentNotStarted() {
+        return sfdcDeploymentNotStarted;
+    }
+
+    public void setSfdcDeploymentNotStarted(String sfdcDeploymentNotStarted) {
+        this.sfdcDeploymentNotStarted = sfdcDeploymentNotStarted;
+    }
 
     public String getCodeReviewValidationNotStarted() {
         return codeReviewValidationNotStarted;
@@ -28,8 +102,6 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     public void setCodeReviewValidationNotStarted(String codeReviewValidationNotStarted) {
         this.codeReviewValidationNotStarted = codeReviewValidationNotStarted;
     }
-
-    private String codeReviewValidationNotStarted;
 
     public String getPrHtml() {
         return prHtml;

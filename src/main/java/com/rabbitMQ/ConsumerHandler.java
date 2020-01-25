@@ -173,19 +173,29 @@ public class ConsumerHandler {
 
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
-                        deploymentJob.setBoolSfdcCompleted(true);
-                        deploymentJob.setBoolSfdcRunning(false);
-                        deploymentJob.setBoolSfdcPass(true);
-                        deploymentJob.setBoolSfdcFail(false);
-                        deploymentJob.setBoolCodeReviewCompleted(false);
+                        if(merge) {
+                            deploymentJob.setBoolSfdcDeploymentRunning(false);
+                            deploymentJob.setBoolSfdcDeploymentPass(true);
+                        } else {
+                            deploymentJob.setBoolSfdcCompleted(true);
+                            deploymentJob.setBoolSfdcRunning(false);
+                            deploymentJob.setBoolSfdcPass(true);
+                            deploymentJob.setBoolSfdcFail(false);
+                            deploymentJob.setBoolCodeReviewCompleted(false);
+                        }
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
-                        deploymentJob.setBoolSfdcCompleted(true);
-                        deploymentJob.setBoolSfdcRunning(false);
-                        deploymentJob.setBoolSfdcFail(true);
-                        deploymentJob.setBoolSfdcPass(false);
-                        deploymentJob.setBoolCodeReviewCompleted(false);
+                        if(merge){
+                            deploymentJob.setBoolSfdcDeploymentRunning(false);
+                            deploymentJob.setBoolSfdcDeploymentFail(true);
+                        } else {
+                            deploymentJob.setBoolSfdcCompleted(true);
+                            deploymentJob.setBoolSfdcRunning(false);
+                            deploymentJob.setBoolSfdcFail(true);
+                            deploymentJob.setBoolSfdcPass(false);
+                            deploymentJob.setBoolCodeReviewCompleted(false);
+                        }
                         break;
                     }
                 }

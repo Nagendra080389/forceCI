@@ -25,25 +25,22 @@ public class DeploymentJob implements Serializable {
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
     private String repoId;
+    private String baseSHA;
     private List<String> lstBuildLines;
     private boolean boolSfdcCompleted;
     private boolean boolSfdcRunning;
     private boolean boolSfdcPass;
     private boolean boolSfdcFail;
+    private boolean boolSfdcDeploymentCompleted;
+    private boolean boolSfdcDeploymentRunning;
+    private boolean boolSfdcDeploymentPass;
+    private boolean boolSfdcDeploymentFail;
+    private boolean boolSfdcDeploymentNotStarted;
     private boolean boolCodeReviewCompleted;
     private boolean boolCodeReviewRunning;
     private boolean boolCodeReviewPass;
     private boolean boolCodeReviewFail;
     private boolean boolMerge;
-
-    public boolean isBoolCodeReviewNotStarted() {
-        return boolCodeReviewNotStarted;
-    }
-
-    public void setBoolCodeReviewNotStarted(boolean boolCodeReviewNotStarted) {
-        this.boolCodeReviewNotStarted = boolCodeReviewNotStarted;
-    }
-
     private boolean boolCodeReviewNotStarted;
     private String pullRequestNumber;
     private String pullRequestTitle;
@@ -53,6 +50,22 @@ public class DeploymentJob implements Serializable {
     @LastModifiedDate
     private Date lastModifiedDate;
     private List<PMDStructure> lstPmdStructures;
+
+    public boolean isBoolCodeReviewNotStarted() {
+        return boolCodeReviewNotStarted;
+    }
+
+    public void setBoolCodeReviewNotStarted(boolean boolCodeReviewNotStarted) {
+        this.boolCodeReviewNotStarted = boolCodeReviewNotStarted;
+    }
+
+    public String getBaseSHA() {
+        return baseSHA;
+    }
+
+    public void setBaseSHA(String baseSHA) {
+        this.baseSHA = baseSHA;
+    }
 
     public String getId() {
         return id;
@@ -264,6 +277,46 @@ public class DeploymentJob implements Serializable {
 
     public void setBoolMerge(boolean boolMerge) {
         this.boolMerge = boolMerge;
+    }
+
+    public boolean isBoolSfdcDeploymentCompleted() {
+        return boolSfdcDeploymentCompleted;
+    }
+
+    public void setBoolSfdcDeploymentCompleted(boolean boolSfdcDeploymentCompleted) {
+        this.boolSfdcDeploymentCompleted = boolSfdcDeploymentCompleted;
+    }
+
+    public boolean isBoolSfdcDeploymentRunning() {
+        return boolSfdcDeploymentRunning;
+    }
+
+    public void setBoolSfdcDeploymentRunning(boolean boolSfdcDeploymentRunning) {
+        this.boolSfdcDeploymentRunning = boolSfdcDeploymentRunning;
+    }
+
+    public boolean isBoolSfdcDeploymentPass() {
+        return boolSfdcDeploymentPass;
+    }
+
+    public void setBoolSfdcDeploymentPass(boolean boolSfdcDeploymentPass) {
+        this.boolSfdcDeploymentPass = boolSfdcDeploymentPass;
+    }
+
+    public boolean isBoolSfdcDeploymentFail() {
+        return boolSfdcDeploymentFail;
+    }
+
+    public void setBoolSfdcDeploymentFail(boolean boolSfdcDeploymentFail) {
+        this.boolSfdcDeploymentFail = boolSfdcDeploymentFail;
+    }
+
+    public boolean isBoolSfdcDeploymentNotStarted() {
+        return boolSfdcDeploymentNotStarted;
+    }
+
+    public void setBoolSfdcDeploymentNotStarted(boolean boolSfdcDeploymentNotStarted) {
+        this.boolSfdcDeploymentNotStarted = boolSfdcDeploymentNotStarted;
     }
 
     @Override
