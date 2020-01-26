@@ -577,8 +577,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
             if (response.data !== undefined && response.data !== null && response.data !== '') {
                 // any kind of extension (.txt,.cpp,.cs,.bat)
                 var filename = type+"_"+jobNo+".txt";
-
-                var blob = new Blob([response.data], {
+                var blob = new Blob([response.data.join('\n')], {
                     type: "text/plain;charset=utf-8"
                 });
 

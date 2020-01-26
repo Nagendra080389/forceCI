@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.model.*;
+import com.pmd.PMDStructure;
 import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
@@ -632,12 +633,19 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
         List<DeploymentJob> byJobIdAndRepoId = deploymentJobMongoRepository.findByJobIdAndRepoId(jobNo, repoId);
-        List<?> lstFinalResult;
+        List<String> lstFinalResult;
         if (byJobIdAndRepoId != null && !byJobIdAndRepoId.isEmpty()) {
             if (type.equals("sfdcValidation")) {
                 lstFinalResult = byJobIdAndRepoId.get(0).getLstBuildLines();
             } else if (type.equals("codeValidation")) {
-                lstFinalResult = byJobIdAndRepoId.get(0).getLstPmdStructures();
+                List<PMDStructure> lstPmdStructures = byJobIdAndRepoId.get(0).getLstPmdStructures();
+                List<String> stringList = new ArrayList<>();
+                for (PMDStructure pmdStructure : lstPmdStructures) {
+                    stringList.add(pmdStructure.getName() + " \n " + "Line Number : " + pmdStructure.getLineNumber() + " \n "
+                            + "Review Feedback : " + pmdStructure.getReviewFeedback() + "\n" + "Rule URL : " + pmdStructure.getRuleUrl());
+                    stringList.add("\n ---------------------------------------------- \n");
+                }
+                lstFinalResult = stringList;
             } else {
                 lstFinalResult = byJobIdAndRepoId.get(0).getLstDeploymentBuildLines();
             }
