@@ -43,7 +43,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
         $location.path("/index");
     }
 
-    if(sse !== undefined && sse !== null && sse !== ''){
+    if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
 });
@@ -51,7 +51,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route) {
     $scope.lstRepositoryData = [];
 
-    if(sse !== undefined && sse !== null && sse !== ''){
+    if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
 
@@ -233,7 +233,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         disabledForm: 'false',
     };
 
-    if(sse !== undefined && sse !== null && sse !== ''){
+    if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
 
@@ -488,7 +488,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
 
-    if(sse !== undefined && sse !== null && sse !== ''){
+    if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
 
@@ -574,15 +574,21 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 
     $scope.downloadValidation = function (jobNo, type) {
         $http.get("/fetchLogs" + "?jobNo=" + jobNo + "&" + "type=" + type + "&" + "repoId=" + repoId).then(function (response) {
-            let logFile = JSON.parse(response.data);
-            debugger;
+            if (response.data !== undefined && response.data !== null && response.data !== '') {
+                var doc = new jsPDF();
+                response.data.forEach(function (line) {
+                    console.log(line);
+                });
+                doc.save(type + jobNo + '.pdf');
+                doc.save(type + jobNo + '.log');
+            }
         })
     }
 
 });
 
-$(window).on("beforeunload", function() {
-    if(sse !== undefined && sse !== null && sse !== ''){
+$(window).on("beforeunload", function () {
+    if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
 });
