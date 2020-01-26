@@ -575,12 +575,14 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.downloadValidation = function (jobNo, type) {
         $http.get("/fetchLogs" + "?jobNo=" + jobNo + "&" + "type=" + type + "&" + "repoId=" + repoId).then(function (response) {
             if (response.data !== undefined && response.data !== null && response.data !== '') {
-                var doc = new jsPDF();
-                response.data.forEach(function (line) {
-                    console.log(line);
+                // any kind of extension (.txt,.cpp,.cs,.bat)
+                var filename = type+"_"+jobNo+".txt";
+
+                var blob = new Blob([response.data], {
+                    type: "text/plain;charset=utf-8"
                 });
-                doc.save(type + jobNo + '.pdf');
-                doc.save(type + jobNo + '.log');
+
+                saveAs(blob, filename);
             }
         })
     }
