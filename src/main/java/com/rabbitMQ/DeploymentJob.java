@@ -5,6 +5,7 @@ import com.pmd.PMDStructure;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,6 +16,7 @@ public class DeploymentJob implements Serializable {
 
     @Id
     private String id;
+    @Indexed
     private String jobId;
     private String access_token;
     private String emailId;

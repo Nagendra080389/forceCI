@@ -1,5 +1,5 @@
 var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize']);
-let webSocket;
+let sse;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
         .when('/index', {
@@ -42,10 +42,18 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
     } else {
         $location.path("/index");
     }
+
+    if(sse !== undefined && sse !== null && sse !== ''){
+        sse.close();
+    }
 });
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route) {
     $scope.lstRepositoryData = [];
+
+    if(sse !== undefined && sse !== null && sse !== ''){
+        sse.close();
+    }
 
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
@@ -224,6 +232,11 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         oauthSaved: 'false',
         disabledForm: 'false',
     };
+
+    if(sse !== undefined && sse !== null && sse !== ''){
+        sse.close();
+    }
+
     $scope.availableTags = [];
     let sfdcAccessTokenFromExternalPage;
     let sfdcUserNameFromExternalPage;
@@ -475,6 +488,10 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
 
+    if(sse !== undefined && sse !== null && sse !== ''){
+        sse.close();
+    }
+
     $scope.fetchRepo = function () {
         if ($scope.repoName) {
             fetchRepoFromApi();
@@ -539,7 +556,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams) {
     $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
-    $scope.repoId = $routeParams.repoId;
+    const repoId = $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
     $scope.branchName = $routeParams.branchConnectedTo;
@@ -548,11 +565,24 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     // table headers that we need to show
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Validation Status', 'Deployment Status'];
 
-    const sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
+    sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
     sse.addEventListener("message", function (e) {
         $scope.lstDeployments = JSON.parse(e.data);
         $scope.$apply();
-    })
+    });
 
 
+    $scope.downloadValidation = function (jobNo, type) {
+        $http.get("/fetchLogs" + "?jobNo=" + jobNo + "&" + "type=" + type + "&" + "repoId=" + repoId).then(function (response) {
+            let logFile = JSON.parse(response.data);
+            debugger;
+        })
+    }
+
+});
+
+$(window).on("beforeunload", function() {
+    if(sse !== undefined && sse !== null && sse !== ''){
+        sse.close();
+    }
 });

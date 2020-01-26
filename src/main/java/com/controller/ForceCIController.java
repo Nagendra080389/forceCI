@@ -126,7 +126,7 @@ public class ForceCIController {
                 if (StringUtils.hasText(userName) && StringUtils.hasText(repoId) && StringUtils.hasText(branchName)) {
                     List<DeploymentJob> byTargetBranch = deploymentJobMongoRepository.findByRepoId(repoId);
                     List<DeploymentJobWrapper> jobWrapperList = new ArrayList<>();
-                    if(byTargetBranch != null && !byTargetBranch.isEmpty()){
+                    if (byTargetBranch != null && !byTargetBranch.isEmpty()) {
                         for (DeploymentJob targetBranch : byTargetBranch) {
                             DeploymentJobWrapper deploymentJobWrapper = new DeploymentJobWrapper();
                             deploymentJobWrapper.setId(targetBranch.getId());
@@ -134,50 +134,50 @@ public class ForceCIController {
                             deploymentJobWrapper.setPrNumber(targetBranch.getPullRequestNumber());
                             deploymentJobWrapper.setPrHtml(targetBranch.getPullRequestHtmlUrl());
 
-                            if(targetBranch.isBoolSfdcDeploymentNotStarted()) {
+                            if (targetBranch.isBoolSfdcDeploymentNotStarted()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentNotStarted(true);
                                 deploymentJobWrapper.setSfdcDeploymentNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
                             }
-                            if(targetBranch.isBoolSfdcDeploymentRunning()) {
+                            if (targetBranch.isBoolSfdcDeploymentRunning()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentRunning(true);
                                 deploymentJobWrapper.setSfdcDeploymentRunning(ValidationStatus.VALIDATION_RUNNING.getText());
                             }
 
-                            if(targetBranch.isBoolSfdcDeploymentFail()) {
+                            if (targetBranch.isBoolSfdcDeploymentFail()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentFail(true);
                                 deploymentJobWrapper.setSfdcDeploymentFail(ValidationStatus.VALIDATION_FAIL.getText());
                             }
 
-                            if(targetBranch.isBoolSfdcDeploymentPass()) {
+                            if (targetBranch.isBoolSfdcDeploymentPass()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentPass(true);
                                 deploymentJobWrapper.setSfdcDeploymentPass(ValidationStatus.VALIDATION_PASS.getText());
                             }
 
-                            if(targetBranch.isBoolCodeReviewNotStarted()){
+                            if (targetBranch.isBoolCodeReviewNotStarted()) {
                                 deploymentJobWrapper.setBoolCodeReviewNotStarted(true);
                                 deploymentJobWrapper.setCodeReviewValidationNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
                             }
-                            if(targetBranch.isBoolCodeReviewPass()){
+                            if (targetBranch.isBoolCodeReviewPass()) {
                                 deploymentJobWrapper.setBoolCodeReviewValidationPass(true);
                                 deploymentJobWrapper.setCodeReviewValidationPass(ValidationStatus.VALIDATION_PASS.getText());
                             }
-                            if(targetBranch.isBoolCodeReviewRunning()){
+                            if (targetBranch.isBoolCodeReviewRunning()) {
                                 deploymentJobWrapper.setBoolCodeReviewValidationRunning(true);
                                 deploymentJobWrapper.setCodeReviewValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
                             }
-                            if(targetBranch.isBoolCodeReviewFail()){
+                            if (targetBranch.isBoolCodeReviewFail()) {
                                 deploymentJobWrapper.setBoolCodeReviewValidationFail(true);
                                 deploymentJobWrapper.setCodeReviewValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
                             }
-                            if(targetBranch.isBoolSfdcRunning()){
+                            if (targetBranch.isBoolSfdcRunning()) {
                                 deploymentJobWrapper.setBoolSfdcValidationRunning(true);
                                 deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
                             }
-                            if(targetBranch.isBoolSfdcPass()) {
+                            if (targetBranch.isBoolSfdcPass()) {
                                 deploymentJobWrapper.setBoolSfdcValidationPass(true);
                                 deploymentJobWrapper.setSfdcValidationPass(ValidationStatus.VALIDATION_PASS.getText());
                             }
-                            if(targetBranch.isBoolSfdcFail()) {
+                            if (targetBranch.isBoolSfdcFail()) {
                                 deploymentJobWrapper.setBoolSfdcValidationFail(true);
                                 deploymentJobWrapper.setSfdcValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
                             }
@@ -625,6 +625,27 @@ public class ForceCIController {
         return returnResponse;
     }
 
+    @RequestMapping(value = "/fetchLogs", method = RequestMethod.GET)
+    public String fetchLogs(@RequestParam String jobNo, @RequestParam String type, @RequestParam String repoId,
+                            HttpServletResponse response, HttpServletRequest request) throws IOException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
+        List<DeploymentJob> byJobIdAndRepoId = deploymentJobMongoRepository.findByJobIdAndRepoId(jobNo, repoId);
+        List<?> lstFinalResult;
+        if (byJobIdAndRepoId != null && !byJobIdAndRepoId.isEmpty()) {
+            if (type.equals("sfdcValidation")) {
+                lstFinalResult = byJobIdAndRepoId.get(0).getLstBuildLines();
+            } else if (type.equals("codeValidation")) {
+                lstFinalResult = byJobIdAndRepoId.get(0).getLstPmdStructures();
+            } else {
+                lstFinalResult = byJobIdAndRepoId.get(0).getLstDeploymentBuildLines();
+            }
+            returnResponse = gson.toJson(lstFinalResult);
+        }
+        return returnResponse;
+    }
+
     @RequestMapping(value = "/deleteSfdcConnectionDetails", method = RequestMethod.DELETE)
     public String deleteSfdcConnectionDetails(@RequestParam String sfdcDetailsId, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
@@ -660,7 +681,7 @@ public class ForceCIController {
         String targetBranch = pullRequestJsonObject.has("base") ? pullRequestJsonObject.get("base").getAsJsonObject().get("ref").getAsString() : "";
         String baseSHA = pullRequestJsonObject.has("base") ? pullRequestJsonObject.get("base").getAsJsonObject().get("sha").getAsString() : "";
 
-        if(merge) {
+        if (merge) {
             baseSHA = pullRequestJsonObject.has("before") ? pullRequestJsonObject.get("before").getAsString() : "";
             userName = repositoryJsonObject.has("owner") ? repositoryJsonObject.get("owner").getAsJsonObject().get("login").getAsString() : "";
             gitCloneURL = repositoryJsonObject.has("clone_url") ? repositoryJsonObject.get("clone_url").getAsString() : "";
@@ -689,28 +710,28 @@ public class ForceCIController {
         String queue_name = develop.getProperty("QUEUE_NAME");
 
         Long aLong = deploymentJobMongoRepository.countByRepoId(gitRepoId);
-        System.out.println("aLong -> "+aLong);
+        System.out.println("aLong -> " + aLong);
         // Create the object detail to be passed to RabbitMQ
         DeploymentJob deploymentJob = new DeploymentJob();
-        if(merge) {
+        if (merge) {
             List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByPullRequestNumberDesc(gitRepoId, baseSHA);
-            if(byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
+            if (byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
                 System.out.println("byRepoIdAndBaseSHA.get(0).getBaseSHA() -> " + byRepoIdAndBaseSHA.get(0).getBaseSHA());
                 System.out.println("byRepoIdAndBaseSHA.get(0).getJobId() -> " + byRepoIdAndBaseSHA.get(0).getJobId());
                 deploymentJob = byRepoIdAndBaseSHA.get(0);
             }
         }
-        if(aLong != null && !merge) {
+        if (aLong != null && !merge) {
             deploymentJob.setJobId(String.valueOf(aLong.intValue() + 1));
         }
         deploymentJob.setRepoId(gitRepoId);
-        if(StringUtils.hasText(prNumber)) {
+        if (StringUtils.hasText(prNumber)) {
             deploymentJob.setPullRequestNumber(prNumber);
         }
-        if(StringUtils.hasText(prHtmlURL)) {
+        if (StringUtils.hasText(prHtmlURL)) {
             deploymentJob.setPullRequestHtmlUrl(prHtmlURL);
         }
-        if(StringUtils.hasText(prTitle)) {
+        if (StringUtils.hasText(prTitle)) {
             deploymentJob.setPullRequestTitle(prTitle);
         }
         deploymentJob.setAccess_token(access_token);
@@ -718,14 +739,14 @@ public class ForceCIController {
         deploymentJob.setEmailId(emailId);
         deploymentJob.setUserName(userName);
         deploymentJob.setGitCloneURL(gitCloneURL);
-        if(StringUtils.hasText(sourceBranch)) {
+        if (StringUtils.hasText(sourceBranch)) {
             deploymentJob.setSourceBranch(sourceBranch);
         }
         deploymentJob.setTargetBranch(targetBranch);
         deploymentJob.setQueueName(queue_name);
         deploymentJob.setBoolSfdcCompleted(false);
         deploymentJob.setBaseSHA(baseSHA);
-        if(merge) {
+        if (merge) {
             deploymentJob.setBoolMerge(true);
             deploymentJob.setBoolSfdcDeploymentNotStarted(false);
             deploymentJob.setBoolSfdcDeploymentRunning(true);

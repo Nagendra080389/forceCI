@@ -159,16 +159,16 @@
                             <td>
                                 <div ng-show="row.boolSfdcValidationRunning === true" class="{{row.sfdcValidationRunning}} d-inline-flex"></div>
                                 <div ng-show="row.boolSfdcValidationFail === true" class="{{row.sfdcValidationFail}} d-inline-flex"></div>
-                                <div ng-show="row.boolSfdcValidationPass === true" class="{{row.sfdcValidationPass}} d-inline-flex"></div>
+                                <div ng-show="row.boolSfdcValidationPass === true" class="{{row.sfdcValidationPass}} d-inline-flex" ng-click="downloadValidation(row.jobNo, 'sfdcValidation')"></div>
                                 <div ng-show="row.boolCodeReviewValidationRunning === true" class="{{row.codeReviewValidationRunning}} d-inline-flex"></div>
                                 <div ng-show="row.boolCodeReviewValidationFail === true" class="{{row.codeReviewValidationFail}} d-inline-flex"></div>
-                                <div ng-show="row.boolCodeReviewValidationPass === true" class="{{row.codeReviewValidationPass}} d-inline-flex"></div>
+                                <div ng-show="row.boolCodeReviewValidationPass === true" class="{{row.codeReviewValidationPass}} d-inline-flex"  ng-click="downloadValidation(row.jobNo, 'codeValidation')"></div>
                                 <div ng-show="row.boolCodeReviewNotStarted === true" class="{{row.codeReviewValidationNotStarted}} d-inline-flex"></div>
                             </td>
                             <td>
                                 <div ng-show="row.boolSFDCDeploymentRunning === true" class="{{row.sfdcDeploymentRunning}} d-inline-flex"></div>
                                 <div ng-show="row.boolSFDCDeploymentFail === true" class="{{row.sfdcDeploymentFail}} d-inline-flex"></div>
-                                <div ng-show="row.boolSFDCDeploymentPass === true" class="{{row.sfdcDeploymentPass}} d-inline-flex"></div>
+                                <div ng-show="row.boolSFDCDeploymentPass === true" class="{{row.sfdcDeploymentPass}} d-inline-flex"  ng-click="downloadValidation(row.jobNo, 'sfdcDeployment')"></div>
                                 <div ng-show="row.boolSFDCDeploymentNotStarted === true" class="{{row.sfdcDeploymentNotStarted}} d-inline-flex"></div>
                             </td>
                         </tr>
