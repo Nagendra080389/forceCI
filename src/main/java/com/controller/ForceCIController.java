@@ -689,13 +689,16 @@ public class ForceCIController {
         String queue_name = develop.getProperty("QUEUE_NAME");
 
         Long aLong = deploymentJobMongoRepository.countByRepoId(gitRepoId);
-        List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByPullRequestNumberDesc(gitRepoId, baseSHA);
         System.out.println("aLong -> "+aLong);
         // Create the object detail to be passed to RabbitMQ
         DeploymentJob deploymentJob = new DeploymentJob();
-        if(byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
-            System.out.println("byRepoIdAndBaseSHA.get(0).getBaseSHA() -> "+byRepoIdAndBaseSHA.get(0).getBaseSHA());
-            deploymentJob = byRepoIdAndBaseSHA.get(0);
+        if(merge) {
+            List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByPullRequestNumberDesc(gitRepoId, baseSHA);
+            if(byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
+                System.out.println("byRepoIdAndBaseSHA.get(0).getBaseSHA() -> " + byRepoIdAndBaseSHA.get(0).getBaseSHA());
+                System.out.println("byRepoIdAndBaseSHA.get(0).getJobId() -> " + byRepoIdAndBaseSHA.get(0).getJobId());
+                deploymentJob = byRepoIdAndBaseSHA.get(0);
+            }
         }
         if(aLong != null && !merge) {
             deploymentJob.setJobId(String.valueOf(aLong.intValue() + 1));
