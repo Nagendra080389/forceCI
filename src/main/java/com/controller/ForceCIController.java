@@ -57,10 +57,19 @@ import static org.kohsuke.github.GHDeploymentState.PENDING;
 public class ForceCIController {
 
     public static final int HTTP_STATUS_OK = 200;
+    public static final int HTTP_STATUS_CREATED = 201;
     public static final int HTTP_STATUS_FAILED = 401;
     public static final List<SseEmitter> emitters = Collections.synchronizedList(new ArrayList<>());
     private final static List<Integer> LIST_VALID_RESPONSE_CODES = Arrays.asList(200, 201, 204, 207);
     private static final String GITHUB_API = "https://api.github.com";
+    public static final String PENDING = "pending";
+    public static final String ERROR = "error";
+    public static final String SUCCESS = "success";
+    public static final String BUILD_IS_PENDING = "Build is pending.";
+    public static final String BUILD_IS_SUCCESSFUL = "Build is successful.";
+    public static final String BUILD_IS_ERROR = "Build error.";
+    public static final String VALIDATION = "_SfdcValidation";
+    public static final String CODE_REVIEW_VALIDATION = "_CodeReviewValidation";
     @Value("${github.clientId}")
     String githubClientId;
     @Value("${github.clientSecret}")
@@ -359,8 +368,17 @@ public class ForceCIController {
                 if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
-                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin, false);
+                    String statuseUrl = jsonObject.get("pull_request").getAsJsonObject().get("statuses_url").getAsString();
+                    String targetBranch = jsonObject.get("pull_request").getAsJsonObject().has("base") ?
+                            jsonObject.get("pull_request").getAsJsonObject().get("base").getAsJsonObject().get("ref").getAsString() : "";
+                    GithubStatusObject githubStatusObject = new GithubStatusObject(PENDING, BUILD_IS_PENDING, targetBranch + VALIDATION);
+                    int status = createStatusAndReturnCode(gson, access_token, statuseUrl, targetBranch, githubStatusObject);
+                    System.out.println("Validation Started -> "+status);
+                    if(status == HTTP_STATUS_CREATED) {
+                        start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
+                                sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig,
+                                rabbitTemplateCustomAdmin, false, jsonObject.get("sender").getAsJsonObject());
+                    }
                 }
                 break;
             case "push":
@@ -372,7 +390,8 @@ public class ForceCIController {
                 }
                 System.out.println("A pull request was merged! Deployment start now...");
                 start_deployment(jsonObject, jsonObject.get("repository").getAsJsonObject(), access_token,
-                        sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig, rabbitTemplateCustomAdmin, true);
+                        sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig,
+                        rabbitTemplateCustomAdmin, true, jsonObject.get("sender").getAsJsonObject());
                 break;
             case "deployment":
                 if (!StringUtils.hasText(access_token)) {
@@ -383,6 +402,16 @@ public class ForceCIController {
                 break;
         }
         return gson.toJson("");
+    }
+
+    public static int createStatusAndReturnCode(Gson gson, String access_token, String statuseUrl, String targetBranch,
+                                         GithubStatusObject githubStatusObject) throws IOException {
+        PostMethod createStatus = new PostMethod(statuseUrl);
+        createStatus.setRequestHeader("Authorization", "token " + access_token);
+        createStatus.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
+        createStatus.setRequestBody(gson.toJson(githubStatusObject));
+        HttpClient httpClient = new HttpClient();
+        return httpClient.executeMethod(createStatus);
     }
 
     @RequestMapping(value = "/fetchRepositoryInDB", method = RequestMethod.GET)
@@ -676,11 +705,13 @@ public class ForceCIController {
     private void start_deployment(JsonObject pullRequestJsonObject, JsonObject repositoryJsonObject, String access_token,
                                   SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository,
                                   SFDCConnectionDetails sfdcConnectionDetail, String emailId,
-                                  RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate, boolean merge) throws Exception {
+                                  RabbitMqSenderConfig rabbitMqSenderConfig, AmqpTemplate rabbitTemplate,
+                                  boolean merge, JsonObject sender) throws Exception {
 
         String userName = pullRequestJsonObject.has("user") ? pullRequestJsonObject.get("user").getAsJsonObject().get("login").getAsString() : "";
         String gitCloneURL = repositoryJsonObject.has("clone_url") ? repositoryJsonObject.get("clone_url").getAsString() : "";
         String prHtmlURL = pullRequestJsonObject.has("html_url") ? pullRequestJsonObject.get("html_url").getAsString() : "";
+        String statusesUrl = pullRequestJsonObject.has("statuses_url") ? pullRequestJsonObject.get("statuses_url").getAsString() : "";
         String prNumber = pullRequestJsonObject.has("number") ? pullRequestJsonObject.get("number").getAsString() : "";
         String prTitle = pullRequestJsonObject.has("title") ? pullRequestJsonObject.get("title").getAsString() : "";
         String gitRepoId = repositoryJsonObject.has("id") ? repositoryJsonObject.get("id").getAsString() : "";
@@ -701,11 +732,10 @@ public class ForceCIController {
 
         if (byGitRepoId != null && !byGitRepoId.isEmpty()) {
             for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
-                if (sfdcConnectionDetails.getBranchConnectedTo() != null) {
-                    if (sfdcConnectionDetails.getBranchConnectedTo().equals(targetBranch)) {
-                        sfdcConnectionDetail = sfdcConnectionDetails;
-                        break;
-                    }
+                if (sfdcConnectionDetails.getBranchConnectedTo() != null &&
+                        sfdcConnectionDetails.getBranchConnectedTo().equals(targetBranch)) {
+                    sfdcConnectionDetail = sfdcConnectionDetails;
+                    break;
                 }
             }
         }
@@ -718,14 +748,12 @@ public class ForceCIController {
         String queue_name = develop.getProperty("QUEUE_NAME");
 
         Long aLong = deploymentJobMongoRepository.countByRepoId(gitRepoId);
-        System.out.println("aLong -> " + aLong);
+
         // Create the object detail to be passed to RabbitMQ
         DeploymentJob deploymentJob = new DeploymentJob();
         if (merge) {
             List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByPullRequestNumberDesc(gitRepoId, baseSHA);
             if (byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
-                System.out.println("byRepoIdAndBaseSHA.get(0).getBaseSHA() -> " + byRepoIdAndBaseSHA.get(0).getBaseSHA());
-                System.out.println("byRepoIdAndBaseSHA.get(0).getJobId() -> " + byRepoIdAndBaseSHA.get(0).getJobId());
                 deploymentJob = byRepoIdAndBaseSHA.get(0);
             }
         }
@@ -741,6 +769,10 @@ public class ForceCIController {
         }
         if (StringUtils.hasText(prTitle)) {
             deploymentJob.setPullRequestTitle(prTitle);
+        }
+
+        if(StringUtils.hasText(statusesUrl)){
+            deploymentJob.setStatusesUrl(statusesUrl);
         }
         deploymentJob.setAccess_token(access_token);
         deploymentJob.setSfdcConnectionDetail(sfdcConnectionDetail);
@@ -794,7 +826,7 @@ public class ForceCIController {
                     jsonObject.get("repository").getAsJsonObject()
                             .get("full_name").getAsString());
             GHDeploymentStatus deploymentStatus = new GHDeploymentStatusBuilder(repository,
-                    jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), PENDING).create();
+                    jsonObject.get("deployment").getAsJsonObject().get("id").getAsInt(), GHDeploymentState.PENDING).create();
 
             List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(String.valueOf(repository.getId()));
 

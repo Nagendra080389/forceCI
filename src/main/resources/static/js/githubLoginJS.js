@@ -566,9 +566,13 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Validation Status', 'Deployment Status'];
 
     sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
-    sse.addEventListener("message", function (e) {
-        $scope.lstDeployments = JSON.parse(e.data);
-        $scope.$apply();
+    sse.addEventListener("message", function (objMessageEvent) {
+        if(objMessageEvent !== undefined && objMessageEvent !== null &&
+            objMessageEvent.data !== undefined && objMessageEvent.data !== null &&
+            $scope.lstDeployments.length !== JSON.parse(objMessageEvent.data).length) {
+            $scope.lstDeployments = JSON.parse(objMessageEvent.data);
+            $scope.$apply();
+        }
     });
 
 

@@ -28,6 +28,7 @@ public class DeploymentJob implements Serializable {
     private String queueName;
     private String repoId;
     private String baseSHA;
+    private String statusesUrl;
     private List<String> lstBuildLines;
     private List<String> lstDeploymentBuildLines;
     private boolean boolSfdcCompleted;
@@ -328,6 +329,14 @@ public class DeploymentJob implements Serializable {
 
     public void setBoolSfdcDeploymentNotStarted(boolean boolSfdcDeploymentNotStarted) {
         this.boolSfdcDeploymentNotStarted = boolSfdcDeploymentNotStarted;
+    }
+
+    public String getStatusesUrl() {
+        return statusesUrl;
+    }
+
+    public void setStatusesUrl(String statusesUrl) {
+        this.statusesUrl = statusesUrl;
     }
 
     @Override

@@ -1,11 +1,14 @@
 package com.rabbitMQ;
 
+import com.controller.ForceCIController;
 import com.controller.PmdReviewService;
 import com.dao.DeploymentJobMongoRepository;
 import com.dao.SFDCConnectionDetailsMongoRepository;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.model.GithubStatusObject;
 import com.model.SFDCConnectionDetails;
 import com.pmd.PMDStructure;
 import com.utils.AntExecutor;
@@ -47,7 +50,6 @@ public class ConsumerHandler {
                 e.printStackTrace();
             }
         }
-
     }
 
     private List<String> createTempDirectoryForDeployment(DeploymentJob deploymentJob) {
@@ -178,6 +180,12 @@ public class ConsumerHandler {
 
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
+                        Gson gson = new Gson();
+                        GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
+                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.VALIDATION);
+                        int status = ForceCIController.createStatusAndReturnCode(gson,
+                                deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
+                        System.out.println("Validation Passed -> "+status);
                         if(merge) {
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentPass(true);
@@ -191,6 +199,12 @@ public class ConsumerHandler {
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
+                        Gson gson = new Gson();
+                        GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
+                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.VALIDATION);
+                        int status = ForceCIController.createStatusAndReturnCode(gson,
+                                deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
+                        System.out.println("Validation Failed -> "+status);
                         if(merge){
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentFail(true);
@@ -209,6 +223,13 @@ public class ConsumerHandler {
                 deploymentJobMongoRepository.save(deploymentJob);
 
                 if(sfdcPass && !merge){
+                    Gson gson = new Gson();
+                    GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
+                            ForceCIController.BUILD_IS_PENDING, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                    int status = ForceCIController.createStatusAndReturnCode(gson,
+                            deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
+                    System.out.println("Code Validation Pending -> "+status);
+
                     deploymentJob.setBoolCodeReviewRunning(true);
                     deploymentJob.setBoolCodeReviewNotStarted(false);
                     deploymentJobMongoRepository.save(deploymentJob);
@@ -248,11 +269,27 @@ public class ConsumerHandler {
                         }
                     }
                     if(!pmdStructures.isEmpty()){
+
+                        githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
+                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                        status = ForceCIController.createStatusAndReturnCode(gson,
+                                deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
+                        System.out.println("Code Validation Pass -> "+status);
+
+
                         deploymentJob.setBoolCodeReviewRunning(false);
                         deploymentJob.setBoolCodeReviewFail(true);
                         deploymentJob.setBoolCodeReviewCompleted(true);
                         deploymentJob.setLstPmdStructures(pmdStructures);
                     } else {
+
+                        githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
+                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                        status = ForceCIController.createStatusAndReturnCode(gson,
+                                deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
+                        System.out.println("Code Validation Failed -> "+status);
+
+
                         deploymentJob.setBoolCodeReviewRunning(false);
                         deploymentJob.setBoolCodeReviewFail(false);
                         deploymentJob.setBoolCodeReviewPass(true);
