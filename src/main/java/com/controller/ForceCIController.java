@@ -374,6 +374,12 @@ public class ForceCIController {
                     GithubStatusObject githubStatusObject = new GithubStatusObject(PENDING, BUILD_IS_PENDING, targetBranch + VALIDATION);
                     int status = createStatusAndReturnCode(gson, access_token, statuseUrl, targetBranch, githubStatusObject);
                     System.out.println("Validation Started -> "+status);
+
+                    githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
+                            ForceCIController.BUILD_IS_PENDING, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                    status = ForceCIController.createStatusAndReturnCode(gson, access_token, statuseUrl, targetBranch, githubStatusObject);
+                    System.out.println("Code Validation Pending -> "+status);
+
                     if(status == HTTP_STATUS_CREATED) {
                         start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
                                 sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig,

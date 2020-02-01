@@ -224,12 +224,8 @@ public class ConsumerHandler {
 
                 if(sfdcPass && !merge){
                     Gson gson = new Gson();
-                    GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
-                            ForceCIController.BUILD_IS_PENDING, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
-                    int status = ForceCIController.createStatusAndReturnCode(gson,
-                            deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                    System.out.println("Code Validation Pending -> "+status);
-
+                    GithubStatusObject githubStatusObject = null;
+                    int status = 0;
                     deploymentJob.setBoolCodeReviewRunning(true);
                     deploymentJob.setBoolCodeReviewNotStarted(false);
                     deploymentJobMongoRepository.save(deploymentJob);
@@ -270,8 +266,8 @@ public class ConsumerHandler {
                     }
                     if(!pmdStructures.isEmpty()){
 
-                        githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
-                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                        githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
+                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Code Validation Pass -> "+status);
@@ -282,9 +278,8 @@ public class ConsumerHandler {
                         deploymentJob.setBoolCodeReviewCompleted(true);
                         deploymentJob.setLstPmdStructures(pmdStructures);
                     } else {
-
-                        githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
-                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                        githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
+                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Code Validation Failed -> "+status);
