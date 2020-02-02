@@ -182,7 +182,9 @@ public class ConsumerHandler {
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
                         Gson gson = new Gson();
                         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
-                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.VALIDATION);
+                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.VALIDATION,
+                                ForceCIController.CONNECT2DEPLOY_URL + "/" +
+                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Validation Passed -> "+status);
@@ -201,7 +203,9 @@ public class ConsumerHandler {
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
                         Gson gson = new Gson();
                         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
-                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.VALIDATION);
+                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.VALIDATION,
+                                ForceCIController.CONNECT2DEPLOY_URL + "/" +
+                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Validation Failed -> "+status);
@@ -267,7 +271,9 @@ public class ConsumerHandler {
                     if(!pmdStructures.isEmpty()){
 
                         githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
-                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION,
+                                ForceCIController.CONNECT2DEPLOY_URL + "/" +
+                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Code Validation Pass -> "+status);
@@ -279,7 +285,9 @@ public class ConsumerHandler {
                         deploymentJob.setLstPmdStructures(pmdStructures);
                     } else {
                         githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
-                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                                ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION,
+                                ForceCIController.CONNECT2DEPLOY_URL + "/" +
+                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Code Validation Failed -> "+status);

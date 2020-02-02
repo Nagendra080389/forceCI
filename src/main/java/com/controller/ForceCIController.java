@@ -70,6 +70,7 @@ public class ForceCIController {
     public static final String BUILD_IS_ERROR = "Build error.";
     public static final String VALIDATION = "_SfdcValidation";
     public static final String CODE_REVIEW_VALIDATION = "_CodeReviewValidation";
+    public static final String CONNECT2DEPLOY_URL = "https://forceci.herokuapp.com/#!/apps/dashboard/app";
     @Value("${github.clientId}")
     String githubClientId;
     @Value("${github.clientSecret}")
@@ -371,16 +372,20 @@ public class ForceCIController {
                     String statuseUrl = jsonObject.get("pull_request").getAsJsonObject().get("statuses_url").getAsString();
                     String targetBranch = jsonObject.get("pull_request").getAsJsonObject().has("base") ?
                             jsonObject.get("pull_request").getAsJsonObject().get("base").getAsJsonObject().get("ref").getAsString() : "";
-                    GithubStatusObject githubStatusObject = new GithubStatusObject(PENDING, BUILD_IS_PENDING, targetBranch + VALIDATION);
+                    String repositoryId = jsonObject.has("repository") ? jsonObject.get("repository").getAsJsonObject().get("id").getAsString() : "";
+                    String repositoryName = jsonObject.has("repository") ? jsonObject.get("repository").getAsJsonObject().get("name").getAsString() : "";
+                    GithubStatusObject githubStatusObject = new GithubStatusObject(PENDING, BUILD_IS_PENDING, targetBranch + VALIDATION,
+                            CONNECT2DEPLOY_URL + "/" + repositoryName + "/" + repositoryId + "/" + targetBranch);
                     int status = createStatusAndReturnCode(gson, access_token, statuseUrl, targetBranch, githubStatusObject);
-                    System.out.println("Validation Started -> "+status);
+                    System.out.println("Validation Started -> " + status);
 
                     githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
-                            ForceCIController.BUILD_IS_PENDING, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION);
+                            ForceCIController.BUILD_IS_PENDING, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION,
+                            CONNECT2DEPLOY_URL + "/" + repositoryName + "/" + repositoryId + "/" + targetBranch);
                     status = ForceCIController.createStatusAndReturnCode(gson, access_token, statuseUrl, targetBranch, githubStatusObject);
-                    System.out.println("Code Validation Pending -> "+status);
+                    System.out.println("Code Validation Pending -> " + status);
 
-                    if(status == HTTP_STATUS_CREATED) {
+                    if (status == HTTP_STATUS_CREATED) {
                         start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
                                 sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig,
                                 rabbitTemplateCustomAdmin, false, jsonObject.get("sender").getAsJsonObject());
@@ -411,7 +416,7 @@ public class ForceCIController {
     }
 
     public static int createStatusAndReturnCode(Gson gson, String access_token, String statuseUrl, String targetBranch,
-                                         GithubStatusObject githubStatusObject) throws IOException {
+                                                GithubStatusObject githubStatusObject) throws IOException {
         PostMethod createStatus = new PostMethod(statuseUrl);
         createStatus.setRequestHeader("Authorization", "token " + access_token);
         createStatus.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
@@ -777,7 +782,7 @@ public class ForceCIController {
             deploymentJob.setPullRequestTitle(prTitle);
         }
 
-        if(StringUtils.hasText(statusesUrl)){
+        if (StringUtils.hasText(statusesUrl)) {
             deploymentJob.setStatusesUrl(statusesUrl);
         }
         deploymentJob.setAccess_token(access_token);
