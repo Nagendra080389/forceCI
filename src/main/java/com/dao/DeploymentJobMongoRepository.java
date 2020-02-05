@@ -15,6 +15,10 @@ public interface DeploymentJobMongoRepository extends MongoRepository<Deployment
 
     List<DeploymentJob> findByRepoId(String repoId);
 
+    List<DeploymentJob> findByRepoIdAndTargetBranch(String repoId, String targetBranch);
+
+    Long countByRepoIdAndTargetBranch(String repoId, String targetBranch);
+
     List<DeploymentJob> findByJobIdAndRepoId(String jobId, String repoId);
 
     List<DeploymentJob> findByRepoIdAndBaseSHAOrderByPullRequestNumberDesc(String repoId, String baseSHA);

@@ -148,8 +148,7 @@
                 <div class="row">
                     <form class="form-inline">
                         <div class="form-group">
-                            <label >Search</label>
-                            <input type="text" ng-model="search" class="form-control" placeholder="Search....">
+                            <input type="text" ng-model="search" class="form-control" placeholder="Search...." style="margin-bottom: 1rem;">
                         </div>
                     </form>
                     <table class="table table-striped table-bordered table-hover">
@@ -159,7 +158,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="row in lstDeployments|filter:search">
+                        <tr dir-paginate="row in lstDeployments|filter:search|itemsPerPage:20">
                             <td>{{row.jobNo}}</td>
                             <td><a href="{{row.prHtml}}" target="_blank">{{row.prNumber}}</a></td>
                             <td>
@@ -168,7 +167,7 @@
                                 <div ng-show="row.boolSfdcValidationPass === true" class="{{row.sfdcValidationPass}} d-inline-flex" ng-click="downloadValidation(row.jobNo, 'sfdcValidation')"></div>
                                 <div ng-show="row.boolCodeReviewValidationRunning === true" class="{{row.codeReviewValidationRunning}} d-inline-flex"></div>
                                 <div ng-show="row.boolCodeReviewValidationFail === true" class="{{row.codeReviewValidationFail}} d-inline-flex" ng-click="downloadValidation(row.jobNo, 'codeValidation')"></div>
-                                <div ng-show="row.boolCodeReviewValidationPass === true" class="{{row.codeReviewValidationPass}} d-inline-flex"  ng-click="downloadValidation(row.jobNo, 'codeValidation')"></div>
+                                <div ng-show="row.boolCodeReviewValidationPass === true" class="{{row.codeReviewValidationPass}} d-inline-flex"></div>
                                 <div ng-show="row.boolCodeReviewNotStarted === true" class="{{row.codeReviewValidationNotStarted}} d-inline-flex"></div>
                             </td>
                             <td>

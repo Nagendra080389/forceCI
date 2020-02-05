@@ -680,10 +680,12 @@ public class ForceCIController {
             } else if (type.equals("codeValidation")) {
                 List<PMDStructure> lstPmdStructures = byJobIdAndRepoId.get(0).getLstPmdStructures();
                 List<String> stringList = new ArrayList<>();
-                for (PMDStructure pmdStructure : lstPmdStructures) {
-                    stringList.add(pmdStructure.getName() + " \n " + "Line Number : " + pmdStructure.getLineNumber() + " \n "
-                            + "Review Feedback : " + pmdStructure.getReviewFeedback() + "\n" + "Rule URL : " + pmdStructure.getRuleUrl());
-                    stringList.add("\n ---------------------------------------------- \n");
+                if(lstPmdStructures != null){
+                    for (PMDStructure pmdStructure : lstPmdStructures) {
+                        stringList.add(pmdStructure.getName() + " \n " + "Line Number : " + pmdStructure.getLineNumber() + " \n "
+                                + "Review Feedback : " + pmdStructure.getReviewFeedback() + "\n" + "Rule URL : " + pmdStructure.getRuleUrl());
+                        stringList.add("\n ---------------------------------------------- \n");
+                    }
                 }
                 lstFinalResult = stringList;
             } else {
@@ -765,6 +767,12 @@ public class ForceCIController {
         if (merge) {
             List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByPullRequestNumberDesc(gitRepoId, baseSHA);
             if (byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
+                byRepoIdAndBaseSHA.sort(new Comparator<DeploymentJob>() {
+                    @Override
+                    public int compare(DeploymentJob deploymentJob1, DeploymentJob deploymentJob2) {
+                        return deploymentJob1.getLastModifiedDate().compareTo(deploymentJob2.getLastModifiedDate());
+                    }
+                });
                 deploymentJob = byRepoIdAndBaseSHA.get(0);
             }
         }
