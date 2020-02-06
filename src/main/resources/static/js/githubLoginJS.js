@@ -400,6 +400,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             gitRepoId: $scope.repoId,
             branchConnectedTo: sfdcOrg.branchConnectedTo,
             boolActive: sfdcOrg.boolActive,
+            repoName: $scope.repoName,
         };
         if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === '' ||
             sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '') {
@@ -568,8 +569,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
     sse.addEventListener("message", function (objMessageEvent) {
         if(objMessageEvent !== undefined && objMessageEvent !== null &&
-            objMessageEvent.data !== undefined && objMessageEvent.data !== null &&
-            $scope.lstDeployments.length !== JSON.parse(objMessageEvent.data).length) {
+            objMessageEvent.data !== undefined && objMessageEvent.data !== null) {
             $scope.lstDeployments = JSON.parse(objMessageEvent.data);
             $scope.$apply();
         }

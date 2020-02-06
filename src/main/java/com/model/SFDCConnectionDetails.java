@@ -26,6 +26,7 @@ public class SFDCConnectionDetails implements Serializable {
     private String gitRepoId;
     private String branchConnectedTo;
     private String testLevel;
+    private String repoName;
     private boolean boolActive;
 
     public String getId() {
@@ -162,6 +163,14 @@ public class SFDCConnectionDetails implements Serializable {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public String getRepoName() {
+        return repoName;
+    }
+
+    public void setRepoName(String repoName) {
+        this.repoName = repoName;
     }
 
     public String getTestLevel() {
