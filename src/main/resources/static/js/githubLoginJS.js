@@ -51,7 +51,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     };
 
-    $scope.logoutFunction = function($location){
+    $scope.logoutFunction = function(){
         logoutFunctionCaller($location);
     };
 
@@ -67,7 +67,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
-    $scope.logoutFunction = function($location){
+    $scope.logoutFunction = function(){
         logoutFunctionCaller($location);
     };
     $http.get("/fetchUserName").then(function (response) {
@@ -253,7 +253,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         sse.close();
     }
 
-    $scope.logoutFunction = function($location){
+    $scope.logoutFunction = function(){
         logoutFunctionCaller($location);
     };
 
@@ -514,7 +514,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
         sse.close();
     }
 
-    $scope.logoutFunction = function($location){
+    $scope.logoutFunction = function(){
         logoutFunctionCaller($location);
     };
     $scope.fetchRepo = function () {
@@ -588,7 +588,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.branchName = $routeParams.branchConnectedTo;
     $scope.lstDeployments = [];
 
-    $scope.logoutFunction = function($location){
+    $scope.logoutFunction = function(){
         logoutFunctionCaller($location);
     };
 
