@@ -11402,13 +11402,11 @@ a:focus {
 }
 
 .bg-login-image {
-    background: url("images/connectdevelop-brands.svg") center;
-    background-size: cover;
+    background: url("../images/connectdevelop-brands.svg") no-repeat center;
 }
 
 .bg-register-image {
-    background: url("https://source.unsplash.com/Mv9hjnEUHR4/600x800");
-    background-position: center;
+    background: url("https://source.unsplash.com/Mv9hjnEUHR4/600x800") center;
     background-size: cover;
 }
 
