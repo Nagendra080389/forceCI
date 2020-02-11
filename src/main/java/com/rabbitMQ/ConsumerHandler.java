@@ -184,7 +184,7 @@ public class ConsumerHandler {
                         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
                                 ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.VALIDATION,
                                 ForceCIController.CONNECT2DEPLOY_URL + "/" +
-                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
+                                        sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Validation Passed -> "+status);
@@ -205,7 +205,7 @@ public class ConsumerHandler {
                         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
                                 ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.VALIDATION,
                                 ForceCIController.CONNECT2DEPLOY_URL + "/" +
-                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
+                                        sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Validation Failed -> "+status);
@@ -273,7 +273,7 @@ public class ConsumerHandler {
                         githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
                                 ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION,
                                 ForceCIController.CONNECT2DEPLOY_URL + "/" +
-                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
+                                        sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Code Validation Pass -> "+status);
@@ -287,7 +287,7 @@ public class ConsumerHandler {
                         githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
                                 ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION,
                                 ForceCIController.CONNECT2DEPLOY_URL + "/" +
-                                        sfdcConnectionDetail.getBranchConnectedTo() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
+                                        sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
                         System.out.println("Code Validation Failed -> "+status);
