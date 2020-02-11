@@ -42,7 +42,10 @@ function checkToken($location) {
 
 function logoutFunctionCaller($location) {
     $.removeCookie("ACCESS_TOKEN");
-    $location.path("/index");
+    let timeout = setTimeout(function () {
+        clearTimeout(timeout);
+        $location.path("/index");
+    }, 500);
 }
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location) {
