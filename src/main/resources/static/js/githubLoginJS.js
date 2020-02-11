@@ -61,7 +61,6 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
 });
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route) {
-    checkToken($location);
     $scope.lstRepositoryData = [];
 
     if (sse !== undefined && sse !== null && sse !== '') {
@@ -226,7 +225,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
-    checkToken($location);
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
@@ -505,7 +503,6 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 });
 
 connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location) {
-    checkToken($location);
     $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
@@ -579,7 +576,6 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 });
 
 connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams) {
-    checkToken($location);
     $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
     const repoId = $scope.repoId = $routeParams.repoId;
