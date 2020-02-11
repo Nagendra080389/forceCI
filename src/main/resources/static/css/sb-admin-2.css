@@ -11402,7 +11402,7 @@ a:focus {
 }
 
 .bg-login-image {
-    background: url("https://upload.wikimedia.org/wikipedia/commons/f/fc/No_picture_available.png") center;
+    background: url("images/connectdevelop-brands.svg") center;
     background-size: cover;
 }
 
