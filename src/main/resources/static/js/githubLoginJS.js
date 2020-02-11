@@ -51,7 +51,9 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     };
 
-    $scope.logoutFunction = logoutFunctionCaller($location);
+    $scope.logoutFunction = function($location){
+        logoutFunctionCaller($location);
+    };
 
     if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
@@ -65,7 +67,9 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
-    $scope.logoutFunction = logoutFunctionCaller($location);
+    $scope.logoutFunction = function($location){
+        logoutFunctionCaller($location);
+    };
     $http.get("/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
@@ -249,7 +253,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         sse.close();
     }
 
-    $scope.logoutFunction = logoutFunctionCaller($location);
+    $scope.logoutFunction = function($location){
+        logoutFunctionCaller($location);
+    };
 
     $scope.availableTags = [];
     let sfdcAccessTokenFromExternalPage;
@@ -508,7 +514,9 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
         sse.close();
     }
 
-    $scope.logoutFunction = logoutFunctionCaller($location);
+    $scope.logoutFunction = function($location){
+        logoutFunctionCaller($location);
+    };
     $scope.fetchRepo = function () {
         if ($scope.repoName) {
             fetchRepoFromApi();
@@ -580,7 +588,9 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.branchName = $routeParams.branchConnectedTo;
     $scope.lstDeployments = [];
 
-    $scope.logoutFunction = logoutFunctionCaller($location);
+    $scope.logoutFunction = function($location){
+        logoutFunctionCaller($location);
+    };
 
     // table headers that we need to show
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Validation Status', 'Deployment Status'];
