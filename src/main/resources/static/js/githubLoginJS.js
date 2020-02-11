@@ -42,9 +42,9 @@ function checkToken($location) {
 
 function logoutFunctionCaller($location) {
     $.removeCookie("ACCESS_TOKEN");
-    let timeout = setTimeout(function () {
-        clearTimeout(timeout);
-        $location.path("/index");
+    $location.path("/index");
+    setTimeout(function () {
+        $('.modal-backdrop').removeClass('show');
     }, 500);
 }
 
