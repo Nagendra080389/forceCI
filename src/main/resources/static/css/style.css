@@ -11,12 +11,15 @@ a.btn.btn-github.btn-user.btn-block {
 
 .validationRunning {
     background-color: #a9b2b5;
+    color: aliceblue;
     padding: 15px 15px 15px 15px;
     text-align:center;
     margin-bottom: 4px;
-    font-size: 24px;
+    font-size: 12px;
     border-radius: 15px;
-    width: 1rem;
+    width: 10rem;
+    vertical-align: middle;
+    line-height: 0;
     height: 1rem;
     -moz-transition:all 0.5s ease-in-out;
     -webkit-transition:all 0.5s ease-in-out;
@@ -32,35 +35,44 @@ a.btn.btn-github.btn-user.btn-block {
 
 .validationNotStarted {
     background-color: #a9b2b5;
+    color: aliceblue;
     padding: 15px 15px 15px 15px;
     text-align:center;
     margin-bottom: 4px;
-    font-size: 24px;
+    font-size: 12px;
     border-radius: 15px;
-    width: 1rem;
+    width:10rem;
+    vertical-align: middle;
+    line-height: 0;
     height: 1rem;
 }
 
 .validationPass {
     background-color: #61da5f;
+    color: aliceblue;
     padding: 15px 15px 15px 15px;
     text-align:center;
     margin-bottom: 4px;
-    font-size: 24px;
+    font-size: 12px;
     border-radius: 15px;
-    width: 1rem;
+    width: 10rem;
     height: 1rem;
+    vertical-align: middle;
+    line-height: 0;
     cursor: pointer;
 }
 
 .validationFail {
     background-color: #f12929;
+    color: aliceblue;
     padding: 15px 15px 15px 15px;
     text-align:center;
     margin-bottom: 4px;
-    font-size: 24px;
+    font-size: 12px;
     border-radius: 15px;
-    width: 1rem;
+    width: 10rem;
     height: 1rem;
+    vertical-align: middle;
+    line-height: 0;
     cursor: pointer;
 }
