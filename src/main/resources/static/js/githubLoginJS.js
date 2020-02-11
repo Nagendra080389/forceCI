@@ -45,6 +45,7 @@ function logoutFunctionCaller($location) {
     $location.path("/index");
     setTimeout(function () {
         $('.modal-backdrop').removeClass('show');
+        $('.modal-backdrop').remove();
     }, 500);
 }
 
