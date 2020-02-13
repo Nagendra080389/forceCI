@@ -306,7 +306,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     };
 
     $scope.createSnapshot = function (targetBranch, repoId) {
-        $scope.showPrompt = function(ev) {
+        /*$scope.showPrompt = function(ev) {
             // Appending dialog to document.body to cover sidenav in docs app
             const confirm = $mdDialog.prompt()
                 .title('Create Snapshot')
@@ -322,7 +322,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             }, function() {
                 // If cancelled run this code
             });
-        };
+        };*/
     };
 
     $scope.authorize = function (sfdcOrg) {
