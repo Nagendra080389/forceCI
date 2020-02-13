@@ -439,11 +439,11 @@ public class ForceCIController {
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
                         RabbitMqConsumer container = new RabbitMqConsumer();
                         container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-                        container.setQueueNames(sfdcConnectionDetails.getBranchConnectedTo());
+                        container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
                         container.setConcurrentConsumers(1);
                         container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
                         container.startConsumers();
-                        rabbitMqConsumerMap.put(sfdcConnectionDetails.getBranchConnectedTo(), container);
+                        rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
                     }
                     consumerMap.put(repositoryWrapper.getRepository().getRepositoryId(), rabbitMqConsumerMap);
                 }
@@ -621,18 +621,18 @@ public class ForceCIController {
                 throw new Exception("User already connected to ForceCI");
             }
         }
-        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(sfdcConnectionDetails.getBranchConnectedTo());
+        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
 
         if (develop != null && develop.stringPropertyNames() != null && !develop.stringPropertyNames().isEmpty()) {
             // Do nothing
         } else {
             RepositoryWrapper byRepositoryRepositoryId = repositoryWrapperMongoRepository.findByRepositoryRepositoryId(sfdcConnectionDetails.getGitRepoId());
-            Queue queue = new Queue(sfdcConnectionDetails.getBranchConnectedTo(), true);
+            Queue queue = new Queue(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), true);
             rabbitMqSenderConfig.amqpAdmin().declareQueue(queue);
-            rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(byRepositoryRepositoryId.getRepository().getRepositoryName())).withQueueName());
+            rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(byRepositoryRepositoryId.getRepository().getRepositoryId())).withQueueName());
             RabbitMqConsumer container = new RabbitMqConsumer();
             container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-            container.setQueueNames(sfdcConnectionDetails.getBranchConnectedTo());
+            container.setQueueNames(queue.getName());
             container.setConcurrentConsumers(1);
             container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
             container.startConsumers();
@@ -641,7 +641,7 @@ public class ForceCIController {
 
             } else {
                 rabbitMqConsumerMap = new ConcurrentHashMap<>();
-                rabbitMqConsumerMap.put(sfdcConnectionDetails.getBranchConnectedTo(), container);
+                rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
             }
         }
         sfdcConnectionDetails.setOauthSaved("true");
@@ -755,10 +755,10 @@ public class ForceCIController {
             return;
         }
 
-        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(targetBranch);
+        Properties develop = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(gitRepoId + "_" + targetBranch);
         String queue_name = develop.getProperty("QUEUE_NAME");
 
-        Long aLong = deploymentJobMongoRepository.countByRepoId(gitRepoId);
+        Long aLong = deploymentJobMongoRepository.countByRepoIdAndTargetBranch(gitRepoId, targetBranch);
 
         // Create the object detail to be passed to RabbitMQ
         DeploymentJob deploymentJob = new DeploymentJob();
