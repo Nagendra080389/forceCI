@@ -183,7 +183,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 
 });
 
-connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams, $mdDialog) {
+connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
