@@ -1,4 +1,4 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize','angularUtils.directives.dirPagination','ngMaterial']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize','angularUtils.directives.dirPagination']);
 let sse;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
