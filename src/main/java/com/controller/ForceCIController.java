@@ -816,7 +816,7 @@ public class ForceCIController {
         }
         deploymentJob.setCreatedDate(new Date());
         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
-        rabbitTemplate.convertAndSend(repoName, queue_name, savedDeploymentJob);
+        rabbitTemplate.convertAndSend(gitRepoId, queue_name, savedDeploymentJob);
         if (consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())) {
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(sfdcConnectionDetail.getGitRepoId());
             if ((rabbitMqConsumerMap != null && !rabbitMqConsumerMap.containsKey(queue_name))) {
