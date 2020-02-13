@@ -133,7 +133,7 @@ public class ForceCIController {
         executor.execute(() -> {
             try {
                 if (StringUtils.hasText(userName) && StringUtils.hasText(repoId) && StringUtils.hasText(branchName)) {
-                    List<DeploymentJob> byTargetBranch = deploymentJobMongoRepository.findByRepoId(repoId);
+                    List<DeploymentJob> byTargetBranch = deploymentJobMongoRepository.findByRepoIdAndTargetBranch(repoId, branchName);
                     List<DeploymentJobWrapper> jobWrapperList = new ArrayList<>();
                     if (byTargetBranch != null && !byTargetBranch.isEmpty()) {
                         for (DeploymentJob targetBranch : byTargetBranch) {
