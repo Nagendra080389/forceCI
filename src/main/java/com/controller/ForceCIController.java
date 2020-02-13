@@ -530,7 +530,7 @@ public class ForceCIController {
             if (status == 204) {
                 try {
                     consumerMap.remove(repositoryId);
-                    rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryName);
+                    rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryId);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
@@ -595,7 +595,7 @@ public class ForceCIController {
                 repositoryWrapper.setRepository(repository);
                 repositoryWrapperMongoRepository.save(repositoryWrapper);
                 try {
-                    rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange(repository.getRepositoryName()));
+                    rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange(repository.getRepositoryId()));
                     Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
                     consumerMap.put(repository.getRepositoryId(), rabbitMqConsumerMap);
                 } catch (URISyntaxException e) {
