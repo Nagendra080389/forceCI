@@ -1,4 +1,4 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize','angularUtils.directives.dirPagination']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize','angularUtils.directives.dirPagination','ngMaterial']);
 let sse;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
@@ -183,7 +183,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 
 });
 
-connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams) {
+connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams, $mdDialog) {
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
@@ -305,6 +305,25 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         sfdcRefreshTokenFromExternalPage = '';
     };
 
+    $scope.createSnapshot = function (targetBranch, repoId) {
+        $scope.showPrompt = function(ev) {
+            // Appending dialog to document.body to cover sidenav in docs app
+            const confirm = $mdDialog.prompt()
+                .title('Create Snapshot')
+                .textContent('Take a snapshot of current branch.')
+                .placeholder('Branch Name')
+                .targetEvent(ev)
+                .required(true)
+                .ok('Create')
+                .cancel('Cancel');
+
+            $mdDialog.show(confirm).then(function(result) {
+                // If confirmed run this code
+            }, function() {
+                // If cancelled run this code
+            });
+        };
+    };
 
     $scope.authorize = function (sfdcOrg) {
         let url = '';
