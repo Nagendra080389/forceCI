@@ -366,12 +366,12 @@ public class ForceCIController {
             httpClient = new HttpClient();
             int createBranchCode = httpClient.executeMethod(createBranch);
             if(createBranchCode == HTTP_STATUS_CREATED){
-                return "Success";
+                return gson.toJson("Success");
             } else {
-                return "Error";
+                return gson.toJson("Error");
             }
         }
-        return "Error";
+        return gson.toJson("Error");
     }
 
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)
