@@ -317,16 +317,25 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             .cancel('Cancel');
 
         $mdDialog.show(confirm).then(function(result) {
+            // If confirmed run this code
             $http.get("/createBranch?repoId=" + repoId +
                 "&targetBranch="+targetBranch + "&userName="+$scope.userName + "&newBranchName="+result).then(function (response) {
-                const result = response.data;
-                console.log(result);
+                const responseResult = response.data;
+                if(responseResult === 'Success'){
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: result + ' created successfully'
+                    });
+                } else {
+                    iziToast.error({title: 'Error', message: 'Not able to create branch.', position: 'topRight'});
+                }
             }, function (error) {
                 console.log(error);
             });
-            // If confirmed run this code
         }, function() {
-            // If cancelled run this code
+            // If cancelled Do nothing
         });
     };
 
