@@ -21,7 +21,10 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;
 import org.kohsuke.github.*;
@@ -358,12 +361,13 @@ public class ForceCIController {
             PostMethod createBranch = new PostMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/refs");
             createBranch.setRequestHeader("Authorization", "token " + access_token);
             createBranch.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
-            NameValuePair[] data = {
-                    new NameValuePair("ref", "refs/heads/"+newBranchName),
-                    new NameValuePair("sha", targetSHA)
-            };
-            System.out.println("data -> "+ Arrays.toString(data));
-            createBranch.setRequestBody(data);
+            CreateBranch objCreateBranch = new CreateBranch("refs/heads/"+newBranchName, targetSHA);
+            System.out.println("objCreateBranch -> "+gson.toJson(objCreateBranch));
+            StringRequestEntity requestEntity = new StringRequestEntity(
+                    gson.toJson(objCreateBranch),
+                    "application/json",
+                    "UTF-8");
+            createBranch.setRequestEntity(requestEntity);
             httpClient = new HttpClient();
             int createBranchCode = httpClient.executeMethod(createBranch);
             System.out.println("response create branch -> "+ IOUtils.toString(createBranch.getResponseBodyAsStream(), StandardCharsets.UTF_8));
