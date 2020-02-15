@@ -135,6 +135,7 @@ public class ForceCIController {
                         for (DeploymentJob deploymentJob : byTargetBranch) {
                             DeploymentJobWrapper deploymentJobWrapper = new DeploymentJobWrapper();
                             deploymentJobWrapper.setSourceBranch(deploymentJob.getSourceBranch());
+                            deploymentJobWrapper.setPackageXML(deploymentJob.getPackageXML());
                             deploymentJobWrapper.setId(deploymentJob.getId());
                             deploymentJobWrapper.setJobNo(deploymentJob.getJobId());
                             deploymentJobWrapper.setPrNumber(deploymentJob.getPullRequestNumber());
@@ -357,12 +358,10 @@ public class ForceCIController {
         if(fetchSHACode == HTTP_STATUS_OK){
             SHAObject shaObject = gson.fromJson(IOUtils.toString(fetchSHA.getResponseBodyAsStream(), StandardCharsets.UTF_8), SHAObject.class);
             String targetSHA = shaObject.getObject().getSha();
-            System.out.println("targetSHA -> "+targetSHA);
             PostMethod createBranch = new PostMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/refs");
             createBranch.setRequestHeader("Authorization", "token " + access_token);
             createBranch.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             CreateBranch objCreateBranch = new CreateBranch("refs/heads/"+newBranchName, targetSHA);
-            System.out.println("objCreateBranch -> "+gson.toJson(objCreateBranch));
             StringRequestEntity requestEntity = new StringRequestEntity(
                     gson.toJson(objCreateBranch),
                     "application/json",
@@ -370,7 +369,6 @@ public class ForceCIController {
             createBranch.setRequestEntity(requestEntity);
             httpClient = new HttpClient();
             int createBranchCode = httpClient.executeMethod(createBranch);
-            System.out.println("response create branch -> "+ IOUtils.toString(createBranch.getResponseBodyAsStream(), StandardCharsets.UTF_8));
             if(createBranchCode == HTTP_STATUS_CREATED){
                 return gson.toJson("Success");
             } else {

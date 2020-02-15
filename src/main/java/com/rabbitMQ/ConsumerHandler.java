@@ -138,6 +138,23 @@ public class ConsumerHandler {
                         lstFileLines.add(eachLine);
                     }
                 }
+
+                StringBuilder stringBuilder = new StringBuilder();
+                // Iterate and extract package xml formed.
+                for (int i = 0; i < sf_build.size(); i++) {
+                    if(sf_build.get(i).startsWith("====FINAL PACKAGE.XML=====")){
+                        for (int j = i; j < sf_build.size(); j++) {
+                            if(sf_build.get(j).startsWith("Package generated.")){
+                                break;
+                            } else {
+                                stringBuilder.append(sf_build.get(j)).append("\n");
+                            }
+                        }
+                    }
+                }
+                deploymentJob.setPackageXML(stringBuilder.toString());
+                deploymentJobMongoRepository.save(deploymentJob);
+
                 if(merge){
                     deploymentJob.setLstDeploymentBuildLines(lstFileLines);
                 } else {
