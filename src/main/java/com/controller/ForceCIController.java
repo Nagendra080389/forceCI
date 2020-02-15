@@ -17,11 +17,14 @@ import com.rabbitMQ.RabbitMqSenderConfig;
 import com.utils.ApiSecurity;
 import com.utils.ValidationStatus;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;
 import org.kohsuke.github.*;
@@ -133,7 +136,9 @@ public class ForceCIController {
                         for (DeploymentJob deploymentJob : byTargetBranch) {
                             DeploymentJobWrapper deploymentJobWrapper = new DeploymentJobWrapper();
                             deploymentJobWrapper.setSourceBranch(deploymentJob.getSourceBranch());
-                            deploymentJobWrapper.setPackageXML(URLEncoder.encode(deploymentJob.getPackageXML(), StandardCharsets.UTF_8.name()));
+                            if(StringUtils.hasText(deploymentJob.getPackageXML())) {
+                                deploymentJobWrapper.setPackageXML(URLEncoder.encode(deploymentJob.getPackageXML(), StandardCharsets.UTF_8.name()));
+                            }
                             deploymentJobWrapper.setId(deploymentJob.getId());
                             deploymentJobWrapper.setJobNo(deploymentJob.getJobId());
                             deploymentJobWrapper.setPrNumber(deploymentJob.getPullRequestNumber());
