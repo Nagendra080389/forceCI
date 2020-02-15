@@ -7,6 +7,7 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     private String jobNo;
     private String prNumber;
     private String prHtml;
+    private String sourceBranch;
     private boolean boolSfdcValidationRunning;
     private boolean boolSfdcValidationPass;
     private boolean boolSfdcValidationFail;
@@ -30,6 +31,13 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     private String codeReviewValidationFail;
     private String codeReviewValidationNotStarted;
 
+    public String getSourceBranch() {
+        return sourceBranch;
+    }
+
+    public void setSourceBranch(String sourceBranch) {
+        this.sourceBranch = sourceBranch;
+    }
 
     public boolean isBoolSFDCDeploymentRunning() {
         return boolSFDCDeploymentRunning;

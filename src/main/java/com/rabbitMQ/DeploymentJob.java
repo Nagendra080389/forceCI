@@ -29,6 +29,7 @@ public class DeploymentJob implements Serializable {
     private String repoId;
     private String baseSHA;
     private String statusesUrl;
+    private String packageXML;
     private List<String> lstBuildLines;
     private List<String> lstDeploymentBuildLines;
     private boolean boolSfdcCompleted;
@@ -61,6 +62,14 @@ public class DeploymentJob implements Serializable {
 
     public void setBoolCodeReviewNotStarted(boolean boolCodeReviewNotStarted) {
         this.boolCodeReviewNotStarted = boolCodeReviewNotStarted;
+    }
+
+    public String getPackageXML() {
+        return packageXML;
+    }
+
+    public void setPackageXML(String packageXML) {
+        this.packageXML = packageXML;
     }
 
     public String getBaseSHA() {

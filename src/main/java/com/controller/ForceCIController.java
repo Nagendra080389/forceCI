@@ -17,6 +17,7 @@ import com.rabbitMQ.RabbitMqSenderConfig;
 import com.utils.ApiSecurity;
 import com.utils.ValidationStatus;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -97,15 +98,6 @@ public class ForceCIController {
     @Autowired
     private DeploymentJobMongoRepository deploymentJobMongoRepository;
 
-    //@RequestMapping(value = "/**/{[path:[^\\.]*}")
-    /*public String redirect(ServletResponse response, ServletRequest
-            request) throws IOException {
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        // Forward to home page so that route is preserved.
-        httpResponse.sendRedirect("/");
-        return null;
-    }*/
-
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
                 " is " + jsonObject.get("deployment_status").getAsJsonObject().get("state").getAsString());
@@ -125,6 +117,7 @@ public class ForceCIController {
         return accessToken;
     }
 
+
     @GetMapping("/asyncDeployments")
     public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoId, @RequestParam String branchName) {
         final SseEmitter emitter = new SseEmitter();
@@ -136,57 +129,58 @@ public class ForceCIController {
                     List<DeploymentJob> byTargetBranch = deploymentJobMongoRepository.findByRepoIdAndTargetBranch(repoId, branchName);
                     List<DeploymentJobWrapper> jobWrapperList = new ArrayList<>();
                     if (byTargetBranch != null && !byTargetBranch.isEmpty()) {
-                        for (DeploymentJob targetBranch : byTargetBranch) {
+                        for (DeploymentJob deploymentJob : byTargetBranch) {
                             DeploymentJobWrapper deploymentJobWrapper = new DeploymentJobWrapper();
-                            deploymentJobWrapper.setId(targetBranch.getId());
-                            deploymentJobWrapper.setJobNo(targetBranch.getJobId());
-                            deploymentJobWrapper.setPrNumber(targetBranch.getPullRequestNumber());
-                            deploymentJobWrapper.setPrHtml(targetBranch.getPullRequestHtmlUrl());
+                            deploymentJobWrapper.setSourceBranch(deploymentJob.getSourceBranch());
+                            deploymentJobWrapper.setId(deploymentJob.getId());
+                            deploymentJobWrapper.setJobNo(deploymentJob.getJobId());
+                            deploymentJobWrapper.setPrNumber(deploymentJob.getPullRequestNumber());
+                            deploymentJobWrapper.setPrHtml(deploymentJob.getPullRequestHtmlUrl());
 
-                            if (targetBranch.isBoolSfdcDeploymentNotStarted()) {
+                            if (deploymentJob.isBoolSfdcDeploymentNotStarted()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentNotStarted(true);
                                 deploymentJobWrapper.setSfdcDeploymentNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
                             }
-                            if (targetBranch.isBoolSfdcDeploymentRunning()) {
+                            if (deploymentJob.isBoolSfdcDeploymentRunning()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentRunning(true);
                                 deploymentJobWrapper.setSfdcDeploymentRunning(ValidationStatus.VALIDATION_RUNNING.getText());
                             }
 
-                            if (targetBranch.isBoolSfdcDeploymentFail()) {
+                            if (deploymentJob.isBoolSfdcDeploymentFail()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentFail(true);
                                 deploymentJobWrapper.setSfdcDeploymentFail(ValidationStatus.VALIDATION_FAIL.getText());
                             }
 
-                            if (targetBranch.isBoolSfdcDeploymentPass()) {
+                            if (deploymentJob.isBoolSfdcDeploymentPass()) {
                                 deploymentJobWrapper.setBoolSFDCDeploymentPass(true);
                                 deploymentJobWrapper.setSfdcDeploymentPass(ValidationStatus.VALIDATION_PASS.getText());
                             }
 
-                            if (targetBranch.isBoolCodeReviewNotStarted()) {
+                            if (deploymentJob.isBoolCodeReviewNotStarted()) {
                                 deploymentJobWrapper.setBoolCodeReviewNotStarted(true);
                                 deploymentJobWrapper.setCodeReviewValidationNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
                             }
-                            if (targetBranch.isBoolCodeReviewPass()) {
+                            if (deploymentJob.isBoolCodeReviewPass()) {
                                 deploymentJobWrapper.setBoolCodeReviewValidationPass(true);
                                 deploymentJobWrapper.setCodeReviewValidationPass(ValidationStatus.VALIDATION_PASS.getText());
                             }
-                            if (targetBranch.isBoolCodeReviewRunning()) {
+                            if (deploymentJob.isBoolCodeReviewRunning()) {
                                 deploymentJobWrapper.setBoolCodeReviewValidationRunning(true);
                                 deploymentJobWrapper.setCodeReviewValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
                             }
-                            if (targetBranch.isBoolCodeReviewFail()) {
+                            if (deploymentJob.isBoolCodeReviewFail()) {
                                 deploymentJobWrapper.setBoolCodeReviewValidationFail(true);
                                 deploymentJobWrapper.setCodeReviewValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
                             }
-                            if (targetBranch.isBoolSfdcRunning()) {
+                            if (deploymentJob.isBoolSfdcRunning()) {
                                 deploymentJobWrapper.setBoolSfdcValidationRunning(true);
                                 deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
                             }
-                            if (targetBranch.isBoolSfdcPass()) {
+                            if (deploymentJob.isBoolSfdcPass()) {
                                 deploymentJobWrapper.setBoolSfdcValidationPass(true);
                                 deploymentJobWrapper.setSfdcValidationPass(ValidationStatus.VALIDATION_PASS.getText());
                             }
-                            if (targetBranch.isBoolSfdcFail()) {
+                            if (deploymentJob.isBoolSfdcFail()) {
                                 deploymentJobWrapper.setBoolSfdcValidationFail(true);
                                 deploymentJobWrapper.setSfdcValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
                             }
@@ -341,6 +335,43 @@ public class ForceCIController {
 
         Gson gson = new Gson();
         return gson.toJson(lstBranchesToBeReturned);
+    }
+
+    @RequestMapping(value = "/createBranch", method = RequestMethod.GET)
+    public String createBranch(@RequestParam String repoId, @RequestParam String targetBranch,
+                               @RequestParam String userName, @RequestParam String newBranchName,
+                               HttpServletResponse response,
+                               HttpServletRequest request) throws IOException, GitAPIException {
+        String access_token = fetchCookies(request);
+        Gson gson = new Gson();
+        GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
+        GHRepository repository = gitHub.getRepositoryById(repoId);
+        GetMethod fetchSHA = new GetMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/ref/heads/" + targetBranch);
+        fetchSHA.setRequestHeader("Authorization", "token " + access_token);
+        fetchSHA.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
+        HttpClient httpClient = new HttpClient();
+        int fetchSHACode = httpClient.executeMethod(fetchSHA);
+        if(fetchSHACode == HTTP_STATUS_OK){
+            SHAObject shaObject = gson.fromJson(IOUtils.toString(fetchSHA.getResponseBodyAsStream(), StandardCharsets.UTF_8), SHAObject.class);
+            String targetSHA = shaObject.getObject().getSha();
+            PostMethod createBranch = new PostMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/refs");
+            createBranch.setRequestHeader("Authorization", "token " + access_token);
+            createBranch.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
+            NameValuePair[] data = {
+                    new NameValuePair("refPair", "refs/heads/"+newBranchName),
+                    new NameValuePair("sha", targetSHA)
+            };
+
+            createBranch.setRequestBody(data);
+            httpClient = new HttpClient();
+            int createBranchCode = httpClient.executeMethod(createBranch);
+            if(createBranchCode == HTTP_STATUS_CREATED){
+                return "Success";
+            } else {
+                return "Error";
+            }
+        }
+        return "Error";
     }
 
     @RequestMapping(value = "/hooks/github", method = RequestMethod.POST)

@@ -32,7 +32,7 @@
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
             <a aria-controls="collapseTwo" aria-expanded="true" class="nav-link collapsed" data-target="#collapseTwo"
-               data-toggle="collapse" href="javascript:;">
+               data-toggle="collapse" href="javascript:void(0);">
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Apps</span>
             </a>
@@ -40,7 +40,7 @@
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Custom Components:</h6>
                     <a class="collapse-item" href="#!apps/dashboard/createApp">Manage Apps</a>
-                    <a class="collapse-item" href="javascript:;">-----</a>
+                    <a class="collapse-item" href="javascript:void(0);">-----</a>
                 </div>
             </div>
         </li>
@@ -72,7 +72,7 @@
                     <!-- Nav Item - Search Dropdown (Visible Only XS) -->
                     <li class="nav-item dropdown no-arrow d-sm-none">
                         <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown"
-                           href="javascript:;" id="searchDropdown" role="button">
+                           href="javascript:void(0);" id="searchDropdown" role="button">
                             <i class="fas fa-search fa-fw"></i>
                         </a>
                         <!-- Dropdown - Messages -->
@@ -98,19 +98,19 @@
                     <!-- Nav Item - User Information -->
                     <li class="nav-item dropdown no-arrow">
                         <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown"
-                           href="javascript:;" id="userDropdown" role="button">
+                           href="javascript:void(0);" id="userDropdown" role="button">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{userName}}</span>
                             <img class="img-profile rounded-circle" src="{{avatar_url}}">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div aria-labelledby="userDropdown"
                              class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                            <a class="dropdown-item" href="javascript:;">
+                            <a class="dropdown-item" href="javascript:void(0);">
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Profile
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" data-target="#logoutModal" data-toggle="modal" href="javascript:;">
+                            <a class="dropdown-item" data-target="#logoutModal" data-toggle="modal" href="javascript:void(0);">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
                             </a>
@@ -146,7 +146,7 @@
                             </div>
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <a class="btn btn-primary" href="javascript:;" ng-click="createNewConnection();">
+                                    <a class="btn btn-primary" href="javascript:void(0);" ng-click="createNewConnection();">
                                         <span class="text">Create Connections</span>
                                     </a>
                                 </div>
@@ -230,7 +230,7 @@
                                     </form>
                                 </div>
                                 <div class="row ">
-                                    <div class="col-xl-3 col-md-6 mb-4" ng-repeat="eachSFDCData in lstSFDCConnectionDetails">
+                                    <div class="col-xl-4 col-md-4 col-sm-4 mb-4" ng-repeat="eachSFDCData in lstSFDCConnectionDetails">
                                         <div class="card border-left-primary shadow h-100 py-2" ng-click="showDataOnForm(eachSFDCData)" style="cursor: pointer;">
                                             <div class="card-body">
                                                 <div class="row no-gutters align-items-center">
@@ -250,7 +250,7 @@
                                                             <a class="btn btn-primary" href="#!apps/dashboard/app/{{repoName}}/{{repoId}}/{{eachSFDCData.branchConnectedTo}}">Deployments</a>
                                                         </div>
                                                         <div class="h5 mb-1 mt-1 font-weight-bold text-gray-800">
-                                                            <a class="btn btn-primary" href="javascript:;" ng-click="createSnapshot(eachSFDCData.branchConnectedTo, repoId, $event)">Take Snapshot</a>
+                                                            <a class="btn btn-primary" href="javascript:void(0);" ng-click="createSnapshot(eachSFDCData.branchConnectedTo, repoId, $event)">Take Snapshot</a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -290,7 +290,7 @@
     <!-- End of Content Wrapper -->
 
     <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" data-href="#page-top" href="javascript:;">
+    <a class="scroll-to-top rounded" data-href="#page-top" href="javascript:void(0);">
         <i class="fas fa-angle-up"></i>
     </a>
 
@@ -308,7 +308,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
-                    <a class="btn btn-primary" href="javascript:;" ng-click="logoutFunction();">Logout</a>
+                    <a class="btn btn-primary" href="javascript:void(0);" ng-click="logoutFunction();">Logout</a>
                 </div>
             </div>
         </div>

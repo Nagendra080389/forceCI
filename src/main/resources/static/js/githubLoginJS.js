@@ -317,6 +317,11 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             .cancel('Cancel');
 
         $mdDialog.show(confirm).then(function(result) {
+            $http.get("/createBranch?repoId=" + repoId +
+                "&targetBranch="+targetBranch + "&userName="+$scope.userName + "&newBranchName="+result).then(function (response) {
+                const result = response.data;
+                console.log(result);
+            })
             // If confirmed run this code
         }, function() {
             // If cancelled run this code
@@ -565,7 +570,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     };
 
     // table headers that we need to show
-    $scope.tableHeaders = ['Job No.', 'PR No.', 'Validation Status', 'Deployment Status'];
+    $scope.tableHeaders = ['Job No.', 'PR No.', 'Source Branch' , 'Validation Status', 'Deployment Status'];
 
     sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
     sse.addEventListener("message", function (objMessageEvent) {
