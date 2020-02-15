@@ -359,7 +359,7 @@ public class ForceCIController {
             createBranch.setRequestHeader("Authorization", "token " + access_token);
             createBranch.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
             NameValuePair[] data = {
-                    new NameValuePair("refPair", "refs/heads/"+newBranchName),
+                    new NameValuePair("ref", "refs/heads/"+newBranchName),
                     new NameValuePair("sha", targetSHA)
             };
             System.out.println("data -> "+ Arrays.toString(data));
