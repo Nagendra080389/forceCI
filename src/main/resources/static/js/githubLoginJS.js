@@ -321,7 +321,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 "&targetBranch="+targetBranch + "&userName="+$scope.userName + "&newBranchName="+result).then(function (response) {
                 const result = response.data;
                 console.log(result);
-            })
+            }, function (error) {
+                console.log(error);
+            });
             // If confirmed run this code
         }, function() {
             // If cancelled run this code
