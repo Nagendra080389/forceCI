@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -136,8 +137,10 @@ public class ForceCIController {
                         for (DeploymentJob deploymentJob : byTargetBranch) {
                             DeploymentJobWrapper deploymentJobWrapper = new DeploymentJobWrapper();
                             deploymentJobWrapper.setSourceBranch(deploymentJob.getSourceBranch());
-                            if(StringUtils.hasText(deploymentJob.getPackageXML())) {
-                                deploymentJobWrapper.setPackageXML(URLEncoder.encode(deploymentJob.getPackageXML(), StandardCharsets.UTF_8.name()));
+                            if (StringUtils.hasText(deploymentJob.getPackageXML())) {
+                                deploymentJobWrapper.setPackageXML(encodeURIComponent(deploymentJob.getPackageXML()));
+                            } else {
+                                deploymentJobWrapper.setPackageXML(encodeURIComponent(""));
                             }
                             deploymentJobWrapper.setId(deploymentJob.getId());
                             deploymentJobWrapper.setJobNo(deploymentJob.getJobId());
@@ -358,13 +361,13 @@ public class ForceCIController {
         fetchSHA.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
         HttpClient httpClient = new HttpClient();
         int fetchSHACode = httpClient.executeMethod(fetchSHA);
-        if(fetchSHACode == HTTP_STATUS_OK){
+        if (fetchSHACode == HTTP_STATUS_OK) {
             SHAObject shaObject = gson.fromJson(IOUtils.toString(fetchSHA.getResponseBodyAsStream(), StandardCharsets.UTF_8), SHAObject.class);
             String targetSHA = shaObject.getObject().getSha();
             PostMethod createBranch = new PostMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/refs");
             createBranch.setRequestHeader("Authorization", "token " + access_token);
             createBranch.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
-            CreateBranch objCreateBranch = new CreateBranch("refs/heads/"+newBranchName, targetSHA);
+            CreateBranch objCreateBranch = new CreateBranch("refs/heads/" + newBranchName, targetSHA);
             StringRequestEntity requestEntity = new StringRequestEntity(
                     gson.toJson(objCreateBranch),
                     "application/json",
@@ -372,7 +375,7 @@ public class ForceCIController {
             createBranch.setRequestEntity(requestEntity);
             httpClient = new HttpClient();
             int createBranchCode = httpClient.executeMethod(createBranch);
-            if(createBranchCode == HTTP_STATUS_CREATED){
+            if (createBranchCode == HTTP_STATUS_CREATED) {
                 return gson.toJson("Success");
             } else {
                 return gson.toJson("Error");
@@ -716,7 +719,7 @@ public class ForceCIController {
             } else if (type.equals("codeValidation")) {
                 List<PMDStructure> lstPmdStructures = byJobIdAndRepoId.get(0).getLstPmdStructures();
                 List<String> stringList = new ArrayList<>();
-                if(lstPmdStructures != null){
+                if (lstPmdStructures != null) {
                     for (PMDStructure pmdStructure : lstPmdStructures) {
                         stringList.add(pmdStructure.getName() + " \n " + "Line Number : " + pmdStructure.getLineNumber() + " \n "
                                 + "Review Feedback : " + pmdStructure.getReviewFeedback() + "\n" + "Rule URL : " + pmdStructure.getRuleUrl());
@@ -917,6 +920,27 @@ public class ForceCIController {
         public void setRepositoryWrappers(List<RepositoryWrapper> repositoryWrappers) {
             this.repositoryWrappers = repositoryWrappers;
         }
+    }
+
+    public static String encodeURIComponent(String s) {
+        String result = null;
+
+        try {
+            result = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
+                    .replaceAll("\\+", "%20")
+                    .replaceAll("\\%21", "!")
+                    .replaceAll("\\%27", "'")
+                    .replaceAll("\\%28", "(")
+                    .replaceAll("\\%29", ")")
+                    .replaceAll("\\%7E", "~");
+        }
+
+        // This exception should never occur.
+        catch (UnsupportedEncodingException e) {
+            result = s;
+        }
+
+        return result;
     }
 
 }
