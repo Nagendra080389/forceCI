@@ -354,6 +354,7 @@ public class ForceCIController {
         if(fetchSHACode == HTTP_STATUS_OK){
             SHAObject shaObject = gson.fromJson(IOUtils.toString(fetchSHA.getResponseBodyAsStream(), StandardCharsets.UTF_8), SHAObject.class);
             String targetSHA = shaObject.getObject().getSha();
+            System.out.println("targetSHA -> "+targetSHA);
             PostMethod createBranch = new PostMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/refs");
             createBranch.setRequestHeader("Authorization", "token " + access_token);
             createBranch.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
@@ -361,7 +362,7 @@ public class ForceCIController {
                     new NameValuePair("refPair", "refs/heads/"+newBranchName),
                     new NameValuePair("sha", targetSHA)
             };
-
+            System.out.println("data -> "+ Arrays.toString(data));
             createBranch.setRequestBody(data);
             httpClient = new HttpClient();
             int createBranchCode = httpClient.executeMethod(createBranch);
