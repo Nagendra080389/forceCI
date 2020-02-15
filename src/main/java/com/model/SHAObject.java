@@ -7,7 +7,7 @@ public class SHAObject {
 
     private String node_id;
 
-    private Object object;
+    private ObjectCustom object;
 
     public String getRef() {
         return ref;
@@ -33,11 +33,11 @@ public class SHAObject {
         this.node_id = node_id;
     }
 
-    public Object getObject() {
+    public ObjectCustom getObject() {
         return object;
     }
 
-    public void setObject(Object object) {
+    public void setObject(ObjectCustom object) {
         this.object = object;
     }
 

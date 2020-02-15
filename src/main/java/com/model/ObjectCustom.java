@@ -1,6 +1,6 @@
 package com.model;
 
-public class Object {
+public class ObjectCustom {
     private String type;
 
     private String sha;
