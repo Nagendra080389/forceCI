@@ -1,7 +1,7 @@
 <!-- Page Wrapper -->
 <div id="wrapper">
 
-    <!-- Sidebar -->
+<!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
@@ -153,6 +153,7 @@
                                 <div ng-show="row.boolCodeReviewValidationPass === true" class="code {{row.codeReviewValidationPass}}">Code Validation</div>
                                 <div ng-show="row.boolCodeReviewNotStarted === true" class="code {{row.codeReviewValidationNotStarted}}">Code Validation</div>
                             </td>
+                            <td><pre>{{row.packageXML | decodeURIComponent}}</pre></td>
                             <td>
                                 <div ng-show="row.boolSFDCDeploymentRunning === true" class="{{row.sfdcDeploymentRunning}} ">SFDC Deployment</div>
                                 <div ng-show="row.boolSFDCDeploymentFail === true" class="{{row.sfdcDeploymentFail}} " ng-click="downloadValidation(row.jobNo, 'sfdcDeployment')">SFDC Deployment</div>

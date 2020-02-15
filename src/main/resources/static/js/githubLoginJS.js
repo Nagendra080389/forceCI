@@ -1,4 +1,9 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize','angularUtils.directives.dirPagination','ngMaterial']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial']);
+
+connect2Deploy.filter('decodeURIComponent', function() {
+    return window.decodeURIComponent;
+});
+
 let sse;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
@@ -55,7 +60,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location)
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     };
 
-    $scope.logoutFunction = function(){
+    $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
 
@@ -70,7 +75,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
-    $scope.logoutFunction = function(){
+    $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
     $http.get("/fetchUserName").then(function (response) {
@@ -210,7 +215,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         sse.close();
     }
 
-    $scope.logoutFunction = function(){
+    $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
 
@@ -316,12 +321,12 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             .ok('Create')
             .cancel('Cancel');
 
-        $mdDialog.show(confirm).then(function(result) {
+        $mdDialog.show(confirm).then(function (result) {
             // If confirmed run this code
             $http.get("/createBranch?repoId=" + repoId +
-                "&targetBranch="+targetBranch + "&userName="+$scope.userName + "&newBranchName="+result).then(function (response) {
+                "&targetBranch=" + targetBranch + "&userName=" + $scope.userName + "&newBranchName=" + result).then(function (response) {
                 const responseResult = response.data;
-                if(responseResult === 'Success'){
+                if (responseResult === 'Success') {
                     iziToast.success({
                         timeout: 5000,
                         icon: 'fa fa-chrome',
@@ -334,7 +339,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             }, function (error) {
                 console.log(error);
             });
-        }, function() {
+        }, function () {
             // If cancelled Do nothing
         });
     };
@@ -503,7 +508,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
         sse.close();
     }
 
-    $scope.logoutFunction = function(){
+    $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
     $scope.fetchRepo = function () {
@@ -576,7 +581,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.branchName = $routeParams.branchConnectedTo;
     $scope.lstDeployments = [];
 
-    $scope.logoutFunction = function(){
+    $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
 
@@ -597,7 +602,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
         $http.get("/fetchLogs" + "?jobNo=" + jobNo + "&" + "type=" + type + "&" + "repoId=" + repoId).then(function (response) {
             if (response.data !== undefined && response.data !== null && response.data !== '') {
                 // any kind of extension (.txt,.cpp,.cs,.bat)
-                var filename = type+"_"+jobNo+".txt";
+                var filename = type + "_" + jobNo + ".txt";
                 var blob = new Blob([response.data.join('\n')], {
                     type: "text/plain;charset=utf-8"
                 });
