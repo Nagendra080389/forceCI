@@ -366,6 +366,7 @@ public class ForceCIController {
             createBranch.setRequestBody(data);
             httpClient = new HttpClient();
             int createBranchCode = httpClient.executeMethod(createBranch);
+            System.out.println("response create branch -> "+ IOUtils.toString(createBranch.getResponseBodyAsStream(), StandardCharsets.UTF_8));
             if(createBranchCode == HTTP_STATUS_CREATED){
                 return gson.toJson("Success");
             } else {
