@@ -66,7 +66,7 @@ public class ConsumerHandler {
 
             Map<String, String> propertiesMap = new HashMap<>();
             Path tempDirectory = null;
-            if(merge){
+            if (merge) {
                 tempDirectory = Files.createTempDirectory(targetBranch);
             } else {
                 tempDirectory = Files.createTempDirectory(sourceBranch);
@@ -105,7 +105,7 @@ public class ConsumerHandler {
                 propertiesMap.put("originURL", gitCloneURL);
                 propertiesMap.put("antPath", antJar.getPath());
                 // Only run on Merge
-                if(merge) {
+                if (merge) {
                     propertiesMap.put("scriptName", get_diff_commits.getName());
                 } else {
                     propertiesMap.put("scriptName", get_diff_branches.getName());
@@ -114,7 +114,7 @@ public class ConsumerHandler {
                 propertiesMap.put("userEmail", emailId);
                 propertiesMap.put("userName", userName);
                 propertiesMap.put("sf.deploy.serverurl", sfdcConnectionDetail.getInstanceURL());
-                if(merge){
+                if (merge) {
                     propertiesMap.put("sf.checkOnly", "false");
                 } else {
                     propertiesMap.put("sf.checkOnly", "true");
@@ -142,9 +142,9 @@ public class ConsumerHandler {
                 StringBuilder stringBuilder = new StringBuilder();
                 // Iterate and extract package xml formed.
                 for (int i = 0; i < sf_build.size(); i++) {
-                    if(sf_build.get(i).startsWith("====FINAL PACKAGE.XML=====")){
+                    if (sf_build.get(i).startsWith("====FINAL PACKAGE.XML=====")) {
                         for (int j = i; j < sf_build.size(); j++) {
-                            if(sf_build.get(j).startsWith("Package generated.")){
+                            if (sf_build.get(j).startsWith("Package generated.")) {
                                 break;
                             } else {
                                 stringBuilder.append(sf_build.get(j)).append("\n");
@@ -155,7 +155,7 @@ public class ConsumerHandler {
                 deploymentJob.setPackageXML(stringBuilder.toString());
                 deploymentJobMongoRepository.save(deploymentJob);
 
-                if(merge){
+                if (merge) {
                     deploymentJob.setLstDeploymentBuildLines(lstFileLines);
                 } else {
                     deploymentJob.setLstBuildLines(lstFileLines);
@@ -204,8 +204,8 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Validation Passed -> "+status);
-                        if(merge) {
+                        System.out.println("Validation Passed -> " + status);
+                        if (merge) {
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentPass(true);
                         } else {
@@ -225,8 +225,8 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Validation Failed -> "+status);
-                        if(merge){
+                        System.out.println("Validation Failed -> " + status);
+                        if (merge) {
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentFail(true);
                         } else {
@@ -243,7 +243,7 @@ public class ConsumerHandler {
                 deploymentJob.setLastModifiedDate(new Date());
                 deploymentJobMongoRepository.save(deploymentJob);
 
-                if(sfdcPass && !merge){
+                if (sfdcPass && !merge) {
                     Gson gson = new Gson();
                     GithubStatusObject githubStatusObject = null;
                     int status = 0;
@@ -261,10 +261,10 @@ public class ConsumerHandler {
 
                     PmdReviewService pmdReviewService = new PmdReviewService(sourceCodeProcessor, ruleSets);
 
-                    Iterator<File> fileIterator = FileUtils.iterateFiles(new File(tempDirectory.toFile().getPath() + "/deploy"),null, true);
+                    Iterator<File> fileIterator = FileUtils.iterateFiles(new File(tempDirectory.toFile().getPath() + "/deploy"), null, true);
                     List<PMDStructure> pmdStructures = new ArrayList<>();
                     FileInputStream fileInputStream = null;
-                    while(fileIterator.hasNext()){
+                    while (fileIterator.hasNext()) {
                         File next = fileIterator.next();
                         fileInputStream = new FileInputStream(next);
                         try {
@@ -279,13 +279,13 @@ public class ConsumerHandler {
                                 pmdStructure.setRulePriority(ruleViolation.getRule().getPriority().getPriority());
                                 pmdStructures.add(pmdStructure);
                             }
-                        } catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         } finally {
                             fileInputStream.close();
                         }
                     }
-                    if(!pmdStructures.isEmpty()){
+                    if (!pmdStructures.isEmpty()) {
 
                         githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
                                 ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION,
@@ -293,7 +293,7 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Code Validation Pass -> "+status);
+                        System.out.println("Code Validation Pass -> " + status);
 
 
                         deploymentJob.setBoolCodeReviewRunning(false);
@@ -307,7 +307,7 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Code Validation Failed -> "+status);
+                        System.out.println("Code Validation Failed -> " + status);
 
 
                         deploymentJob.setBoolCodeReviewRunning(false);
