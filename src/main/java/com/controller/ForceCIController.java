@@ -136,8 +136,6 @@ public class ForceCIController {
                             deploymentJobWrapper.setSourceBranch(deploymentJob.getSourceBranch());
                             if (StringUtils.hasText(deploymentJob.getPackageXML())) {
                                 deploymentJobWrapper.setPackageXML(encodeURIComponent(deploymentJob.getPackageXML()));
-                            } else {
-                                deploymentJobWrapper.setPackageXML(encodeURIComponent(""));
                             }
                             deploymentJobWrapper.setId(deploymentJob.getId());
                             deploymentJobWrapper.setJobNo(deploymentJob.getJobId());
