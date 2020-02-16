@@ -572,7 +572,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
 });
 
-connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams) {
+connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams, $mdDialog) {
     $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
     const repoId = $scope.repoId = $routeParams.repoId;
@@ -586,7 +586,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     };
 
     // table headers that we need to show
-    $scope.tableHeaders = ['Job No.', 'PR No.', 'Source Branch' , 'Validation Status', 'Deployment Status'];
+    $scope.tableHeaders = ['Job No.', 'PR No.', 'Source Branch', 'Generated Package' , 'Validation Status', 'Deployment Status'];
 
     sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
     sse.addEventListener("message", function (objMessageEvent) {
@@ -597,6 +597,26 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
         }
     });
 
+    $scope.showAlert = function(ev, deploymentId) {
+        const deploymentList = $scope.lstDeployments;
+        let packageString = '';
+        for (let i = 0; i < deploymentList.length; i++) {
+            if(deploymentList[i].id === deploymentId){
+                packageString = deploymentList[i].packageXML;
+                break;
+            }
+        }
+
+        $mdDialog.show({
+            controller: function ($scope) {
+                $scope.msg = packageString;
+            },
+            template: '<div class="md-padding" style="border: 1px solid black;margin: 10px;"><pre>{{msg | decodeURIComponent}}</pre></div>',
+            parent: angular.element(document.body),
+            clickOutsideToClose: true,
+            fullscreen: true
+            });
+    };
 
     $scope.downloadValidation = function (jobNo, type) {
         $http.get("/fetchLogs" + "?jobNo=" + jobNo + "&" + "type=" + type + "&" + "repoId=" + repoId).then(function (response) {

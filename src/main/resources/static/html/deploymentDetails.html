@@ -153,7 +153,10 @@
                                 <div ng-show="row.boolCodeReviewValidationPass === true" class="code {{row.codeReviewValidationPass}}">Code Validation</div>
                                 <div ng-show="row.boolCodeReviewNotStarted === true" class="code {{row.codeReviewValidationNotStarted}}">Code Validation</div>
                             </td>
-                            <td><pre>{{row.packageXML | decodeURIComponent}}</pre></td>
+                            <td>
+                                <div ng-show="row.packageXML !== null"><a class="btn btn-primary disabled" href="javascript:void(0);" ng-click="showAlert($event, row.id)">Show</a></div>
+                                <div ng-show="row.packageXML === null"><a class="btn btn-primary" href="javascript:void(0);">Show</a></div>
+                            </td>
                             <td>
                                 <div ng-show="row.boolSFDCDeploymentRunning === true" class="{{row.sfdcDeploymentRunning}} ">SFDC Deployment</div>
                                 <div ng-show="row.boolSFDCDeploymentFail === true" class="{{row.sfdcDeploymentFail}} " ng-click="downloadValidation(row.jobNo, 'sfdcDeployment')">SFDC Deployment</div>
