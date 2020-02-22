@@ -581,7 +581,15 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.branchName = $routeParams.branchConnectedTo;
     $scope.lstDeployments = [];
 
-    $scope.logoutFunction = function () {
+    $scope.cancelDeployment = function (deploymentJobId) {
+        $http.post("/cancelDeployment", deploymentJobId).then(function (response) {
+
+        }, function (error) {
+            console.log(error);
+        })
+    };
+
+    $scope.cancelDeployment = function (sfdcDetails) {
         logoutFunctionCaller($location);
     };
 
@@ -610,8 +618,15 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
         $mdDialog.show({
             controller: function ($scope) {
                 $scope.msg = packageString;
+                $scope.closeDialog = function() {
+                    $mdDialog.hide();
+                }
             },
-            template: '<div class="md-padding" style="border: 1px solid black;margin: 10px;"><pre>{{msg | decodeURIComponent}}</pre></div>',
+            template: '<div class="md-padding" style="border: 1px solid black;margin: 10px;">' +
+                '<button type="button" class="close" ng-click="closeDialog()" aria-label="Close">\n' +
+                '  <span aria-hidden="true">×</span>\n' +
+                '</button>' +
+                '<pre>{{msg | decodeURIComponent}}</pre></div>',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             fullscreen: true

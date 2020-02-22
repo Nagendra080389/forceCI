@@ -9,6 +9,7 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     private String prHtml;
     private String sourceBranch;
     private String packageXML;
+    private String sfdcAsyncJobId;
     private boolean boolSfdcValidationRunning;
     private boolean boolSfdcValidationPass;
     private boolean boolSfdcValidationFail;
@@ -31,6 +32,14 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     private String codeReviewValidationPass;
     private String codeReviewValidationFail;
     private String codeReviewValidationNotStarted;
+
+    public String getSfdcAsyncJobId() {
+        return sfdcAsyncJobId;
+    }
+
+    public void setSfdcAsyncJobId(String sfdcAsyncJobId) {
+        this.sfdcAsyncJobId = sfdcAsyncJobId;
+    }
 
     public String getSourceBranch() {
         return sourceBranch;

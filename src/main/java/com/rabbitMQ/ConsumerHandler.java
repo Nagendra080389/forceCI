@@ -18,6 +18,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -27,6 +29,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class ConsumerHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerHandler.class);
 
     private DeploymentJobMongoRepository deploymentJobMongoRepository;
 
@@ -136,6 +140,14 @@ public class ConsumerHandler {
                             eachLine.startsWith(" +Target: ") || eachLine.startsWith("Setting project") || eachLine.startsWith("Adding reference") ||
                             eachLine.startsWith("Detected ") || eachLine.startsWith("Setting ro project ") || eachLine.startsWith("Condition "))) {
                         lstFileLines.add(eachLine);
+                    }
+                    try {
+                        if (eachLine.contains("Request ID for the current deploy task:")) {
+                            String sfdcAsyncJobId = eachLine.split("Request ID for the current deploy task:")[1].replace("\"", "").replace(",", "");
+                            deploymentJob.setSfdcAsyncJobId(sfdcAsyncJobId);
+                        }
+                    } catch (Exception e){
+                        logger.error(e.getMessage());
                     }
                 }
 

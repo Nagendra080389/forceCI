@@ -152,6 +152,7 @@
                                 <div ng-show="row.boolCodeReviewValidationFail === true" class="code {{row.codeReviewValidationFail}}" ng-click="downloadValidation(row.jobNo, 'codeValidation')">Code Validation</div>
                                 <div ng-show="row.boolCodeReviewValidationPass === true" class="code {{row.codeReviewValidationPass}}">Code Validation</div>
                                 <div ng-show="row.boolCodeReviewNotStarted === true" class="code {{row.codeReviewValidationNotStarted}}">Code Validation</div>
+                                <!--<span><a class="btn btn-primary" href="javascript:void(0);" ng-click="cancelDeployment(row.id)">Show</a></span>-->
                             </td>
                             <td>
                                 <div ng-show="row.packageXML !== null"><a class="btn btn-primary" href="javascript:void(0);" ng-click="showAlert($event, row.id)">Show</a></div>

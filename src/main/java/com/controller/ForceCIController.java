@@ -14,7 +14,10 @@ import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
+import com.sforce.soap.metadata.MetadataConnection;
+import com.sforce.ws.ConnectorConfig;
 import com.utils.ApiSecurity;
+import com.utils.SFDCUtils;
 import com.utils.ValidationStatus;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
@@ -22,8 +25,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.json.JSONException;
 import org.kohsuke.github.*;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.BindingBuilder;
@@ -86,6 +87,8 @@ public class ForceCIController {
     String sfdcRedirectURI;
     @Value("${application.hmacSecretKet}")
     String hmacSecretKet;
+    @Value("${salesforce.metadataEndpoint}")
+    String salesforceMetaDataEndpoint;
     private Map<String, Map<String, RabbitMqConsumer>> consumerMap = new ConcurrentHashMap<>();
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
@@ -119,6 +122,33 @@ public class ForceCIController {
         return accessToken;
     }
 
+    @PostMapping("/cancelDeployment")
+    public String cancelDeployment(String deploymentJobId) throws Exception {
+        Gson gson = new Gson();
+        Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
+        boolean boolDeploymentCancelled = false;
+        if(jobMongoRepositoryById.isPresent()){
+            DeploymentJob deploymentJob = jobMongoRepositoryById.get();
+            String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
+            String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
+            ConnectorConfig connectorConfig = new ConnectorConfig();
+            connectorConfig.setServiceEndpoint(instanceURL+salesforceMetaDataEndpoint);
+            connectorConfig.setSessionId(oauthToken);
+            MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
+            try {
+                boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob);
+            } catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+        if(boolDeploymentCancelled) {
+            return gson.toJson("Success");
+        } else {
+            return gson.toJson("Error");
+        }
+    }
+
 
     @GetMapping("/asyncDeployments")
     public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoId, @RequestParam String branchName) {
@@ -137,6 +167,7 @@ public class ForceCIController {
                             if (StringUtils.hasText(deploymentJob.getPackageXML())) {
                                 deploymentJobWrapper.setPackageXML(encodeURIComponent(deploymentJob.getPackageXML()));
                             }
+                            deploymentJobWrapper.setSfdcAsyncJobId(deploymentJob.getSfdcAsyncJobId());
                             deploymentJobWrapper.setId(deploymentJob.getId());
                             deploymentJobWrapper.setJobNo(deploymentJob.getJobId());
                             deploymentJobWrapper.setPrNumber(deploymentJob.getPullRequestNumber());
@@ -328,7 +359,8 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/getAllBranches", method = RequestMethod.GET)
-    public String getAllBranches(@RequestParam String strRepoId, HttpServletResponse response, HttpServletRequest request) throws IOException, GitAPIException {
+    public String getAllBranches(@RequestParam String strRepoId, HttpServletResponse response,
+                                 HttpServletRequest request) throws IOException {
         String access_token = fetchCookies(request);
         GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
         GHRepository repository = gitHub.getRepositoryById(strRepoId);
@@ -346,7 +378,7 @@ public class ForceCIController {
     public String createBranch(@RequestParam String repoId, @RequestParam String targetBranch,
                                @RequestParam String userName, @RequestParam String newBranchName,
                                HttpServletResponse response,
-                               HttpServletRequest request) throws IOException, GitAPIException {
+                               HttpServletRequest request) throws IOException {
         String access_token = fetchCookies(request);
         Gson gson = new Gson();
         GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
@@ -490,7 +522,7 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/fetchUserName", method = RequestMethod.GET)
-    public String getUserName(HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+    public String getUserName(HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
         String loginNameAndAvatar = "";
         String accessToken = fetchCookies(request);
@@ -513,14 +545,15 @@ public class ForceCIController {
                 userWrapperMongoRepository.save(userWrapper);
                 loginNameAndAvatar = gson.toJson(gitRepositoryUser);
             } else {
-                throw new JSONException("Bad Credentials");
+                throw new Exception("Bad Credentials");
             }
         }
         return loginNameAndAvatar;
     }
 
     @RequestMapping(value = "/fetchRepository", method = RequestMethod.GET)
-    public String getRepositoryByName(@RequestParam String repoName, @RequestParam String repoUser, HttpServletResponse response, HttpServletRequest request) throws IOException, JSONException {
+    public String getRepositoryByName(@RequestParam String repoName, @RequestParam String repoUser,
+                                      HttpServletResponse response, HttpServletRequest request) throws IOException {
         Cookie[] cookies = request.getCookies();
         Gson gson = new Gson();
         String lstRepo = "";

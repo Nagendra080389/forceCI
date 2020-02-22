@@ -24,6 +24,7 @@ public class DeploymentJob implements Serializable {
     private String gitCloneURL;
     private String sourceBranch;
     private String targetBranch;
+    private String sfdcAsyncJobId;
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
     private String repoId;
@@ -55,6 +56,14 @@ public class DeploymentJob implements Serializable {
     @LastModifiedDate
     private Date lastModifiedDate;
     private List<PMDStructure> lstPmdStructures;
+
+    public String getSfdcAsyncJobId() {
+        return sfdcAsyncJobId;
+    }
+
+    public void setSfdcAsyncJobId(String sfdcAsyncJobId) {
+        this.sfdcAsyncJobId = sfdcAsyncJobId;
+    }
 
     public boolean isBoolCodeReviewNotStarted() {
         return boolCodeReviewNotStarted;
