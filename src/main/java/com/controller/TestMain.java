@@ -3,7 +3,6 @@ package com.controller;
 import com.rabbitMQ.ConsumerHandler;
 import com.utils.AntExecutor;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -16,7 +15,7 @@ import java.util.stream.Stream;
 
 public class TestMain {
 
-    public static void main(String[] args) throws IOException, GitAPIException {
+    public static void main(String[] args) throws IOException {
 
         Map<String, String> propertiesMap = new HashMap<>();
         Path tempDirectory = Files.createTempDirectory("TestMe");
