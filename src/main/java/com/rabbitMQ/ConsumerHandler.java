@@ -36,7 +36,9 @@ public class ConsumerHandler {
 
     private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
 
-    public ConsumerHandler(DeploymentJobMongoRepository deploymentJobMongoRepository, SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository) {
+
+    public ConsumerHandler(DeploymentJobMongoRepository deploymentJobMongoRepository,
+                           SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository) {
         this.deploymentJobMongoRepository = deploymentJobMongoRepository;
         this.sfdcConnectionDetailsMongoRepository = sfdcConnectionDetailsMongoRepository;
     }
@@ -173,7 +175,7 @@ public class ConsumerHandler {
                     deploymentJob.setLstBuildLines(lstFileLines);
                 }
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
-                    if (eachBuildLine.contains("Failed to login: INVALID_SESSION_ID")) {
+                    if (eachBuildLine.contains("Failed to login:")) {
                         // try to get proper access token again
                         String refreshToken = sfdcConnectionDetail.getRefreshToken();
                         String environment = sfdcConnectionDetail.getEnvironment();
@@ -230,24 +232,10 @@ public class ConsumerHandler {
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
-                        Gson gson = new Gson();
-                        GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
-                                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.VALIDATION,
-                                ForceCIController.CONNECT2DEPLOY_URL + "/" +
-                                        sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
-                        int status = ForceCIController.createStatusAndReturnCode(gson,
-                                deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Validation Failed -> " + status);
-                        if (merge) {
-                            deploymentJob.setBoolSfdcDeploymentRunning(false);
-                            deploymentJob.setBoolSfdcDeploymentFail(true);
-                        } else {
-                            deploymentJob.setBoolSfdcCompleted(true);
-                            deploymentJob.setBoolSfdcRunning(false);
-                            deploymentJob.setBoolSfdcFail(true);
-                            deploymentJob.setBoolSfdcPass(false);
-                            deploymentJob.setBoolCodeReviewCompleted(false);
-                        }
+                        setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
+                        break;
+                    } else {
+                        setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
                         break;
                     }
                 }
@@ -338,6 +326,26 @@ public class ConsumerHandler {
             e.printStackTrace();
         }
         return lstFileLines;
+    }
+
+    private void setFailedDeploymentDetails(DeploymentJob deploymentJob, SFDCConnectionDetails sfdcConnectionDetail, String targetBranch, boolean merge) throws IOException {
+        Gson gson = new Gson();
+        GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
+                ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.VALIDATION,
+                ForceCIController.CONNECT2DEPLOY_URL + "/" +
+                        sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
+        int status = ForceCIController.createStatusAndReturnCode(gson,
+                deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
+        if (merge) {
+            deploymentJob.setBoolSfdcDeploymentRunning(false);
+            deploymentJob.setBoolSfdcDeploymentFail(true);
+        } else {
+            deploymentJob.setBoolSfdcCompleted(true);
+            deploymentJob.setBoolSfdcRunning(false);
+            deploymentJob.setBoolSfdcFail(true);
+            deploymentJob.setBoolSfdcPass(false);
+            deploymentJob.setBoolCodeReviewCompleted(false);
+        }
     }
 
     public static File stream2file(InputStream in) throws IOException {
