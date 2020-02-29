@@ -234,10 +234,10 @@ public class ConsumerHandler {
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
                         setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
                         break;
-                    } else {
+                    }/* else {
                         setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
                         break;
-                    }
+                    }*/
                 }
 
                 deploymentJob.setLastModifiedDate(new Date());
