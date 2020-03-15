@@ -139,11 +139,12 @@ public class ForceCIController {
                 connectorConfig.setSessionId(oauthToken);
                 MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
                 System.out.println("metadataConnection -> "+metadataConnection);
+                System.out.println("oauthToken -> "+oauthToken);
+                System.out.println("instanceURL -> "+instanceURL + salesforceMetaDataEndpoint);
                 try {
                     boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    System.out.println(e.getMessage());
                 }
             } else {
                 boolDeploymentCancelled = true;
