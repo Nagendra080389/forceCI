@@ -164,7 +164,7 @@
                                     <div ng-show="row.boolJobCancelled === true"
                                          class="sfdc {{row.jobCancelled}}">SFDC Cancelled
                                     </div>
-                                    <div class="text-center my-1" ng-show="row.boolJobCancelled === false && (row.boolSfdcValidationPass === true || row.boolSfdcValidationFail === true)">
+                                    <div class="text-center my-1" ng-show="row.boolJobCancelled === false && row.boolSfdcValidationRunning === true">
                                         <i class="fa fa-close d-cursor" ng-click="cancelDeployment(row.id)"></i>
                                     </div>
                                 </div>
