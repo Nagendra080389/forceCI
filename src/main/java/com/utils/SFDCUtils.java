@@ -5,16 +5,23 @@ import com.sforce.soap.metadata.CancelDeployResult;
 import com.sforce.soap.metadata.DeployResult;
 import com.sforce.soap.metadata.DeployStatus;
 import com.sforce.soap.metadata.MetadataConnection;
+import com.sforce.ws.ConnectorConfig;
 
 public class SFDCUtils {
 
-    public static boolean cancelDeploy(MetadataConnection metadataConnection, DeploymentJob deploymentJob) throws Exception {
+    public static boolean cancelDeploy(String salesforceMetaDataEndpoint, DeploymentJob deploymentJob) throws Exception {
 
         String asyncId = deploymentJob.getSfdcAsyncJobId();
         // Issue the deployment cancellation request
-        System.out.println("asyncId -> "+asyncId);
-        System.out.println("metadataConnection asd -> "+metadataConnection);
-        System.out.println("deploymentJob -> "+deploymentJob);
+        String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL() + salesforceMetaDataEndpoint;
+        String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
+        ConnectorConfig connectorConfig = new ConnectorConfig();
+        System.out.println("instanceURL -> "+instanceURL);
+        System.out.println("oauthToken -> "+oauthToken);
+        connectorConfig.setServiceEndpoint(instanceURL);
+        connectorConfig.setSessionId(oauthToken);
+        MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
+
         CancelDeployResult result = metadataConnection.cancelDeploy(asyncId);
 
         // If the deployment cancellation completed, write a message to the output.

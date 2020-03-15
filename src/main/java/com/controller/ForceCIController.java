@@ -132,17 +132,8 @@ public class ForceCIController {
         if (jobMongoRepositoryById.isPresent()) {
             deploymentJob = jobMongoRepositoryById.get();
             if (StringUtils.hasText(deploymentJob.getSfdcAsyncJobId())) {
-                String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
-                String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
-                ConnectorConfig connectorConfig = new ConnectorConfig();
-                connectorConfig.setServiceEndpoint(instanceURL + salesforceMetaDataEndpoint);
-                connectorConfig.setSessionId(oauthToken);
-                MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
-                System.out.println("metadataConnection -> "+metadataConnection);
-                System.out.println("oauthToken -> "+oauthToken);
-                System.out.println("instanceURL -> "+instanceURL + salesforceMetaDataEndpoint);
                 try {
-                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob);
+                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(salesforceMetaDataEndpoint, deploymentJob);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
