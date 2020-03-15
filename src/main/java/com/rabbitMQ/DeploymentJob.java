@@ -28,6 +28,7 @@ public class DeploymentJob implements Serializable {
     private SFDCConnectionDetails sfdcConnectionDetail;
     private String queueName;
     private String repoId;
+    private String repoName;
     private String baseSHA;
     private String statusesUrl;
     private String packageXML;
@@ -57,6 +58,15 @@ public class DeploymentJob implements Serializable {
     @LastModifiedDate
     private Date lastModifiedDate;
     private List<PMDStructure> lstPmdStructures;
+
+
+    public String getRepoName() {
+        return repoName;
+    }
+
+    public void setRepoName(String repoName) {
+        this.repoName = repoName;
+    }
 
     public boolean isBoolIsJobCancelled() {
         return boolIsJobCancelled;

@@ -125,15 +125,13 @@ public class ForceCIController {
 
     @PostMapping("/cancelDeployment")
     public String cancelDeployment(@RequestBody String deploymentJobId) throws Exception {
-        System.out.println("deploymentJobId -> "+deploymentJobId);
         Gson gson = new Gson();
         Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
         boolean boolDeploymentCancelled = false;
-        System.out.println("jobMongoRepositoryById -> "+jobMongoRepositoryById.get());
         DeploymentJob deploymentJob = null;
-        if(jobMongoRepositoryById.isPresent()){
+        if (jobMongoRepositoryById.isPresent()) {
             deploymentJob = jobMongoRepositoryById.get();
-            if(StringUtils.hasText(deploymentJob.getSfdcAsyncJobId())) {
+            if (StringUtils.hasText(deploymentJob.getSfdcAsyncJobId())) {
                 String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
                 String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
                 ConnectorConfig connectorConfig = new ConnectorConfig();
@@ -150,10 +148,13 @@ public class ForceCIController {
             }
         }
 
-        if(boolDeploymentCancelled) {
-            if(!ObjectUtils.isEmpty(deploymentJob)){
+        if (boolDeploymentCancelled) {
+            if (!ObjectUtils.isEmpty(deploymentJob)) {
                 deploymentJob.setBoolIsJobCancelled(true);
                 deploymentJobMongoRepository.save(deploymentJob);
+                GithubStatusObject githubStatusObject = new GithubStatusObject(ERROR, BUILD_IS_ERROR, deploymentJob.getTargetBranch() + VALIDATION,
+                        CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
+                createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
             }
             return gson.toJson("Success");
         } else {
@@ -185,7 +186,7 @@ public class ForceCIController {
                             deploymentJobWrapper.setPrNumber(deploymentJob.getPullRequestNumber());
                             deploymentJobWrapper.setPrHtml(deploymentJob.getPullRequestHtmlUrl());
 
-                            if(deploymentJob.isBoolIsJobCancelled()){
+                            if (deploymentJob.isBoolIsJobCancelled()) {
                                 deploymentJobWrapper.setBoolJobCancelled(true);
                                 deploymentJobWrapper.setBoolCodeReviewNotStarted(false);
                                 deploymentJobWrapper.setBoolCodeReviewValidationFail(false);
@@ -876,6 +877,7 @@ public class ForceCIController {
             deploymentJob.setJobId(String.valueOf(aLong.intValue() + 1));
         }
         deploymentJob.setRepoId(gitRepoId);
+        deploymentJob.setRepoName(repoName);
         if (StringUtils.hasText(prNumber)) {
             deploymentJob.setPullRequestNumber(prNumber);
         }
