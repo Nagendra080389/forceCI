@@ -454,6 +454,7 @@ public class ForceCIController {
         String access_token = fetchCookies(request);
         String emailId = null;
         SFDCConnectionDetails sfdcConnectionDetails = null;
+        System.out.println("githubEvent -> "+githubEvent);
         switch (githubEvent) {
             case "pull_request":
                 String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
