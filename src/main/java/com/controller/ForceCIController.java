@@ -123,8 +123,8 @@ public class ForceCIController {
         return accessToken;
     }
 
-    @PostMapping("/cancelDeployment")
-    public String cancelDeployment(@RequestBody String deploymentJobId) throws Exception {
+    @GetMapping("/cancelDeployment")
+    public String cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
         Gson gson = new Gson();
         Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
         boolean boolDeploymentCancelled = false;

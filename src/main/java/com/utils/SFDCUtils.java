@@ -18,6 +18,7 @@ public class SFDCUtils {
         ConnectorConfig connectorConfig = new ConnectorConfig();
         System.out.println("instanceURL -> "+instanceURL);
         System.out.println("oauthToken -> "+oauthToken);
+        System.out.println("asyncId -> "+asyncId);
         connectorConfig.setServiceEndpoint(instanceURL);
         connectorConfig.setSessionId(oauthToken);
         MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
