@@ -34,6 +34,7 @@ public class DeploymentJob implements Serializable {
     private List<String> lstBuildLines;
     private List<String> lstDeploymentBuildLines;
     private boolean boolSfdcCompleted;
+    private boolean boolIsJobCancelled;
     private boolean boolSfdcRunning;
     private boolean boolSfdcPass;
     private boolean boolSfdcFail;
@@ -56,6 +57,14 @@ public class DeploymentJob implements Serializable {
     @LastModifiedDate
     private Date lastModifiedDate;
     private List<PMDStructure> lstPmdStructures;
+
+    public boolean isBoolIsJobCancelled() {
+        return boolIsJobCancelled;
+    }
+
+    public void setBoolIsJobCancelled(boolean boolIsJobCancelled) {
+        this.boolIsJobCancelled = boolIsJobCancelled;
+    }
 
     public String getSfdcAsyncJobId() {
         return sfdcAsyncJobId;

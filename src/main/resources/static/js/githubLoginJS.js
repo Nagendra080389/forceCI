@@ -1,6 +1,6 @@
 var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial']);
 
-connect2Deploy.filter('decodeURIComponent', function() {
+connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
 });
 
@@ -583,18 +583,18 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 
     $scope.cancelDeployment = function (deploymentJobId) {
         $http.post("/cancelDeployment", deploymentJobId).then(function (response) {
-
+            console.log(response);
         }, function (error) {
             console.log(error);
         })
     };
 
-    $scope.cancelDeployment = function (sfdcDetails) {
+    $scope.logoutFunction = function (sfdcDetails) {
         logoutFunctionCaller($location);
     };
 
     // table headers that we need to show
-    $scope.tableHeaders = ['Job No.', 'PR No.', 'Source Branch', 'Validation Status', 'Generated Package' , 'Deployment Status'];
+    $scope.tableHeaders = ['Job No.', 'PR No.', 'Source Branch', 'Validation Status', 'Generated Package', 'Deployment Status'];
 
     sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
     sse.addEventListener("message", function (objMessageEvent) {
@@ -605,11 +605,11 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
         }
     });
 
-    $scope.showAlert = function(ev, deploymentId) {
+    $scope.showAlert = function (ev, deploymentId) {
         const deploymentList = $scope.lstDeployments;
         let packageString = '';
         for (let i = 0; i < deploymentList.length; i++) {
-            if(deploymentList[i].id === deploymentId){
+            if (deploymentList[i].id === deploymentId) {
                 packageString = deploymentList[i].packageXML;
                 break;
             }
@@ -618,7 +618,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
         $mdDialog.show({
             controller: function ($scope) {
                 $scope.msg = packageString;
-                $scope.closeDialog = function() {
+                $scope.closeDialog = function () {
                     $mdDialog.hide();
                 }
             },
@@ -630,7 +630,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             fullscreen: true
-            });
+        });
     };
 
     $scope.downloadValidation = function (jobNo, type) {

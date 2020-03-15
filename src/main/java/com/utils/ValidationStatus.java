@@ -4,6 +4,7 @@ public enum ValidationStatus {
     VALIDATION_RUNNING("validationRunning"),
     VALIDATION_PASS("validationPass"),
     VALIDATION_FAIL("validationFail"),
+    VALIDATION_CANCELLED("cancelledJob"),
     VALIDATION_NOTSTARTED("validationNotStarted");
 
     private String text;

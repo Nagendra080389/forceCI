@@ -35,6 +35,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -127,22 +128,31 @@ public class ForceCIController {
         Gson gson = new Gson();
         Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
         boolean boolDeploymentCancelled = false;
+        DeploymentJob deploymentJob = null;
         if(jobMongoRepositoryById.isPresent()){
-            DeploymentJob deploymentJob = jobMongoRepositoryById.get();
-            String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
-            String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
-            ConnectorConfig connectorConfig = new ConnectorConfig();
-            connectorConfig.setServiceEndpoint(instanceURL+salesforceMetaDataEndpoint);
-            connectorConfig.setSessionId(oauthToken);
-            MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
-            try {
-                boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob);
-            } catch (Exception e){
-                System.out.println(e.getMessage());
+            deploymentJob = jobMongoRepositoryById.get();
+            if(StringUtils.hasText(deploymentJob.getSfdcAsyncJobId())) {
+                String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
+                String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
+                ConnectorConfig connectorConfig = new ConnectorConfig();
+                connectorConfig.setServiceEndpoint(instanceURL + salesforceMetaDataEndpoint);
+                connectorConfig.setSessionId(oauthToken);
+                MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
+                try {
+                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            } else {
+                boolDeploymentCancelled = true;
             }
         }
 
         if(boolDeploymentCancelled) {
+            if(!ObjectUtils.isEmpty(deploymentJob)){
+                deploymentJob.setBoolIsJobCancelled(true);
+                deploymentJobMongoRepository.save(deploymentJob);
+            }
             return gson.toJson("Success");
         } else {
             return gson.toJson("Error");
@@ -173,52 +183,69 @@ public class ForceCIController {
                             deploymentJobWrapper.setPrNumber(deploymentJob.getPullRequestNumber());
                             deploymentJobWrapper.setPrHtml(deploymentJob.getPullRequestHtmlUrl());
 
-                            if (deploymentJob.isBoolSfdcDeploymentNotStarted()) {
-                                deploymentJobWrapper.setBoolSFDCDeploymentNotStarted(true);
-                                deploymentJobWrapper.setSfdcDeploymentNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
-                            }
-                            if (deploymentJob.isBoolSfdcDeploymentRunning()) {
-                                deploymentJobWrapper.setBoolSFDCDeploymentRunning(true);
-                                deploymentJobWrapper.setSfdcDeploymentRunning(ValidationStatus.VALIDATION_RUNNING.getText());
-                            }
+                            if(deploymentJob.isBoolIsJobCancelled()){
+                                deploymentJobWrapper.setBoolJobCancelled(true);
+                                deploymentJobWrapper.setBoolCodeReviewNotStarted(false);
+                                deploymentJobWrapper.setBoolCodeReviewValidationFail(false);
+                                deploymentJobWrapper.setBoolCodeReviewValidationPass(false);
+                                deploymentJobWrapper.setBoolCodeReviewValidationRunning(false);
+                                deploymentJobWrapper.setBoolSFDCDeploymentFail(false);
+                                deploymentJobWrapper.setBoolSFDCDeploymentNotStarted(false);
+                                deploymentJobWrapper.setBoolSFDCDeploymentPass(false);
+                                deploymentJobWrapper.setBoolSFDCDeploymentRunning(false);
+                                deploymentJobWrapper.setBoolSfdcValidationFail(false);
+                                deploymentJobWrapper.setBoolSfdcValidationPass(false);
+                                deploymentJobWrapper.setBoolSfdcValidationRunning(false);
+                                deploymentJobWrapper.setJobCancelled(ValidationStatus.VALIDATION_CANCELLED.getText());
+                            } else {
 
-                            if (deploymentJob.isBoolSfdcDeploymentFail()) {
-                                deploymentJobWrapper.setBoolSFDCDeploymentFail(true);
-                                deploymentJobWrapper.setSfdcDeploymentFail(ValidationStatus.VALIDATION_FAIL.getText());
-                            }
+                                if (deploymentJob.isBoolSfdcDeploymentNotStarted()) {
+                                    deploymentJobWrapper.setBoolSFDCDeploymentNotStarted(true);
+                                    deploymentJobWrapper.setSfdcDeploymentNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
+                                }
+                                if (deploymentJob.isBoolSfdcDeploymentRunning()) {
+                                    deploymentJobWrapper.setBoolSFDCDeploymentRunning(true);
+                                    deploymentJobWrapper.setSfdcDeploymentRunning(ValidationStatus.VALIDATION_RUNNING.getText());
+                                }
 
-                            if (deploymentJob.isBoolSfdcDeploymentPass()) {
-                                deploymentJobWrapper.setBoolSFDCDeploymentPass(true);
-                                deploymentJobWrapper.setSfdcDeploymentPass(ValidationStatus.VALIDATION_PASS.getText());
-                            }
+                                if (deploymentJob.isBoolSfdcDeploymentFail()) {
+                                    deploymentJobWrapper.setBoolSFDCDeploymentFail(true);
+                                    deploymentJobWrapper.setSfdcDeploymentFail(ValidationStatus.VALIDATION_FAIL.getText());
+                                }
 
-                            if (deploymentJob.isBoolCodeReviewNotStarted()) {
-                                deploymentJobWrapper.setBoolCodeReviewNotStarted(true);
-                                deploymentJobWrapper.setCodeReviewValidationNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
-                            }
-                            if (deploymentJob.isBoolCodeReviewPass()) {
-                                deploymentJobWrapper.setBoolCodeReviewValidationPass(true);
-                                deploymentJobWrapper.setCodeReviewValidationPass(ValidationStatus.VALIDATION_PASS.getText());
-                            }
-                            if (deploymentJob.isBoolCodeReviewRunning()) {
-                                deploymentJobWrapper.setBoolCodeReviewValidationRunning(true);
-                                deploymentJobWrapper.setCodeReviewValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
-                            }
-                            if (deploymentJob.isBoolCodeReviewFail()) {
-                                deploymentJobWrapper.setBoolCodeReviewValidationFail(true);
-                                deploymentJobWrapper.setCodeReviewValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
-                            }
-                            if (deploymentJob.isBoolSfdcRunning()) {
-                                deploymentJobWrapper.setBoolSfdcValidationRunning(true);
-                                deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
-                            }
-                            if (deploymentJob.isBoolSfdcPass()) {
-                                deploymentJobWrapper.setBoolSfdcValidationPass(true);
-                                deploymentJobWrapper.setSfdcValidationPass(ValidationStatus.VALIDATION_PASS.getText());
-                            }
-                            if (deploymentJob.isBoolSfdcFail()) {
-                                deploymentJobWrapper.setBoolSfdcValidationFail(true);
-                                deploymentJobWrapper.setSfdcValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
+                                if (deploymentJob.isBoolSfdcDeploymentPass()) {
+                                    deploymentJobWrapper.setBoolSFDCDeploymentPass(true);
+                                    deploymentJobWrapper.setSfdcDeploymentPass(ValidationStatus.VALIDATION_PASS.getText());
+                                }
+
+                                if (deploymentJob.isBoolCodeReviewNotStarted()) {
+                                    deploymentJobWrapper.setBoolCodeReviewNotStarted(true);
+                                    deploymentJobWrapper.setCodeReviewValidationNotStarted(ValidationStatus.VALIDATION_NOTSTARTED.getText());
+                                }
+                                if (deploymentJob.isBoolCodeReviewPass()) {
+                                    deploymentJobWrapper.setBoolCodeReviewValidationPass(true);
+                                    deploymentJobWrapper.setCodeReviewValidationPass(ValidationStatus.VALIDATION_PASS.getText());
+                                }
+                                if (deploymentJob.isBoolCodeReviewRunning()) {
+                                    deploymentJobWrapper.setBoolCodeReviewValidationRunning(true);
+                                    deploymentJobWrapper.setCodeReviewValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
+                                }
+                                if (deploymentJob.isBoolCodeReviewFail()) {
+                                    deploymentJobWrapper.setBoolCodeReviewValidationFail(true);
+                                    deploymentJobWrapper.setCodeReviewValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
+                                }
+                                if (deploymentJob.isBoolSfdcRunning()) {
+                                    deploymentJobWrapper.setBoolSfdcValidationRunning(true);
+                                    deploymentJobWrapper.setSfdcValidationRunning(ValidationStatus.VALIDATION_RUNNING.getText());
+                                }
+                                if (deploymentJob.isBoolSfdcPass()) {
+                                    deploymentJobWrapper.setBoolSfdcValidationPass(true);
+                                    deploymentJobWrapper.setSfdcValidationPass(ValidationStatus.VALIDATION_PASS.getText());
+                                }
+                                if (deploymentJob.isBoolSfdcFail()) {
+                                    deploymentJobWrapper.setBoolSfdcValidationFail(true);
+                                    deploymentJobWrapper.setSfdcValidationFail(ValidationStatus.VALIDATION_FAIL.getText());
+                                }
                             }
                             jobWrapperList.add(deploymentJobWrapper);
                         }
@@ -884,6 +911,7 @@ public class ForceCIController {
 
         }
         deploymentJob.setCreatedDate(new Date());
+        deploymentJob.setBoolIsJobCancelled(false);
         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
         rabbitTemplate.convertAndSend(gitRepoId, queue_name, savedDeploymentJob);
         if (consumerMap != null && !consumerMap.isEmpty() && !consumerMap.containsKey(sfdcConnectionDetail.getGitRepoId())) {

@@ -150,18 +150,18 @@
                                         <span class="text">Create Connections</span>
                                     </a>
                                 </div>
-                                <div class="col-12 col-sm-6 col-md-8">
+                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
                                     <form>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label required" for="inputorgNamel3">Name</label>
-                                            <div class="col-sm-10">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label required" for="inputorgNamel3">Name</label>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                                                 <input class="form-control" id="inputorgNamel3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.orgName" placeholder="Name"
                                                        type="text">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label required" for="inputenvironment3">Environment</label>
-                                            <div class="col-sm-10">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label required" for="inputenvironment3">Environment</label>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                                                 <div class="dropdown bootstrap-select">
                                                     <select class="form-control" id="inputenvironment3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.environment">
                                                         <option selected value="0">Production/Developer</option>
@@ -172,8 +172,8 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label required" for="inputTestLevel">Test Level</label>
-                                            <div class="col-sm-10">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label required" for="inputTestLevel">Test Level</label>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                                                 <div class="dropdown bootstrap-select">
                                                     <select class="form-control" id="inputTestLevel" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.testLevel">
                                                         <option selected value="NoTestRun">NoTestRun</option>
@@ -185,34 +185,34 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label required" for="salesforceLoginl3">Salesforce Login</label>
-                                            <div class="col-sm-10">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label required" for="salesforceLoginl3">Salesforce Login</label>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                                                 <input class="form-control" id="salesforceLoginl3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.userName"
                                                        placeholder="Salesforce userName" type="text">
                                             </div>
                                         </div>
                                         <div class="form-group row" ng-show="sfdcOrg.environment === '2'">
-                                            <label class="col-sm-2 col-form-label required" for="salesforceinstanceURLl3">Instance Url</label>
-                                            <div class="col-sm-10">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label required" for="salesforceinstanceURLl3">Instance Url</label>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                                                 <input class="form-control" id="salesforceinstanceURLl3" ng-disabled="sfdcOrg.disabledForm == 'true'" ng-model="sfdcOrg.instanceURL"
                                                        placeholder="Salesforce Instance Url" type="text">
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label" for="branchNamel3">Branch Name</label>
-                                            <div class="col-sm-10">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="branchNamel3">Branch Name</label>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                                                 <input class="form-control" id="branchNamel3" ng-keyup="complete()" ng-model="sfdcOrg.branchConnectedTo"/>
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label" for="isActive">Is Active</label>
-                                            <div class="col-sm-10">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="isActive">Is Active</label>
+                                            <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
                                                 <input class="form-check-input" id="isActive" ng-model="sfdcOrg.boolActive" style="margin-left: 0 !important;" type="checkbox">
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <div class="form-group">
-                                                <div class="col-sm-12">
+                                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
                                                     <button class="btn btn-primary" ng-click="authorize(sfdcOrg);" type="button">{{sfdcOrg.authorize}}</button>
                                                     <button class="btn btn-primary" ng-click="saveConnection(sfdcOrg);" ng-disabled="sfdcOrg.oauthSuccess === 'false'"
                                                             type="button">{{sfdcOrg.save}}
@@ -229,8 +229,8 @@
                                         </div>
                                     </form>
                                 </div>
-                                <div class="row ">
-                                    <div class="col-xl-4 col-md-4 col-sm-4 mb-4" ng-repeat="eachSFDCData in lstSFDCConnectionDetails">
+                                <div class="row">
+                                    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 mb-4" ng-repeat="eachSFDCData in lstSFDCConnectionDetails">
                                         <div class="card border-left-primary shadow h-100 py-2" ng-click="showDataOnForm(eachSFDCData)" style="cursor: pointer;">
                                             <div class="card-body">
                                                 <div class="row no-gutters align-items-center">

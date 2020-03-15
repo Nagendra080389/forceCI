@@ -24,6 +24,7 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     private boolean boolSFDCDeploymentPass;
     private boolean boolSFDCDeploymentFail;
     private boolean boolSFDCDeploymentNotStarted;
+    private boolean boolJobCancelled;
     private String sfdcDeploymentRunning;
     private String sfdcDeploymentPass;
     private String sfdcDeploymentFail;
@@ -32,6 +33,7 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
     private String codeReviewValidationPass;
     private String codeReviewValidationFail;
     private String codeReviewValidationNotStarted;
+    private String jobCancelled;
 
     public String getSfdcAsyncJobId() {
         return sfdcAsyncJobId;
@@ -263,6 +265,22 @@ public class DeploymentJobWrapper implements Serializable, Comparable<Deployment
 
     public void setBoolCodeReviewNotStarted(boolean boolCodeReviewNotStarted) {
         this.boolCodeReviewNotStarted = boolCodeReviewNotStarted;
+    }
+
+    public boolean isBoolJobCancelled() {
+        return boolJobCancelled;
+    }
+
+    public void setBoolJobCancelled(boolean boolJobCancelled) {
+        this.boolJobCancelled = boolJobCancelled;
+    }
+
+    public String getJobCancelled() {
+        return jobCancelled;
+    }
+
+    public void setJobCancelled(String jobCancelled) {
+        this.jobCancelled = jobCancelled;
     }
 
     @Override

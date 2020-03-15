@@ -47,18 +47,13 @@ public class ConsumerHandler {
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
-            createTempDirectoryForDeployment(deploymentJob);
-            try {
-                DeploymentJob deploymentJobWithoutLogs = optionalDeploymentJob.get();
-                deploymentJobWithoutLogs.setLstBuildLines(new ArrayList<>());
-                deploymentJobWithoutLogs.setLstDeploymentBuildLines(new ArrayList<>());
-            } catch (Exception e) {
-                e.printStackTrace();
+            if(!deploymentJob.isBoolIsJobCancelled()) {
+                createTempDirectoryForDeployment(deploymentJob);
             }
         }
     }
 
-    private List<String> createTempDirectoryForDeployment(DeploymentJob deploymentJob) {
+    private void createTempDirectoryForDeployment(DeploymentJob deploymentJob) {
         boolean sfdcPass = false;
         List<String> lstFileLines = new ArrayList<>();
         try {
@@ -135,21 +130,13 @@ public class ConsumerHandler {
                 propertiesMap.put("sf.testRun", sfdcConnectionDetail.getTestLevel());
                 propertiesMap.put("targetName", targetBranch);
 
-                List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap);
+                List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap, deploymentJob, deploymentJobMongoRepository);
                 for (String eachLine : sf_build) {
                     if (!(eachLine.startsWith("Finding class") || eachLine.startsWith("Loaded from") || eachLine.startsWith("Class ") ||
                             eachLine.startsWith("+Datatype ") || eachLine.startsWith("Note: ") || eachLine.startsWith(" +Datatype ") ||
                             eachLine.startsWith(" +Target: ") || eachLine.startsWith("Setting project") || eachLine.startsWith("Adding reference") ||
                             eachLine.startsWith("Detected ") || eachLine.startsWith("Setting ro project ") || eachLine.startsWith("Condition "))) {
                         lstFileLines.add(eachLine);
-                    }
-                    try {
-                        if (eachLine.contains("Request ID for the current deploy task:")) {
-                            String sfdcAsyncJobId = eachLine.split("Request ID for the current deploy task:")[1].replace("\"", "").replace(",", "");
-                            deploymentJob.setSfdcAsyncJobId(sfdcAsyncJobId);
-                        }
-                    } catch (Exception e){
-                        logger.error(e.getMessage());
                     }
                 }
 
@@ -208,7 +195,6 @@ public class ConsumerHandler {
                         deploymentJob.setSfdcConnectionDetail(newSfdcConnection);
                         DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
                         createTempDirectoryForDeployment(savedDeploymentJob);
-
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
                         Gson gson = new Gson();
@@ -218,7 +204,6 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Validation Passed -> " + status);
                         if (merge) {
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentPass(true);
@@ -234,10 +219,7 @@ public class ConsumerHandler {
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
                         setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
                         break;
-                    }/* else {
-                        setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
-                        break;
-                    }*/
+                    }
                 }
 
                 deploymentJob.setLastModifiedDate(new Date());
@@ -325,7 +307,6 @@ public class ConsumerHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return lstFileLines;
     }
 
     private void setFailedDeploymentDetails(DeploymentJob deploymentJob, SFDCConnectionDetails sfdcConnectionDetail, String targetBranch, boolean merge) throws IOException {

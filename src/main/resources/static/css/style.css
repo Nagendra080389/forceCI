@@ -47,6 +47,20 @@ a.btn.btn-github.btn-user.btn-block {
     height: 1rem;
 }
 
+.cancelledJob {
+    background-color: #e5ba2a;
+    color: aliceblue;
+    padding: 15px 15px 15px 15px;
+    text-align:center;
+    margin-bottom: 4px;
+    font-size: 12px;
+    border-radius: 15px;
+    width:10rem;
+    vertical-align: middle;
+    line-height: 0;
+    height: 1rem;
+}
+
 .validationPass {
     background-color: #61da5f;
     color: aliceblue;
@@ -75,4 +89,17 @@ a.btn.btn-github.btn-user.btn-block {
     vertical-align: middle;
     line-height: 0;
     cursor: pointer;
+}
+
+.fa-remove:before, .fa-close:before, .fa-times:before {
+    content: "\f00d";
+}
+
+.d-cursor{
+    cursor: pointer;
+}
+
+.d-container {
+    display: grid !important;
+    grid-template-columns: auto auto; /* 2 COL LAYOUT */
 }
