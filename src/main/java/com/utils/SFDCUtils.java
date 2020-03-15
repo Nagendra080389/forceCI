@@ -12,6 +12,9 @@ public class SFDCUtils {
 
         String asyncId = deploymentJob.getSfdcAsyncJobId();
         // Issue the deployment cancellation request
+        System.out.println("asyncId -> "+asyncId);
+        System.out.println("metadataConnection asd -> "+metadataConnection);
+        System.out.println("deploymentJob -> "+deploymentJob);
         CancelDeployResult result = metadataConnection.cancelDeploy(asyncId);
 
         // If the deployment cancellation completed, write a message to the output.
