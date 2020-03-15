@@ -124,10 +124,12 @@ public class ForceCIController {
     }
 
     @PostMapping("/cancelDeployment")
-    public String cancelDeployment(String deploymentJobId) throws Exception {
+    public String cancelDeployment(@RequestBody String deploymentJobId) throws Exception {
+        System.out.println("deploymentJobId -> "+deploymentJobId);
         Gson gson = new Gson();
         Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
         boolean boolDeploymentCancelled = false;
+        System.out.println("jobMongoRepositoryById -> "+jobMongoRepositoryById.get());
         DeploymentJob deploymentJob = null;
         if(jobMongoRepositoryById.isPresent()){
             deploymentJob = jobMongoRepositoryById.get();
