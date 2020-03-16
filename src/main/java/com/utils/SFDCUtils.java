@@ -63,8 +63,7 @@ public class SFDCUtils {
         HttpClient client = new HttpClient();
 
         PostMethod patch = createPost(instanceURL + "/services/data/v44.0" + "/metadata/deployRequest/" + asyncId.trim() + "?_HttpMethod=PATCH", oauthToken);
-        DeployResult canceling = new DeployResult("Canceling");
-        String stringRequestBody = gson.toJson(new DeployResultWrapper(canceling));
+        String stringRequestBody = "{\"deployResult\":{\"status\" : \"Canceling\"}}";
         System.out.println("stringRequestBody -> "+stringRequestBody);
         patch.setRequestEntity(new StringRequestEntity(stringRequestBody, MediaType.APPLICATION_JSON_VALUE, StandardCharsets.UTF_8.name()));
         System.out.println("Patch -> "+patch.getQueryString());

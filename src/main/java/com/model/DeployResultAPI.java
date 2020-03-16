@@ -1,28 +1,11 @@
 package com.model;
 
-import com.sforce.soap.metadata.DeployResult;
 
-public class DeployResultAPI {
+import java.io.Serializable;
 
-    private String id;
-    private String url;
+public class DeployResultAPI implements Serializable {
     private DeployResult deployResult;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
+    private String id;
 
     public DeployResult getDeployResult() {
         return deployResult;
@@ -30,5 +13,13 @@ public class DeployResultAPI {
 
     public void setDeployResult(DeployResult deployResult) {
         this.deployResult = deployResult;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
