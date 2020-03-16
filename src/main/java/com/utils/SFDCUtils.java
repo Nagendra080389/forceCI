@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 public class SFDCUtils {
 
-    public static boolean cancelDeploy(MetadataConnection metadataConnection, DeploymentJob deploymentJob) throws Exception {
+    public static String cancelDeploy(MetadataConnection metadataConnection, DeploymentJob deploymentJob) throws Exception {
 
         String asyncId = deploymentJob.getSfdcAsyncJobId().trim();
         // Issue the deployment cancellation request
@@ -29,7 +29,7 @@ public class SFDCUtils {
         // If the deployment cancellation completed, write a message to the output.
         if (result.isDone()) {
             System.out.println("Your deployment was canceled successfully!");
-            return true;
+            return "Done";
         } else {
             // The deployment cancellation is still in progress, so get a new status
             DeployResult deployResult = metadataConnection.checkDeployStatus(asyncId, false);
@@ -50,7 +50,7 @@ public class SFDCUtils {
             // and the status should be Canceled. However, in very rare cases,
             // the deployment can complete before it is canceled.)
             System.out.println("Final deploy status = >" + deployResult.getStatus());
-            return true;
+            return "Done";
         }
     }
 

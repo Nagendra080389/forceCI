@@ -142,16 +142,16 @@ public class ForceCIController {
                 connectorConfig.setSessionId(oauthToken);
                 MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
                 try {
-                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    result = e.getMessage();
+                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob).equalsIgnoreCase("Done");
+                } catch (Exception objException) {
+                    result = objException.getMessage();
                 }
             } else {
                 boolDeploymentCancelled = true;
             }
         }
 
+        System.out.println("boolDeploymentCancelled -> " + boolDeploymentCancelled);
         if (boolDeploymentCancelled) {
             if (!ObjectUtils.isEmpty(deploymentJob)) {
                 deploymentJob.setBoolIsJobCancelled(true);
@@ -162,7 +162,7 @@ public class ForceCIController {
             }
             return gson.toJson(result);
         } else {
-           return gson.toJson(result);
+            return gson.toJson(result);
         }
     }
 
@@ -458,7 +458,7 @@ public class ForceCIController {
         String access_token = fetchCookies(request);
         String emailId = null;
         SFDCConnectionDetails sfdcConnectionDetails = null;
-        System.out.println("githubEvent -> "+githubEvent);
+        System.out.println("githubEvent -> " + githubEvent);
         switch (githubEvent) {
             case "pull_request":
                 String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
