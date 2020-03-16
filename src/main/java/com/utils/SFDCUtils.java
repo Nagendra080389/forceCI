@@ -2,6 +2,7 @@ package com.utils;
 
 import com.google.gson.Gson;
 import com.model.DeployResult;
+import com.model.DeployResultAPI;
 import com.model.DeployResultWrapper;
 import com.model.SHAObject;
 import com.rabbitMQ.DeploymentJob;
@@ -70,8 +71,10 @@ public class SFDCUtils {
         System.out.println("Patch request Entity -> "+patch.getRequestEntity().toString());
         int i = client.executeMethod(patch);
         System.out.println("Patch response code -> "+i);
-        com.sforce.soap.metadata.DeployResult deployResult = gson.fromJson(IOUtils.toString(patch.getResponseBodyAsStream(), StandardCharsets.UTF_8), com.sforce.soap.metadata.DeployResult.class);
-        System.out.println(deployResult.getStatus());
+        DeployResultAPI deployResult = gson.fromJson(IOUtils.toString(patch.getResponseBodyAsStream(), StandardCharsets.UTF_8), DeployResultAPI.class);
+        if(deployResult != null && deployResult.getDeployResult() != null && deployResult.getDeployResult().getStatus() != null) {
+            System.out.println(deployResult.getDeployResult().getStatus().toString());
+        }
         return true;
     }
 
