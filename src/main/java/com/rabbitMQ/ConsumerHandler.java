@@ -64,6 +64,7 @@ public class ConsumerHandler {
             String sourceBranch = deploymentJob.getSourceBranch();
             String targetBranch = deploymentJob.getTargetBranch();
             boolean merge = deploymentJob.isBoolMerge();
+            boolean jobCancelled = deploymentJob.isBoolIsJobCancelled();
 
             Map<String, String> propertiesMap = new HashMap<>();
             Path tempDirectory = null;
@@ -220,11 +221,18 @@ public class ConsumerHandler {
                         Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
                         if(deploymentJobMongoRepositoryById.isPresent()){
                             DeploymentJob deploymentJobFromDB = deploymentJobMongoRepositoryById.get();
-                            if(deploymentJobFromDB.isBoolIsJobCancelled()){
-                                return;
-                            }
+                            jobCancelled = deploymentJobFromDB.isBoolIsJobCancelled();
                         }
-                        setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
+                        if(!jobCancelled) {
+                            setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
+                        } else {
+                            deploymentJob.setBoolSfdcCompleted(true);
+                            deploymentJob.setBoolSfdcRunning(false);
+                            deploymentJob.setBoolSfdcFail(false);
+                            deploymentJob.setBoolSfdcPass(false);
+                            deploymentJob.setBoolCodeReviewCompleted(false);
+                            deploymentJob.setBoolIsJobCancelled(true);
+                        }
                         break;
                     }
                 }
@@ -232,7 +240,7 @@ public class ConsumerHandler {
                 deploymentJob.setLastModifiedDate(new Date());
                 deploymentJobMongoRepository.save(deploymentJob);
 
-                if (sfdcPass && !merge) {
+                if (sfdcPass && !merge && !jobCancelled) {
                     Gson gson = new Gson();
                     GithubStatusObject githubStatusObject = null;
                     int status = 0;
