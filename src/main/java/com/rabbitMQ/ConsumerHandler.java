@@ -310,6 +310,13 @@ public class ConsumerHandler {
     }
 
     private void setFailedDeploymentDetails(DeploymentJob deploymentJob, SFDCConnectionDetails sfdcConnectionDetail, String targetBranch, boolean merge) throws IOException {
+        Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
+        if(deploymentJobMongoRepositoryById.isPresent()){
+            DeploymentJob deploymentJobFromDB = deploymentJobMongoRepositoryById.get();
+            if(deploymentJobFromDB.isBoolIsJobCancelled()){
+                return;
+            }
+        }
         Gson gson = new Gson();
         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.ERROR,
                 ForceCIController.BUILD_IS_ERROR, targetBranch + ForceCIController.VALIDATION,
