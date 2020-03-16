@@ -70,9 +70,8 @@ public class SFDCUtils {
         System.out.println("Patch request Entity -> "+patch.getRequestEntity().toString());
         int i = client.executeMethod(patch);
         System.out.println("Patch response code -> "+i);
-        System.out.println("Patch response -> "+patch.getResponseBodyAsStream());
         com.sforce.soap.metadata.DeployResult deployResult = gson.fromJson(IOUtils.toString(patch.getResponseBodyAsStream(), StandardCharsets.UTF_8), com.sforce.soap.metadata.DeployResult.class);
-        System.out.println(deployResult.getStatus().toString());
+        System.out.println(deployResult.getStatus());
         return true;
     }
 
