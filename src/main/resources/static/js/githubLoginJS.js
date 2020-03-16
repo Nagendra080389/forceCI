@@ -582,7 +582,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.lstDeployments = [];
 
     $scope.cancelDeployment = function (deploymentJobId) {
-        $http.post("/cancelDeployment", deploymentJobId).then(function (response) {
+        $http.get("/cancelDeployment?deploymentJobId="+deploymentJobId,).then(function (response) {
             console.log(response);
         }, function (error) {
             console.log(error);
