@@ -155,6 +155,7 @@ public class ConsumerHandler {
                     }
                 }
                 deploymentJob.setPackageXML(stringBuilder.toString());
+                System.out.println("jobCancelled before setting lst Lines : "+jobCancelled);
                 deploymentJobMongoRepository.save(deploymentJob);
 
                 if (merge) {
@@ -223,6 +224,8 @@ public class ConsumerHandler {
                             DeploymentJob deploymentJobFromDB = deploymentJobMongoRepositoryById.get();
                             jobCancelled = deploymentJobFromDB.isBoolIsJobCancelled();
                         }
+                        System.out.println("jobCancelled inside failed job-> "+jobCancelled);
+                        System.out.println("jobCancelled inside failed job-> "+deploymentJob.getId());
                         if(!jobCancelled) {
                             setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
                         } else {
