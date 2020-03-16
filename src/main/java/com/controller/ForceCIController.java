@@ -35,6 +35,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +53,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -123,8 +125,9 @@ public class ForceCIController {
         return accessToken;
     }
 
+    @Async("asyncExecutor")
     @GetMapping("/cancelDeployment")
-    public String cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
+    public CompletableFuture<String> cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
         Gson gson = new Gson();
         Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
         boolean boolDeploymentCancelled = false;
@@ -150,9 +153,9 @@ public class ForceCIController {
                         CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
                 createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
             }
-            return gson.toJson("Success");
+            return CompletableFuture.completedFuture(gson.toJson("Success"));
         } else {
-            return gson.toJson("Error");
+            return CompletableFuture.completedFuture(gson.toJson("Error"));
         }
     }
 
