@@ -1,24 +1,30 @@
 package com.utils;
 
+import com.google.gson.Gson;
+import com.model.DeployResult;
+import com.model.DeployResultWrapper;
+import com.model.SHAObject;
 import com.rabbitMQ.DeploymentJob;
 import com.sforce.soap.metadata.CancelDeployResult;
-import com.sforce.soap.metadata.DeployResult;
 import com.sforce.soap.metadata.DeployStatus;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.MediaType;
+
+import java.nio.charset.StandardCharsets;
 
 public class SFDCUtils {
 
-    public static boolean cancelDeploy(String salesforceMetaDataEndpoint, DeploymentJob deploymentJob) throws Exception {
+    public static boolean cancelDeploy(Gson gson, DeploymentJob deploymentJob) throws Exception {
 
         String asyncId = deploymentJob.getSfdcAsyncJobId();
         // Issue the deployment cancellation request
         String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
         String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
-        ConnectorConfig connectorConfig = new ConnectorConfig();
         System.out.println("instanceURL -> "+instanceURL);
         System.out.println("oauthToken -> "+oauthToken);
         System.out.println("asyncId -> "+asyncId);
@@ -56,20 +62,26 @@ public class SFDCUtils {
         HttpClient client = new HttpClient();
 
         PostMethod patch = createPost(instanceURL + "/services/data/v44.0" + "/metadata/deployRequest/" + asyncId.trim() + "?_HttpMethod=PATCH", oauthToken);
-        patch.setRequestEntity(new StringRequestEntity("{\"deployResult\":{\"status\" : \"Canceling\"}}","application/json", "UTF-8"));
+        DeployResult canceling = new DeployResult("Canceling");
+        String stringRequestBody = gson.toJson(new DeployResultWrapper(canceling));
+        System.out.println("stringRequestBody -> "+stringRequestBody);
+        patch.setRequestEntity(new StringRequestEntity(stringRequestBody, MediaType.APPLICATION_JSON_VALUE, StandardCharsets.UTF_8.name()));
         System.out.println("Patch -> "+patch.getQueryString());
+        System.out.println("Patch request Entity -> "+patch.getRequestEntity().toString());
         int i = client.executeMethod(patch);
         System.out.println("Patch response code -> "+i);
-        System.out.println("Patch response -> "+patch.getResponseBodyAsString());
-
+        System.out.println("Patch response -> "+patch.getResponseBodyAsStream());
+        com.sforce.soap.metadata.DeployResult deployResult = gson.fromJson(IOUtils.toString(patch.getResponseBodyAsStream(), StandardCharsets.UTF_8), com.sforce.soap.metadata.DeployResult.class);
+        System.out.println(deployResult.getStatus().toString());
         return true;
     }
 
     private static PostMethod createPost(String uri, String oauthToken) {
         PostMethod post = new PostMethod(uri);
-        post.setRequestHeader("Authorization", "OAuth " + oauthToken.trim());
+        post.setRequestHeader("Authorization", "Bearer " + oauthToken.trim());
         return post;
     }
+
 }
 
 

@@ -137,7 +137,7 @@ public class ForceCIController {
             deploymentJob = jobMongoRepositoryById.get();
             if (StringUtils.hasText(deploymentJob.getSfdcAsyncJobId())) {
                 try {
-                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(salesforceMetaDataEndpoint, deploymentJob);
+                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(gson,  deploymentJob);
                 } catch (Exception e) {
                     e.printStackTrace();
                     result = e.getMessage();
