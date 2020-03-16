@@ -18,11 +18,11 @@ public class SFDCUtils {
         // Issue the deployment cancellation request
         String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
         String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
-        /*ConnectorConfig connectorConfig = new ConnectorConfig();
+        ConnectorConfig connectorConfig = new ConnectorConfig();
         System.out.println("instanceURL -> "+instanceURL);
         System.out.println("oauthToken -> "+oauthToken);
         System.out.println("asyncId -> "+asyncId);
-        connectorConfig.setServiceEndpoint(instanceURL);
+        /*connectorConfig.setServiceEndpoint(instanceURL);
         connectorConfig.setSessionId(oauthToken);
         MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
 
@@ -54,16 +54,10 @@ public class SFDCUtils {
             System.out.println("Final deploy status = >" + deployResult.getStatus());
             return true;*/
         HttpClient client = new HttpClient();
-        PostMethod patch = createPost(instanceURL + "/services/data/"
-                + "v44.0" + "/metadata/deployRequest/" + asyncId + "?_HttpMethod=PATCH", oauthToken
+        PostMethod patch = createPost(instanceURL + "/services/data/v44.0" + "/metadata/deployRequest/" + asyncId + "?_HttpMethod=PATCH", oauthToken
         );
-        patch.setRequestEntity(new StringRequestEntity("{ \n" +
-                " \"deployResult\":\n" +
-                "       {\n" +
-                "       \"status\" : \"Canceling\"\n" +
-                "       }\n" +
-                "}",
-                "application/json", "UTF-8"));
+        patch.setRequestEntity(new StringRequestEntity("{\"deployResult\":{\"status\" : \"Canceling\"}}","application/json", "UTF-8"));
+        System.out.println("Patch -> "+patch.getQueryString());
         int i = client.executeMethod(patch);
         System.out.println("Patch response code -> "+i);
         System.out.println("Patch response -> "+patch.getResponseBodyAsString());
@@ -73,7 +67,7 @@ public class SFDCUtils {
 
     private static PostMethod createPost(String uri, String oauthToken) {
         PostMethod post = new PostMethod(uri);
-        post.setRequestHeader("Authorization", "OAuth " + oauthToken);
+        post.setRequestHeader("Authorization", "OAuth " + oauthToken.trim());
         return post;
     }
 }
