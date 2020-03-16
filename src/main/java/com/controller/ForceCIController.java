@@ -125,9 +125,8 @@ public class ForceCIController {
         return accessToken;
     }
 
-    @Async("asyncExecutor")
     @GetMapping("/cancelDeployment")
-    public CompletableFuture<String> cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
+    public String cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
         Gson gson = new Gson();
         String result = "Success";
         Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
@@ -136,8 +135,14 @@ public class ForceCIController {
         if (jobMongoRepositoryById.isPresent()) {
             deploymentJob = jobMongoRepositoryById.get();
             if (StringUtils.hasText(deploymentJob.getSfdcAsyncJobId())) {
+                String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
+                String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken().trim();
+                ConnectorConfig connectorConfig = new ConnectorConfig();
+                connectorConfig.setServiceEndpoint(instanceURL + salesforceMetaDataEndpoint);
+                connectorConfig.setSessionId(oauthToken);
+                MetadataConnection metadataConnection = new MetadataConnection(connectorConfig);
                 try {
-                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(gson,  deploymentJob);
+                    boolDeploymentCancelled = SFDCUtils.cancelDeploy(metadataConnection, deploymentJob);
                 } catch (Exception e) {
                     e.printStackTrace();
                     result = e.getMessage();
@@ -155,9 +160,9 @@ public class ForceCIController {
                         CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
                 createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
             }
-            return CompletableFuture.completedFuture(gson.toJson(result));
+            return gson.toJson(result);
         } else {
-           return CompletableFuture.completedFuture(gson.toJson(result));
+           return gson.toJson(result);
         }
     }
 

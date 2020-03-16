@@ -1,12 +1,12 @@
 package com.utils;
 
 import com.google.gson.Gson;
-import com.model.DeployResult;
 import com.model.DeployResultAPI;
 import com.model.DeployResultWrapper;
 import com.model.SHAObject;
 import com.rabbitMQ.DeploymentJob;
 import com.sforce.soap.metadata.CancelDeployResult;
+import com.sforce.soap.metadata.DeployResult;
 import com.sforce.soap.metadata.DeployStatus;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
@@ -20,35 +20,38 @@ import java.nio.charset.StandardCharsets;
 
 public class SFDCUtils {
 
-    public static boolean cancelDeploy(Gson gson, DeploymentJob deploymentJob) throws Exception {
+    public static boolean cancelDeploy(MetadataConnection metadataConnection, DeploymentJob deploymentJob) throws Exception {
 
-        boolean jobCancelled = false;
-        String asyncId = deploymentJob.getSfdcAsyncJobId();
-        String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
-        String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
-        HttpClient client = new HttpClient();
-
+        String asyncId = deploymentJob.getSfdcAsyncJobId().trim();
         // Issue the deployment cancellation request
-        PostMethod patch = createPost(instanceURL + "/services/data/v44.0" + "/metadata/deployRequest/" + asyncId.trim() + "?_HttpMethod=PATCH", oauthToken);
-        String stringRequestBody = "{\"deployResult\":{\"status\" : \"Canceling\"}}";
-        patch.setRequestEntity(new StringRequestEntity(stringRequestBody, MediaType.APPLICATION_JSON_VALUE, StandardCharsets.UTF_8.name()));
-        int jobCancelledStatus = client.executeMethod(patch);
-        if (jobCancelledStatus == 202) {
-            DeployResultAPI deployResult = gson.fromJson(IOUtils.toString(patch.getResponseBodyAsStream(), StandardCharsets.UTF_8), DeployResultAPI.class);
-            if (deployResult != null && deployResult.getDeployResult() != null && deployResult.getDeployResult().getStatus() != null) {
-                String deploymentStatusFromAPI = deployResult.getDeployResult().getStatus().toString();
-                if (deploymentStatusFromAPI.equalsIgnoreCase(DeployStatus.Canceling.toString()) || deploymentStatusFromAPI.equalsIgnoreCase(DeployStatus.Canceled.toString())) {
-                    jobCancelled = true;
-                }
-            }
-        }
-        return jobCancelled;
-    }
+        CancelDeployResult result = metadataConnection.cancelDeploy(asyncId);
 
-    private static PostMethod createPost(String uri, String oauthToken) {
-        PostMethod post = new PostMethod(uri);
-        post.setRequestHeader("Authorization", "Bearer " + oauthToken.trim());
-        return post;
+        // If the deployment cancellation completed, write a message to the output.
+        if (result.isDone()) {
+            System.out.println("Your deployment was canceled successfully!");
+            return true;
+        } else {
+            // The deployment cancellation is still in progress, so get a new status
+            DeployResult deployResult = metadataConnection.checkDeployStatus(asyncId, false);
+
+            // Check whether the deployment is done. If not done, this means
+            // that the cancellation is still in progress and the status is Canceling.
+            while (!deployResult.isDone()) {
+                // Assert that the deployment status is Canceling
+                assert deployResult.getStatus() == DeployStatus.Canceling;
+                // Wait 2 seconds
+                Thread.sleep(2000);
+                // Get the deployment status again
+                deployResult = metadataConnection.checkDeployStatus(asyncId, false);
+            }
+
+            // The deployment is done. Write the status to the output.
+            // (When the deployment is done, the cancellation should have completed
+            // and the status should be Canceled. However, in very rare cases,
+            // the deployment can complete before it is canceled.)
+            System.out.println("Final deploy status = >" + deployResult.getStatus());
+            return true;
+        }
     }
 
 }
