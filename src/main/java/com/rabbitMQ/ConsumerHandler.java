@@ -132,6 +132,10 @@ public class ConsumerHandler {
                 propertiesMap.put("targetName", targetBranch);
 
                 List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap, deploymentJob, deploymentJobMongoRepository);
+                Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
+                if(deploymentJobMongoRepositoryById.isPresent()){
+                    deploymentJob = deploymentJobMongoRepositoryById.get();
+                }
                 for (String eachLine : sf_build) {
                     if (!(eachLine.startsWith("Finding class") || eachLine.startsWith("Loaded from") || eachLine.startsWith("Class ") ||
                             eachLine.startsWith("+Datatype ") || eachLine.startsWith("Note: ") || eachLine.startsWith(" +Datatype ") ||
@@ -219,13 +223,9 @@ public class ConsumerHandler {
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
-                        Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
-                        if(deploymentJobMongoRepositoryById.isPresent()){
-                            DeploymentJob deploymentJobFromDB = deploymentJobMongoRepositoryById.get();
-                            jobCancelled = deploymentJobFromDB.isBoolIsJobCancelled();
-                        }
-                        System.out.println("jobCancelled inside failed job-> "+jobCancelled);
-                        System.out.println("jobCancelled inside failed job-> "+deploymentJob.getId());
+
+                        System.out.println("deploymentJob.isBoolIsJobCancelled() -> "+deploymentJob.isBoolIsJobCancelled());
+                        jobCancelled = deploymentJob.isBoolIsJobCancelled();
                         if(!jobCancelled) {
                             setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
                         } else {
