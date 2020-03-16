@@ -6,6 +6,9 @@ import com.sforce.soap.metadata.DeployResult;
 import com.sforce.soap.metadata.DeployStatus;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 public class SFDCUtils {
 
@@ -15,7 +18,7 @@ public class SFDCUtils {
         // Issue the deployment cancellation request
         String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL() + salesforceMetaDataEndpoint;
         String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
-        ConnectorConfig connectorConfig = new ConnectorConfig();
+        /*ConnectorConfig connectorConfig = new ConnectorConfig();
         System.out.println("instanceURL -> "+instanceURL);
         System.out.println("oauthToken -> "+oauthToken);
         System.out.println("asyncId -> "+asyncId);
@@ -49,7 +52,30 @@ public class SFDCUtils {
             // and the status should be Canceled. However, in very rare cases,
             // the deployment can complete before it is canceled.)
             System.out.println("Final deploy status = >" + deployResult.getStatus());
-            return true;
-        }
+            return true;*/
+        HttpClient client = new HttpClient();
+        PostMethod patch = createPost(instanceURL + "/services/data/"
+                + "v44.0" + "/metadata/deployRequest/" + asyncId + "?_HttpMethod=PATCH", oauthToken
+        );
+        patch.setRequestEntity(new StringRequestEntity("{ \n" +
+                " \"deployResult\":\n" +
+                "       {\n" +
+                "       \"status\" : \"Canceling\"\n" +
+                "       }\n" +
+                "}",
+                "application/json", "UTF-8"));
+        int i = client.executeMethod(patch);
+        System.out.println("Patch response code -> "+i);
+        System.out.println("Patch response -> "+patch.getResponseBodyAsString());
+
+        return true;
+    }
+
+    private static PostMethod createPost(String uri, String oauthToken) {
+        PostMethod post = new PostMethod(uri);
+        post.setRequestHeader("Authorization", "OAuth " + oauthToken);
+        return post;
     }
 }
+
+
