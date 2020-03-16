@@ -132,10 +132,6 @@ public class ConsumerHandler {
                 propertiesMap.put("targetName", targetBranch);
 
                 List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap, deploymentJob, deploymentJobMongoRepository);
-                Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
-                if(deploymentJobMongoRepositoryById.isPresent()){
-                    deploymentJob = deploymentJobMongoRepositoryById.get();
-                }
                 for (String eachLine : sf_build) {
                     if (!(eachLine.startsWith("Finding class") || eachLine.startsWith("Loaded from") || eachLine.startsWith("Class ") ||
                             eachLine.startsWith("+Datatype ") || eachLine.startsWith("Note: ") || eachLine.startsWith(" +Datatype ") ||
@@ -143,6 +139,16 @@ public class ConsumerHandler {
                             eachLine.startsWith("Detected ") || eachLine.startsWith("Setting ro project ") || eachLine.startsWith("Condition "))) {
                         lstFileLines.add(eachLine);
                     }
+                }
+                if (merge) {
+                    deploymentJob.setLstDeploymentBuildLines(lstFileLines);
+                } else {
+                    deploymentJob.setLstBuildLines(lstFileLines);
+                }
+                deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
+                Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
+                if(deploymentJobMongoRepositoryById.isPresent()){
+                    deploymentJob = deploymentJobMongoRepositoryById.get();
                 }
 
                 StringBuilder stringBuilder = new StringBuilder();
@@ -159,14 +165,8 @@ public class ConsumerHandler {
                     }
                 }
                 deploymentJob.setPackageXML(stringBuilder.toString());
-                System.out.println("jobCancelled before setting lst Lines : "+jobCancelled);
                 deploymentJobMongoRepository.save(deploymentJob);
 
-                if (merge) {
-                    deploymentJob.setLstDeploymentBuildLines(lstFileLines);
-                } else {
-                    deploymentJob.setLstBuildLines(lstFileLines);
-                }
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
                     if (eachBuildLine.contains("Failed to login:")) {
                         // try to get proper access token again
@@ -223,8 +223,6 @@ public class ConsumerHandler {
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
-
-                        System.out.println("deploymentJob.isBoolIsJobCancelled() -> "+deploymentJob.isBoolIsJobCancelled());
                         jobCancelled = deploymentJob.isBoolIsJobCancelled();
                         if(!jobCancelled) {
                             setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
