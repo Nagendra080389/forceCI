@@ -16,7 +16,7 @@ public class SFDCUtils {
 
         String asyncId = deploymentJob.getSfdcAsyncJobId();
         // Issue the deployment cancellation request
-        String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL() + salesforceMetaDataEndpoint;
+        String instanceURL = deploymentJob.getSfdcConnectionDetail().getInstanceURL();
         String oauthToken = deploymentJob.getSfdcConnectionDetail().getOauthToken();
         /*ConnectorConfig connectorConfig = new ConnectorConfig();
         System.out.println("instanceURL -> "+instanceURL);
