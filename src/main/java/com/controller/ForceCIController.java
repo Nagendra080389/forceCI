@@ -129,6 +129,7 @@ public class ForceCIController {
     @GetMapping("/cancelDeployment")
     public CompletableFuture<String> cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
         Gson gson = new Gson();
+        String result = "Success";
         Optional<DeploymentJob> jobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJobId);
         boolean boolDeploymentCancelled = false;
         DeploymentJob deploymentJob = null;
@@ -139,6 +140,7 @@ public class ForceCIController {
                     boolDeploymentCancelled = SFDCUtils.cancelDeploy(salesforceMetaDataEndpoint, deploymentJob);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    result = e.getMessage();
                 }
             } else {
                 boolDeploymentCancelled = true;
@@ -153,9 +155,9 @@ public class ForceCIController {
                         CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
                 createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
             }
-            return CompletableFuture.completedFuture(gson.toJson("Success"));
+            return CompletableFuture.completedFuture(gson.toJson(result));
         } else {
-            return CompletableFuture.completedFuture(gson.toJson("Error"));
+           return CompletableFuture.completedFuture(gson.toJson(result));
         }
     }
 
