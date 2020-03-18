@@ -473,27 +473,9 @@ public class ForceCIController {
                 if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
                     System.out.println("A pull request was created! A validation should start now...");
-                    String statuseUrl = jsonObject.get("pull_request").getAsJsonObject().get("statuses_url").getAsString();
-                    String targetBranch = jsonObject.get("pull_request").getAsJsonObject().has("base") ?
-                            jsonObject.get("pull_request").getAsJsonObject().get("base").getAsJsonObject().get("ref").getAsString() : "";
-                    String repositoryId = jsonObject.has("repository") ? jsonObject.get("repository").getAsJsonObject().get("id").getAsString() : "";
-                    String repositoryName = jsonObject.has("repository") ? jsonObject.get("repository").getAsJsonObject().get("name").getAsString() : "";
-                    GithubStatusObject githubStatusObject = new GithubStatusObject(PENDING, BUILD_IS_PENDING, targetBranch + VALIDATION,
-                            CONNECT2DEPLOY_URL + "/" + repositoryName + "/" + repositoryId + "/" + targetBranch);
-                    int status = createStatusAndReturnCode(gson, access_token, statuseUrl, targetBranch, githubStatusObject);
-                    System.out.println("Validation Started -> " + status);
-
-                    githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
-                            ForceCIController.BUILD_IS_PENDING, targetBranch + ForceCIController.CODE_REVIEW_VALIDATION,
-                            CONNECT2DEPLOY_URL + "/" + repositoryName + "/" + repositoryId + "/" + targetBranch);
-                    status = ForceCIController.createStatusAndReturnCode(gson, access_token, statuseUrl, targetBranch, githubStatusObject);
-                    System.out.println("Code Validation Pending -> " + status);
-
-                    if (status == HTTP_STATUS_CREATED) {
-                        start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
-                                sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig,
-                                rabbitTemplateCustomAdmin, false, jsonObject.get("sender").getAsJsonObject());
-                    }
+                    start_deployment(jsonObject.get("pull_request").getAsJsonObject(), jsonObject.get("repository").getAsJsonObject(), access_token,
+                            sfdcConnectionDetailsMongoRepository, sfdcConnectionDetails, emailId, rabbitMqSenderConfig,
+                            rabbitTemplateCustomAdmin, false, jsonObject.get("sender").getAsJsonObject());
                 }
                 break;
             case "push":

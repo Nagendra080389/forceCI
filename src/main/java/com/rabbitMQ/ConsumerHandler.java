@@ -44,7 +44,28 @@ public class ConsumerHandler {
     }
 
     public void handleMessage(DeploymentJob deploymentJob) {
+        Gson gson = new Gson();
         System.out.println("Deployment Job Started inside Container thread -> "+deploymentJob.getId());
+        GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.PENDING, ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.VALIDATION,
+                ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
+        int status = 0;
+        try {
+            status = ForceCIController.createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Validation Started -> " + status);
+
+        githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
+                ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.CODE_REVIEW_VALIDATION,
+                ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
+        try {
+            status = ForceCIController.createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Code Validation Pending -> " + status);
+
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
@@ -167,7 +188,7 @@ public class ConsumerHandler {
                     }
                 }
                 deploymentJob.setPackageXML(stringBuilder.toString());
-                deploymentJobMongoRepository.save(deploymentJob);
+                deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
 
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
                     System.out.println("eachBuildLine -> "+eachBuildLine);
@@ -215,6 +236,7 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
+                        System.out.println("status create and return -> "+status);
                         if (merge) {
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentPass(true);
@@ -225,6 +247,9 @@ public class ConsumerHandler {
                             deploymentJob.setBoolSfdcFail(false);
                             deploymentJob.setBoolCodeReviewCompleted(false);
                         }
+                        System.out.println("merge -> "+merge);
+                        System.out.println("deploymentJob isBoolSfdcCompleted -> "+deploymentJob.isBoolSfdcCompleted());
+                        System.out.println("deploymentJob isBoolSfdcPass -> "+deploymentJob.isBoolSfdcPass());
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
@@ -245,6 +270,11 @@ public class ConsumerHandler {
 
                 deploymentJob.setLastModifiedDate(new Date());
                 deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
+                System.out.println("deploymentJob isBoolSfdcCompleted after save -> "+deploymentJob.isBoolSfdcCompleted());
+                System.out.println("deploymentJob isBoolSfdcPass after save -> "+deploymentJob.isBoolSfdcPass());
+                System.out.println("sfdcPass -> "+sfdcPass);
+                System.out.println("merge -> "+merge);
+                System.out.println("jobCancelled -> "+jobCancelled);
                 if (sfdcPass && !merge && !jobCancelled) {
                     Gson gson = new Gson();
                     GithubStatusObject githubStatusObject = null;
