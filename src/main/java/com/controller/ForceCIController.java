@@ -155,11 +155,13 @@ public class ForceCIController {
         if (boolDeploymentCancelled) {
             if (!ObjectUtils.isEmpty(deploymentJob)) {
                 deploymentJob.setBoolIsJobCancelled(true);
-                DeploymentJob save = deploymentJobMongoRepository.save(deploymentJob);
-                System.out.println("save -> "+save.getId());
-                GithubStatusObject githubStatusObject = new GithubStatusObject(ERROR, BUILD_IS_ERROR, deploymentJob.getTargetBranch() + VALIDATION,
-                        CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
-                createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
+                DeploymentJob cancelledJob = deploymentJobMongoRepository.save(deploymentJob);
+                System.out.println("cancelledJob -> "+cancelledJob.getId());
+                if(StringUtils.hasText(cancelledJob.getSfdcAsyncJobId())) {
+                    GithubStatusObject githubStatusObject = new GithubStatusObject(ERROR, BUILD_IS_ERROR, deploymentJob.getTargetBranch() + VALIDATION,
+                            CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
+                    createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
+                }
             }
             return gson.toJson(result);
         } else {

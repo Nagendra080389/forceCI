@@ -244,15 +244,14 @@ public class ConsumerHandler {
                 }
 
                 deploymentJob.setLastModifiedDate(new Date());
-                deploymentJobMongoRepository.save(deploymentJob);
-
+                deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
                 if (sfdcPass && !merge && !jobCancelled) {
                     Gson gson = new Gson();
                     GithubStatusObject githubStatusObject = null;
                     int status = 0;
                     deploymentJob.setBoolCodeReviewRunning(true);
                     deploymentJob.setBoolCodeReviewNotStarted(false);
-                    deploymentJobMongoRepository.save(deploymentJob);
+                    deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
                     PMDConfiguration pmdConfiguration = new PMDConfiguration();
                     pmdConfiguration.setReportFormat("text");
                     pmdConfiguration.setRuleSets(ruleSet.getPath());
