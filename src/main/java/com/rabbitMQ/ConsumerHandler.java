@@ -44,6 +44,7 @@ public class ConsumerHandler {
     }
 
     public void handleMessage(DeploymentJob deploymentJob) {
+        System.out.println("Deployment Job Started inside Container thread -> "+deploymentJob.getId());
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
@@ -148,6 +149,7 @@ public class ConsumerHandler {
                 deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
                 Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
                 if(deploymentJobMongoRepositoryById.isPresent()){
+                    System.out.println("deploymentJob isPresent -> "+deploymentJob.getId());
                     deploymentJob = deploymentJobMongoRepositoryById.get();
                 }
 
@@ -168,6 +170,7 @@ public class ConsumerHandler {
                 deploymentJobMongoRepository.save(deploymentJob);
 
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
+                    System.out.println("eachBuildLine -> "+eachBuildLine);
                     if (eachBuildLine.contains("Failed to login:")) {
                         // try to get proper access token again
                         String refreshToken = sfdcConnectionDetail.getRefreshToken();
@@ -203,6 +206,8 @@ public class ConsumerHandler {
                         createTempDirectoryForDeployment(savedDeploymentJob);
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
+                        System.out.println("deploymentJob Id inside deployment succeeded -> "+deploymentJob.getId());
+                        System.out.println("deploymentJob status url -> "+deploymentJob.getStatusesUrl());
                         Gson gson = new Gson();
                         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
                                 ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.VALIDATION,
