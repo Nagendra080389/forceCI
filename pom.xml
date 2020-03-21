@@ -57,10 +57,11 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.sendgrid/sendgrid-java -->
+        <!-- https://mvnrepository.com/artifact/com.sendgrid/sendgrid-java -->
         <dependency>
             <groupId>com.sendgrid</groupId>
             <artifactId>sendgrid-java</artifactId>
-            <version>4.4.6</version>
+            <version>4.3.0</version>
         </dependency>
 
         <dependency>
