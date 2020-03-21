@@ -15,6 +15,14 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             templateUrl: './html/dashboard.html',
             controller: 'dashBoardController',
         })
+        .when('/apps/forgotPassword', {
+            templateUrl: './html/forgotPassword.html',
+            controller: 'forgotPasswordController',
+        })
+        .when('/apps/register', {
+            templateUrl: './html/register.html',
+            controller: 'registerController',
+        })
         .when('/apps/dashboard/app/:repoName/:repoId', {
             templateUrl: './html/repoDetails.html',
             controller: 'repoController',
@@ -26,6 +34,10 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
         .when('/apps/dashboard/createApp', {
             templateUrl: './html/addApp.html',
             controller: 'appPageRepoController',
+        })
+        .when('/apps/dashboard/scheduledDeployments', {
+            templateUrl: './html/scheduledDeployments.html',
+            controller: 'scheduledDeploymentController',
         })
         .when('/apps/error', {
             templateUrl: './html/error.html'
@@ -54,10 +66,77 @@ function logoutFunctionCaller($location) {
     }, 500);
 }
 
-connect2Deploy.controller('indexController', function ($scope, $http, $location) {
+connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog) {
     checkToken($location);
     $scope.redirectJS = function () {
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
+    };
+
+    function DialogController($scope, $mdDialog) {
+        $scope.hide = function () {
+            $mdDialog.hide();
+        };
+
+        $scope.cancel = function () {
+            $mdDialog.cancel();
+        };
+
+        $scope.answer = function (answer) {
+            $mdDialog.hide(answer);
+        };
+    }
+
+    $scope.redirectEnterpriseJS = function ($event) {
+        const parentEl = angular.element(document.body);
+        $mdDialog.show({
+            controller: DialogController,
+            template: '<md-dialog aria-label="Enterprise Github Configuration">\n' +
+                '        <form>\n' +
+                '            <md-toolbar>\n' +
+                '                <div class="md-toolbar-tools">\n' +
+                '                    <h2>Enterprise Github Configuration</h2>\n' +
+                '                    <span flex></span>\n' +
+                '                    <md-button class="md-icon-button" ng-click="cancel()">\n' +
+                '                        <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>\n' +
+                '                    </md-button>\n' +
+                '                </div>\n' +
+                '            </md-toolbar>\n' +
+                '            <md-content layout-padding="">\n' +
+                '                <div>\n' +
+                '                    <form name="githubForm">\n' +
+                '                        <md-input-container class="md-block" flex-gt-sm="">\n' +
+                '                            <label>Server Name</label>\n' +
+                '                            <input ng-model="githubEnterprise.ServerName">\n' +
+                '                        </md-input-container>\n' +
+                '                        <md-input-container class="md-block">\n' +
+                '                            <label>Client Id</label>\n' +
+                '                            <input ng-model="githubEnterprise.ClientId">\n' +
+                '                        </md-input-container>\n' +
+                '                        <md-input-container class="md-block">\n' +
+                '                            <label>Client Secret</label>\n' +
+                '                            <input ng-model="githubEnterprise.ClientSecret">\n' +
+                '                        </md-input-container>\n' +
+                '                    </form>\n' +
+                '                </div>\n' +
+                '            </md-content>\n' +
+                '\n' +
+                '            <md-dialog-actions layout="row">\n' +
+                '                <span flex></span>\n' +
+                '                <md-button ng-click="answer(githubEnterprise)">\n' +
+                '                    Connect\n' +
+                '                </md-button>\n' +
+                '                <md-button ng-click="answer(\'Cancelled\')" style="margin-right:20px;">\n' +
+                '                    Cancel\n' +
+                '                </md-button>\n' +
+                '            </md-dialog-actions>\n' +
+                '        </form>\n' +
+                '    </md-dialog>',
+            parent: parentEl,
+            targetEvent: $event,
+            clickOutsideToClose: true
+        });
+
+        //window.open('https://github.com/login/oauth/authorize?client_id=a1568a2b609baf9a3634&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     };
 
     $scope.logoutFunction = function () {
@@ -582,7 +661,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.lstDeployments = [];
 
     $scope.cancelDeployment = function (deploymentJobId) {
-        $http.get("/cancelDeployment?deploymentJobId="+deploymentJobId,).then(function (response) {
+        $http.get("/cancelDeployment?deploymentJobId=" + deploymentJobId,).then(function (response) {
             console.log(response);
         }, function (error) {
             console.log(error);
@@ -598,7 +677,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 
     sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
     sse.addEventListener("message", function (objMessageEvent) {
-        if(objMessageEvent !== undefined && objMessageEvent !== null &&
+        if (objMessageEvent !== undefined && objMessageEvent !== null &&
             objMessageEvent.data !== undefined && objMessageEvent.data !== null) {
             $scope.lstDeployments = JSON.parse(objMessageEvent.data);
             $scope.$apply();
@@ -647,6 +726,38 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
         })
     }
 
+});
+
+connect2Deploy.controller('scheduledDeploymentController', function ($scope, $http, $location, $routeParams, $mdDialog) {
+    $scope.userName = localStorage.githubOwner;
+    $scope.avatar_url = localStorage.avatar_url;
+    const repoId = $scope.repoId = $routeParams.repoId;
+    $scope.repoName = $routeParams.repoName;
+    $scope.branchConnectedTo = $routeParams.branchConnectedTo;
+    $scope.branchName = $routeParams.branchConnectedTo;
+
+
+});
+
+connect2Deploy.controller('registerController', function ($scope, $http, $location) {
+    $scope.register = function (userEntity) {
+        $http.post("/register", userEntity).then(function (response) {
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'User created successfully'
+                });
+
+            }, function (error) {
+                iziToast.error({
+                    title: 'Error',
+                    message: 'User Creation Failed. ' + error.data.message,
+                    position: 'topRight'
+                });
+            }
+        );
+    }
 });
 
 $(window).on("beforeunload", function () {

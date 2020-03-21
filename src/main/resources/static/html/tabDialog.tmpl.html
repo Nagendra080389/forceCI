@@ -1,0 +1,43 @@
+<script type="text/ng-template" id="tabDialog.tmpl.html">
+    <md-dialog aria-label="Enterprise Github Configuration">
+        <form>
+            <md-toolbar>
+                <div class="md-toolbar-tools">
+                    <h2>Enterprise Github Configuration</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="cancel()">
+                        <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-content layout-padding="">
+                <div>
+                    <form name="githubForm">
+                        <md-input-container class="md-block" flex-gt-sm="">
+                            <label>Server Name</label>
+                            <input ng-model="githubEnterprise.ServerName">
+                        </md-input-container>
+                        <md-input-container class="md-block">
+                            <label>Client Id</label>
+                            <input ng-model="githubEnterprise.ClientId">
+                        </md-input-container>
+                        <md-input-container class="md-block">
+                            <label>Client Secret</label>
+                            <input ng-model="githubEnterprise.ClientSecret">
+                        </md-input-container>
+                    </form>
+                </div>
+            </md-content>
+
+            <md-dialog-actions layout="row">
+                <span flex></span>
+                <md-button ng-click="answer(githubEnterprise)">
+                    Connect
+                </md-button>
+                <md-button ng-click="answer('Cancelled')" style="margin-right:20px;">
+                    Cancel
+                </md-button>
+            </md-dialog-actions>
+        </form>
+    </md-dialog>
+</script>

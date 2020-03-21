@@ -1,9 +1,6 @@
 package com.controller;
 
-import com.dao.DeploymentJobMongoRepository;
-import com.dao.RepositoryWrapperMongoRepository;
-import com.dao.SFDCConnectionDetailsMongoRepository;
-import com.dao.UserWrapperMongoRepository;
+import com.dao.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,6 +11,7 @@ import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
+import com.service.EmailSenderService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.ApiSecurity;
@@ -35,6 +33,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -105,6 +104,12 @@ public class ForceCIController {
     private AmqpTemplate rabbitTemplateCustomAdmin;
     @Autowired
     private DeploymentJobMongoRepository deploymentJobMongoRepository;
+    @Autowired
+    private Connect2DeployUserMongoRepository connect2DeployUserMongoRepository;
+    @Autowired
+    private Connect2DeployTokenMongoRepository connect2DeployTokenMongoRepository;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
@@ -696,6 +701,34 @@ public class ForceCIController {
         }
 
         return returnResponse;
+    }
+
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String registerUser(@RequestBody Connect2DeployUser user, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
+        Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(user.getEmailId());
+        if(existingUser != null){
+            returnResponse = "User Already Exists";
+        } else {
+            Connect2DeployToken confirmationToken = new Connect2DeployToken(user);
+            user = connect2DeployUserMongoRepository.save(user);
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(user.getEmailId());
+            mailMessage.setSubject("Complete Registration!");
+            mailMessage.setFrom("nagesingh@deloitte.com");
+            mailMessage.setText("To confirm your account, please click here : "
+                    +"https://forceci.herokuapp.com/confirm-account?token="+confirmationToken.getConfirmationToken());
+
+            emailSenderService.sendEmail(mailMessage);
+            returnResponse = "Success";
+        }
+
+
+        return gson.toJson(returnResponse);
     }
 
     @RequestMapping(value = "/saveSfdcConnectionDetails", method = RequestMethod.POST)
