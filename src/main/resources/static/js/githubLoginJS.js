@@ -4,6 +4,28 @@ connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
 });
 
+
+const compareTo = function() {
+    return {
+        require: "ngModel",
+        scope: {
+            otherModelValue: "=compareTo"
+        },
+        link: function(scope, element, attributes, ngModel) {
+
+            ngModel.$validators.compareTo = function(modelValue) {
+                return modelValue === scope.otherModelValue;
+            };
+
+            scope.$watch("otherModelValue", function() {
+                ngModel.$validate();
+            });
+        }
+    };
+};
+
+connect2Deploy.directive("compareTo", compareTo);
+
 let sse;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
@@ -741,22 +763,26 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
 connect2Deploy.controller('registerController', function ($scope, $http, $location) {
     $scope.register = function (userEntity) {
-        $http.post("/register", userEntity).then(function (response) {
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'User created successfully'
-                });
+        if(userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
+            $http.post("/register", userEntity).then(function (response) {
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: 'User created successfully'
+                    });
 
-            }, function (error) {
-                iziToast.error({
-                    title: 'Error',
-                    message: 'User Creation Failed. ' + error.data.message,
-                    position: 'topRight'
-                });
-            }
-        );
+                }, function (error) {
+                    iziToast.error({
+                        title: 'Error',
+                        message: 'User Creation Failed. ' + error.data.message,
+                        position: 'topRight'
+                    });
+                }
+            );
+        } else {
+
+        }
     }
 });
 

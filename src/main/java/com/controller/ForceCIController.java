@@ -11,12 +11,14 @@ import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
+import com.security.CryptoPassword;
 import com.service.EmailSenderService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.ApiSecurity;
 import com.utils.SFDCUtils;
 import com.utils.ValidationStatus;
+import org.apache.commons.codec.digest.Crypt;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -51,6 +53,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -706,7 +710,7 @@ public class ForceCIController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerUser(@RequestBody Connect2DeployUser userEntity, HttpServletResponse response, HttpServletRequest
-            request) throws IOException {
+            request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
 
         Gson gson = new Gson();
         String returnResponse = null;
@@ -715,11 +719,13 @@ public class ForceCIController {
             returnResponse = "User Already Exists";
         } else {
             Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity);
+            userEntity.setEnabled(true);
+            userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
             userEntity = connect2DeployUserMongoRepository.save(userEntity);
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(userEntity.getEmailId());
             mailMessage.setSubject("Complete Registration!");
-            mailMessage.setFrom("nagesingh@deloitte.com");
+            mailMessage.setFrom("connect2deployNoReply@deloitte.com");
             mailMessage.setText("To confirm your account, please click here : "
                     +"https://forceci.herokuapp.com/confirm-account?token="+confirmationToken.getConfirmationToken());
 
