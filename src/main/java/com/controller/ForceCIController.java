@@ -726,10 +726,10 @@ public class ForceCIController {
             Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity);
             userEntity.setEnabled(true);
             userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
-            //userEntity = connect2DeployUserMongoRepository.save(userEntity);
+            userEntity = connect2DeployUserMongoRepository.save(userEntity);
             SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
 
-            Email from = new Email("write2nagendra0808@gmail.com");
+            Email from = new Email("no-reply@connect2deploy.com");
             String subject = "Hello "+userEntity.getFirstName() + " !";
             Email to = new Email(userEntity.getEmailId());
             Content content = new Content("text/plain", "To confirm your account, please click here : "
