@@ -41,6 +41,10 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             templateUrl: './html/forgotPassword.html',
             controller: 'forgotPasswordController',
         })
+        .when('/apps/dashboard/:token', {
+            templateUrl: './html/dashboard.html',
+            controller: 'dashBoardController',
+        })
         .when('/apps/register', {
             templateUrl: './html/register.html',
             controller: 'registerController',
@@ -170,7 +174,9 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
     }
 });
 
-connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route) {
+connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
+    $scope.connect2DeployToken = $routeParams.token;
+    debugger;
     $scope.lstRepositoryData = [];
 
     if (sse !== undefined && sse !== null && sse !== '') {
@@ -761,7 +767,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
 });
 
-connect2Deploy.controller('registerController', function ($scope, $http, $location) {
+connect2Deploy.controller('registerController', function ($scope, $http, $location, $routeParams) {
     $scope.register = function (userEntity) {
         if(userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
             $http.post("/register", userEntity).then(function (response) {
