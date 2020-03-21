@@ -12,6 +12,13 @@ import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.security.CryptoPassword;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 import com.service.EmailSenderService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
@@ -36,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -721,15 +729,25 @@ public class ForceCIController {
             Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity);
             userEntity.setEnabled(true);
             userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
-            userEntity = connect2DeployUserMongoRepository.save(userEntity);
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo(userEntity.getEmailId());
-            mailMessage.setSubject("Complete Registration!");
-            mailMessage.setFrom("no-reply@gmail.com");
-            mailMessage.setText("To confirm your account, please click here : "
-                    +"https://forceci.herokuapp.com/confirm-account?token="+confirmationToken.getConfirmationToken());
+            //userEntity = connect2DeployUserMongoRepository.save(userEntity);
+            SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
 
-            emailSenderService.sendEmail(mailMessage);
+            Email from = new Email("no-reply@gmail.com");
+            String subject = "Hello "+userEntity.getFirstName() + " !";
+            Email to = new Email("nagendra080389@gmail.com");
+            Content content = new Content("text/plain", "To confirm your account, please click here : "
+                    +"https://forceci.herokuapp.com/confirm-account?token="+confirmationToken.getConfirmationToken());
+            Mail mail = new Mail(from, subject, to, content);
+
+            Request sendGridRequest = new Request();
+            sendGridRequest.setMethod(Method.POST);
+            sendGridRequest.setEndpoint("mail/send");
+            sendGridRequest.setBody(mail.build());
+            Response sendGridResponse = sg.api(sendGridRequest);
+            System.out.println(sendGridResponse.getStatusCode());
+            System.out.println(sendGridResponse.getBody());
+            System.out.println(sendGridResponse.getHeaders());
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
             returnResponse = "Success";
         }
 
