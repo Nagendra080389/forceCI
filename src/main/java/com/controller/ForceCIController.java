@@ -725,7 +725,7 @@ public class ForceCIController {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(userEntity.getEmailId());
             mailMessage.setSubject("Complete Registration!");
-            mailMessage.setFrom("connect2deployNoReply@deloitte.com");
+            mailMessage.setFrom("no-reply@gmail.com");
             mailMessage.setText("To confirm your account, please click here : "
                     +"https://forceci.herokuapp.com/confirm-account?token="+confirmationToken.getConfirmationToken());
 
