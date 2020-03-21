@@ -11,7 +11,7 @@ import java.util.UUID;
 public class Connect2DeployToken implements Serializable {
 
     @Id
-    private long tokenid;
+    private String id;
     private String confirmationToken;
     @CreatedDate
     private Date createdDate;
@@ -23,12 +23,12 @@ public class Connect2DeployToken implements Serializable {
         confirmationToken = UUID.randomUUID().toString();
     }
 
-    public long getTokenid() {
-        return tokenid;
+    public String getId() {
+        return id;
     }
 
-    public void setTokenid(long tokenid) {
-        this.tokenid = tokenid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getConfirmationToken() {
@@ -60,7 +60,7 @@ public class Connect2DeployToken implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Connect2DeployToken that = (Connect2DeployToken) o;
-        return tokenid == that.tokenid &&
+        return id == that.id &&
                 confirmationToken.equals(that.confirmationToken) &&
                 createdDate.equals(that.createdDate) &&
                 user.equals(that.user);
@@ -68,6 +68,6 @@ public class Connect2DeployToken implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(tokenid, confirmationToken, createdDate, user);
+        return Objects.hash(id, confirmationToken, createdDate, user);
     }
 }

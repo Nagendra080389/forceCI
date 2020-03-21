@@ -8,19 +8,19 @@ import java.util.Objects;
 
 public class Connect2DeployUser implements Serializable {
     @Id
-    private long userid;
+    private String id;
     private String emailId;
     private String password;
     private String firstName;
     private String lastName;
     private boolean isEnabled;
 
-    public long getUserid() {
-        return userid;
+    public String getId() {
+        return id;
     }
 
-    public void setUserid(long userid) {
-        this.userid = userid;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getEmailId() {
@@ -68,16 +68,16 @@ public class Connect2DeployUser implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Connect2DeployUser that = (Connect2DeployUser) o;
-        return userid == that.userid &&
-                isEnabled == that.isEnabled &&
+        return isEnabled == that.isEnabled &&
+                id.equals(that.id) &&
                 emailId.equals(that.emailId) &&
                 password.equals(that.password) &&
-                Objects.equals(firstName, that.firstName) &&
+                firstName.equals(that.firstName) &&
                 Objects.equals(lastName, that.lastName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userid, emailId, password, firstName, lastName, isEnabled);
+        return Objects.hash(id, emailId, password, firstName, lastName, isEnabled);
     }
 }
