@@ -732,9 +732,9 @@ public class ForceCIController {
             //userEntity = connect2DeployUserMongoRepository.save(userEntity);
             SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
 
-            Email from = new Email("no-reply@gmail.com");
+            Email from = new Email("write2nagendra0808@gmail.com");
             String subject = "Hello "+userEntity.getFirstName() + " !";
-            Email to = new Email("nagendra080389@gmail.com");
+            Email to = new Email(userEntity.getEmailId());
             Content content = new Content("text/plain", "To confirm your account, please click here : "
                     +"https://forceci.herokuapp.com/confirm-account?token="+confirmationToken.getConfirmationToken());
             Mail mail = new Mail(from, subject, to, content);
@@ -747,7 +747,6 @@ public class ForceCIController {
             System.out.println(sendGridResponse.getStatusCode());
             System.out.println(sendGridResponse.getBody());
             System.out.println(sendGridResponse.getHeaders());
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
             returnResponse = "Success";
         }
 
