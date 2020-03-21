@@ -705,19 +705,19 @@ public class ForceCIController {
 
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String registerUser(@RequestBody Connect2DeployUser user, HttpServletResponse response, HttpServletRequest
+    public String registerUser(@RequestBody Connect2DeployUser userEntity, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
         Gson gson = new Gson();
         String returnResponse = null;
-        Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(user.getEmailId());
+        Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(userEntity.getEmailId());
         if(existingUser != null){
             returnResponse = "User Already Exists";
         } else {
-            Connect2DeployToken confirmationToken = new Connect2DeployToken(user);
-            user = connect2DeployUserMongoRepository.save(user);
+            Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity);
+            userEntity = connect2DeployUserMongoRepository.save(userEntity);
             SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo(user.getEmailId());
+            mailMessage.setTo(userEntity.getEmailId());
             mailMessage.setSubject("Complete Registration!");
             mailMessage.setFrom("nagesingh@deloitte.com");
             mailMessage.setText("To confirm your account, please click here : "
