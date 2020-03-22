@@ -39,7 +39,7 @@
                                              Password</span>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-user btn-block" ng-disabled="registrationDetails.$invalid" ng-click="register(user)">Register Account</button>
+                                    <button type="submit" class="btn btn-primary btn-user btn-block" ng-disabled="(registrationDetails.$invalid && user.password != user.RepeatPassword)" ng-click="register(user)">Register Account</button>
                                 </form>
                                 <hr>
                                 <div class="text-center">
