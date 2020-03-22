@@ -752,7 +752,7 @@ public class ForceCIController {
         String subject = "Hello " + userEntity.getFirstName() + " !";
         Email to = new Email(userEntity.getEmailId());
         Content content = new Content("text/plain", "To confirm your account, please click here : "
-                + "https://forceci.herokuapp.com/#!/apps/dashboard/" + confirmationToken.getConfirmationToken());
+                + "https://forceci.herokuapp.com/#!/apps/dashboard/token/" + confirmationToken.getConfirmationToken());
         Mail mail = new Mail(from, subject, to, content);
 
         Request sendGridRequest = new Request();

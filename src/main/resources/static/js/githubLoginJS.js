@@ -22,7 +22,7 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
         .when('/apps/dashboard/success', {
             templateUrl: './html/verificationEmailSent.html'
         })
-        .when('/apps/dashboard/:token', {
+        .when('/apps/dashboard/token/:token', {
             templateUrl: './html/dashboard.html',
             controller: 'dashBoardController',
         })
