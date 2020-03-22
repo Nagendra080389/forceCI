@@ -30,7 +30,7 @@
                                         <div class="col-sm-6 mb-3 mb-sm-0" ng-class="{ 'has-error' : registrationDetails.password.$dirty && registrationDetails.password.$invalid }">
                                             <input type="password" name="password" class="form-control form-control-user" ng-model="user.password" minlength="6"
                                                    required id="exampleInputPassword" placeholder="Password">
-                                            <span ng-show="registrationDetails.password.$touched && registrationDetails.password.$invalid" style="color:red">Password is required.</span>
+                                            <span ng-show="registrationDetails.password.$touched && registrationDetails.password.$invalid" style="color:red">Password is required and should be minimum of 6 characters.</span>
                                         </div>
                                         <div class="col-sm-6" ng-class="{ 'has-error' : registrationDetails.repeatPassword.$dirty && registrationDetails.repeatPassword.$invalid }">
                                             <input type="password" name="repeatPassword" class="form-control form-control-user" ng-model="user.RepeatPassword"
