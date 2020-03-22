@@ -1,25 +1,39 @@
 package com.controller;
 
-import com.rabbitMQ.DeploymentJob;
-import com.rabbitMQ.RabbitMqSenderConfig;
-import com.sforce.soap.metadata.MetadataConnection;
-import com.sforce.ws.ConnectorConfig;
-import com.utils.SFDCUtils;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class TestMain {
 
     public static void main(String[] args) throws Exception {
-        RabbitMqSenderConfig rabbitMqSenderConfig = new RabbitMqSenderConfig();
-        AmqpAdmin amqpAdmin = rabbitMqSenderConfig.amqpAdmin();
-        System.out.println(amqpAdmin.getQueueProperties("182022017_master"));
+
+        Email from = new Email("test@example.com");
+        Email to = new Email("write2nagendra0808@gmail.com"); // use your own email address here
+
+        String subject = "Sending with Twilio SendGrid is Fun";
+        Content content = new Content("text/html", "and <em>easy</em> to do anywhere with <strong>Java</strong>");
+
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(System.getenv("SG.k-TIw1RQQDO-ZiXfa-8k8w.Kw0r_vw-KrWZdw0T836wRjxZXjqOkePn2apT7rGTwPU"));
+        Request request = new Request();
+
+        request.setMethod(Method.POST);
+        request.setEndpoint("mail/send");
+        request.setBody(mail.build());
+
+        Response response = sg.api(request);
+
+        System.out.println(response.getStatusCode());
+        System.out.println(response.getHeaders());
+        System.out.println(response.getBody());
     }
 
     public void execute() throws FileNotFoundException {
