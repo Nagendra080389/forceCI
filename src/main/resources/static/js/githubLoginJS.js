@@ -99,6 +99,12 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
                 });
                 $scope.user.emailId = '';
                 $scope.user.password = '';
+            } else if(response.data !== undefined && response.data !== null && response.data === 'Email Not Verified'){
+                iziToast.error({
+                    title: 'Error',
+                    message: response.data + '! Please verify your email and login try again.',
+                    position: 'topRight'
+                });
             } else {
                 $location.path("/apps/dashboard");
             }
@@ -193,21 +199,43 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
+    let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    if(validateConnect2DeployToken(cookie, $http)){
+
+    } else {
+        $location.path("/index");
+    }
     if($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
         $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
             if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
                 if (response.data === 'Email Verified') {
-
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: response.data
+                    });
                 } else if (response.data === 'Email Already Verified') {
-
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: response.data
+                    });
                 } else {
-
+                    $location.path("/index");
                 }
             }
         }, function (error) {
-
+            iziToast.error({
+                title: 'Error',
+                message: error.data.message,
+                position: 'topRight'
+            });
         });
     }
+
+
 
     $scope.lstRepositoryData = [];
 
@@ -217,7 +245,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
-    $http.get("/api/fetchUserName").then(function (response) {
+    /*$http.get("/api/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
             $scope.avatar_url = response.data.avatar_url;
@@ -231,7 +259,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                     }
                 }
             }, function (error) {
-
+                $location.path("/index");
             });
 
         }
@@ -244,7 +272,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             position: 'topRight'
         });
         $location.path("/index");
-    });
+    });*/
 
 
     $scope.disconnectAndDelete = function (eachData) {

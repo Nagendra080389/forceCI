@@ -20,6 +20,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.service.EmailSenderService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
+import com.utils.AntExecutor;
 import com.utils.ApiSecurity;
 import com.utils.SFDCUtils;
 import com.utils.ValidationStatus;
@@ -31,6 +32,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -70,6 +73,7 @@ import java.util.concurrent.Executors;
 @RestController
 public class ForceCIController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ForceCIController.class);
     public static final int HTTP_STATUS_OK = 200;
     public static final int HTTP_STATUS_CREATED = 201;
     public static final int HTTP_STATUS_FAILED = 401;
@@ -721,37 +725,45 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(userEntity.getEmailId());
-        if(existingUser != null){
+        if(existingUser != null && existingUser.isBoolEmailVerified()){
             returnResponse = "User Already Exists";
+        } else if(existingUser != null && !existingUser.isBoolEmailVerified()){
+            connect2DeployUserMongoRepository.delete(existingUser);
+            returnResponse = createNewUserAndReturnMessage(userEntity);
         } else {
-            userEntity.setEnabled(true);
-            userEntity.setBoolEmailVerified(false);
-            userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
-            userEntity = connect2DeployUserMongoRepository.save(userEntity);
-            Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
-            confirmationToken  = connect2DeployTokenMongoRepository.save(confirmationToken);
-            SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
-
-            Email from = new Email("no-reply@connect2deploy.com");
-            String subject = "Hello "+userEntity.getFirstName() + " !";
-            Email to = new Email(userEntity.getEmailId());
-            Content content = new Content("text/plain", "To confirm your account, please click here : "
-                    +"https://forceci.herokuapp.com/#!/apps/dashboard/"+confirmationToken.getConfirmationToken());
-            Mail mail = new Mail(from, subject, to, content);
-
-            Request sendGridRequest = new Request();
-            sendGridRequest.setMethod(Method.POST);
-            sendGridRequest.setEndpoint("mail/send");
-            sendGridRequest.setBody(mail.build());
-            Response sendGridResponse = sg.api(sendGridRequest);
-            System.out.println(sendGridResponse.getStatusCode());
-            System.out.println(sendGridResponse.getBody());
-            System.out.println(sendGridResponse.getHeaders());
-            returnResponse = "Success";
+            returnResponse = createNewUserAndReturnMessage(userEntity);
         }
 
 
         return gson.toJson(returnResponse);
+    }
+
+    private String createNewUserAndReturnMessage(@RequestBody Connect2DeployUser userEntity) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+        String returnResponse;
+        userEntity.setEnabled(true);
+        userEntity.setBoolEmailVerified(false);
+        userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
+        userEntity = connect2DeployUserMongoRepository.save(userEntity);
+        Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
+        confirmationToken = connect2DeployTokenMongoRepository.save(confirmationToken);
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+
+        Email from = new Email("no-reply@connect2deploy.com");
+        String subject = "Hello " + userEntity.getFirstName() + " !";
+        Email to = new Email(userEntity.getEmailId());
+        Content content = new Content("text/plain", "To confirm your account, please click here : "
+                + "https://forceci.herokuapp.com/#!/apps/dashboard/" + confirmationToken.getConfirmationToken());
+        Mail mail = new Mail(from, subject, to, content);
+
+        Request sendGridRequest = new Request();
+        sendGridRequest.setMethod(Method.POST);
+        sendGridRequest.setEndpoint("mail/send");
+        sendGridRequest.setBody(mail.build());
+        Response sendGridResponse = sg.api(sendGridRequest);
+        logger.info("Email Sent -> "+sendGridResponse.getStatusCode());
+        logger.info("Email Sent for user -> "+userEntity.getEmailId());
+        returnResponse = "Success";
+        return returnResponse;
     }
 
     @RequestMapping(value = "/api/saveSfdcConnectionDetails", method = RequestMethod.POST)
@@ -809,7 +821,7 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    @RequestMapping(value = "/api/validateToken", method = RequestMethod.GET)
+    @RequestMapping(value = "/validateToken", method = RequestMethod.GET)
     public String validateToken(@RequestParam String token, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
@@ -842,13 +854,17 @@ public class ForceCIController {
         String returnResponse = null;
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser.getEmailId());
         if(byEmailId != null && CryptoPassword.validatePassword(connect2DeployUser.getPassword() , byEmailId.getPassword())){
-            String token = UUID.randomUUID().toString();
-            byEmailId.setToken(token);
-            connect2DeployUserMongoRepository.save(byEmailId);
-            returnResponse = token;
-            Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", token);
-            response.addCookie(accessTokenCookie);
-            accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            if(!byEmailId.isBoolEmailVerified()){
+                returnResponse = "Email Not Verified";
+            } else {
+                String token = UUID.randomUUID().toString();
+                byEmailId.setToken(token);
+                connect2DeployUserMongoRepository.save(byEmailId);
+                returnResponse = token;
+                Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", token);
+                response.addCookie(accessTokenCookie);
+                accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            }
         } else {
             returnResponse = "No User Found";
         }
