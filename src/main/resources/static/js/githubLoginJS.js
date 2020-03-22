@@ -55,8 +55,17 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
 
 });
 
+function validateConnect2DeployToken(strToken, $http) {
+    $http.get("/validateConnect2DeployToken?strToken=" + strToken).then(function (response) {
+        return response.data;
+    }, function (error) {
+        return false;
+    })
+}
+
 function checkToken($location) {
-    let accessToken = $.cookie("ACCESS_TOKEN");
+    let accessToken = $.cookie("CONNECT2DEPLOY_TOKEN");
+
     if (accessToken !== undefined && accessToken !== null && accessToken !== '') {
         $location.path("/apps/dashboard");
     } else {
@@ -65,7 +74,7 @@ function checkToken($location) {
 }
 
 function logoutFunctionCaller($location) {
-    $.removeCookie("ACCESS_TOKEN");
+    $.removeCookie("CONNECT2DEPLOY_TOKEN", {path: '/'});
     $location.path("/index");
     setTimeout(function () {
         $('.modal-backdrop').removeClass('show');
@@ -74,9 +83,24 @@ function logoutFunctionCaller($location) {
 }
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog) {
+    let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    if(validateConnect2DeployToken(cookie, $http)){
+        $location.path("/apps/dashboard");
+    } else {
+        $location.path("/index");
+    }
     checkToken($location);
-    $scope.login = function(userEntity){
+    $scope.login = function (userEntity) {
+        $http.post("/loginConnect", userEntity).then(function (response) {
 
+        }, function (error) {
+            console.log(error);
+            iziToast.error({
+                title: 'Error',
+                message: 'SFDC connection failed, Please retry. ' + error.data.message,
+                position: 'topRight'
+            });
+        })
     };
     $scope.redirectJS = function () {
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
@@ -160,11 +184,11 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
-    $http.get("/validateToken?token="+$scope.connect2DeployToken).then(function (response) {
-        if(response !== undefined && response !== null && response.data !== undefined && response.data !== null){
-            if(response.data === 'Email Verified'){
+    $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
+        if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
+            if (response.data === 'Email Verified') {
 
-            } else if (response.data === 'Email Already Verified'){
+            } else if (response.data === 'Email Already Verified') {
 
             } else {
 
@@ -766,9 +790,9 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
 connect2Deploy.controller('registerController', function ($scope, $http, $location, $routeParams) {
     $scope.register = function (userEntity) {
-        if(userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
+        if (userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
             $http.post("/register", userEntity).then(function (response) {
-                $location.path("/apps/dashboard/success");
+                    $location.path("/apps/dashboard/success");
                 }, function (error) {
                     iziToast.error({
                         title: 'Error',

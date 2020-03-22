@@ -13,8 +13,17 @@ public class Connect2DeployUser implements Serializable {
     private String password;
     private String firstName;
     private String lastName;
+    private String token;
     private boolean isEnabled;
     private boolean boolEmailVerified;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public String getId() {
         return id;

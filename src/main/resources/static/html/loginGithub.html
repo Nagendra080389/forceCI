@@ -15,17 +15,15 @@
                                 <div class="text-center">
                                     <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                 </div>
-                                <form class="user">
+                                <form class="user" name="loginDetails">
                                     <div class="form-group">
-                                        <input type="email" class="form-control form-control-user" ng-model="user.emailId" id="exampleInputEmail"
+                                        <input type="email" required class="form-control form-control-user" name="userName" ng-model="user.emailId" id="exampleInputEmail"
                                                aria-describedby="emailHelp" placeholder="Enter Email Address...">
                                     </div>
                                     <div class="form-group">
-                                        <input type="password" class="form-control form-control-user" ng-model="user.password" id="exampleInputPassword" placeholder="Password">
+                                        <input type="password" required class="form-control form-control-user" name="password" ng-model="user.password" id="exampleInputPassword" placeholder="Password">
                                     </div>
-                                    <a href="javascript:void(0);" ng-click="login(user)" class="btn btn-primary btn-user btn-block">
-                                        Login
-                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-user btn-block" ng-disabled="loginDetails.$invalid" ng-click="login(user)">Login</button>
                                     <hr>
                                 </form>
                                 <div class="text-center">

@@ -12,6 +12,7 @@ import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.security.CryptoPassword;
+import com.security.SecurityConfiguration;
 import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
@@ -139,7 +140,7 @@ public class ForceCIController {
         return accessToken;
     }
 
-    @GetMapping("/cancelDeployment")
+    @GetMapping("/api/cancelDeployment")
     public String cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
         Gson gson = new Gson();
         String result = "Success";
@@ -184,7 +185,7 @@ public class ForceCIController {
     }
 
 
-    @GetMapping("/asyncDeployments")
+    @GetMapping("/api/asyncDeployments")
     public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoId, @RequestParam String branchName) {
         final SseEmitter emitter = new SseEmitter();
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -409,7 +410,7 @@ public class ForceCIController {
         }
     }
 
-    @RequestMapping(value = "/getAllBranches", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/getAllBranches", method = RequestMethod.GET)
     public String getAllBranches(@RequestParam String strRepoId, HttpServletResponse response,
                                  HttpServletRequest request) throws IOException {
         String access_token = fetchCookies(request);
@@ -425,7 +426,7 @@ public class ForceCIController {
         return gson.toJson(lstBranchesToBeReturned);
     }
 
-    @RequestMapping(value = "/createBranch", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/createBranch", method = RequestMethod.GET)
     public String createBranch(@RequestParam String repoId, @RequestParam String targetBranch,
                                @RequestParam String userName, @RequestParam String newBranchName,
                                HttpServletResponse response,
@@ -525,7 +526,7 @@ public class ForceCIController {
         return httpClient.executeMethod(createStatus);
     }
 
-    @RequestMapping(value = "/fetchRepositoryInDB", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/fetchRepositoryInDB", method = RequestMethod.GET)
     public String getRepositoryList(@RequestParam String gitHubUser, HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
         String reposOnDB = "";
@@ -555,7 +556,7 @@ public class ForceCIController {
         return reposOnDB;
     }
 
-    @RequestMapping(value = "/fetchUserName", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/fetchUserName", method = RequestMethod.GET)
     public String getUserName(HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
         String loginNameAndAvatar = "";
@@ -585,7 +586,7 @@ public class ForceCIController {
         return loginNameAndAvatar;
     }
 
-    @RequestMapping(value = "/fetchRepository", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/fetchRepository", method = RequestMethod.GET)
     public String getRepositoryByName(@RequestParam String repoName, @RequestParam String repoUser,
                                       HttpServletResponse response, HttpServletRequest request) throws IOException {
         Cookie[] cookies = request.getCookies();
@@ -615,7 +616,7 @@ public class ForceCIController {
         return gson.toJson(finalResult);
     }
 
-    @RequestMapping(value = "/deleteWebHook", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/deleteWebHook", method = RequestMethod.DELETE)
     public String deleteWebHook(@RequestParam String repositoryName, @RequestParam String repositoryId, @RequestParam String repositoryOwner,
                                 @RequestParam String webHookId, HttpServletResponse response, HttpServletRequest
                                         request) throws IOException, URISyntaxException {
@@ -651,7 +652,7 @@ public class ForceCIController {
         return gson.toJson(status);
     }
 
-    @RequestMapping(value = "/createWebHook", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/createWebHook", method = RequestMethod.POST)
     public String createWebHook(@RequestBody Repository repository, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
@@ -753,7 +754,7 @@ public class ForceCIController {
         return gson.toJson(returnResponse);
     }
 
-    @RequestMapping(value = "/saveSfdcConnectionDetails", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/saveSfdcConnectionDetails", method = RequestMethod.POST)
     public String saveSfdcConnectionDetails(@RequestBody SFDCConnectionDetails sfdcConnectionDetails, HttpServletResponse response, HttpServletRequest
             request) throws Exception {
 
@@ -795,7 +796,7 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    @RequestMapping(value = "/showSfdcConnectionDetails", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/showSfdcConnectionDetails", method = RequestMethod.GET)
     public String showSfdcConnectionDetails(@RequestParam String gitRepoId, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
@@ -808,7 +809,7 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    @RequestMapping(value = "/validateToken", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/validateToken", method = RequestMethod.GET)
     public String validateToken(@RequestParam String token, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
 
@@ -833,7 +834,35 @@ public class ForceCIController {
         return gson.toJson(returnResponse);
     }
 
-    @RequestMapping(value = "/fetchLogs", method = RequestMethod.GET)
+    @RequestMapping(value = "/loginConnect", method = RequestMethod.POST)
+    public String loginController(@RequestBody Connect2DeployUser connect2DeployUser, HttpServletResponse response, HttpServletRequest
+            request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
+        Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser.getEmailId());
+        if(byEmailId != null && CryptoPassword.validatePassword(connect2DeployUser.getPassword() , byEmailId.getPassword())){
+            String token = UUID.randomUUID().toString();
+            byEmailId.setToken(token);
+            connect2DeployUserMongoRepository.save(byEmailId);
+            returnResponse = token;
+            Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", token);
+            response.addCookie(accessTokenCookie);
+            accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+        } else {
+            returnResponse = "No User Found";
+        }
+        return gson.toJson(returnResponse);
+    }
+
+    @RequestMapping(value = "/validateConnect2DeployToken", method = RequestMethod.GET)
+    public Boolean validateConnect2DeployToken(@RequestParam String strToken, HttpServletResponse response, HttpServletRequest
+            request) {
+        Optional<Connect2DeployUser> connect2DeployUser = connect2DeployUserMongoRepository.findByToken(strToken);
+        return connect2DeployUser.isPresent();
+    }
+
+    @RequestMapping(value = "/api/fetchLogs", method = RequestMethod.GET)
     public String fetchLogs(@RequestParam String jobNo, @RequestParam String type, @RequestParam String repoId,
                             HttpServletResponse response, HttpServletRequest request) throws IOException {
 
@@ -863,7 +892,7 @@ public class ForceCIController {
         return returnResponse;
     }
 
-    @RequestMapping(value = "/deleteSfdcConnectionDetails", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/deleteSfdcConnectionDetails", method = RequestMethod.DELETE)
     public String deleteSfdcConnectionDetails(@RequestParam String sfdcDetailsId, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
         Gson gson = new Gson();
