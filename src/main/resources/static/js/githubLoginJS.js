@@ -56,11 +56,14 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
 });
 
 function validateConnect2DeployToken(strToken, $http) {
-    $http.get("/validateConnect2DeployToken?strToken=" + strToken).then(function (response) {
-        return response.data;
-    }, function (error) {
-        return false;
-    })
+    return new Promise(function (resolve, reject) {
+        $http.get("/validateConnect2DeployToken?strToken=" + strToken).then(function (response) {
+            resolve(response.data);
+        }, function (error) {
+            reject(false);
+        })
+    });
+
 }
 
 function checkToken($location) {
@@ -83,12 +86,15 @@ function logoutFunctionCaller($location) {
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog) {
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
-    if(validateConnect2DeployToken(cookie, $http)){
-        $location.path("/apps/dashboard");
-    } else {
-        $location.path("/index");
-    }
-    checkToken($location);
+    validateConnect2DeployToken(cookie, $http).then(function (objResult) {
+        if(objResult) {
+            $location.path("/apps/dashboard");
+        } else {
+            $location.path("/index");
+        }
+    }).catch(function (objError) {
+
+    });
     $scope.login = function (userEntity) {
         $http.post("/loginConnect", userEntity).then(function (response) {
             if(response.data !== undefined && response.data !== null && response.data === 'No User Found'){
@@ -200,43 +206,42 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
-    if(validateConnect2DeployToken(cookie, $http)){
-
-    } else {
-        $location.path("/index");
-    }
-    if($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
-        $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
-            if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
-                if (response.data === 'Email Verified') {
-                    iziToast.success({
-                        timeout: 5000,
-                        icon: 'fa fa-chrome',
-                        title: 'OK',
-                        message: response.data
-                    });
-                } else if (response.data === 'Email Already Verified') {
-                    iziToast.success({
-                        timeout: 5000,
-                        icon: 'fa fa-chrome',
-                        title: 'OK',
-                        message: response.data
-                    });
-                } else {
-                    $location.path("/index");
+    validateConnect2DeployToken(cookie, $http).then(function (objResult) {
+        if(!objResult) {
+            $location.path("/index");
+        }
+        if($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
+            $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
+                if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
+                    if (response.data === 'Email Verified') {
+                        iziToast.success({
+                            timeout: 5000,
+                            icon: 'fa fa-chrome',
+                            title: 'OK',
+                            message: response.data
+                        });
+                    } else if (response.data === 'Email Already Verified') {
+                        iziToast.success({
+                            timeout: 5000,
+                            icon: 'fa fa-chrome',
+                            title: 'OK',
+                            message: response.data
+                        });
+                    } else {
+                        $location.path("/index");
+                    }
                 }
-            }
-        }, function (error) {
-            iziToast.error({
-                title: 'Error',
-                message: error.data.message,
-                position: 'topRight'
+            }, function (error) {
+                iziToast.error({
+                    title: 'Error',
+                    message: error.data.message,
+                    position: 'topRight'
+                });
             });
-        });
-    }
+        }
+    }).catch(function (objError) {
 
-
-
+    });
     $scope.lstRepositoryData = [];
 
     if (sse !== undefined && sse !== null && sse !== '') {
