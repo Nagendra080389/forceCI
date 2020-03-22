@@ -217,13 +217,13 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
-    $http.get("/fetchUserName").then(function (response) {
+    $http.get("/api/fetchUserName").then(function (response) {
         if (response.data !== undefined && response.data !== null) {
             $scope.userName = response.data.login;
             $scope.avatar_url = response.data.avatar_url;
             localStorage.setItem('githubOwner', response.data.login);
             localStorage.setItem('avatar_url', response.data.avatar_url);
-            $http.get("/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
+            $http.get("/api/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
                 $scope.lstRepositoryData = [];
                 if (response.data.length > 0) {
                     for (let i = 0; i < response.data.length; i++) {
@@ -270,7 +270,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                         }
                     }, toast, 'button');
                     if (eachData.repositoryId) {
-                        $http.delete("/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryId=" + eachData.repositoryId + "&repositoryOwner=" +
+                        $http.delete("/api/deleteWebHook?repositoryName=" + eachData.repositoryName + "&repositoryId=" + eachData.repositoryId + "&repositoryOwner=" +
                             eachData.owner + "&webHookId=" + eachData.webHook.id).then(function (response) {
                             console.log(response);
                             if (response.status === 200 && response.data === 204) {
@@ -281,7 +281,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                                     message: 'App deleted successfully'
                                 });
                                 let gitHubOwner = localStorage.getItem('githubOwner');
-                                $http.get("/fetchRepositoryInDB?gitHubUser=" + gitHubOwner).then(function (response) {
+                                $http.get("/api/fetchRepositoryInDB?gitHubUser=" + gitHubOwner).then(function (response) {
                                     $scope.lstRepositoryData = [];
                                     if (response.data.length > 0) {
                                         for (let i = 0; i < response.data.length; i++) {
@@ -403,13 +403,13 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     });
 
 
-    $http.get("/showSfdcConnectionDetails?gitRepoId=" + $scope.repoId).then(function (response) {
+    $http.get("/api/showSfdcConnectionDetails?gitRepoId=" + $scope.repoId).then(function (response) {
         $scope.lstSFDCConnectionDetails = response.data;
     }, function (error) {
         console.log(error);
     });
 
-    $http.get("/getAllBranches?strRepoId=" + $scope.repoId).then(function (response) {
+    $http.get("/api/getAllBranches?strRepoId=" + $scope.repoId).then(function (response) {
         $scope.availableTags = response.data;
     }, function (error) {
         console.log(error);
@@ -462,7 +462,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
         $mdDialog.show(confirm).then(function (result) {
             // If confirmed run this code
-            $http.get("/createBranch?repoId=" + repoId +
+            $http.get("/api/createBranch?repoId=" + repoId +
                 "&targetBranch=" + targetBranch + "&userName=" + $scope.userName + "&newBranchName=" + result).then(function (response) {
                 const responseResult = response.data;
                 if (responseResult === 'Success') {
@@ -566,7 +566,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             return;
         }
 
-        $http.post("/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
+        $http.post("/api/saveSfdcConnectionDetails", sfdcDetails).then(function (response) {
                 $.removeCookie('SFDC_ACCESS_TOKEN', {path: '/'});
                 $.removeCookie('SFDC_USER_NAME', {path: '/'});
                 $.removeCookie('SFDC_INSTANCE_URL', {path: '/'});
@@ -593,7 +593,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     };
 
     function fetchDetailsFromDB(gitRepoId) {
-        $http.get("/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
+        $http.get("/api/showSfdcConnectionDetails?gitRepoId=" + gitRepoId).then(function (response) {
             $scope.lstSFDCConnectionDetails = response.data;
         }, function (error) {
             console.log(error);
@@ -619,7 +619,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     }
 
     $scope.deleteConnection = function (sfdcOrg) {
-        $http.delete("/deleteSfdcConnectionDetails?sfdcDetailsId=" + sfdcOrg.id).then(function (response) {
+        $http.delete("/api/deleteSfdcConnectionDetails?sfdcDetailsId=" + sfdcOrg.id).then(function (response) {
             fetchDetailsFromDB($scope.repoId);
             iziToast.success({
                 timeout: 5000,
@@ -658,7 +658,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
     function fetchRepoFromApi() {
         $scope.lstRepositoryFromApi = [];
-        $http.get("/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
+        $http.get("/api/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
             let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
             let repositoryWrappers = response.data.repositoryWrappers;
             for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
@@ -690,7 +690,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     }
 
     $scope.connectAndCreateApp = function (data) {
-        $http.post("/createWebHook", data).then(function (response) {
+        $http.post("/api/createWebHook", data).then(function (response) {
                 fetchRepoFromApi();
                 iziToast.success({
                     timeout: 5000,
@@ -721,7 +721,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     $scope.lstDeployments = [];
 
     $scope.cancelDeployment = function (deploymentJobId) {
-        $http.get("/cancelDeployment?deploymentJobId=" + deploymentJobId,).then(function (response) {
+        $http.get("/api/cancelDeployment?deploymentJobId=" + deploymentJobId,).then(function (response) {
             console.log(response);
         }, function (error) {
             console.log(error);
@@ -773,7 +773,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     };
 
     $scope.downloadValidation = function (jobNo, type) {
-        $http.get("/fetchLogs" + "?jobNo=" + jobNo + "&" + "type=" + type + "&" + "repoId=" + repoId).then(function (response) {
+        $http.get("/api/fetchLogs" + "?jobNo=" + jobNo + "&" + "type=" + type + "&" + "repoId=" + repoId).then(function (response) {
             if (response.data !== undefined && response.data !== null && response.data !== '') {
                 // any kind of extension (.txt,.cpp,.cs,.bat)
                 var filename = type + "_" + jobNo + ".txt";
