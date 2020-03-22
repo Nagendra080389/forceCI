@@ -65,7 +65,6 @@ function validateConnect2DeployToken(strToken, $http) {
 
 function checkToken($location) {
     let accessToken = $.cookie("CONNECT2DEPLOY_TOKEN");
-
     if (accessToken !== undefined && accessToken !== null && accessToken !== '') {
         $location.path("/apps/dashboard");
     } else {
@@ -92,7 +91,17 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
     checkToken($location);
     $scope.login = function (userEntity) {
         $http.post("/loginConnect", userEntity).then(function (response) {
-
+            if(response.data !== undefined && response.data !== null && response.data === 'No User Found'){
+                iziToast.error({
+                    title: 'Error',
+                    message: response.data,
+                    position: 'topRight'
+                });
+                $scope.user.emailId = '';
+                $scope.user.password = '';
+            } else {
+                $location.path("/apps/dashboard");
+            }
         }, function (error) {
             console.log(error);
             iziToast.error({
@@ -184,19 +193,21 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
-    $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
-        if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
-            if (response.data === 'Email Verified') {
+    if($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
+        $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
+            if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
+                if (response.data === 'Email Verified') {
 
-            } else if (response.data === 'Email Already Verified') {
+                } else if (response.data === 'Email Already Verified') {
 
-            } else {
+                } else {
 
+                }
             }
-        }
-    }, function (error) {
+        }, function (error) {
 
-    });
+        });
+    }
 
     $scope.lstRepositoryData = [];
 
