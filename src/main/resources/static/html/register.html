@@ -28,23 +28,18 @@
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-6 mb-3 mb-sm-0" ng-class="{ 'has-error' : registrationDetails.password.$dirty && registrationDetails.password.$invalid }">
-                                            <input type="password" name="password" class="form-control form-control-user" ng-model="user.password"
-                                                   required id="exampleInputPassword" placeholder="Password" password-verify="{{user.RepeatPassword}}">
+                                            <input type="password" name="password" class="form-control form-control-user" ng-model="user.password" minlength="6"
+                                                   required id="exampleInputPassword" placeholder="Password">
                                             <span ng-show="registrationDetails.password.$touched && registrationDetails.password.$invalid" style="color:red">Password is required.</span>
-                                            <div class="help-block" ng-messages="registrationDetails.password.$error" ng-if="registrationDetails.password.$dirty">
-                                                <p ng-message="passwordVerify">No match!</p>
-                                            </div>
                                         </div>
                                         <div class="col-sm-6" ng-class="{ 'has-error' : registrationDetails.repeatPassword.$dirty && registrationDetails.repeatPassword.$invalid }">
                                             <input type="password" name="repeatPassword" class="form-control form-control-user" ng-model="user.RepeatPassword"
-                                                   required id="exampleRepeatPassword" placeholder="Confirm Password" password-verify="{{user.password}}">
-                                            <span ng-show="registrationDetails.repeatPassword.$touched && registrationDetails.repeatPassword.$invalid" style="color:red">Confirm Password is required.</span>
-                                            <div class="help-block" ng-messages="registrationDetails.repeatPassword.$error" ng-if="registrationDetails.repeatPassword.$dirty">
-                                                <p ng-message="passwordVerify">No match!</p>
-                                            </div>
+                                                   required id="exampleRepeatPassword" placeholder="Confirm Password" minlength="6">
+                                            <span ng-show="registrationDetails.repeatPassword.$touched && (registrationDetails.repeatPassword.$invalid || user.password != user.RepeatPassword)" style="color:red">Confirm Password is required and should match
+                                             Password</span>
                                         </div>
                                     </div>
-                                    <button type="submit" ng-disabled="registrationDetails.$invalid" ng-click="register(user)">Register Account</button>
+                                    <button type="submit" class="btn btn-primary btn-user btn-block" ng-disabled="registrationDetails.$invalid" ng-click="register(user)">Register Account</button>
                                 </form>
                                 <hr>
                                 <div class="text-center">
