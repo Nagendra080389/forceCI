@@ -34,7 +34,7 @@
                                         </div>
                                         <div class="col-sm-6" ng-class="{ 'has-error' : registrationDetails.repeatPassword.$dirty && registrationDetails.repeatPassword.$invalid }">
                                             <input type="password" name="repeatPassword" class="form-control form-control-user" ng-model="user.RepeatPassword"
-                                                   required id="exampleRepeatPassword" placeholder="Confirm Password" minlength="6">
+                                                   required id="exampleRepeatPassword" placeholder="Confirm Password" minlength="6" ng-disabled="registrationDetails.password.$invalid">
                                             <span ng-show="registrationDetails.repeatPassword.$touched && (registrationDetails.repeatPassword.$invalid || user.password != user.RepeatPassword)" style="color:red">Confirm Password is required and should match
                                              Password</span>
                                         </div>
