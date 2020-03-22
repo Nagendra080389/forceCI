@@ -14,6 +14,7 @@ public class Connect2DeployUser implements Serializable {
     private String firstName;
     private String lastName;
     private boolean isEnabled;
+    private boolean boolEmailVerified;
 
     public String getId() {
         return id;
@@ -61,6 +62,14 @@ public class Connect2DeployUser implements Serializable {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public boolean isBoolEmailVerified() {
+        return boolEmailVerified;
+    }
+
+    public void setBoolEmailVerified(boolean boolEmailVerified) {
+        this.boolEmailVerified = boolEmailVerified;
     }
 
     @Override

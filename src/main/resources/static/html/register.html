@@ -3,50 +3,61 @@
     <div class="row justify-content-center">
         <div class="col-xl-12 col-lg-12 col-md-12">
             <div class="card o-hidden border-0 shadow-lg my-5">
-        <div class="card-body p-0">
-            <div class="row">
-            <div class="col-lg-6 d-none d-lg-block bg-register-image"></div>
-            <div class="col-lg-6">
-                <div class="p-5">
-                    <div class="text-center">
-                        <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
-                    </div>
-                    <form class="user">
-                        <div class="form-group row">
-                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="text" class="form-control form-control-user" ng-model="user.firstName" required id="exampleFirstName" placeholder="First Name">
-                            </div>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control form-control-user" ng-model="user.lastName" id="exampleLastName" placeholder="Last Name">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <div class="col-lg-6 d-none d-lg-block bg-register-image"></div>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
+                                </div>
+                                <form class="user" name="registrationDetails">
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 mb-3 mb-sm-0" ng-class="{ 'has-error' : registrationDetails.firstName.$dirty && registrationDetails.firstName.$invalid }">
+                                            <input type="text" name="firstName" class="form-control form-control-user" ng-model="user.firstName" required id="exampleFirstName" placeholder="First Name">
+                                            <span ng-show="registrationDetails.firstName.$touched && registrationDetails.firstName.$invalid" style="color:red">First Name is required.</span>
+                                        </div>
+                                        <div class="col-sm-6" ng-class="{ 'has-error' : registrationDetails.lastName.$dirty && registrationDetails.lastName.$invalid }">
+                                            <input type="text" name="lastName" class="form-control form-control-user" ng-model="user.lastName" id="exampleLastName" placeholder="Last Name">
+                                            <span ng-show="registrationDetails.lastName.$touched && registrationDetails.lastName.$invalid" style="color:red">Last Name is required.</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : registrationDetails.emailId.$dirty && registrationDetails.emailId.$invalid }">
+                                        <input type="email" name="emailId" class="form-control form-control-user" ng-model="user.emailId" required id="exampleInputEmail" placeholder="Email Address">
+                                        <span ng-show="registrationDetails.emailId.$touched && registrationDetails.emailId.$invalid" style="color:red">Email is required.</span>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 mb-3 mb-sm-0" ng-class="{ 'has-error' : registrationDetails.password.$dirty && registrationDetails.password.$invalid }">
+                                            <input type="password" name="password" class="form-control form-control-user" ng-model="user.password"
+                                                   required id="exampleInputPassword" placeholder="Password" password-verify="{{user.RepeatPassword}}">
+                                            <span ng-show="registrationDetails.password.$touched && registrationDetails.password.$invalid" style="color:red">Password is required.</span>
+                                            <div class="help-block" ng-messages="registrationDetails.password.$error" ng-if="registrationDetails.password.$dirty">
+                                                <p ng-message="passwordVerify">No match!</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" ng-class="{ 'has-error' : registrationDetails.repeatPassword.$dirty && registrationDetails.repeatPassword.$invalid }">
+                                            <input type="password" name="repeatPassword" class="form-control form-control-user" ng-model="user.RepeatPassword"
+                                                   required id="exampleRepeatPassword" placeholder="Confirm Password" password-verify="{{user.password}}">
+                                            <span ng-show="registrationDetails.repeatPassword.$touched && registrationDetails.repeatPassword.$invalid" style="color:red">Confirm Password is required.</span>
+                                            <div class="help-block" ng-messages="registrationDetails.repeatPassword.$error" ng-if="registrationDetails.repeatPassword.$dirty">
+                                                <p ng-message="passwordVerify">No match!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" ng-disabled="registrationDetails.$invalid" ng-click="register(user)">Register Account</button>
+                                </form>
+                                <hr>
+                                <div class="text-center">
+                                    <a class="small" href="#!apps/forgotPassword">Forgot Password?</a>
+                                </div>
+                                <div class="text-center">
+                                    <a class="small" href="#!index">Already have an account? Login!</a>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control form-control-user" ng-model="user.emailId" required id="exampleInputEmail" placeholder="Email Address">
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-6 mb-3 mb-sm-0">
-                                <input type="password" class="form-control form-control-user" ng-model="user.password" required id="exampleInputPassword" placeholder="Password">
-                            </div>
-                            <div class="col-sm-6">
-                                <input type="password" class="form-control form-control-user" ng-model="user.RepeatPassword" compare-to="user.password" required id="exampleRepeatPassword" placeholder="Repeat Password">
-                            </div>
-                        </div>
-                        <a href="javascript:void(0);" ng-click="register(user)" class="btn btn-primary btn-user btn-block">
-                            Register Account
-                        </a>
-                    </form>
-                    <hr>
-                    <div class="text-center">
-                        <a class="small" href="#!apps/forgotPassword">Forgot Password?</a>
-                    </div>
-                    <div class="text-center">
-                        <a class="small" href="#!index">Already have an account? Login!</a>
                     </div>
                 </div>
             </div>
-            </div>
-        </div>
-    </div>
         </div>
     </div>
 </div>

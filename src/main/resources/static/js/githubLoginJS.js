@@ -5,26 +5,36 @@ connect2Deploy.filter('decodeURIComponent', function () {
 });
 
 
-const compareTo = function() {
+function passwordVerify() {
     return {
-        require: "ngModel",
-        scope: {
-            otherModelValue: "=compareTo"
-        },
-        link: function(scope, element, attributes, ngModel) {
+        restrict: 'A', // only activate on element attribute
+        require: '?ngModel', // get a hold of NgModelController
+        link: function(scope, elem, attrs, ngModel) {
+            if (!ngModel) return; // do nothing if no ng-model
 
-            ngModel.$validators.compareTo = function(modelValue) {
-                return modelValue === scope.otherModelValue;
-            };
-
-            scope.$watch("otherModelValue", function() {
-                ngModel.$validate();
+            // watch own value and re-validate on change
+            scope.$watch(attrs.ngModel, function() {
+                validate();
             });
-        }
-    };
-};
 
-connect2Deploy.directive("compareTo", compareTo);
+            // observe the other value and re-validate on change
+            attrs.$observe('passwordVerify', function(val) {
+                validate();
+            });
+
+            var validate = function() {
+                // values
+                var val1 = ngModel.$viewValue;
+                var val2 = attrs.passwordVerify;
+
+                // set validity
+                ngModel.$setValidity('passwordVerify', val1 === val2);
+            };
+        }
+    }
+}
+
+connect2Deploy.directive("passwordVerify", passwordVerify);
 
 let sse;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
@@ -40,6 +50,9 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
         .when('/apps/forgotPassword', {
             templateUrl: './html/forgotPassword.html',
             controller: 'forgotPasswordController',
+        })
+        .when('/apps/dashboard/success', {
+            templateUrl: './html/verificationEmailSent.html'
         })
         .when('/apps/dashboard/:token', {
             templateUrl: './html/dashboard.html',
@@ -94,6 +107,9 @@ function logoutFunctionCaller($location) {
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog) {
     checkToken($location);
+    $scope.login = function(userEntity){
+
+    };
     $scope.redirectJS = function () {
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     };
@@ -176,7 +192,20 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
-    debugger;
+    $http.get("/validateToken?token="+$scope.connect2DeployToken).then(function (response) {
+        if(response !== undefined && response !== null && response.data !== undefined && response.data !== null){
+            if(response.data === 'Email Verified'){
+
+            } else if (response.data === 'Email Already Verified'){
+
+            } else {
+
+            }
+        }
+    }, function (error) {
+
+    });
+
     $scope.lstRepositoryData = [];
 
     if (sse !== undefined && sse !== null && sse !== '') {
@@ -771,13 +800,7 @@ connect2Deploy.controller('registerController', function ($scope, $http, $locati
     $scope.register = function (userEntity) {
         if(userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
             $http.post("/register", userEntity).then(function (response) {
-                    iziToast.success({
-                        timeout: 5000,
-                        icon: 'fa fa-chrome',
-                        title: 'OK',
-                        message: 'User created successfully'
-                    });
-
+                $location.path("/apps/dashboard/success");
                 }, function (error) {
                     iziToast.error({
                         title: 'Error',

@@ -723,10 +723,12 @@ public class ForceCIController {
         if(existingUser != null){
             returnResponse = "User Already Exists";
         } else {
-            Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity);
             userEntity.setEnabled(true);
+            userEntity.setBoolEmailVerified(false);
             userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
             userEntity = connect2DeployUserMongoRepository.save(userEntity);
+            Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
+            confirmationToken  = connect2DeployTokenMongoRepository.save(confirmationToken);
             SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
 
             Email from = new Email("no-reply@connect2deploy.com");
@@ -804,6 +806,31 @@ public class ForceCIController {
             returnResponse = gson.toJson(gitReposById);
         }
         return returnResponse;
+    }
+
+    @RequestMapping(value = "/validateToken", method = RequestMethod.GET)
+    public String validateToken(@RequestParam String token, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
+        Connect2DeployToken byConfirmationToken = connect2DeployTokenMongoRepository.findByConfirmationToken(token);
+        if (byConfirmationToken != null) {
+            Optional<Connect2DeployUser> userFromDB = connect2DeployUserMongoRepository.findById(byConfirmationToken.getUserId());
+            if(userFromDB.isPresent()){
+                Connect2DeployUser connect2DeployUser = userFromDB.get();
+                if(!connect2DeployUser.isBoolEmailVerified()) {
+                    connect2DeployUser.setBoolEmailVerified(true);
+                    connect2DeployUserMongoRepository.save(connect2DeployUser);
+                    returnResponse = "Email Verified";
+                } else {
+                    returnResponse = "Email Already Verified";
+                }
+            }
+        } else {
+            returnResponse = "Error";
+        }
+        return gson.toJson(returnResponse);
     }
 
     @RequestMapping(value = "/fetchLogs", method = RequestMethod.GET)

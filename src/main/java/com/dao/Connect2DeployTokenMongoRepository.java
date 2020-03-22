@@ -8,4 +8,6 @@ public interface Connect2DeployTokenMongoRepository extends MongoRepository<Conn
 
     Connect2DeployToken findByConfirmationToken(String confirmationToken);
 
+    Connect2DeployToken findByUserIdAndConfirmationToken(String userId, String confirmationToken);
+
 }
