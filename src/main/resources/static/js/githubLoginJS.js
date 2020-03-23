@@ -208,6 +208,8 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
 
     validateConnect2DeployToken(cookie, $http).then(function (objResult) {
         if(!objResult) {
@@ -369,6 +371,8 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 });
 
 connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams, $mdDialog) {
+    $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
@@ -681,6 +685,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
 connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location) {
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
@@ -691,8 +696,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
     $scope.tableHeaders = ['Linked Services', 'Username', 'Actions'];
     $scope.services = [];
-
-    $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName, {'Authorization': 'Bearer '+$scope.connect2DeployHeaderCookie}).then(function (response) {
+    $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName).then(function (response) {
         let data = response.data;
         debugger;
         try {
@@ -786,6 +790,8 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 });
 
 connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams, $mdDialog) {
+    $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
     const repoId = $scope.repoId = $routeParams.repoId;
@@ -863,6 +869,8 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 });
 
 connect2Deploy.controller('scheduledDeploymentController', function ($scope, $http, $location, $routeParams, $mdDialog) {
+    $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.userName = localStorage.githubOwner;
     $scope.avatar_url = localStorage.avatar_url;
     const repoId = $scope.repoId = $routeParams.repoId;
