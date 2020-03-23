@@ -698,17 +698,15 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.services = [];
     $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName).then(function (response) {
         let data = response.data;
-        debugger;
         try {
-            const lstData = JSON.parse(data);
-            for (let i = 0; i < lstData.length; i++) {
-                $scope.services.push(lstData[i]);
+            for (let i = 0; i < data.length; i++) {
+                $scope.services.push(data[i]);
             }
         }catch (e) {
 
         }
     }, function (error) {
-        debugger;
+        console.error(error);
     });
 
 
