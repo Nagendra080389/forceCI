@@ -20,10 +20,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.service.EmailSenderService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
-import com.utils.AntExecutor;
-import com.utils.ApiSecurity;
-import com.utils.SFDCUtils;
-import com.utils.ValidationStatus;
+import com.utils.*;
 import org.apache.commons.codec.digest.Crypt;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
@@ -743,6 +740,8 @@ public class ForceCIController {
         userEntity.setEnabled(true);
         userEntity.setBoolEmailVerified(false);
         userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
+        List<LinkedServices> linkedServices = LinkedServicesUtil.createLinkedServices();
+        userEntity.setLinkedServices(linkedServices);
         userEntity = connect2DeployUserMongoRepository.save(userEntity);
         Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
         confirmationToken = connect2DeployTokenMongoRepository.save(confirmationToken);
@@ -859,8 +858,8 @@ public class ForceCIController {
             } else {
                 String token = UUID.randomUUID().toString();
                 byEmailId.setToken(token);
-                connect2DeployUserMongoRepository.save(byEmailId);
-                returnResponse = token;
+                byEmailId = connect2DeployUserMongoRepository.save(byEmailId);
+                returnResponse = byEmailId.getEmailId();
                 Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", token);
                 response.addCookie(accessTokenCookie);
                 accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
@@ -1116,6 +1115,23 @@ public class ForceCIController {
         }
 
         return result;
+    }
+
+    @RequestMapping(value = "/api/fetchAllLinkedServices", method = RequestMethod.GET)
+    public String fetchAllLinkedServices(@RequestParam String userEmail, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+        Gson gson = new Gson();
+        List<LinkedServices> linkedServices = null;
+        try {
+            Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(userEmail);
+            if(byEmailId != null){
+                linkedServices = byEmailId.getLinkedServices();
+            }
+            return gson.toJson(linkedServices);
+        } catch (Exception e) {
+            return gson.toJson("Error");
+        }
+
     }
 
 }

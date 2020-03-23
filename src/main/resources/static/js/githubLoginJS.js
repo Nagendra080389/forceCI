@@ -77,6 +77,7 @@ function checkToken($location) {
 
 function logoutFunctionCaller($location) {
     $.removeCookie("CONNECT2DEPLOY_TOKEN", {path: '/'});
+    localStorage.removeItem('userEmail');
     $location.path("/index");
     setTimeout(function () {
         $('.modal-backdrop').removeClass('show');
@@ -112,6 +113,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
                     position: 'topRight'
                 });
             } else {
+                localStorage.setItem('userEmail', response.data);
                 $location.path("/apps/dashboard");
             }
         }, function (error) {
@@ -206,6 +208,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+
     validateConnect2DeployToken(cookie, $http).then(function (objResult) {
         if(!objResult) {
             $location.path("/index");
@@ -239,6 +242,11 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                 });
             });
         }
+
+        if(cookie !== undefined && cookie !== null){
+
+        }
+
     }).catch(function (objError) {
 
     });
@@ -365,7 +373,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.repoName = $routeParams.repoName;
     $scope.lstSFDCConnectionDetails = [];
     let objWindow;
-    $scope.userName = localStorage.githubOwner;
+    $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
     $scope.sfdcOrg = {
         orgName: '',
@@ -672,13 +680,45 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 });
 
 connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location) {
-    $scope.userName = localStorage.githubOwner;
+    $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
 
     if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }
+
+    $scope.tableHeaders = ['Linked Services', 'Username', 'Actions'];
+    $scope.services = [];
+
+    $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName).then(function (response) {
+        let data = response.data;
+        debugger;
+        try {
+            const lstData = JSON.parse(data);
+            for (let i = 0; i < lstData.length; i++) {
+                $scope.services.push(lstData[i]);
+            }
+        }catch (e) {
+
+        }
+    }, function (error) {
+        debugger;
+    });
+
+
+    $scope.connectGit = function(gitName){
+        if(gitName === 'GitHub'){
+
+        }
+        if(gitName === 'GitHub Enterprise'){
+
+        }
+    };
+
+    $scope.disconnectGit = function(gitName){
+
+    };
 
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);

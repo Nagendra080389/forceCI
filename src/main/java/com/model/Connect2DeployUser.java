@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 public class Connect2DeployUser implements Serializable {
@@ -16,6 +17,7 @@ public class Connect2DeployUser implements Serializable {
     private String token;
     private boolean isEnabled;
     private boolean boolEmailVerified;
+    private List<LinkedServices> linkedServices;
 
     public String getToken() {
         return token;
@@ -79,6 +81,14 @@ public class Connect2DeployUser implements Serializable {
 
     public void setBoolEmailVerified(boolean boolEmailVerified) {
         this.boolEmailVerified = boolEmailVerified;
+    }
+
+    public List<LinkedServices> getLinkedServices() {
+        return linkedServices;
+    }
+
+    public void setLinkedServices(List<LinkedServices> linkedServices) {
+        this.linkedServices = linkedServices;
     }
 
     @Override
