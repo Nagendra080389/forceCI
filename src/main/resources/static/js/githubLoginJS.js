@@ -680,6 +680,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 });
 
 connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location) {
+    $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
     $scope.lstRepositoryFromApi = [];
@@ -691,7 +692,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.tableHeaders = ['Linked Services', 'Username', 'Actions'];
     $scope.services = [];
 
-    $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName).then(function (response) {
+    $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName, {'Authorization': 'Bearer '+$scope.connect2DeployHeaderCookie}).then(function (response) {
         let data = response.data;
         debugger;
         try {
