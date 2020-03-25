@@ -88,7 +88,10 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
     if(redirect_git !== undefined && redirect_git !== null && redirect_git !== '' && redirect_git){
         $http.get("/api/fetchAccessTokens?userEmail="+localStorage.getItem('userEmail')).then(function (response) {
             if (response.data !== undefined && response.data !== null) {
-                debugger;
+                Object.keys(response.data).forEach(key => {
+                    let replacedKey = key.replace(/\s+/g, '_');
+                    $.cookie(replacedKey+'_token', response.data[key]);
+                });
                 $location.path("/apps/dashboard/createApp");
             }
         }, function (error) {
