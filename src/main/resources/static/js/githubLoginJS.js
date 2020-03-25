@@ -68,11 +68,7 @@ function validateConnect2DeployToken(strToken, $http) {
 
 function checkToken($location) {
     let accessToken = $.cookie("ACCESS_TOKEN");
-    if (accessToken !== undefined && accessToken !== null && accessToken !== '') {
-        return true;
-    } else {
-        return false;
-    }
+    return accessToken !== undefined && accessToken !== null && accessToken !== '';
 }
 
 function logoutFunctionCaller($location) {
@@ -87,8 +83,16 @@ function logoutFunctionCaller($location) {
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog, $routeParams) {
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
-    if(checkToken($location)){
-        $location.path("/apps/dashboard/createApp");
+    let redirect_git = $location.search()['redirect_git'];
+    if(redirect_git !== undefined && redirect_git !== null && redirect_git !== '' && redirect_git){
+        $http.get("/api/fetchAccessTokens?userEmail="+localStorage.getItem('userEmail')).then(function (response) {
+            if (response.data !== undefined && response.data !== null) {
+                debugger;
+                $location.path("/apps/dashboard/createApp");
+            }
+        }, function (error) {
+            console.error(error);
+        });
     } else {
         validateConnect2DeployToken(cookie, $http).then(function (objResult) {
             if(objResult) {
@@ -649,7 +653,11 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
     $scope.connectGit = function(gitName, $event){
         if(gitName === 'GitHub'){
-            window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
+            $http.get("/api/initiateGitHubFlow?userEmail="+localStorage.getItem('userEmail')).then(function (response) {
+                window.open(response.data, '_self');
+            }, function (error) {
+                console.error(error);
+            });
         }
         if(gitName === 'GitHub Enterprise'){
             function DialogController($scope, $mdDialog) {

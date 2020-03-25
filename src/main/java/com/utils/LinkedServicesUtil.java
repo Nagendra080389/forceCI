@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LinkedServicesUtil {
-    private static List<String> lstLinkedServicesName = new ArrayList<String>( Arrays.asList("GitHub", "GitHub Enterprise"));
+    public static final String GIT_HUB = "GitHub";
+    public static final String GIT_HUB_ENTERPRISE = "GitHub Enterprise";
+    private static List<String> lstLinkedServicesName = new ArrayList<String>( Arrays.asList(GIT_HUB, GIT_HUB_ENTERPRISE));
     public static List<LinkedServices> createLinkedServices(){
         List<LinkedServices> linkedServices = new ArrayList<>();
         for (String eachLinkedService : lstLinkedServicesName) {
