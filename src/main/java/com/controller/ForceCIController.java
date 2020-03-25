@@ -321,6 +321,7 @@ public class ForceCIController {
                     accessToken = jsonObject.get("access_token").getAsString();
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
                         if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)){
+                            linkedService.setConnected(true);
                             linkedService.setAccessToken(accessToken);
                             break;
                         }
@@ -412,6 +413,7 @@ public class ForceCIController {
                 if(!ObjectUtils.isEmpty(byEmailId)){
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
                         if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
+                            linkedService.setConnected(true);
                             linkedService.setAccessToken(accessToken);
                             break;
                         }
