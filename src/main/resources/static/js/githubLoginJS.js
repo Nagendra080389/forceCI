@@ -85,12 +85,12 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     let redirect_git = new URL(location.href).searchParams.get('redirect_git');
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + cookie;
-    if(redirect_git !== undefined && redirect_git !== null && redirect_git !== '' && redirect_git){
-        $http.get("/api/fetchAccessTokens?userEmail="+localStorage.getItem('userEmail')).then(function (response) {
+    if (redirect_git !== undefined && redirect_git !== null && redirect_git !== '' && redirect_git) {
+        $http.get("/api/fetchAccessTokens?userEmail=" + localStorage.getItem('userEmail')).then(function (response) {
             if (response.data !== undefined && response.data !== null) {
                 Object.keys(response.data).forEach(key => {
                     let replacedKey = key.replace(/\s+/g, '_');
-                    $.cookie(replacedKey+'_token', response.data[key]);
+                    $.cookie(replacedKey + '_token', response.data[key]);
                 });
                 $location.path("/apps/dashboard/createApp");
             }
@@ -99,7 +99,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
         });
     } else {
         validateConnect2DeployToken(cookie, $http).then(function (objResult) {
-            if(objResult) {
+            if (objResult) {
                 $location.path("/apps/dashboard");
             } else {
                 $location.path("/index");
@@ -111,7 +111,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
     $scope.login = function (userEntity) {
         $http.post("/loginConnect", userEntity).then(function (response) {
-            if(response.data !== undefined && response.data !== null && response.data === 'No User Found'){
+            if (response.data !== undefined && response.data !== null && response.data === 'No User Found') {
                 iziToast.error({
                     title: 'Error',
                     message: response.data,
@@ -119,7 +119,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
                 });
                 $scope.user.emailId = '';
                 $scope.user.password = '';
-            } else if(response.data !== undefined && response.data !== null && response.data === 'Email Not Verified'){
+            } else if (response.data !== undefined && response.data !== null && response.data === 'Email Not Verified') {
                 iziToast.error({
                     title: 'Error',
                     message: response.data + '! Please verify your email and login try again.',
@@ -157,10 +157,10 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
 
     validateConnect2DeployToken(cookie, $http).then(function (objResult) {
-        if(!objResult) {
+        if (!objResult) {
             $location.path("/index");
         }
-        if($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
+        if ($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
             $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
                 if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
                     if (response.data === 'Email Verified') {
@@ -190,7 +190,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             });
         }
 
-        if(cookie !== undefined && cookie !== null){
+        if (cookie !== undefined && cookie !== null) {
 
         }
 
@@ -205,35 +205,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
-    /*$http.get("/api/fetchUserName").then(function (response) {
-        if (response.data !== undefined && response.data !== null) {
-            $scope.userName = response.data.login;
-            $scope.avatar_url = response.data.avatar_url;
-            localStorage.setItem('githubOwner', response.data.login);
-            localStorage.setItem('avatar_url', response.data.avatar_url);
-            $http.get("/api/fetchRepositoryInDB?gitHubUser=" + response.data.login).then(function (response) {
-                $scope.lstRepositoryData = [];
-                if (response.data.length > 0) {
-                    for (let i = 0; i < response.data.length; i++) {
-                        $scope.lstRepositoryData.push(response.data[i].repository);
-                    }
-                }
-            }, function (error) {
-                $location.path("/index");
-            });
-
-        }
-    }, function (error) {
-        $.removeCookie('ACCESS_TOKEN', {path: '/'});
-        $.removeCookie('TOKEN_TYPE', {path: '/'});
-        iziToast.error({
-            title: 'Error',
-            message: error.data.message,
-            position: 'topRight'
-        });
-        $location.path("/index");
-    });*/
-
 
     $scope.disconnectAndDelete = function (eachData) {
 
@@ -628,7 +599,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
 });
 
-connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location,$routeParams, $mdDialog) {
+connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location, $routeParams, $mdDialog) {
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.userName = localStorage.getItem('userEmail');
@@ -647,7 +618,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
             for (let i = 0; i < data.length; i++) {
                 $scope.services.push(data[i]);
             }
-        }catch (e) {
+        } catch (e) {
 
         }
     }, function (error) {
@@ -655,15 +626,15 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     });
 
 
-    $scope.connectGit = function(gitName, $event){
-        if(gitName === 'GitHub'){
-            $http.get("/api/initiateGitHubFlow?userEmail="+localStorage.getItem('userEmail')).then(function (response) {
+    $scope.connectGit = function (gitName, $event) {
+        if (gitName === 'GitHub') {
+            $http.get("/api/initiateGitHubFlow?userEmail=" + localStorage.getItem('userEmail')).then(function (response) {
                 window.open(response.data, '_self');
             }, function (error) {
                 console.error(error);
             });
         }
-        if(gitName === 'GitHub Enterprise'){
+        if (gitName === 'GitHub Enterprise') {
             function DialogController($scope, $mdDialog) {
                 $scope.hide = function () {
                     $mdDialog.hide();
@@ -684,6 +655,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     });
                 };
             }
+
             const parentEl = angular.element(document.body);
             $mdDialog.show({
                 controller: DialogController,
@@ -735,7 +707,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
         }
     };
 
-    $scope.disconnectGit = function(gitName){
+    $scope.disconnectGit = function (gitName) {
 
     };
 

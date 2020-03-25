@@ -72,6 +72,7 @@ public class ForceCIController {
     public static final List<SseEmitter> emitters = Collections.synchronizedList(new ArrayList<>());
     private final static List<Integer> LIST_VALID_RESPONSE_CODES = Arrays.asList(200, 201, 204, 207);
     private static final String GITHUB_API = "https://api.github.com";
+    public static final String GITHUB_GHE_API = "/api/v3";
     public static final String PENDING = "pending";
     public static final String ERROR = "error";
     public static final String SUCCESS = "success";
@@ -322,7 +323,9 @@ public class ForceCIController {
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
                         if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)){
                             linkedService.setConnected(true);
+                            linkedService.setServerURL(connectionDetails.getServerURL());
                             linkedService.setAccessToken(accessToken);
+                            fetchUserName(linkedService, byEmailId);
                             break;
                         }
                     }
@@ -414,7 +417,9 @@ public class ForceCIController {
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
                         if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
                             linkedService.setConnected(true);
+                            linkedService.setServerURL(connectionDetails.getServerURL());
                             linkedService.setAccessToken(accessToken);
+                            fetchUserName(linkedService, byEmailId);
                             break;
                         }
                     }
@@ -652,34 +657,23 @@ public class ForceCIController {
         return reposOnDB;
     }
 
-    @RequestMapping(value = "/api/fetchUserName", method = RequestMethod.GET)
-    public String getUserName(HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public void fetchUserName(LinkedServices linkedService, Connect2DeployUser byEmailId) throws Exception {
         Gson gson = new Gson();
-        String loginNameAndAvatar = "";
-        String accessToken = fetchCookies(request);
-        if (StringUtils.hasText(accessToken)) {
-            GetMethod getUserMethod = new GetMethod(GITHUB_API + "/user");
+        String accessToken = null;
+        String serverURL = null;
+        if(!ObjectUtils.isEmpty(byEmailId)){
+            accessToken = linkedService.getAccessToken();
+            serverURL = linkedService.getServerURL();
+            GetMethod getUserMethod = new GetMethod(serverURL + GITHUB_GHE_API + "/user");
             getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
             HttpClient httpClient = new HttpClient();
             int intStatusOk = httpClient.executeMethod(getUserMethod);
             if (intStatusOk == HTTP_STATUS_OK) {
                 GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
-                UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(gitRepositoryUser.getLogin());
-                if (userWrapper != null) {
-                    userWrapper.setAccess_token(accessToken);
-                } else {
-                    userWrapper = new UserWrapper();
-                    userWrapper.setAccess_token(accessToken);
-                    userWrapper.setOwnerId(gitRepositoryUser.getLogin());
-                    userWrapper.setEmail_Id(gitRepositoryUser.getEmail());
-                }
-                userWrapperMongoRepository.save(userWrapper);
-                loginNameAndAvatar = gson.toJson(gitRepositoryUser);
-            } else {
-                throw new Exception("Bad Credentials");
+                linkedService.setUserName(gitRepositoryUser.getLogin());
+                linkedService.setUserEmail(gitRepositoryUser.getEmail());
             }
         }
-        return loginNameAndAvatar;
     }
 
     @RequestMapping(value = "/api/fetchRepository", method = RequestMethod.GET)
