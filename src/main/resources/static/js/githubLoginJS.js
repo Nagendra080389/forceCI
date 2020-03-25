@@ -675,7 +675,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     '                    <h2>Enterprise Github Configuration</h2>\n' +
                     '                    <span flex></span>\n' +
                     '                    <md-button class="md-icon-button" ng-click="cancel()">\n' +
-                    '                        <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>\n' +
+                    '                        <md-icon md-svg-src="../images/ic_close_24px.svg" aria-label="Close dialog"></md-icon>\n' +
                     '                    </md-button>\n' +
                     '                </div>\n' +
                     '            </md-toolbar>\n' +
