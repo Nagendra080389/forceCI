@@ -302,6 +302,7 @@ public class ForceCIController {
             ConnectionDetails connectionDetails = byUui.get();
             SwingUtilities.invokeLater(() -> connectionDetailsMongoRepository.delete(connectionDetails));
             Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
+            logger.info("byEmailId -> Github -> "+byEmailId.getEmailId());
             if(!ObjectUtils.isEmpty(byEmailId)){
                 PostMethod post = new PostMethod(environment);
                 post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
@@ -311,7 +312,8 @@ public class ForceCIController {
                 post.addParameter("client_secret", githubClientSecret);
                 post.addParameter("state", state);
 
-                httpClient.executeMethod(post);
+                int i = httpClient.executeMethod(post);
+                logger.info("byEmailId -> Github status -> "+i);
                 String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
                 String accessToken = null;
@@ -321,13 +323,20 @@ public class ForceCIController {
                 try {
                     accessToken = jsonObject.get("access_token").getAsString();
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
+                        logger.info("byEmailId -> Github status linkedService -> "+linkedService.getName());
                         if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)){
                             linkedService.setConnected(true);
                             linkedService.setServerURL(connectionDetails.getServerURL());
                             linkedService.setAccessToken(accessToken);
-                            fetchUserName(linkedService, byEmailId);
+                            fetchUserName(linkedService);
                             break;
                         }
+                    }
+
+                    for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
+                        logger.info("byEmailId -> Github status getUserName -> "+linkedService.getUserName());
+                        logger.info("byEmailId -> Github status getAccessToken -> "+linkedService.getAccessToken());
+
                     }
                     SwingUtilities.invokeLater(() -> connect2DeployUserMongoRepository.save(byEmailId));
                 } catch (Exception e) {
@@ -419,7 +428,7 @@ public class ForceCIController {
                             linkedService.setConnected(true);
                             linkedService.setServerURL(connectionDetails.getServerURL());
                             linkedService.setAccessToken(accessToken);
-                            fetchUserName(linkedService, byEmailId);
+                            fetchUserName(linkedService);
                             break;
                         }
                     }
@@ -657,22 +666,20 @@ public class ForceCIController {
         return reposOnDB;
     }
 
-    public void fetchUserName(LinkedServices linkedService, Connect2DeployUser byEmailId) throws Exception {
+    public void fetchUserName(LinkedServices linkedService) throws Exception {
         Gson gson = new Gson();
         String accessToken = null;
         String serverURL = null;
-        if(!ObjectUtils.isEmpty(byEmailId)){
-            accessToken = linkedService.getAccessToken();
-            serverURL = linkedService.getServerURL();
-            GetMethod getUserMethod = new GetMethod(serverURL + GITHUB_GHE_API + "/user");
-            getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
-            HttpClient httpClient = new HttpClient();
-            int intStatusOk = httpClient.executeMethod(getUserMethod);
-            if (intStatusOk == HTTP_STATUS_OK) {
-                GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
-                linkedService.setUserName(gitRepositoryUser.getLogin());
-                linkedService.setUserEmail(gitRepositoryUser.getEmail());
-            }
+        accessToken = linkedService.getAccessToken();
+        serverURL = linkedService.getServerURL();
+        GetMethod getUserMethod = new GetMethod(serverURL + GITHUB_GHE_API + "/user");
+        getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
+        HttpClient httpClient = new HttpClient();
+        int intStatusOk = httpClient.executeMethod(getUserMethod);
+        if (intStatusOk == HTTP_STATUS_OK) {
+            GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
+            linkedService.setUserName(gitRepositoryUser.getLogin());
+            linkedService.setUserEmail(gitRepositoryUser.getEmail());
         }
     }
 
