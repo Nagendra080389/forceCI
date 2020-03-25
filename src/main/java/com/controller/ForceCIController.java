@@ -368,6 +368,8 @@ public class ForceCIController {
             post.addParameter("client_secret", connectionDetails.getClientSecret());
             post.addParameter("state", state);
 
+            logger.info("connectionDetails.getUserName() -> "+connectionDetails.getUserName());
+
             int i = httpClient.executeMethod(post);
             logger.info("Status -> "+i);
             String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
