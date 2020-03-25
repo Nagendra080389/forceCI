@@ -48,6 +48,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -352,41 +353,55 @@ public class ForceCIController {
         logger.info("connectionId - > "+connectionId);
         logger.info("state - > "+state);
         logger.info("code - > "+code);
-        Gson gson = new Gson();
-        String environment = "https://github.com/login/oauth/access_token";
-        HttpClient httpClient = new HttpClient();
+        Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
+        HttpServletResponse httpResponse = null;
+        if(byUui.isPresent()){
+            ConnectionDetails connectionDetails = byUui.get();
+            String environment = connectionDetails.getServerURL() + "/login/oauth/access_token";
+            HttpClient httpClient = new HttpClient();
 
-        PostMethod post = new PostMethod(environment);
-        post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
-        post.addParameter("code", code);
-        post.addParameter("redirect_uri", redirectURI);
-        post.addParameter("client_id", githubClientId);
-        post.addParameter("client_secret", githubClientSecret);
-        post.addParameter("state", state);
+            PostMethod post = new PostMethod(environment);
+            post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+            post.addParameter("code", code);
+            post.addParameter("redirect_uri", gitHubEnterpriseRedirectURI);
+            post.addParameter("client_id", connectionDetails.getClientId());
+            post.addParameter("client_secret", connectionDetails.getClientSecret());
+            post.addParameter("state", state);
 
-        httpClient.executeMethod(post);
-        String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
+            httpClient.executeMethod(post);
+            String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
-        String accessToken = null;
-        String token_type = null;
-        JsonParser parser = new JsonParser();
+            String accessToken = null;
+            String token_type = null;
+            JsonParser parser = new JsonParser();
 
-        JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        try {
+            JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
+            httpResponse = (HttpServletResponse) response;
+            try {
 
-            accessToken = jsonObject.get("access_token").getAsString();
-            token_type = jsonObject.get("token_type").getAsString();
+                accessToken = jsonObject.get("access_token").getAsString();
+                token_type = jsonObject.get("token_type").getAsString();
 
-            Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
-            Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
-            session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-            session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-            httpResponse.addCookie(session1);
-            httpResponse.addCookie(session2);
-        } catch (Exception e) {
-            e.printStackTrace();
+                Cookie session1 = new Cookie("GITHUB_ENTERPRISE_ACCESS_TOKEN", accessToken);
+                Cookie session2 = new Cookie("GITHUB_ENTERPRISE_TOKEN_TYPE", token_type);
+                session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+                session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+                httpResponse.addCookie(session1);
+                httpResponse.addCookie(session2);
+                Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
+                if(!ObjectUtils.isEmpty(byEmailId)){
+                    for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
+                        if(linkedService.getName().equalsIgnoreCase("GitHub Enterprise")){
+                            linkedService.setAccessToken(accessToken);
+                        }
+                    }
+                    SwingUtilities.invokeLater(() -> connect2DeployUserMongoRepository.save(byEmailId));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
         httpResponse.sendRedirect("/index.html");
     }
 

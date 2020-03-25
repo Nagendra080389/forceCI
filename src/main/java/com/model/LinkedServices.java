@@ -13,6 +13,7 @@ public class LinkedServices implements Serializable {
     private String userName;
     private boolean connected;
     private String actions;
+    private String accessToken;
 
     public String getName() {
         return name;
@@ -44,6 +45,14 @@ public class LinkedServices implements Serializable {
 
     public void setActions(String actions) {
         this.actions = actions;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     @Override
