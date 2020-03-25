@@ -339,13 +339,13 @@ public class ForceCIController {
         connectionDetails.setRequestFrom("/apps/dashboard/createApp");
         connectionDetailsMongoRepository.save(connectionDetails);
         oauthUrl = connectionDetails.getServerURL() + "/login/oauth/authorize?scope=repo,user:email&client_id="+ connectionDetails.getClientId()+
-                "&redirect_uri="+gitHubEnterpriseRedirectURI+"/callback/apps/dashboard/createApp?connectionId="+ connectionDetails.getUui()+"&state="+randomString;
+                "&redirect_uri="+gitHubEnterpriseRedirectURI+"/callback?connectionId="+ connectionDetails.getUui()+"&state="+randomString;
 
         logger.info("randomString -> "+randomString);
         return gson.toJson(oauthUrl);
     }
 
-    @RequestMapping(value = "/github-enterprise", method = RequestMethod.GET, params = {"code", "state", "connectionId"})
+    @RequestMapping(value = "/github-enterprise/callback", method = RequestMethod.GET, params = {"code", "state", "connectionId"})
     public void gitHubEnterprise(@RequestParam String code, @RequestParam String state, @RequestParam String connectionId, ServletResponse response, ServletRequest
             request) throws Exception {
 
