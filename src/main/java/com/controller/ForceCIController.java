@@ -378,13 +378,13 @@ public class ForceCIController {
                 token_type = jsonObject.get("token_type").getAsString();
 
                 logger.info("accessToken after -> " + accessToken);
+                logger.info("httpResponse -> " + httpResponse.getContentType());
+                logger.info("httpResponse  httpResponse -> " + httpResponse.getHeaderNames());
 
                 Cookie session1 = new Cookie("GHE_TOKEN", accessToken);
                 Cookie session2 = new Cookie("GHE_TYPE", token_type);
                 session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
                 session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-                httpResponse.addCookie(session1);
-                httpResponse.addCookie(session2);
                 Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
                 if (!ObjectUtils.isEmpty(byEmailId)) {
 
@@ -396,6 +396,10 @@ public class ForceCIController {
                     }
                     SwingUtilities.invokeLater(() -> connect2DeployUserMongoRepository.save(byEmailId));
                 }
+                logger.info("session2 -> " + session2);
+                logger.info("session1 -> " + session1);
+                httpResponse.addCookie(session1);
+                httpResponse.addCookie(session2);
             } catch (Exception e) {
                 e.printStackTrace();
             }
