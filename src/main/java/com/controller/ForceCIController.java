@@ -349,14 +349,11 @@ public class ForceCIController {
     @RequestMapping(value = "/github-enterprise/callback", method = RequestMethod.GET, params = {"code", "state", "connectionId"})
     public void gitHubEnterprise(@RequestParam String code, @RequestParam String state, @RequestParam String connectionId, ServletResponse response, ServletRequest
             request) throws Exception {
-
-        logger.info("connectionId - > "+connectionId);
-        logger.info("state - > "+state);
-        logger.info("code - > "+code);
         Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
         HttpServletResponse httpResponse = null;
         if(byUui.isPresent()){
             ConnectionDetails connectionDetails = byUui.get();
+            connectionDetailsMongoRepository.delete(connectionDetails);
             String environment = connectionDetails.getServerURL() + "/login/oauth/access_token";
             HttpClient httpClient = new HttpClient();
 
@@ -368,13 +365,9 @@ public class ForceCIController {
             post.addParameter("client_secret", connectionDetails.getClientSecret());
             post.addParameter("state", state);
 
-            logger.info("connectionDetails.getUserName() -> "+connectionDetails.getUserName());
-
-            int i = httpClient.executeMethod(post);
-            logger.info("Status -> "+i);
+            httpClient.executeMethod(post);
             String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
-            logger.info("responseBody -> "+responseBody);
             String accessToken = null;
             String token_type = null;
             JsonParser parser = new JsonParser();
@@ -382,9 +375,12 @@ public class ForceCIController {
             JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
             httpResponse = (HttpServletResponse) response;
             try {
+                logger.info("accessToken before -> "+accessToken);
 
                 accessToken = jsonObject.get("access_token").getAsString();
                 token_type = jsonObject.get("token_type").getAsString();
+
+                logger.info("accessToken after -> "+accessToken);
 
                 Cookie session1 = new Cookie("GITHUB_ENTERPRISE_ACCESS_TOKEN", accessToken);
                 Cookie session2 = new Cookie("GITHUB_ENTERPRISE_TOKEN_TYPE", token_type);
@@ -394,6 +390,8 @@ public class ForceCIController {
                 httpResponse.addCookie(session2);
                 Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
                 if(!ObjectUtils.isEmpty(byEmailId)){
+
+                    logger.info("byEmailId -> "+byEmailId.getEmailId());
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
                         if(linkedService.getName().equalsIgnoreCase("GitHub Enterprise")){
                             linkedService.setAccessToken(accessToken);
