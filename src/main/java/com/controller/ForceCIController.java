@@ -672,7 +672,12 @@ public class ForceCIController {
         String serverURL = null;
         accessToken = linkedService.getAccessToken();
         serverURL = linkedService.getServerURL();
-        GetMethod getUserMethod = new GetMethod(serverURL + GITHUB_GHE_API + "/user");
+        GetMethod getUserMethod = null;
+        if(StringUtils.hasText(serverURL)){
+            getUserMethod = new GetMethod(serverURL + GITHUB_GHE_API + "/user");
+        }else {
+            getUserMethod = new GetMethod(GITHUB_API + "/user");
+        }
         getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
         HttpClient httpClient = new HttpClient();
         int intStatusOk = httpClient.executeMethod(getUserMethod);
