@@ -424,6 +424,7 @@ public class ForceCIController {
                 Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
                 if(!ObjectUtils.isEmpty(byEmailId)){
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
+                        logger.info("Enterprise -> "+linkedService.getName());
                         if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
                             linkedService.setConnected(true);
                             linkedService.setServerURL(connectionDetails.getServerURL());
@@ -681,8 +682,10 @@ public class ForceCIController {
         getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
         HttpClient httpClient = new HttpClient();
         int intStatusOk = httpClient.executeMethod(getUserMethod);
+        logger.info("intStatusOk for -> "+serverURL + " -> "+intStatusOk);
         if (intStatusOk == HTTP_STATUS_OK) {
             GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
+            logger.info("User for -> "+serverURL + " -> "+IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8));
             linkedService.setUserName(gitRepositoryUser.getLogin());
             linkedService.setUserEmail(gitRepositoryUser.getEmail());
         }
