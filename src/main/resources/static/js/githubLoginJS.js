@@ -69,9 +69,9 @@ function validateConnect2DeployToken(strToken, $http) {
 function checkToken($location) {
     let accessToken = $.cookie("ACCESS_TOKEN");
     if (accessToken !== undefined && accessToken !== null && accessToken !== '') {
-        $location.path("/apps/dashboard/createApp");
+        return true;
     } else {
-        $location.path("/index");
+        return false;
     }
 }
 
@@ -86,17 +86,21 @@ function logoutFunctionCaller($location) {
 }
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog) {
-    checkToken($location);
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
-    validateConnect2DeployToken(cookie, $http).then(function (objResult) {
-        if(objResult) {
-            $location.path("/apps/dashboard");
-        } else {
-            $location.path("/index");
-        }
-    }).catch(function (objError) {
+    if(checkToken($location)){
+        $location.path("/apps/dashboard/createApp");
+    } else {
+        validateConnect2DeployToken(cookie, $http).then(function (objResult) {
+            if(objResult) {
+                $location.path("/apps/dashboard");
+            } else {
+                $location.path("/index");
+            }
+        }).catch(function (objError) {
 
-    });
+        });
+    }
+
     $scope.login = function (userEntity) {
         $http.post("/loginConnect", userEntity).then(function (response) {
             if(response.data !== undefined && response.data !== null && response.data === 'No User Found'){
@@ -661,6 +665,8 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
                 $scope.answer = function (githubEnterprise) {
                     $mdDialog.hide();
+                    githubEnterprise.userName = '$scope.userName';
+                    githubEnterprise.requestFrom = 'apps/dashboard/createApp';
                     $http.post("/api/initiateGitHubEnterpriseFlow", githubEnterprise).then(function (response) {
                         window.open(response.data, '_self');
                     }, function (error) {
@@ -687,15 +693,15 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     '                    <form name="githubForm">\n' +
                     '                        <md-input-container class="md-block" flex-gt-sm="">\n' +
                     '                            <label>Server Name</label>\n' +
-                    '                            <input ng-model="githubEnterprise.ServerName">\n' +
+                    '                            <input ng-model="githubEnterprise.serverURL">\n' +
                     '                        </md-input-container>\n' +
                     '                        <md-input-container class="md-block">\n' +
                     '                            <label>Client Id</label>\n' +
-                    '                            <input ng-model="githubEnterprise.ClientId">\n' +
+                    '                            <input ng-model="githubEnterprise.clientId">\n' +
                     '                        </md-input-container>\n' +
                     '                        <md-input-container class="md-block">\n' +
                     '                            <label>Client Secret</label>\n' +
-                    '                            <input ng-model="githubEnterprise.ClientSecret">\n' +
+                    '                            <input ng-model="githubEnterprise.clientSecret">\n' +
                     '                        </md-input-container>\n' +
                     '                    </form>\n' +
                     '                </div>\n' +
