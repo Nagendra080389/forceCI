@@ -318,6 +318,11 @@ public class ForceCIController {
             accessToken = jsonObject.get("access_token").getAsString();
             token_type = jsonObject.get("token_type").getAsString();
 
+            logger.info("accessToken after -> " + accessToken);
+            logger.info("httpResponse -> " + httpResponse);
+            logger.info("httpResponse content Type -> " + httpResponse.getContentType());
+            logger.info("httpResponse  httpResponse -> " + httpResponse.getHeaderNames());
+
             Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
             Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
             session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
@@ -378,7 +383,8 @@ public class ForceCIController {
                 token_type = jsonObject.get("token_type").getAsString();
 
                 logger.info("accessToken after -> " + accessToken);
-                logger.info("httpResponse -> " + httpResponse.getContentType());
+                logger.info("httpResponse -> " + httpResponse);
+                logger.info("httpResponse content Type -> " + httpResponse.getContentType());
                 logger.info("httpResponse  httpResponse -> " + httpResponse.getHeaderNames());
 
                 Cookie session1 = new Cookie("GHE_TOKEN", accessToken);
