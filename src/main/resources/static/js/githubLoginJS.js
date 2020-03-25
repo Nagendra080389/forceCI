@@ -665,7 +665,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
                 $scope.answer = function (githubEnterprise) {
                     $mdDialog.hide();
-                    githubEnterprise.userName = '$scope.userName';
+                    githubEnterprise.userName = $scope.userName;
                     githubEnterprise.requestFrom = 'apps/dashboard/createApp';
                     $http.post("/api/initiateGitHubEnterpriseFlow", githubEnterprise).then(function (response) {
                         window.open(response.data, '_self');
