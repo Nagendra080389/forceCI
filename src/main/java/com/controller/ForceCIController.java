@@ -318,11 +318,6 @@ public class ForceCIController {
             accessToken = jsonObject.get("access_token").getAsString();
             token_type = jsonObject.get("token_type").getAsString();
 
-            logger.info("accessToken after -> " + accessToken);
-            logger.info("httpResponse -> " + httpResponse);
-            logger.info("httpResponse content Type -> " + httpResponse.getContentType());
-            logger.info("httpResponse  httpResponse -> " + httpResponse.getHeaderNames());
-
             Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
             Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
             session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
@@ -353,6 +348,7 @@ public class ForceCIController {
     @RequestMapping(value = "/github-enterprise/callback", method = RequestMethod.GET, params = {"code", "state", "connectionId"})
     public void gitHubEnterprise(@RequestParam String code, @RequestParam String state, @RequestParam String connectionId, ServletResponse response, ServletRequest request) throws Exception {
         Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (byUui.isPresent()) {
             ConnectionDetails connectionDetails = byUui.get();
             connectionDetailsMongoRepository.delete(connectionDetails);
@@ -375,7 +371,6 @@ public class ForceCIController {
             JsonParser parser = new JsonParser();
 
             JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
             try {
                 logger.info("accessToken before -> " + accessToken);
 
@@ -383,14 +378,12 @@ public class ForceCIController {
                 token_type = jsonObject.get("token_type").getAsString();
 
                 logger.info("accessToken after -> " + accessToken);
-                logger.info("httpResponse -> " + httpResponse);
-                logger.info("httpResponse content Type -> " + httpResponse.getContentType());
-                logger.info("httpResponse  httpResponse -> " + httpResponse.getHeaderNames());
-
-                Cookie session1 = new Cookie("GHE_TOKEN", accessToken);
-                Cookie session2 = new Cookie("GHE_TYPE", token_type);
+                Cookie session1 = new Cookie("Test", "Test1");
+                Cookie session2 = new Cookie("Test123", "Test2");
                 session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
                 session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+                httpResponse.addCookie(session1);
+                httpResponse.addCookie(session2);
                 Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
                 if (!ObjectUtils.isEmpty(byEmailId)) {
 
@@ -402,15 +395,10 @@ public class ForceCIController {
                     }
                     SwingUtilities.invokeLater(() -> connect2DeployUserMongoRepository.save(byEmailId));
                 }
-                logger.info("session2 -> " + session2);
-                logger.info("session1 -> " + session1);
-                httpResponse.addCookie(session1);
-                httpResponse.addCookie(session2);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpResponse.sendRedirect("/index.html");
     }
 
