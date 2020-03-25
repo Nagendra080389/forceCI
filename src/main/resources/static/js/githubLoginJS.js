@@ -67,9 +67,9 @@ function validateConnect2DeployToken(strToken, $http) {
 }
 
 function checkToken($location) {
-    let accessToken = $.cookie("CONNECT2DEPLOY_TOKEN");
+    let accessToken = $.cookie("ACCESS_TOKEN");
     if (accessToken !== undefined && accessToken !== null && accessToken !== '') {
-        $location.path("/apps/dashboard");
+        $location.path("/apps/dashboard/createApp");
     } else {
         $location.path("/index");
     }
@@ -86,6 +86,7 @@ function logoutFunctionCaller($location) {
 }
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog) {
+    checkToken($location);
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     validateConnect2DeployToken(cookie, $http).then(function (objResult) {
         if(objResult) {
@@ -129,72 +130,6 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
     };
 
-    function DialogController($scope, $mdDialog) {
-        $scope.hide = function () {
-            $mdDialog.hide();
-        };
-
-        $scope.cancel = function () {
-            $mdDialog.cancel();
-        };
-
-        $scope.answer = function (answer) {
-            $mdDialog.hide(answer);
-        };
-    }
-
-    $scope.redirectEnterpriseJS = function ($event) {
-        const parentEl = angular.element(document.body);
-        $mdDialog.show({
-            controller: DialogController,
-            template: '<md-dialog aria-label="Enterprise Github Configuration">\n' +
-                '        <form>\n' +
-                '            <md-toolbar>\n' +
-                '                <div class="md-toolbar-tools">\n' +
-                '                    <h2>Enterprise Github Configuration</h2>\n' +
-                '                    <span flex></span>\n' +
-                '                    <md-button class="md-icon-button" ng-click="cancel()">\n' +
-                '                        <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>\n' +
-                '                    </md-button>\n' +
-                '                </div>\n' +
-                '            </md-toolbar>\n' +
-                '            <md-content layout-padding="">\n' +
-                '                <div>\n' +
-                '                    <form name="githubForm">\n' +
-                '                        <md-input-container class="md-block" flex-gt-sm="">\n' +
-                '                            <label>Server Name</label>\n' +
-                '                            <input ng-model="githubEnterprise.ServerName">\n' +
-                '                        </md-input-container>\n' +
-                '                        <md-input-container class="md-block">\n' +
-                '                            <label>Client Id</label>\n' +
-                '                            <input ng-model="githubEnterprise.ClientId">\n' +
-                '                        </md-input-container>\n' +
-                '                        <md-input-container class="md-block">\n' +
-                '                            <label>Client Secret</label>\n' +
-                '                            <input ng-model="githubEnterprise.ClientSecret">\n' +
-                '                        </md-input-container>\n' +
-                '                    </form>\n' +
-                '                </div>\n' +
-                '            </md-content>\n' +
-                '\n' +
-                '            <md-dialog-actions layout="row">\n' +
-                '                <span flex></span>\n' +
-                '                <md-button ng-click="answer(githubEnterprise)">\n' +
-                '                    Connect\n' +
-                '                </md-button>\n' +
-                '                <md-button ng-click="answer(\'Cancelled\')" style="margin-right:20px;">\n' +
-                '                    Cancel\n' +
-                '                </md-button>\n' +
-                '            </md-dialog-actions>\n' +
-                '        </form>\n' +
-                '    </md-dialog>',
-            parent: parentEl,
-            targetEvent: $event,
-            clickOutsideToClose: true
-        });
-
-        //window.open('https://github.com/login/oauth/authorize?client_id=a1568a2b609baf9a3634&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
-    };
 
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
@@ -683,7 +618,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
 });
 
-connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location) {
+connect2Deploy.controller('appPageRepoController', function ($scope, $http, $location,$routeParams, $mdDialog) {
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.userName = localStorage.getItem('userEmail');
@@ -710,12 +645,74 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     });
 
 
-    $scope.connectGit = function(gitName){
+    $scope.connectGit = function(gitName, $event){
         if(gitName === 'GitHub'){
-
+            window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
         }
         if(gitName === 'GitHub Enterprise'){
+            function DialogController($scope, $mdDialog) {
+                $scope.hide = function () {
+                    $mdDialog.hide();
+                };
 
+                $scope.cancel = function () {
+                    $mdDialog.cancel();
+                };
+
+                $scope.answer = function (githubEnterprise) {
+                    $mdDialog.hide();
+                    window.open(githubEnterprise.ServerName+'/login/oauth/authorize?client_id='+githubEnterprise.ClientId+'&redirect_uri=' +
+                        'https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
+                };
+            }
+            const parentEl = angular.element(document.body);
+            $mdDialog.show({
+                controller: DialogController,
+                template: '<md-dialog aria-label="Enterprise Github Configuration">\n' +
+                    '        <form>\n' +
+                    '            <md-toolbar>\n' +
+                    '                <div class="md-toolbar-tools">\n' +
+                    '                    <h2>Enterprise Github Configuration</h2>\n' +
+                    '                    <span flex></span>\n' +
+                    '                    <md-button class="md-icon-button" ng-click="cancel()">\n' +
+                    '                        <md-icon md-svg-src="img/icons/ic_close_24px.svg" aria-label="Close dialog"></md-icon>\n' +
+                    '                    </md-button>\n' +
+                    '                </div>\n' +
+                    '            </md-toolbar>\n' +
+                    '            <md-content layout-padding="">\n' +
+                    '                <div>\n' +
+                    '                    <form name="githubForm">\n' +
+                    '                        <md-input-container class="md-block" flex-gt-sm="">\n' +
+                    '                            <label>Server Name</label>\n' +
+                    '                            <input ng-model="githubEnterprise.ServerName">\n' +
+                    '                        </md-input-container>\n' +
+                    '                        <md-input-container class="md-block">\n' +
+                    '                            <label>Client Id</label>\n' +
+                    '                            <input ng-model="githubEnterprise.ClientId">\n' +
+                    '                        </md-input-container>\n' +
+                    '                        <md-input-container class="md-block">\n' +
+                    '                            <label>Client Secret</label>\n' +
+                    '                            <input ng-model="githubEnterprise.ClientSecret">\n' +
+                    '                        </md-input-container>\n' +
+                    '                    </form>\n' +
+                    '                </div>\n' +
+                    '            </md-content>\n' +
+                    '\n' +
+                    '            <md-dialog-actions layout="row">\n' +
+                    '                <span flex></span>\n' +
+                    '                <md-button ng-click="answer(githubEnterprise)">\n' +
+                    '                    Connect\n' +
+                    '                </md-button>\n' +
+                    '                <md-button ng-click="answer(\'Cancelled\')" style="margin-right:20px;">\n' +
+                    '                    Cancel\n' +
+                    '                </md-button>\n' +
+                    '            </md-dialog-actions>\n' +
+                    '        </form>\n' +
+                    '    </md-dialog>',
+                parent: parentEl,
+                targetEvent: $event,
+                clickOutsideToClose: true
+            });
         }
     };
 
