@@ -661,8 +661,11 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
                 $scope.answer = function (githubEnterprise) {
                     $mdDialog.hide();
-                    window.open(githubEnterprise.ServerName+'/login/oauth/authorize?client_id='+githubEnterprise.ClientId+'&redirect_uri=' +
-                        'https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
+                    $http.post("/api/initiateGitHubEnterpriseFlow", githubEnterprise).then(function (response) {
+                        window.open(response.data, '_self');
+                    }, function (error) {
+                        console.error(error);
+                    });
                 };
             }
             const parentEl = angular.element(document.body);

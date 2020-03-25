@@ -12,7 +12,6 @@ import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.security.CryptoPassword;
-import com.security.SecurityConfiguration;
 import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
@@ -21,7 +20,6 @@ import com.service.EmailSenderService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.*;
-import org.apache.commons.codec.digest.Crypt;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -40,9 +38,6 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +57,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -92,6 +86,8 @@ public class ForceCIController {
     String githubClientSecret;
     @Value("${application.redirectURI}")
     String redirectURI;
+    @Value("${application.gitHubEnterpriseRedirectURI}")
+    String gitHubEnterpriseRedirectURI;
     @Value("${sfdc.clientId}")
     String sfdcClientId;
     @Value("${sfdc.clientSecret}")
@@ -119,6 +115,8 @@ public class ForceCIController {
     private Connect2DeployUserMongoRepository connect2DeployUserMongoRepository;
     @Autowired
     private Connect2DeployTokenMongoRepository connect2DeployTokenMongoRepository;
+    @Autowired
+    private ConnectionDetailsMongoRepository connectionDetailsMongoRepository;
     @Autowired
     private EmailSenderService emailSenderService;
 
@@ -294,6 +292,66 @@ public class ForceCIController {
     public void gitAuth(@RequestParam String code, @RequestParam String state, ServletResponse response, ServletRequest
             request) throws Exception {
 
+        Gson gson = new Gson();
+        String environment = "https://github.com/login/oauth/access_token";
+        HttpClient httpClient = new HttpClient();
+
+        PostMethod post = new PostMethod(environment);
+        post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
+        post.addParameter("code", code);
+        post.addParameter("redirect_uri", redirectURI);
+        post.addParameter("client_id", githubClientId);
+        post.addParameter("client_secret", githubClientSecret);
+        post.addParameter("state", state);
+
+        httpClient.executeMethod(post);
+        String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
+
+        String accessToken = null;
+        String token_type = null;
+        JsonParser parser = new JsonParser();
+
+        JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        try {
+
+            accessToken = jsonObject.get("access_token").getAsString();
+            token_type = jsonObject.get("token_type").getAsString();
+
+            Cookie session1 = new Cookie("ACCESS_TOKEN", accessToken);
+            Cookie session2 = new Cookie("TOKEN_TYPE", token_type);
+            session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+            httpResponse.addCookie(session1);
+            httpResponse.addCookie(session2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        httpResponse.sendRedirect("/index.html");
+    }
+
+    @RequestMapping(value = "/api/initiateGitHubEnterpriseFlow", method = RequestMethod.POST)
+    public String initiateGitHubEnterpriseFlow(@RequestBody ConnectionDetails connectionDetails){
+        Gson gson = new Gson();
+        String oauthUrl;
+        String randomString = String.valueOf(UUID.randomUUID());
+        connectionDetails.setUui(randomString);
+        connectionDetails.setRequestFrom("/apps/dashboard/createApp");
+        connectionDetailsMongoRepository.save(connectionDetails);
+        oauthUrl = connectionDetails.getServerURL() + "/login/oauth/authorize?scope=repo,user:email&client_id="+ connectionDetails.getClientId()+
+                "&redirect_uri="+gitHubEnterpriseRedirectURI+"/callback/apps/dashboard/createApp?connectionId="+ connectionDetails.getUui()+"&state="+randomString;
+
+        logger.info("randomString -> "+randomString);
+        return gson.toJson(oauthUrl);
+    }
+
+    @RequestMapping(value = "/github-enterprise", method = RequestMethod.GET, params = {"code", "state", "connectionId"})
+    public void gitHubEnterprise(@RequestParam String code, @RequestParam String state, @RequestParam String connectionId, ServletResponse response, ServletRequest
+            request) throws Exception {
+
+        logger.info("connectionId - > "+connectionId);
+        logger.info("state - > "+state);
+        logger.info("code - > "+code);
         Gson gson = new Gson();
         String environment = "https://github.com/login/oauth/access_token";
         HttpClient httpClient = new HttpClient();
