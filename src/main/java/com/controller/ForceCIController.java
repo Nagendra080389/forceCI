@@ -382,8 +382,8 @@ public class ForceCIController {
 
                 logger.info("accessToken after -> "+accessToken);
 
-                Cookie session1 = new Cookie("GITHUB_ENTERPRISE_ACCESS_TOKEN", accessToken);
-                Cookie session2 = new Cookie("GITHUB_ENTERPRISE_TOKEN_TYPE", token_type);
+                Cookie session1 = new Cookie("GHE_ACCESS_TOKEN", accessToken);
+                Cookie session2 = new Cookie("GHE_TOKEN_TYPE", token_type);
                 session1.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
                 session2.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
                 httpResponse.addCookie(session1);
