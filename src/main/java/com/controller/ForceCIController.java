@@ -350,7 +350,6 @@ public class ForceCIController {
     public void gitHubEnterprise(@RequestParam String code, @RequestParam String state, @RequestParam String connectionId, ServletResponse response, ServletRequest
             request) throws Exception {
         Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
-        HttpServletResponse httpResponse = null;
         if(byUui.isPresent()){
             ConnectionDetails connectionDetails = byUui.get();
             connectionDetailsMongoRepository.delete(connectionDetails);
@@ -373,7 +372,7 @@ public class ForceCIController {
             JsonParser parser = new JsonParser();
 
             JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
-            httpResponse = (HttpServletResponse) response;
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
             try {
                 logger.info("accessToken before -> "+accessToken);
 
@@ -403,7 +402,7 @@ public class ForceCIController {
                 e.printStackTrace();
             }
         }
-
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         httpResponse.sendRedirect("/index.html");
     }
 
