@@ -372,6 +372,7 @@ public class ForceCIController {
             logger.info("Status -> "+i);
             String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
+            logger.info("responseBody -> "+responseBody);
             String accessToken = null;
             String token_type = null;
             JsonParser parser = new JsonParser();
