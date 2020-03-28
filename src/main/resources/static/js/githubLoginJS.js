@@ -30,6 +30,10 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             templateUrl: './html/register.html',
             controller: 'registerController',
         })
+        .when('/apps/dashboard/app/:appName', {
+            templateUrl: './html/dashboard.html',
+            controller: 'dashBoardAppController',
+        })
         .when('/apps/dashboard/app/:repoName/:repoId', {
             templateUrl: './html/repoDetails.html',
             controller: 'repoController',
@@ -149,6 +153,23 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
         sse.close();
     }
 });
+
+connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $location, $route, $routeParams) {
+
+    $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
+
+    $http.get("/api/fetchRepositoryInDB?gitHubUser=" + "response.data.login").then(function (response) {
+        $scope.lstRepositoryData = [];
+        if (response.data.length > 0) {
+            for (let i = 0; i < response.data.length; i++) {
+                $scope.lstRepositoryData.push(response.data[i].repository);
+            }
+        }
+    }, function (error) {
+
+    });
+})
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;

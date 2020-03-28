@@ -16,7 +16,6 @@ import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-import com.service.EmailSenderService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.*;
@@ -104,8 +103,6 @@ public class ForceCIController {
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
     @Autowired
-    private UserWrapperMongoRepository userWrapperMongoRepository;
-    @Autowired
     private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
     @Autowired
     private RabbitMqSenderConfig rabbitMqSenderConfig;
@@ -120,7 +117,7 @@ public class ForceCIController {
     @Autowired
     private ConnectionDetailsMongoRepository connectionDetailsMongoRepository;
     @Autowired
-    private EmailSenderService emailSenderService;
+    private LinkedServicesMongoRepository linkedServicesMongoRepository;
 
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
@@ -591,10 +588,10 @@ public class ForceCIController {
         switch (githubEvent) {
             case "pull_request":
                 String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
-                UserWrapper byOwnerId = userWrapperMongoRepository.findByOwnerId(user);
-                if (byOwnerId != null) {
-                    access_token = byOwnerId.getAccess_token();
-                    emailId = byOwnerId.getEmail_Id();
+                LinkedServices byUserName = linkedServicesMongoRepository.findByUserName(user);
+                if (byUserName != null) {
+                    access_token = byUserName.getAccessToken();
+                    emailId = byUserName.getUserEmail();
                 }
                 if (("opened".equalsIgnoreCase(jsonObject.get("action").getAsString()) || "synchronize".equalsIgnoreCase(jsonObject.get("action").getAsString())) &&
                         !jsonObject.get("pull_request").getAsJsonObject().get("merged").getAsBoolean()) {
@@ -606,10 +603,10 @@ public class ForceCIController {
                 break;
             case "push":
                 String pushUser = jsonObject.get("repository").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString();
-                UserWrapper userWrapper = userWrapperMongoRepository.findByOwnerId(pushUser);
-                if (userWrapper != null) {
-                    access_token = userWrapper.getAccess_token();
-                    emailId = userWrapper.getEmail_Id();
+                LinkedServices byUserName1 = linkedServicesMongoRepository.findByUserName(pushUser);
+                if (byUserName1 != null) {
+                    access_token = byUserName1.getAccessToken();
+                    emailId = byUserName1.getUserEmail();
                 }
                 System.out.println("A pull request was merged! Deployment start now...");
                 start_deployment(jsonObject, jsonObject.get("repository").getAsJsonObject(), access_token,
@@ -619,7 +616,7 @@ public class ForceCIController {
             case "deployment":
                 if (!StringUtils.hasText(access_token)) {
                     String userId = jsonObject.get("repository").getAsJsonObject().get("owner").getAsJsonObject().get("login").getAsString();
-                    access_token = userWrapperMongoRepository.findByOwnerId(userId).getAccess_token();
+                    access_token = linkedServicesMongoRepository.findByUserName(userId).getAccessToken();
                 }
                 process_deployment(jsonObject, access_token);
                 break;
