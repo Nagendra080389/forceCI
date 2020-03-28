@@ -168,7 +168,7 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
 
     function fetchRepoFromApi() {
         $scope.lstRepositoryFromApi = [];
-        $http.get("/api/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName + "&" + "appName=" + $scope.appName).then(function (response) {
+        $http.get("/api/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "appName=" + $scope.appName).then(function (response) {
             let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
             let repositoryWrappers = response.data.repositoryWrappers;
             for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {

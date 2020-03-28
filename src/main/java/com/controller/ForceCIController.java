@@ -61,6 +61,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @RestController
 public class ForceCIController {
 
@@ -680,35 +682,61 @@ public class ForceCIController {
         HttpClient httpClient = new HttpClient();
         int intStatusOk = httpClient.executeMethod(getUserMethod);
         logger.info("intStatusOk for -> "+serverURL + " -> "+intStatusOk);
+        logger.info("getUserMethod.getResponseBodyAsString() - > " + getUserMethod.getResponseBodyAsString());
         if (intStatusOk == HTTP_STATUS_OK) {
             GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
-            logger.info("User for -> "+serverURL + " -> "+IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8));
+            logger.info("User for -> "+gitRepositoryUser.getLogin());
+            logger.info("User for -> "+gitRepositoryUser.getEmail());
+            logger.info("User for -> "+gitRepositoryUser.getAvatar_url());
             linkedService.setUserName(gitRepositoryUser.getLogin());
             linkedService.setUserEmail(gitRepositoryUser.getEmail());
         }
     }
 
     @RequestMapping(value = "/api/fetchRepository", method = RequestMethod.GET)
-    public String getRepositoryByName(@RequestParam String repoName, @RequestParam String repoUser,
+    public String getRepositoryByName(@RequestParam String repoName, @RequestParam String appName,
                                       HttpServletResponse response, HttpServletRequest request) throws IOException {
-        Cookie[] cookies = request.getCookies();
         Gson gson = new Gson();
+        String repoUser = org.apache.commons.lang3.StringUtils.EMPTY;
+        String gitHubURL = org.apache.commons.lang3.StringUtils.EMPTY;
+        String accessToken = org.apache.commons.lang3.StringUtils.isNotEmpty(request.getHeader(AUTHORIZATION)) ? request.getHeader(AUTHORIZATION) : "";
+        accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
+        Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
+        if(byToken.isPresent()){
+            Connect2DeployUser connect2DeployUser = byToken.get();
+            for (LinkedServices linkedService : connect2DeployUser.getLinkedServices()) {
+                if (appName.equalsIgnoreCase(linkedService.getName())){
+                    accessToken = linkedService.getAccessToken();
+                    repoUser = linkedService.getUserName();
+                    gitHubURL = linkedService.getServerURL();
+                }
+                break;
+            }
+        }
         String lstRepo = "";
 
         FinalResult finalResult = new FinalResult();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("ACCESS_TOKEN")) {
-                String accessToken = cookie.getValue();
-                String queryParam = repoName + "%20in:name+user:" + repoUser + "+fork:true";
-                GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q=" + queryParam);
-                getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
-                HttpClient httpClient = new HttpClient();
-                int intStatusOk = httpClient.executeMethod(getRepoByName);
-                if (intStatusOk == HTTP_STATUS_OK) {
-                    GitRepositoryFromQuery gitRepositoryFromQuery = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryFromQuery.class);
-                    lstRepo = gson.toJson(gitRepositoryFromQuery);
-                }
+        String queryParam = repoName + "%20in:name+user:" + repoUser + "+fork:true";
+        if(appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
+            GitHub gitHub = GitHub.connectToEnterpriseWithOAuth(gitHubURL + GITHUB_GHE_API, repoUser, accessToken);
+            PagedSearchIterable<GHRepository> list = gitHub.searchRepositories().q(queryParam).list();
+            for (GHRepository ghRepository : list) {
+                Repository repository = new Repository();
+                repository.setFull_name(ghRepository.getFullName());
+                repository.setOwner(ghRepository.getOwner().getLogin());
+                repository.setOwnerHtmlUrl(ghRepository.getOwner().getLogin());
+
             }
+
+
+        }
+        GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q=" + queryParam);
+        getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
+        HttpClient httpClient = new HttpClient();
+        int intStatusOk = httpClient.executeMethod(getRepoByName);
+        if (intStatusOk == HTTP_STATUS_OK) {
+            GitRepositoryFromQuery gitRepositoryFromQuery = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryFromQuery.class);
+            lstRepo = gson.toJson(gitRepositoryFromQuery);
         }
 
         List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(repoUser);
@@ -783,8 +811,7 @@ public class ForceCIController {
             int status = httpClient.executeMethod(createWebHook);
             if (LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
-                GetMethod fetchBranches = new GetMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" + repository.getRepositoryName() + "/branches");
-                GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(accessToken).build();
+                GitHub gitHub = GitHub.connectUsingOAuth(accessToken);
                 GHRepository repositoryFromLib = gitHub.getRepositoryById(repository.getRepositoryId());
                 Map<String, GHBranch> branches = repositoryFromLib.getBranches();
                 List<String> lstBranchesInRepo = new ArrayList<>();
