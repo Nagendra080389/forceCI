@@ -261,7 +261,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             });
         }
 
-        $http.get("/api/fetchRepositoryInDB?linkedService=" + $scope.appName).then(function (response) {
+        $http.get("/api/fetchRepositoryInDB").then(function (response) {
             $scope.lstRepositoryData = [];
             if (response.data.length > 0) {
                 for (let i = 0; i < response.data.length; i++) {
@@ -318,7 +318,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                                     message: 'App deleted successfully'
                                 });
                                 let gitHubOwner = localStorage.getItem('githubOwner');
-                                $http.get("/api/fetchRepositoryInDB?gitHubUser=" + gitHubOwner).then(function (response) {
+                                $http.get("/api/fetchRepositoryInDB").then(function (response) {
                                     $scope.lstRepositoryData = [];
                                     if (response.data.length > 0) {
                                         for (let i = 0; i < response.data.length; i++) {

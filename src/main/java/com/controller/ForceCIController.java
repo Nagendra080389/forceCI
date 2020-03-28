@@ -840,6 +840,8 @@ public class ForceCIController {
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
             int status = httpClient.executeMethod(createWebHook);
+            logger.info("status -> Create webhook -> "+status);
+            logger.info("status -> Create webhook response -> "+createWebHook.getResponseBodyAsString());
             if (LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
                 GitHub gitHub = GitHub.connectUsingOAuth(accessToken);
