@@ -31,7 +31,7 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             controller: 'registerController',
         })
         .when('/apps/dashboard/app/:appName', {
-            templateUrl: './html/dashboard.html',
+            templateUrl: './html/appDashboard.html',
             controller: 'dashBoardAppController',
         })
         .when('/apps/dashboard/app/:repoName/:repoId', {
