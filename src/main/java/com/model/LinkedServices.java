@@ -13,9 +13,9 @@ public class LinkedServices implements Serializable {
     private String userName;
     private String userEmail;
     private String serverURL;
-    private boolean connected;
     private String actions;
     private String accessToken;
+    private boolean connected;
 
     public String getName() {
         return name;

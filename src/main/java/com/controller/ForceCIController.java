@@ -1,6 +1,8 @@
 package com.controller;
 
 import com.dao.*;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -56,6 +58,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -637,28 +641,36 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/api/fetchRepositoryInDB", method = RequestMethod.GET)
-    public String getRepositoryList(@RequestParam String linkedService, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public String getRepositoryList(HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
         String reposOnDB = "";
-        List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(linkedService);
-        List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
-        if (lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()) {
-            for (RepositoryWrapper repositoryWrapper : lstRepositoryWrapper) {
-                List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
-                repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
-                newLstRepositoryWrapper.add(repositoryWrapper);
-                if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
-                    Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
-                    for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
-                        RabbitMqConsumer container = new RabbitMqConsumer();
-                        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-                        container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
-                        container.setConcurrentConsumers(1);
-                        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
-                        container.startConsumers();
-                        rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
+        String accessToken = org.apache.commons.lang3.StringUtils.isNotEmpty(request.getHeader(AUTHORIZATION)) ? request.getHeader(AUTHORIZATION) : "";
+        accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
+        Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
+        if(byToken.isPresent()){
+            Connect2DeployUser connect2DeployUser = byToken.get();
+            List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
+            for (LinkedServices linkedServiceFromDB : connect2DeployUser.getLinkedServices()) {
+                List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(linkedServiceFromDB.getUserName());
+                if (lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()) {
+                    for (RepositoryWrapper repositoryWrapper : lstRepositoryWrapper) {
+                        List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
+                        repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
+                        newLstRepositoryWrapper.add(repositoryWrapper);
+                        if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
+                            Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
+                            for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                                RabbitMqConsumer container = new RabbitMqConsumer();
+                                container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+                                container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
+                                container.setConcurrentConsumers(1);
+                                container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+                                container.startConsumers();
+                                rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
+                            }
+                            consumerMap.put(repositoryWrapper.getRepository().getRepositoryId(), rabbitMqConsumerMap);
+                        }
                     }
-                    consumerMap.put(repositoryWrapper.getRepository().getRepositoryId(), rabbitMqConsumerMap);
                 }
             }
             reposOnDB = gson.toJson(newLstRepositoryWrapper);
@@ -682,12 +694,8 @@ public class ForceCIController {
         HttpClient httpClient = new HttpClient();
         int intStatusOk = httpClient.executeMethod(getUserMethod);
         logger.info("intStatusOk for -> "+serverURL + " -> "+intStatusOk);
-        logger.info("getUserMethod.getResponseBodyAsString() - > " + getUserMethod.getResponseBodyAsString());
         if (intStatusOk == HTTP_STATUS_OK) {
             GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
-            logger.info("User for -> "+gitRepositoryUser.getLogin());
-            logger.info("User for -> "+gitRepositoryUser.getEmail());
-            logger.info("User for -> "+gitRepositoryUser.getAvatar_url());
             linkedService.setUserName(gitRepositoryUser.getLogin());
             linkedService.setUserEmail(gitRepositoryUser.getEmail());
         }
@@ -713,37 +721,60 @@ public class ForceCIController {
                 break;
             }
         }
-        String lstRepo = "";
-
         FinalResult finalResult = new FinalResult();
-        String queryParam = repoName + "%20in:name+user:" + repoUser + "+fork:true";
+        String queryParam = "fork:true user:"+repoUser+" "+repoName;
         if(appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
             GitHub gitHub = GitHub.connectToEnterpriseWithOAuth(gitHubURL + GITHUB_GHE_API, repoUser, accessToken);
-            PagedSearchIterable<GHRepository> list = gitHub.searchRepositories().q(queryParam).list();
-            for (GHRepository ghRepository : list) {
-                Repository repository = new Repository();
-                repository.setFull_name(ghRepository.getFullName());
-                repository.setOwner(ghRepository.getOwner().getLogin());
-                repository.setOwnerHtmlUrl(ghRepository.getOwner().getLogin());
-
-            }
-
-
+            extractItemAndConvertToFinalResult(gson, repoUser, finalResult, queryParam, gitHub);
+        } else if(appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
+            GitHub gitHub = GitHub.connectUsingOAuth( accessToken);
+            extractItemAndConvertToFinalResult(gson, repoUser, finalResult, queryParam, gitHub);
         }
-        GetMethod getRepoByName = new GetMethod(GITHUB_API + "/search/repositories?q=" + queryParam);
-        getRepoByName.setRequestHeader("Authorization", "token " + accessToken);
-        HttpClient httpClient = new HttpClient();
-        int intStatusOk = httpClient.executeMethod(getRepoByName);
-        if (intStatusOk == HTTP_STATUS_OK) {
-            GitRepositoryFromQuery gitRepositoryFromQuery = gson.fromJson(IOUtils.toString(getRepoByName.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryFromQuery.class);
-            lstRepo = gson.toJson(gitRepositoryFromQuery);
-        }
-
-        List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(repoUser);
-        finalResult.setGitRepositoryFromQuery(lstRepo);
-        finalResult.setRepositoryWrappers(lstRepositoryWrapper);
 
         return gson.toJson(finalResult);
+    }
+
+    private void extractItemAndConvertToFinalResult(Gson gson, String repoUser, FinalResult finalResult, String queryParam, GitHub gitHub) throws IOException {
+        String lstRepo;
+        PagedSearchIterable<GHRepository> ghRepositories = gitHub.searchRepositories().q(queryParam).list();
+        GitRepositoryFromQuery gitRepositoryFromQuery = new GitRepositoryFromQuery();
+        gitRepositoryFromQuery.setIncomplete_results(String.valueOf(ghRepositories.isIncomplete()));
+        gitRepositoryFromQuery.setTotal_count(String.valueOf(ghRepositories.getTotalCount()));
+        List<Items> itemsList = new ArrayList<>();
+        for (GHRepository ghRepository : ghRepositories) {
+            Items items = new Items();
+            items.setName(ghRepository.getName());
+            items.setFull_name(ghRepository.getFullName());
+            items.setHtml_url(ghRepository.getHtmlUrl().toExternalForm());
+            items.setGit_url(ghRepository.getGitTransportUrl());
+            items.setClone_url(ghRepository.getHttpTransportUrl());
+            items.setLanguage(ghRepository.getLanguage());
+            items.setDefault_branch(ghRepository.getDefaultBranch());
+            GHUser ghRepositoryOwner = ghRepository.getOwner();
+            Owner owner = new Owner();
+            owner.setAvatar_url(ghRepositoryOwner.getAvatarUrl());
+            owner.setHtml_url(ghRepositoryOwner.getHtmlUrl().toExternalForm());
+            owner.setId(String.valueOf(ghRepositoryOwner.getId()));
+            owner.setLogin(ghRepositoryOwner.getLogin());
+            owner.setUrl(ghRepositoryOwner.getUrl().toExternalForm());
+            items.setOwner(owner);
+            Permissions permissions = new Permissions();
+            permissions.setAdmin(String.valueOf(ghRepository.hasAdminAccess()));
+            permissions.setPull(String.valueOf(ghRepository.hasPullAccess()));
+            permissions.setPush(String.valueOf(ghRepository.hasPushAccess()));
+            items.setPermissions(permissions);
+            DateFormat dateFormat = new SimpleDateFormat();
+            items.setCreated_at(dateFormat.format((ghRepository.getCreatedAt())));
+            items.setUpdated_at(dateFormat.format((ghRepository.getUpdatedAt())));
+            items.setOpen_issues_count(String.valueOf(ghRepository.getOpenIssueCount()));
+            items.setId(String.valueOf(ghRepository.getId()));
+            itemsList.add(items);
+        }
+        gitRepositoryFromQuery.setItems((Items[]) itemsList.toArray());
+        List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(repoUser);
+        lstRepo = gson.toJson(gitRepositoryFromQuery);
+        finalResult.setGitRepositoryFromQuery(lstRepo);
+        finalResult.setRepositoryWrappers(lstRepositoryWrapper);
     }
 
     @RequestMapping(value = "/api/deleteWebHook", method = RequestMethod.DELETE)

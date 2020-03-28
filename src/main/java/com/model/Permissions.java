@@ -1,6 +1,7 @@
 package com.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Permissions implements Serializable {
     private String pull;
@@ -31,5 +32,20 @@ public class Permissions implements Serializable {
 
     public void setPush(String push) {
         this.push = push;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Permissions that = (Permissions) o;
+        return Objects.equals(pull, that.pull) &&
+                Objects.equals(admin, that.admin) &&
+                Objects.equals(push, that.push);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pull, admin, push);
     }
 }

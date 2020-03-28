@@ -1,6 +1,7 @@
 package com.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Owner implements Serializable {
     private String gists_url;
@@ -181,5 +182,35 @@ public class Owner implements Serializable {
 
     public void setOrganizations_url(String organizations_url) {
         this.organizations_url = organizations_url;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Owner owner = (Owner) o;
+        return Objects.equals(gists_url, owner.gists_url) &&
+                Objects.equals(repos_url, owner.repos_url) &&
+                Objects.equals(following_url, owner.following_url) &&
+                Objects.equals(starred_url, owner.starred_url) &&
+                Objects.equals(login, owner.login) &&
+                Objects.equals(followers_url, owner.followers_url) &&
+                Objects.equals(type, owner.type) &&
+                Objects.equals(url, owner.url) &&
+                Objects.equals(subscriptions_url, owner.subscriptions_url) &&
+                Objects.equals(received_events_url, owner.received_events_url) &&
+                Objects.equals(avatar_url, owner.avatar_url) &&
+                Objects.equals(events_url, owner.events_url) &&
+                Objects.equals(html_url, owner.html_url) &&
+                Objects.equals(site_admin, owner.site_admin) &&
+                Objects.equals(id, owner.id) &&
+                Objects.equals(gravatar_id, owner.gravatar_id) &&
+                Objects.equals(node_id, owner.node_id) &&
+                Objects.equals(organizations_url, owner.organizations_url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gists_url, repos_url, following_url, starred_url, login, followers_url, type, url, subscriptions_url, received_events_url, avatar_url, events_url, html_url, site_admin, id, gravatar_id, node_id, organizations_url);
     }
 }

@@ -181,7 +181,7 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
                     repositoryOwnerLogin: gitRepositoryFromQuery.items[i].owner.login,
                     repositoryFullName: gitRepositoryFromQuery.items[i].full_name,
                     ownerHtmlUrl: gitRepositoryFromQuery.items[i].owner.html_url,
-                    owner: $scope.userName,
+                    owner: gitRepositoryFromQuery.items[i].owner.login,
                     full_name: gitRepositoryFromQuery.items[i].full_name
                 };
                 if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
@@ -682,8 +682,6 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
-    $scope.lstRepositoryFromApi = [];
-
     if (sse !== undefined && sse !== null && sse !== '') {
         sse.close();
     }

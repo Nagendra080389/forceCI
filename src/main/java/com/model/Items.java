@@ -1,5 +1,7 @@
 package com.model;
 
+import java.util.Objects;
+
 public class Items {
 
     private String language;
@@ -650,5 +652,82 @@ public class Items {
 
     public void setForks_count(String forks_count) {
         this.forks_count = forks_count;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Items items = (Items) o;
+        return Objects.equals(language, items.language) &&
+                Objects.equals(branches_url, items.branches_url) &&
+                Objects.equals(issue_comment_url, items.issue_comment_url) &&
+                Objects.equals(labels_url, items.labels_url) &&
+                Objects.equals(subscribers_url, items.subscribers_url) &&
+                Objects.equals(permissions, items.permissions) &&
+                Objects.equals(releases_url, items.releases_url) &&
+                Objects.equals(svn_url, items.svn_url) &&
+                Objects.equals(id, items.id) &&
+                Objects.equals(forks, items.forks) &&
+                Objects.equals(archive_url, items.archive_url) &&
+                Objects.equals(git_refs_url, items.git_refs_url) &&
+                Objects.equals(forks_url, items.forks_url) &&
+                Objects.equals(statuses_url, items.statuses_url) &&
+                Objects.equals(full_name, items.full_name) &&
+                Objects.equals(size, items.size) &&
+                Objects.equals(languages_url, items.languages_url) &&
+                Objects.equals(html_url, items.html_url) &&
+                Objects.equals(collaborators_url, items.collaborators_url) &&
+                Objects.equals(clone_url, items.clone_url) &&
+                Objects.equals(name, items.name) &&
+                Objects.equals(pulls_url, items.pulls_url) &&
+                Objects.equals(default_branch, items.default_branch) &&
+                Objects.equals(hooks_url, items.hooks_url) &&
+                Objects.equals(trees_url, items.trees_url) &&
+                Objects.equals(tags_url, items.tags_url) &&
+                Objects.equals(contributors_url, items.contributors_url) &&
+                Objects.equals(has_downloads, items.has_downloads) &&
+                Objects.equals(notifications_url, items.notifications_url) &&
+                Objects.equals(open_issues_count, items.open_issues_count) &&
+                Objects.equals(created_at, items.created_at) &&
+                Objects.equals(watchers, items.watchers) &&
+                Objects.equals(keys_url, items.keys_url) &&
+                Objects.equals(deployments_url, items.deployments_url) &&
+                Objects.equals(has_projects, items.has_projects) &&
+                Objects.equals(archived, items.archived) &&
+                Objects.equals(has_wiki, items.has_wiki) &&
+                Objects.equals(updated_at, items.updated_at) &&
+                Objects.equals(comments_url, items.comments_url) &&
+                Objects.equals(stargazers_url, items.stargazers_url) &&
+                Objects.equals(disabled, items.disabled) &&
+                Objects.equals(git_url, items.git_url) &&
+                Objects.equals(has_pages, items.has_pages) &&
+                Objects.equals(owner, items.owner) &&
+                Objects.equals(commits_url, items.commits_url) &&
+                Objects.equals(compare_url, items.compare_url) &&
+                Objects.equals(git_commits_url, items.git_commits_url) &&
+                Objects.equals(blobs_url, items.blobs_url) &&
+                Objects.equals(git_tags_url, items.git_tags_url) &&
+                Objects.equals(merges_url, items.merges_url) &&
+                Objects.equals(downloads_url, items.downloads_url) &&
+                Objects.equals(has_issues, items.has_issues) &&
+                Objects.equals(url, items.url) &&
+                Objects.equals(contents_url, items.contents_url) &&
+                Objects.equals(milestones_url, items.milestones_url) &&
+                Objects.equals(teams_url, items.teams_url) &&
+                Objects.equals(fork, items.fork) &&
+                Objects.equals(issues_url, items.issues_url) &&
+                Objects.equals(events_url, items.events_url) &&
+                Objects.equals(issue_events_url, items.issue_events_url) &&
+                Objects.equals(assignees_url, items.assignees_url) &&
+                Objects.equals(open_issues, items.open_issues) &&
+                Objects.equals(watchers_count, items.watchers_count) &&
+                Objects.equals(node_id, items.node_id) &&
+                Objects.equals(forks_count, items.forks_count);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(language, branches_url, issue_comment_url, labels_url, subscribers_url, permissions, releases_url, svn_url, id, forks, archive_url, git_refs_url, forks_url, statuses_url, full_name, size, languages_url, html_url, collaborators_url, clone_url, name, pulls_url, default_branch, hooks_url, trees_url, tags_url, contributors_url, has_downloads, notifications_url, open_issues_count, created_at, watchers, keys_url, deployments_url, has_projects, archived, has_wiki, updated_at, comments_url, stargazers_url, disabled, git_url, has_pages, owner, commits_url, compare_url, git_commits_url, blobs_url, git_tags_url, merges_url, downloads_url, has_issues, url, contents_url, milestones_url, teams_url, fork, issues_url, events_url, issue_events_url, assignees_url, open_issues, watchers_count, node_id, forks_count);
     }
 }
