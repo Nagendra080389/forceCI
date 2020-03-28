@@ -156,19 +156,69 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
 connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $location, $route, $routeParams) {
 
+    $scope.appName = $routeParams.appName;
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
 
-    $http.get("/api/fetchRepositoryInDB?gitHubUser=" + "response.data.login").then(function (response) {
-        $scope.lstRepositoryData = [];
-        if (response.data.length > 0) {
-            for (let i = 0; i < response.data.length; i++) {
-                $scope.lstRepositoryData.push(response.data[i].repository);
-            }
+    $scope.fetchRepo = function () {
+        if ($scope.repoName && $scope.appName) {
+            fetchRepoFromApi();
         }
-    }, function (error) {
+    };
 
-    });
+    function fetchRepoFromApi() {
+        $scope.lstRepositoryFromApi = [];
+        $http.get("/api/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName + "&" + "appName=" + $scope.appName).then(function (response) {
+            let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
+            let repositoryWrappers = response.data.repositoryWrappers;
+            for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
+                const data = {
+                    active: true,
+                    repositoryName: gitRepositoryFromQuery.items[i].name,
+                    repositoryId: gitRepositoryFromQuery.items[i].id,
+                    repositoryURL: gitRepositoryFromQuery.items[i].html_url,
+                    repositoryOwnerAvatarUrl: $scope.avatar_url,
+                    repositoryOwnerLogin: gitRepositoryFromQuery.items[i].owner.login,
+                    repositoryFullName: gitRepositoryFromQuery.items[i].full_name,
+                    ownerHtmlUrl: gitRepositoryFromQuery.items[i].owner.html_url,
+                    owner: $scope.userName,
+                    full_name: gitRepositoryFromQuery.items[i].full_name
+                };
+                if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
+                    for (let j = 0; j < repositoryWrappers.length; j++) {
+                        if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
+                            $scope.lstRepositoryFromApi.push(data);
+                        }
+                    }
+                } else {
+                    $scope.lstRepositoryFromApi.push(data);
+                }
+            }
+        }, function (error) {
+
+        });
+    }
+
+    $scope.connectAndCreateApp = function (data) {
+        data.linkedService = $scope.appName;
+        $http.post("/api/createWebHook", data).then(function (response) {
+                fetchRepoFromApi();
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'WebHook created successfully'
+                });
+            }, function (error) {
+                console.log(error);
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Not able to create WebHook, Please retry.',
+                    position: 'topRight'
+                });
+            }
+        );
+    }
 })
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
@@ -211,9 +261,16 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             });
         }
 
-        if (cookie !== undefined && cookie !== null) {
+        $http.get("/api/fetchRepositoryInDB?linkedService=" + $scope.appName).then(function (response) {
+            $scope.lstRepositoryData = [];
+            if (response.data.length > 0) {
+                for (let i = 0; i < response.data.length; i++) {
+                    $scope.lstRepositoryData.push(response.data[i].repository);
+                }
+            }
+        }, function (error) {
 
-        }
+        });
 
     }).catch(function (objError) {
 
@@ -735,64 +792,6 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
-    $scope.fetchRepo = function () {
-        if ($scope.repoName) {
-            fetchRepoFromApi();
-        }
-    };
-
-    function fetchRepoFromApi() {
-        $scope.lstRepositoryFromApi = [];
-        $http.get("/api/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "repoUser=" + $scope.userName).then(function (response) {
-            let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
-            let repositoryWrappers = response.data.repositoryWrappers;
-            for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
-                const data = {
-                    active: true,
-                    repositoryName: gitRepositoryFromQuery.items[i].name,
-                    repositoryId: gitRepositoryFromQuery.items[i].id,
-                    repositoryURL: gitRepositoryFromQuery.items[i].html_url,
-                    repositoryOwnerAvatarUrl: $scope.avatar_url,
-                    repositoryOwnerLogin: gitRepositoryFromQuery.items[i].owner.login,
-                    repositoryFullName: gitRepositoryFromQuery.items[i].full_name,
-                    ownerHtmlUrl: gitRepositoryFromQuery.items[i].owner.html_url,
-                    owner: $scope.userName,
-                    full_name: gitRepositoryFromQuery.items[i].full_name
-                };
-                if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
-                    for (let j = 0; j < repositoryWrappers.length; j++) {
-                        if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
-                            $scope.lstRepositoryFromApi.push(data);
-                        }
-                    }
-                } else {
-                    $scope.lstRepositoryFromApi.push(data);
-                }
-            }
-        }, function (error) {
-
-        });
-    }
-
-    $scope.connectAndCreateApp = function (data) {
-        $http.post("/api/createWebHook", data).then(function (response) {
-                fetchRepoFromApi();
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'WebHook created successfully'
-                });
-            }, function (error) {
-                console.log(error);
-                iziToast.error({
-                    title: 'Error',
-                    message: 'Not able to create WebHook, Please retry.',
-                    position: 'topRight'
-                });
-            }
-        );
-    }
 
 });
 

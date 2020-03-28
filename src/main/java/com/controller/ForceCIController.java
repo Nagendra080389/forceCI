@@ -635,10 +635,10 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/api/fetchRepositoryInDB", method = RequestMethod.GET)
-    public String getRepositoryList(@RequestParam String gitHubUser, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public String getRepositoryList(@RequestParam String linkedService, HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
         String reposOnDB = "";
-        List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(gitHubUser);
+        List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(linkedService);
         List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
         if (lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()) {
             for (RepositoryWrapper repositoryWrapper : lstRepositoryWrapper) {
