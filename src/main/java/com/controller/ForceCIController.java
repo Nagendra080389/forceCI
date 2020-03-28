@@ -770,7 +770,7 @@ public class ForceCIController {
             items.setId(String.valueOf(ghRepository.getId()));
             itemsList.add(items);
         }
-        gitRepositoryFromQuery.setItems((Items[]) itemsList.toArray());
+        gitRepositoryFromQuery.setItems(Iterables.toArray(itemsList, Items.class));
         List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(repoUser);
         lstRepo = gson.toJson(gitRepositoryFromQuery);
         finalResult.setGitRepositoryFromQuery(lstRepo);
