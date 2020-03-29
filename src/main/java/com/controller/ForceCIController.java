@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.model.*;
 import com.pmd.PMDStructure;
 import com.rabbitMQ.ConsumerHandler;
@@ -53,6 +54,7 @@ import javax.swing.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -130,18 +132,20 @@ public class ForceCIController {
                 " is " + jsonObject.get("deployment_status").getAsJsonObject().get("state").getAsString());
     }
 
-    private static String fetchCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        String accessToken = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("ACCESS_TOKEN")) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
+    private static String fetchCookies(HttpServletRequest request, Connect2DeployUserMongoRepository connect2DeployUserMongoRepository) {
+        Gson gson = new Gson();
+        String accessToken = org.apache.commons.lang3.StringUtils.isNotEmpty(request.getHeader(AUTHORIZATION)) ? request.getHeader(AUTHORIZATION) : "";
+        accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
+        Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
+        Map<String, String> mapLinkedServiceAndAccessToken = new HashMap<>();
+        if(byToken.isPresent()){
+            Connect2DeployUser connect2DeployUser = byToken.get();
+            for (LinkedServices linkedService : connect2DeployUser.getLinkedServices()) {
+                mapLinkedServiceAndAccessToken.put(linkedService.getName(), linkedService.getAccessToken());
             }
+
         }
-        return accessToken;
+        return gson.toJson(mapLinkedServiceAndAccessToken);
     }
 
     @GetMapping("/api/cancelDeployment")
@@ -527,16 +531,17 @@ public class ForceCIController {
     @RequestMapping(value = "/api/getAllBranches", method = RequestMethod.GET)
     public String getAllBranches(@RequestParam String strRepoId, HttpServletResponse response,
                                  HttpServletRequest request) throws IOException {
-        String access_token = fetchCookies(request);
-        GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
+        Gson gson = new Gson();
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
+        GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB)).build();
         GHRepository repository = gitHub.getRepositoryById(strRepoId);
         Map<String, GHBranch> branches = repository.getBranches();
         List<String> lstBranchesToBeReturned = new ArrayList<>();
         for (Map.Entry<String, GHBranch> stringGHBranchEntry : branches.entrySet()) {
             lstBranchesToBeReturned.add(stringGHBranchEntry.getValue().getName());
         }
-
-        Gson gson = new Gson();
         return gson.toJson(lstBranchesToBeReturned);
     }
 
@@ -545,8 +550,11 @@ public class ForceCIController {
                                @RequestParam String userName, @RequestParam String newBranchName,
                                HttpServletResponse response,
                                HttpServletRequest request) throws IOException {
-        String access_token = fetchCookies(request);
         Gson gson = new Gson();
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
+        String access_token = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
         GHRepository repository = gitHub.getRepositoryById(repoId);
         GetMethod fetchSHA = new GetMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/ref/heads/" + targetBranch);
@@ -587,10 +595,13 @@ public class ForceCIController {
         }
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
-        String access_token = fetchCookies(request);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
+        String access_token = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         String emailId = null;
         SFDCConnectionDetails sfdcConnectionDetails = null;
-        System.out.println("githubEvent -> " + githubEvent);
+        logger.info("githubEvent -> " + githubEvent);
         switch (githubEvent) {
             case "pull_request":
                 String user = jsonObject.get("pull_request").getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString();
@@ -785,7 +796,10 @@ public class ForceCIController {
         Gson gson = new Gson();
         int status = 0;
 
-        String accessToken = fetchCookies(request);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
+        String accessToken = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         if (accessToken != null) {
             DeleteMethod deleteWebHook = new DeleteMethod(GITHUB_API + "/repos/" + repositoryOwner + "/" + repositoryName + "/hooks/" + webHookId);
             deleteWebHook.setRequestHeader("Authorization", "token " + accessToken);
@@ -820,7 +834,10 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
 
-        String accessToken = fetchCookies(request);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
+        String accessToken = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         if (accessToken != null) {
             PostMethod createWebHook = new PostMethod(GITHUB_API + "/repos/" + repository.getOwner() + "/" + repository.getRepositoryName() + "/hooks");
             createWebHook.setRequestHeader("Authorization", "token " + accessToken);
