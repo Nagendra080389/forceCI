@@ -1,6 +1,7 @@
 package com.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,11 +15,27 @@ public class Connect2DeployUser implements Serializable {
     private String password;
     private String firstName;
     private String lastName;
+    private String token;
     private boolean isEnabled;
     private boolean boolEmailVerified;
     private List<LinkedServices> linkedServices;
     private Map<String, String> mapIpAddressAndToken;
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public Map<String, String> getMapIpAddressAndToken() {
+        return mapIpAddressAndToken;
+    }
+
+    public void setMapIpAddressAndToken(Map<String, String> mapIpAddressAndToken) {
+        this.mapIpAddressAndToken = mapIpAddressAndToken;
+    }
 
     public String getId() {
         return id;
@@ -84,14 +101,6 @@ public class Connect2DeployUser implements Serializable {
         this.linkedServices = linkedServices;
     }
 
-    public Map<String, String> getMapIpAddressAndToken() {
-        return mapIpAddressAndToken;
-    }
-
-    public void setMapIpAddressAndToken(Map<String, String> mapIpAddressAndToken) {
-        this.mapIpAddressAndToken = mapIpAddressAndToken;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -104,12 +113,13 @@ public class Connect2DeployUser implements Serializable {
                 Objects.equals(password, that.password) &&
                 Objects.equals(firstName, that.firstName) &&
                 Objects.equals(lastName, that.lastName) &&
+                Objects.equals(token, that.token) &&
                 Objects.equals(linkedServices, that.linkedServices) &&
                 Objects.equals(mapIpAddressAndToken, that.mapIpAddressAndToken);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, emailId, password, firstName, lastName, isEnabled, boolEmailVerified, linkedServices, mapIpAddressAndToken);
+        return Objects.hash(id, emailId, password, firstName, lastName, token, isEnabled, boolEmailVerified, linkedServices, mapIpAddressAndToken);
     }
 }

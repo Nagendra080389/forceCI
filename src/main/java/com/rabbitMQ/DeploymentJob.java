@@ -204,8 +204,16 @@ public class DeploymentJob implements Serializable {
         return createdDate;
     }
 
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public Date getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public boolean isBoolSfdcCompleted() {
@@ -270,14 +278,6 @@ public class DeploymentJob implements Serializable {
 
     public void setBoolCodeReviewFail(boolean boolCodeReviewFail) {
         this.boolCodeReviewFail = boolCodeReviewFail;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public void setLastModifiedDate(Date lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
     }
 
     public String getPullRequestNumber() {

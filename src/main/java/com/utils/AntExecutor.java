@@ -1,7 +1,6 @@
 package com.utils;
 
 import com.dao.DeploymentJobMongoRepository;
-import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import org.apache.tools.ant.*;
 import org.slf4j.Logger;
@@ -29,6 +28,7 @@ public class AntExecutor {
 
     /**
      * To execute a target specified in the Ant build.xml file
+     *
      * @param buildXmlFileFullPath
      * @param target
      * @param deploymentJob
@@ -95,7 +95,7 @@ public class AntExecutor {
                             deploymentJob.setSfdcAsyncJobId(sfdcAsyncJobId);
                             deploymentJobMongoRepository.save(deploymentJob);
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         logger.error(e.getMessage());
                     }
                     consoleLogs.add(buildEvent.getMessage());

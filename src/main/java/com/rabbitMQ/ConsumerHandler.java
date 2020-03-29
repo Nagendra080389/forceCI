@@ -43,9 +43,31 @@ public class ConsumerHandler {
         this.sfdcConnectionDetailsMongoRepository = sfdcConnectionDetailsMongoRepository;
     }
 
+    public static File stream2file(InputStream in) throws IOException {
+        final File tempFile = File.createTempFile("build", ".xml");
+        tempFile.deleteOnExit();
+        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
+            IOUtils.copy(in, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempFile;
+    }
+
+    public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
+        final File tempFile = File.createTempFile(prefix, suffix);
+        tempFile.deleteOnExit();
+        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
+            IOUtils.copy(in, out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tempFile;
+    }
+
     public void handleMessage(DeploymentJob deploymentJob) {
         Gson gson = new Gson();
-        System.out.println("Deployment Job Started inside Container thread -> "+deploymentJob.getId());
+        System.out.println("Deployment Job Started inside Container thread -> " + deploymentJob.getId());
         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.PENDING, ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.VALIDATION,
                 ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
         int status = 0;
@@ -69,7 +91,7 @@ public class ConsumerHandler {
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
-            if(!deploymentJob.isBoolIsJobCancelled()) {
+            if (!deploymentJob.isBoolIsJobCancelled()) {
                 createTempDirectoryForDeployment(deploymentJob);
             }
         }
@@ -169,8 +191,8 @@ public class ConsumerHandler {
                 }
                 deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
                 Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
-                if(deploymentJobMongoRepositoryById.isPresent()){
-                    System.out.println("deploymentJob isPresent -> "+deploymentJob.getId());
+                if (deploymentJobMongoRepositoryById.isPresent()) {
+                    System.out.println("deploymentJob isPresent -> " + deploymentJob.getId());
                     deploymentJob = deploymentJobMongoRepositoryById.get();
                 }
 
@@ -191,7 +213,7 @@ public class ConsumerHandler {
                 deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
 
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
-                    System.out.println("eachBuildLine -> "+eachBuildLine);
+                    System.out.println("eachBuildLine -> " + eachBuildLine);
                     if (eachBuildLine.contains("Failed to login:")) {
                         // try to get proper access token again
                         String refreshToken = sfdcConnectionDetail.getRefreshToken();
@@ -227,8 +249,8 @@ public class ConsumerHandler {
                         createTempDirectoryForDeployment(savedDeploymentJob);
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
-                        System.out.println("deploymentJob Id inside deployment succeeded -> "+deploymentJob.getId());
-                        System.out.println("deploymentJob status url -> "+deploymentJob.getStatusesUrl());
+                        System.out.println("deploymentJob Id inside deployment succeeded -> " + deploymentJob.getId());
+                        System.out.println("deploymentJob status url -> " + deploymentJob.getStatusesUrl());
                         Gson gson = new Gson();
                         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
                                 ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.VALIDATION,
@@ -236,7 +258,7 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("status create and return -> "+status);
+                        System.out.println("status create and return -> " + status);
                         if (merge) {
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentPass(true);
@@ -247,14 +269,14 @@ public class ConsumerHandler {
                             deploymentJob.setBoolSfdcFail(false);
                             deploymentJob.setBoolCodeReviewCompleted(false);
                         }
-                        System.out.println("merge -> "+merge);
-                        System.out.println("deploymentJob isBoolSfdcCompleted -> "+deploymentJob.isBoolSfdcCompleted());
-                        System.out.println("deploymentJob isBoolSfdcPass -> "+deploymentJob.isBoolSfdcPass());
+                        System.out.println("merge -> " + merge);
+                        System.out.println("deploymentJob isBoolSfdcCompleted -> " + deploymentJob.isBoolSfdcCompleted());
+                        System.out.println("deploymentJob isBoolSfdcPass -> " + deploymentJob.isBoolSfdcPass());
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
                         jobCancelled = deploymentJob.isBoolIsJobCancelled();
-                        if(!jobCancelled) {
+                        if (!jobCancelled) {
                             setFailedDeploymentDetails(deploymentJob, sfdcConnectionDetail, targetBranch, merge);
                         } else {
                             deploymentJob.setBoolSfdcCompleted(true);
@@ -270,11 +292,11 @@ public class ConsumerHandler {
 
                 deploymentJob.setLastModifiedDate(new Date());
                 deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
-                System.out.println("deploymentJob isBoolSfdcCompleted after save -> "+deploymentJob.isBoolSfdcCompleted());
-                System.out.println("deploymentJob isBoolSfdcPass after save -> "+deploymentJob.isBoolSfdcPass());
-                System.out.println("sfdcPass -> "+sfdcPass);
-                System.out.println("merge -> "+merge);
-                System.out.println("jobCancelled -> "+jobCancelled);
+                System.out.println("deploymentJob isBoolSfdcCompleted after save -> " + deploymentJob.isBoolSfdcCompleted());
+                System.out.println("deploymentJob isBoolSfdcPass after save -> " + deploymentJob.isBoolSfdcPass());
+                System.out.println("sfdcPass -> " + sfdcPass);
+                System.out.println("merge -> " + merge);
+                System.out.println("jobCancelled -> " + jobCancelled);
                 if (sfdcPass && !merge && !jobCancelled) {
                     Gson gson = new Gson();
                     GithubStatusObject githubStatusObject = null;
@@ -377,27 +399,5 @@ public class ConsumerHandler {
             deploymentJob.setBoolSfdcPass(false);
             deploymentJob.setBoolCodeReviewCompleted(false);
         }
-    }
-
-    public static File stream2file(InputStream in) throws IOException {
-        final File tempFile = File.createTempFile("build", ".xml");
-        tempFile.deleteOnExit();
-        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
-            IOUtils.copy(in, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tempFile;
-    }
-
-    public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
-        final File tempFile = File.createTempFile(prefix, suffix);
-        tempFile.deleteOnExit();
-        try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
-            IOUtils.copy(in, out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return tempFile;
     }
 }

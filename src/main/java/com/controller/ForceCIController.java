@@ -1085,9 +1085,15 @@ public class ForceCIController {
                     mapIpAddressAndToken = new HashMap<>();
                     mapIpAddressAndToken.put(clientIp, token);
                     byEmailId.setMapIpAddressAndToken(mapIpAddressAndToken);
+                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", mapIpAddressAndToken.get(clientIp));
+                    response.addCookie(accessTokenCookie);
+                    accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
                 } else if (!mapIpAddressAndToken.containsKey(clientIp)) {
                     mapIpAddressAndToken.put(clientIp, token);
                     byEmailId.setMapIpAddressAndToken(mapIpAddressAndToken);
+                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", mapIpAddressAndToken.get(clientIp));
+                    response.addCookie(accessTokenCookie);
+                    accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
                 } else {
                     Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", mapIpAddressAndToken.get(clientIp));
                     response.addCookie(accessTokenCookie);

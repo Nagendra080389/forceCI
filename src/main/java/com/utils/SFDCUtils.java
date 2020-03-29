@@ -1,22 +1,10 @@
 package com.utils;
 
-import com.google.gson.Gson;
-import com.model.DeployResultAPI;
-import com.model.DeployResultWrapper;
-import com.model.SHAObject;
 import com.rabbitMQ.DeploymentJob;
 import com.sforce.soap.metadata.CancelDeployResult;
 import com.sforce.soap.metadata.DeployResult;
 import com.sforce.soap.metadata.DeployStatus;
 import com.sforce.soap.metadata.MetadataConnection;
-import com.sforce.ws.ConnectorConfig;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.io.IOUtils;
-import org.springframework.http.MediaType;
-
-import java.nio.charset.StandardCharsets;
 
 public class SFDCUtils {
 

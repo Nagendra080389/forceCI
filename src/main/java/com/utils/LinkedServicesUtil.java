@@ -9,12 +9,13 @@ import java.util.List;
 public class LinkedServicesUtil {
     public static final String GIT_HUB = "GitHub";
     public static final String GIT_HUB_ENTERPRISE = "GitHub Enterprise";
-    private static List<String> lstLinkedServicesName = new ArrayList<String>( Arrays.asList(GIT_HUB, GIT_HUB_ENTERPRISE));
-    public static List<LinkedServices> createLinkedServices(){
+    private static List<String> lstLinkedServicesName = new ArrayList<String>(Arrays.asList(GIT_HUB, GIT_HUB_ENTERPRISE));
+
+    public static List<LinkedServices> createLinkedServices() {
         List<LinkedServices> linkedServices = new ArrayList<>();
         for (String eachLinkedService : lstLinkedServicesName) {
             LinkedServices objServices = new LinkedServices();
-            objServices.setActions("+ Connect to "+eachLinkedService);
+            objServices.setActions("+ Connect to " + eachLinkedService);
             objServices.setConnected(false);
             objServices.setName(eachLinkedService);
             objServices.setUserName("Not Connected");
