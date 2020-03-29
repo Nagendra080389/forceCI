@@ -33,6 +33,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.kohsuke.github.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1070,9 +1071,6 @@ public class ForceCIController {
     public String loginController(@RequestBody Connect2DeployUser connect2DeployUser, HttpServletResponse response, HttpServletRequest
             request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
 
-        String clientIp = getClientIp(request);
-        clientIp = clientIp.replaceAll("\\.", "#");
-        logger.info("getClientIp(request) -> " + clientIp);
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser.getEmailId());
@@ -1080,28 +1078,25 @@ public class ForceCIController {
             if (!byEmailId.isBoolEmailVerified()) {
                 returnResponse = "Email Not Verified";
             } else {
-                String token = UUID.randomUUID().toString();
-                Map<String, String> mapIpAddressAndToken = byEmailId.getMapIpAddressAndToken();
-                if (mapIpAddressAndToken == null) {
-                    mapIpAddressAndToken = new HashMap<>();
-                    mapIpAddressAndToken.put(clientIp, token);
-                    byEmailId.setMapIpAddressAndToken(mapIpAddressAndToken);
-                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", mapIpAddressAndToken.get(clientIp));
+                // This means the token has not expired
+                if(byEmailId.getTokenExpirationTime() != null && byEmailId.getTokenExpirationTime().after(new Date())){
+                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", byEmailId.getToken());
                     response.addCookie(accessTokenCookie);
                     accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
-                } else if (!mapIpAddressAndToken.containsKey(clientIp)) {
-                    mapIpAddressAndToken.put(clientIp, token);
-                    byEmailId.setMapIpAddressAndToken(mapIpAddressAndToken);
-                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", mapIpAddressAndToken.get(clientIp));
-                    response.addCookie(accessTokenCookie);
-                    accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+                    returnResponse = byEmailId.getEmailId();
                 } else {
-                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", mapIpAddressAndToken.get(clientIp));
+                    // Token has expired or this is a new User
+                    String token = UUID.randomUUID().toString();
+                    byEmailId.setToken(token);
+                    Date currentDate = Calendar.getInstance().getTime();
+                    currentDate = cvtToGmt(currentDate);
+                    byEmailId.setTokenExpirationTime(DateUtils.addHours(currentDate, 24));
+                    byEmailId = connect2DeployUserMongoRepository.save(byEmailId);
+                    returnResponse = byEmailId.getEmailId();
+                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", token);
                     response.addCookie(accessTokenCookie);
                     accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
                 }
-                byEmailId = connect2DeployUserMongoRepository.save(byEmailId);
-                returnResponse = byEmailId.getEmailId();
             }
         } else {
             returnResponse = "No User Found";
@@ -1328,6 +1323,23 @@ public class ForceCIController {
             return gson.toJson("Error");
         }
 
+    }
+
+    public static Date cvtToGmt(Date date){
+        TimeZone tz = TimeZone.getDefault();
+        Date ret = new Date( date.getTime() - tz.getRawOffset() );
+
+        // if we are now in DST, back off by the delta.  Note that we are checking the GMT date, this is the KEY.
+        if ( tz.inDaylightTime( ret )){
+            Date dstDate = new Date( ret.getTime() - tz.getDSTSavings() );
+
+            // check to make sure we have not crossed back into standard time
+            // this happens when we are on the cusp of DST (7pm the day before the change for PDT)
+            if ( tz.inDaylightTime( dstDate )){
+                ret = dstDate;
+            }
+        }
+        return ret;
     }
 
     private class FinalResult {
