@@ -4,6 +4,8 @@ connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
 });
 
+localStorage.setItem('avatar_url', "../images/connectdevelop-brands.svg");
+
 let sse;
 connect2Deploy.config(function ($routeProvider, $locationProvider) {
     $routeProvider
@@ -177,7 +179,7 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
                     repositoryName: gitRepositoryFromQuery.items[i].name,
                     repositoryId: gitRepositoryFromQuery.items[i].id,
                     repositoryURL: gitRepositoryFromQuery.items[i].html_url,
-                    repositoryOwnerAvatarUrl: $scope.avatar_url,
+                    repositoryOwnerAvatarUrl: gitRepositoryFromQuery.items[i].owner.avatar_url,
                     repositoryOwnerLogin: gitRepositoryFromQuery.items[i].owner.login,
                     repositoryFullName: gitRepositoryFromQuery.items[i].full_name,
                     ownerHtmlUrl: gitRepositoryFromQuery.items[i].owner.html_url,

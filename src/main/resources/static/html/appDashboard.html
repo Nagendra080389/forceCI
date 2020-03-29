@@ -129,54 +129,54 @@
                 <!-- Content Row -->
                 <div class="row">
                     <form class="navbar-search">
-                   <div class="input-group">
-                       <input aria-describedby="basic-addon2" aria-label="Search" class="form-control bg-light small"
-                              ng-model="repoName" placeholder="Search for Repository..." type="text">
-                       <div class="input-group-append">
-                           <button class="btn btn-primary" ng-click="fetchRepo()" type="submit">
-                               <i class="fas fa-search fa-sm"></i>
-                           </button>
-                       </div>
-                   </div>
-               </form>
+                        <div class="input-group col-xl-12 col-md-12">
+                            <input aria-describedby="basic-addon2" aria-label="Search" class="form-control bg-light small"
+                                   ng-model="repoName" placeholder="Search for Repository..." type="text">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" ng-click="fetchRepo()" type="submit">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
 
-               <div class="row mt-4">
-                   <div class="col-xl-12 col-md-12 mb-4" ng-repeat="eachRepository in lstRepositoryFromApi">
-                       <div class="card border-left-primary shadow h-100 py-2">
-                           <div class="card-body">
-                               <div class="row no-gutters align-items-center">
-                                   <div class="col-xl-9 col-md-9 mr-2">
-                                       <div class="text-xs font-weight-bold text-primary mb-1">
-                                           <svg class="icon malibu-icon fill-near-black nudge-down--1 mr1" data-test-icon-name="repo-16" data-test-target="malibu-icon"
-                                                style="width: 16px; height: 16px;">
-                                               <use xlink:href="#repo-16" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                                   <svg id="repo-16"
-                                                        viewBox="0 0 16 16">
-                                                       <path d="M6 4v1h1V4H6zm0-2v1h1V2H6zM3 0c-.5 0-1 .5-1 1v12c0 .5.5 1 1 1h2v2l1.5-1.5L8 16v-2h5c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1H3zm9.5 13H8v-1H5v1H3.5c-.266 0-.5-.266-.5-.5V11h10v1.5c0 .25-.234.5-.5.5zM5 10V1h8.016L13 10H5zm1-2v1h1V8H6zm0-2v1h1V6H6z"
-                                                             fill-rule="evenodd">
+                    <div class="row col-xl-12 col-md-12 mt-4">
+                        <div class="col-xl-12 col-md-12 mb-4" ng-repeat="eachRepository in lstRepositoryFromApi">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col-xl-9 col-md-9 mr-2">
+                                            <div class="text-xs font-weight-bold text-primary mb-1">
+                                                <svg class="icon malibu-icon fill-near-black nudge-down--1 mr1" data-test-icon-name="repo-16" data-test-target="malibu-icon"
+                                                     style="width: 16px; height: 16px;">
+                                                    <use xlink:href="#repo-16" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                        <svg id="repo-16"
+                                                             viewBox="0 0 16 16">
+                                                            <path d="M6 4v1h1V4H6zm0-2v1h1V2H6zM3 0c-.5 0-1 .5-1 1v12c0 .5.5 1 1 1h2v2l1.5-1.5L8 16v-2h5c.5 0 1-.5 1-1V1c0-.5-.5-1-1-1H3zm9.5 13H8v-1H5v1H3.5c-.266 0-.5-.266-.5-.5V11h10v1.5c0 .25-.234.5-.5.5zM5 10V1h8.016L13 10H5zm1-2v1h1V8H6zm0-2v1h1V6H6z"
+                                                                  fill-rule="evenodd">
 
-                                                       </path>
-                                                   </svg>
-                                                   <title></title>
-                                               </use>
-                                           </svg>
-                                           {{eachRepository.full_name}}
-                                       </div>
-                                   </div>
-                                   <div class="col-xl-2 col-md-2 mr-2">
-                                       <a class="btn btn-secondary btn-icon-split float-right" href="javascript:void(0);" ng-click="connectAndCreateApp(eachRepository)">
+                                                            </path>
+                                                        </svg>
+                                                        <title></title>
+                                                    </use>
+                                                </svg>
+                                                {{eachRepository.full_name}}
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-3 col-md-3 mr-2">
+                                            <a class="btn btn-secondary btn-icon-split float-right" href="javascript:void(0);" ng-click="connectAndCreateApp(eachRepository)">
                                        <span class="icon text-white-50">
                                          <i class="fab fa-connectdevelop mt-1"></i>
                                        </span>
-                                           <span class="text">Connect</span>
-                                       </a>
-                                   </div>
+                                                <span class="text">Connect</span>
+                                            </a>
+                                        </div>
 
-                               </div>
-                           </div>
-                       </div>
-                   </div>
-               </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
