@@ -535,7 +535,7 @@ public class ForceCIController {
         String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
-        GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB)).build();
+        GitHub gitHub = GitHub.connectUsingOAuth(linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB));
         GHRepository repository = gitHub.getRepositoryById(strRepoId);
         Map<String, GHBranch> branches = repository.getBranches();
         List<String> lstBranchesToBeReturned = new ArrayList<>();
@@ -555,7 +555,7 @@ public class ForceCIController {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
         String access_token = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
-        GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
+        GitHub gitHub = GitHub.connectUsingOAuth(access_token);
         GHRepository repository = gitHub.getRepositoryById(repoId);
         GetMethod fetchSHA = new GetMethod(GITHUB_API + "/repos/" + userName + "/" + repository.getName() + "/" + "git/ref/heads/" + targetBranch);
         fetchSHA.setRequestHeader("Authorization", "token " + access_token);
@@ -1231,7 +1231,7 @@ public class ForceCIController {
 
         try {
             Thread.sleep(2000L);
-            GitHub gitHub = GitHubBuilder.fromEnvironment().withOAuthToken(access_token).build();
+            GitHub gitHub = GitHub.connectUsingOAuth(access_token);
             GHRepository repository = gitHub.getRepository(
                     jsonObject.get("repository").getAsJsonObject()
                             .get("full_name").getAsString());
