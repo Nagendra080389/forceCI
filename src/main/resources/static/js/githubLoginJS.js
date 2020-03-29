@@ -228,7 +228,8 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
-
+    $scope.userName = localStorage.getItem('userEmail');
+    $scope.avatar_url = localStorage.avatar_url;
     validateConnect2DeployToken(cookie, $http).then(function (objResult) {
         if (!objResult) {
             $location.path("/index");
@@ -319,7 +320,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
                                     title: 'OK',
                                     message: 'App deleted successfully'
                                 });
-                                let gitHubOwner = localStorage.getItem('githubOwner');
                                 $http.get("/api/fetchRepositoryInDB").then(function (response) {
                                     $scope.lstRepositoryData = [];
                                     if (response.data.length > 0) {
@@ -798,7 +798,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 connect2Deploy.controller('deploymentController', function ($scope, $http, $location, $routeParams, $mdDialog) {
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
-    $scope.userName = localStorage.githubOwner;
+    $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
     const repoId = $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
@@ -877,7 +877,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 connect2Deploy.controller('scheduledDeploymentController', function ($scope, $http, $location, $routeParams, $mdDialog) {
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
-    $scope.userName = localStorage.githubOwner;
+    $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
     const repoId = $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
