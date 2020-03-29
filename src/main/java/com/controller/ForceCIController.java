@@ -2,7 +2,6 @@ package com.controller;
 
 import com.dao.*;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,13 +14,19 @@ import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.security.CryptoPassword;
-import com.sendgrid.*;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
-import com.utils.*;
+import com.utils.ApiSecurity;
+import com.utils.LinkedServicesUtil;
+import com.utils.SFDCUtils;
+import com.utils.ValidationStatus;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -72,13 +77,10 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RestController
 public class ForceCIController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ForceCIController.class);
     public static final int HTTP_STATUS_OK = 200;
     public static final int HTTP_STATUS_CREATED = 201;
     public static final int HTTP_STATUS_FAILED = 401;
     public static final List<SseEmitter> emitters = Collections.synchronizedList(new ArrayList<>());
-    private final static List<Integer> LIST_VALID_RESPONSE_CODES = Arrays.asList(200, 201, 204, 207);
-    private static final String GITHUB_API = "https://api.github.com";
     public static final String GITHUB_GHE_API = "/api/v3";
     public static final String PENDING = "pending";
     public static final String ERROR = "error";
@@ -89,6 +91,9 @@ public class ForceCIController {
     public static final String VALIDATION = "_SfdcValidation";
     public static final String CODE_REVIEW_VALIDATION = "_CodeReviewValidation";
     public static final String CONNECT2DEPLOY_URL = "https://forceci.herokuapp.com/#!/apps/dashboard/app";
+    private static final Logger logger = LoggerFactory.getLogger(ForceCIController.class);
+    private final static List<Integer> LIST_VALID_RESPONSE_CODES = Arrays.asList(200, 201, 204, 207);
+    private static final String GITHUB_API = "https://api.github.com";
     @Value("${github.clientId}")
     String githubClientId;
     @Value("${github.clientSecret}")
@@ -148,6 +153,51 @@ public class ForceCIController {
         return gson.toJson(mapLinkedServiceAndAccessToken);
     }
 
+    public static int createStatusAndReturnCode(Gson gson, String access_token, String statuseUrl, String targetBranch,
+                                                GithubStatusObject githubStatusObject) throws IOException {
+        PostMethod createStatus = new PostMethod(statuseUrl);
+        createStatus.setRequestHeader("Authorization", "token " + access_token);
+        createStatus.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
+        createStatus.setRequestBody(gson.toJson(githubStatusObject));
+        HttpClient httpClient = new HttpClient();
+        return httpClient.executeMethod(createStatus);
+    }
+
+    public static String encodeURIComponent(String s) {
+        String result = null;
+
+        try {
+            result = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
+                    .replaceAll("\\+", "%20")
+                    .replaceAll("\\%21", "!")
+                    .replaceAll("\\%27", "'")
+                    .replaceAll("\\%28", "(")
+                    .replaceAll("\\%29", ")")
+                    .replaceAll("\\%7E", "~");
+        }
+
+        // This exception should never occur.
+        catch (UnsupportedEncodingException e) {
+            result = s;
+        }
+
+        return result;
+    }
+
+    private static String getClientIp(HttpServletRequest request) {
+
+        String remoteAddr = "";
+
+        if (request != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
+        }
+
+        return remoteAddr;
+    }
+
     @GetMapping("/api/cancelDeployment")
     public String cancelDeployment(@RequestParam String deploymentJobId) throws Exception {
         Gson gson = new Gson();
@@ -191,7 +241,6 @@ public class ForceCIController {
             return gson.toJson(result);
         }
     }
-
 
     @GetMapping("/api/asyncDeployments")
     public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoId, @RequestParam String branchName) {
@@ -644,16 +693,6 @@ public class ForceCIController {
         return gson.toJson("");
     }
 
-    public static int createStatusAndReturnCode(Gson gson, String access_token, String statuseUrl, String targetBranch,
-                                                GithubStatusObject githubStatusObject) throws IOException {
-        PostMethod createStatus = new PostMethod(statuseUrl);
-        createStatus.setRequestHeader("Authorization", "token " + access_token);
-        createStatus.setRequestHeader("Content-Type", MediaType.APPLICATION_JSON);
-        createStatus.setRequestBody(gson.toJson(githubStatusObject));
-        HttpClient httpClient = new HttpClient();
-        return httpClient.executeMethod(createStatus);
-    }
-
     @RequestMapping(value = "/api/fetchRepositoryInDB", method = RequestMethod.GET)
     public String getRepositoryList(HttpServletResponse response, HttpServletRequest request) throws Exception {
         Gson gson = new Gson();
@@ -897,7 +936,6 @@ public class ForceCIController {
         return returnResponse;
     }
 
-
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerUser(@RequestBody Connect2DeployUser userEntity, HttpServletResponse response, HttpServletRequest
             request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
@@ -1032,7 +1070,8 @@ public class ForceCIController {
     public String loginController(@RequestBody Connect2DeployUser connect2DeployUser, HttpServletResponse response, HttpServletRequest
             request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
 
-        logger.info("getClientIp(request) -> " + getClientIp(request));
+        String clientIp = getClientIp(request);
+        logger.info("getClientIp(request) -> " + clientIp);
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser.getEmailId());
@@ -1041,12 +1080,21 @@ public class ForceCIController {
                 returnResponse = "Email Not Verified";
             } else {
                 String token = UUID.randomUUID().toString();
-                byEmailId.setToken(token);
+                Map<String, String> mapIpAddressAndToken = byEmailId.getMapIpAddressAndToken();
+                if (mapIpAddressAndToken == null) {
+                    mapIpAddressAndToken = new HashMap<>();
+                    mapIpAddressAndToken.put(clientIp, token);
+                    byEmailId.setMapIpAddressAndToken(mapIpAddressAndToken);
+                } else if (!mapIpAddressAndToken.containsKey(clientIp)) {
+                    mapIpAddressAndToken.put(clientIp, token);
+                    byEmailId.setMapIpAddressAndToken(mapIpAddressAndToken);
+                } else {
+                    Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", mapIpAddressAndToken.get(clientIp));
+                    response.addCookie(accessTokenCookie);
+                    accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
+                }
                 byEmailId = connect2DeployUserMongoRepository.save(byEmailId);
                 returnResponse = byEmailId.getEmailId();
-                Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", token);
-                response.addCookie(accessTokenCookie);
-                accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
             }
         } else {
             returnResponse = "No User Found";
@@ -1258,6 +1306,23 @@ public class ForceCIController {
 
     }
 
+    @RequestMapping(value = "/api/fetchAllLinkedServices", method = RequestMethod.GET)
+    public String fetchAllLinkedServices(@RequestParam String userEmail, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+        Gson gson = new Gson();
+        List<LinkedServices> linkedServices = null;
+        try {
+            Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(userEmail);
+            if (byEmailId != null) {
+                linkedServices = byEmailId.getLinkedServices();
+            }
+            return gson.toJson(linkedServices);
+        } catch (Exception e) {
+            return gson.toJson("Error");
+        }
+
+    }
+
     private class FinalResult {
 
         private String gitRepositoryFromQuery;
@@ -1278,58 +1343,6 @@ public class ForceCIController {
         public void setRepositoryWrappers(List<RepositoryWrapper> repositoryWrappers) {
             this.repositoryWrappers = repositoryWrappers;
         }
-    }
-
-    public static String encodeURIComponent(String s) {
-        String result = null;
-
-        try {
-            result = URLEncoder.encode(s, StandardCharsets.UTF_8.name())
-                    .replaceAll("\\+", "%20")
-                    .replaceAll("\\%21", "!")
-                    .replaceAll("\\%27", "'")
-                    .replaceAll("\\%28", "(")
-                    .replaceAll("\\%29", ")")
-                    .replaceAll("\\%7E", "~");
-        }
-
-        // This exception should never occur.
-        catch (UnsupportedEncodingException e) {
-            result = s;
-        }
-
-        return result;
-    }
-
-    @RequestMapping(value = "/api/fetchAllLinkedServices", method = RequestMethod.GET)
-    public String fetchAllLinkedServices(@RequestParam String userEmail, HttpServletResponse response, HttpServletRequest
-            request) throws IOException {
-        Gson gson = new Gson();
-        List<LinkedServices> linkedServices = null;
-        try {
-            Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(userEmail);
-            if (byEmailId != null) {
-                linkedServices = byEmailId.getLinkedServices();
-            }
-            return gson.toJson(linkedServices);
-        } catch (Exception e) {
-            return gson.toJson("Error");
-        }
-
-    }
-
-    private static String getClientIp(HttpServletRequest request) {
-
-        String remoteAddr = "";
-
-        if (request != null) {
-            remoteAddr = request.getHeader("X-FORWARDED-FOR");
-            if (remoteAddr == null || "".equals(remoteAddr)) {
-                remoteAddr = request.getRemoteAddr();
-            }
-        }
-
-        return remoteAddr;
     }
 
 }

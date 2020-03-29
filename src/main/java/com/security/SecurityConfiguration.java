@@ -19,7 +19,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled=true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final RequestMatcher PROTECTED_URLS = new OrRequestMatcher(
@@ -30,7 +30,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     public SecurityConfiguration(final AuthenticationProvider authenticationProvider) {
         super();
-        this.provider=authenticationProvider;
+        this.provider = authenticationProvider;
     }
 
     @Override

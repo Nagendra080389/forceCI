@@ -1,10 +1,10 @@
 package com.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Connect2DeployUser implements Serializable {
@@ -14,18 +14,11 @@ public class Connect2DeployUser implements Serializable {
     private String password;
     private String firstName;
     private String lastName;
-    private String token;
     private boolean isEnabled;
     private boolean boolEmailVerified;
     private List<LinkedServices> linkedServices;
+    private Map<String, String> mapIpAddressAndToken;
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
 
     public String getId() {
         return id;
@@ -91,21 +84,32 @@ public class Connect2DeployUser implements Serializable {
         this.linkedServices = linkedServices;
     }
 
+    public Map<String, String> getMapIpAddressAndToken() {
+        return mapIpAddressAndToken;
+    }
+
+    public void setMapIpAddressAndToken(Map<String, String> mapIpAddressAndToken) {
+        this.mapIpAddressAndToken = mapIpAddressAndToken;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Connect2DeployUser that = (Connect2DeployUser) o;
         return isEnabled == that.isEnabled &&
-                id.equals(that.id) &&
-                emailId.equals(that.emailId) &&
-                password.equals(that.password) &&
-                firstName.equals(that.firstName) &&
-                Objects.equals(lastName, that.lastName);
+                boolEmailVerified == that.boolEmailVerified &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(emailId, that.emailId) &&
+                Objects.equals(password, that.password) &&
+                Objects.equals(firstName, that.firstName) &&
+                Objects.equals(lastName, that.lastName) &&
+                Objects.equals(linkedServices, that.linkedServices) &&
+                Objects.equals(mapIpAddressAndToken, that.mapIpAddressAndToken);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, emailId, password, firstName, lastName, isEnabled);
+        return Objects.hash(id, emailId, password, firstName, lastName, isEnabled, boolEmailVerified, linkedServices, mapIpAddressAndToken);
     }
 }
