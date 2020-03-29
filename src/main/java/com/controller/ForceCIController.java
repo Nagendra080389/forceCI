@@ -1071,6 +1071,7 @@ public class ForceCIController {
             request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
 
         String clientIp = getClientIp(request);
+        clientIp = clientIp.replaceAll("\\.", "#");
         logger.info("getClientIp(request) -> " + clientIp);
         Gson gson = new Gson();
         String returnResponse = null;
