@@ -138,7 +138,7 @@ public class ForceCIController {
         accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
         Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
         Map<String, String> mapLinkedServiceAndAccessToken = new HashMap<>();
-        if(byToken.isPresent()){
+        if (byToken.isPresent()) {
             Connect2DeployUser connect2DeployUser = byToken.get();
             for (LinkedServices linkedService : connect2DeployUser.getLinkedServices()) {
                 mapLinkedServiceAndAccessToken.put(linkedService.getName(), linkedService.getAccessToken());
@@ -179,8 +179,8 @@ public class ForceCIController {
             if (!ObjectUtils.isEmpty(deploymentJob)) {
                 deploymentJob.setBoolIsJobCancelled(true);
                 DeploymentJob cancelledJob = deploymentJobMongoRepository.save(deploymentJob);
-                System.out.println("cancelledJob -> "+cancelledJob.getId());
-                if(StringUtils.hasText(cancelledJob.getSfdcAsyncJobId())) {
+                System.out.println("cancelledJob -> " + cancelledJob.getId());
+                if (StringUtils.hasText(cancelledJob.getSfdcAsyncJobId())) {
                     GithubStatusObject githubStatusObject = new GithubStatusObject(ERROR, BUILD_IS_ERROR, deploymentJob.getTargetBranch() + VALIDATION,
                             CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
                     createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
@@ -305,12 +305,12 @@ public class ForceCIController {
         HttpClient httpClient = new HttpClient();
 
         Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
-        if(byUui.isPresent()){
+        if (byUui.isPresent()) {
             ConnectionDetails connectionDetails = byUui.get();
             SwingUtilities.invokeLater(() -> connectionDetailsMongoRepository.delete(connectionDetails));
             Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
-            logger.info("byEmailId -> Github -> "+byEmailId.getEmailId());
-            if(!ObjectUtils.isEmpty(byEmailId)){
+            logger.info("byEmailId -> Github -> " + byEmailId.getEmailId());
+            if (!ObjectUtils.isEmpty(byEmailId)) {
                 PostMethod post = new PostMethod(environment);
                 post.setRequestHeader("Accept", MediaType.APPLICATION_JSON);
                 post.addParameter("code", code);
@@ -320,7 +320,7 @@ public class ForceCIController {
                 post.addParameter("state", state);
 
                 int i = httpClient.executeMethod(post);
-                logger.info("byEmailId -> Github status -> "+i);
+                logger.info("byEmailId -> Github status -> " + i);
                 String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
 
                 String accessToken = null;
@@ -330,8 +330,8 @@ public class ForceCIController {
                 try {
                     accessToken = jsonObject.get("access_token").getAsString();
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
-                        logger.info("byEmailId -> Github status linkedService -> "+linkedService.getName());
-                        if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)){
+                        logger.info("byEmailId -> Github status linkedService -> " + linkedService.getName());
+                        if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
                             linkedService.setConnected(true);
                             linkedService.setServerURL(connectionDetails.getServerURL());
                             linkedService.setAccessToken(accessToken);
@@ -341,8 +341,8 @@ public class ForceCIController {
                     }
 
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
-                        logger.info("byEmailId -> Github status getUserName -> "+linkedService.getUserName());
-                        logger.info("byEmailId -> Github status getAccessToken -> "+linkedService.getAccessToken());
+                        logger.info("byEmailId -> Github status getUserName -> " + linkedService.getUserName());
+                        logger.info("byEmailId -> Github status getAccessToken -> " + linkedService.getAccessToken());
 
                     }
                     SwingUtilities.invokeLater(() -> connect2DeployUserMongoRepository.save(byEmailId));
@@ -355,26 +355,26 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/api/initiateGitHubEnterpriseFlow", method = RequestMethod.POST)
-    public String initiateGitHubEnterpriseFlow(@RequestBody ConnectionDetails connectionDetails){
+    public String initiateGitHubEnterpriseFlow(@RequestBody ConnectionDetails connectionDetails) {
         Gson gson = new Gson();
         String oauthUrl;
         String randomString = String.valueOf(UUID.randomUUID());
         connectionDetails.setUui(randomString);
         connectionDetails.setRequestFrom("/apps/dashboard/createApp");
         connectionDetailsMongoRepository.save(connectionDetails);
-        oauthUrl = connectionDetails.getServerURL() + "/login/oauth/authorize?scope=repo,user:email&client_id="+ connectionDetails.getClientId()+
-                "&redirect_uri="+gitHubEnterpriseRedirectURI+"?connectionId="+ connectionDetails.getUui()+"&state="+randomString;
+        oauthUrl = connectionDetails.getServerURL() + "/login/oauth/authorize?scope=repo,user:email&client_id=" + connectionDetails.getClientId() +
+                "&redirect_uri=" + gitHubEnterpriseRedirectURI + "?connectionId=" + connectionDetails.getUui() + "&state=" + randomString;
 
-        logger.info("randomString -> "+randomString);
+        logger.info("randomString -> " + randomString);
         return gson.toJson(oauthUrl);
     }
 
     @RequestMapping(value = "/api/fetchAccessTokens", method = RequestMethod.GET)
-    public String fetchAccessTokens(@RequestParam String userEmail){
+    public String fetchAccessTokens(@RequestParam String userEmail) {
         Gson gson = new Gson();
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(userEmail);
         Map<String, String> mapAppAndAccessToken = new HashMap<>();
-        if(!ObjectUtils.isEmpty(byEmailId)){
+        if (!ObjectUtils.isEmpty(byEmailId)) {
             for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
                 mapAppAndAccessToken.put(linkedService.getName(), linkedService.getAccessToken());
             }
@@ -383,7 +383,7 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/api/initiateGitHubFlow", method = RequestMethod.GET)
-    public String initiateGitHubFlow(@RequestParam String userEmail){
+    public String initiateGitHubFlow(@RequestParam String userEmail) {
         Gson gson = new Gson();
         String oauthUrl;
         String randomString = String.valueOf(UUID.randomUUID());
@@ -392,10 +392,10 @@ public class ForceCIController {
         connectionDetails.setUserName(userEmail);
         connectionDetails.setRequestFrom("/apps/dashboard/createApp");
         connectionDetailsMongoRepository.save(connectionDetails);
-        oauthUrl = "https://github.com/login/oauth/authorize?scope=repo,user:email&client_id="+ githubClientId+
-                "&redirect_uri="+gitHubRedirectURI+"?connectionId="+ randomString+"&state="+randomString;
+        oauthUrl = "https://github.com/login/oauth/authorize?scope=repo,user:email&client_id=" + githubClientId +
+                "&redirect_uri=" + gitHubRedirectURI + "?connectionId=" + randomString + "&state=" + randomString;
 
-        logger.info("randomString -> "+randomString);
+        logger.info("randomString -> " + randomString);
         return gson.toJson(oauthUrl);
     }
 
@@ -404,7 +404,7 @@ public class ForceCIController {
             request) throws Exception {
         Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        if(byUui.isPresent()){
+        if (byUui.isPresent()) {
             ConnectionDetails connectionDetails = byUui.get();
             connectionDetailsMongoRepository.delete(connectionDetails);
             String environment = connectionDetails.getServerURL() + "/login/oauth/access_token";
@@ -429,10 +429,10 @@ public class ForceCIController {
             try {
                 accessToken = jsonObject.get("access_token").getAsString();
                 Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
-                if(!ObjectUtils.isEmpty(byEmailId)){
+                if (!ObjectUtils.isEmpty(byEmailId)) {
                     for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
-                        logger.info("Enterprise -> "+linkedService.getName());
-                        if(linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
+                        logger.info("Enterprise -> " + linkedService.getName());
+                        if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
                             linkedService.setConnected(true);
                             linkedService.setServerURL(connectionDetails.getServerURL());
                             linkedService.setAccessToken(accessToken);
@@ -533,7 +533,8 @@ public class ForceCIController {
                                  HttpServletRequest request) throws IOException {
         Gson gson = new Gson();
         String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
         GitHub gitHub = GitHub.connectUsingOAuth(linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB));
         GHRepository repository = gitHub.getRepositoryById(strRepoId);
@@ -552,7 +553,8 @@ public class ForceCIController {
                                HttpServletRequest request) throws IOException {
         Gson gson = new Gson();
         String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
         String access_token = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         GitHub gitHub = GitHub.connectUsingOAuth(access_token);
@@ -596,7 +598,8 @@ public class ForceCIController {
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
         String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
         String access_token = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         String emailId = null;
@@ -658,7 +661,7 @@ public class ForceCIController {
         String accessToken = org.apache.commons.lang3.StringUtils.isNotEmpty(request.getHeader(AUTHORIZATION)) ? request.getHeader(AUTHORIZATION) : "";
         accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
         Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
-        if(byToken.isPresent()){
+        if (byToken.isPresent()) {
             Connect2DeployUser connect2DeployUser = byToken.get();
             List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
             for (LinkedServices linkedServiceFromDB : connect2DeployUser.getLinkedServices()) {
@@ -696,15 +699,15 @@ public class ForceCIController {
         accessToken = linkedService.getAccessToken();
         serverURL = linkedService.getServerURL();
         GetMethod getUserMethod = null;
-        if(StringUtils.hasText(serverURL)){
+        if (StringUtils.hasText(serverURL)) {
             getUserMethod = new GetMethod(serverURL + GITHUB_GHE_API + "/user");
-        }else {
+        } else {
             getUserMethod = new GetMethod(GITHUB_API + "/user");
         }
         getUserMethod.setRequestHeader("Authorization", "token " + accessToken);
         HttpClient httpClient = new HttpClient();
         int intStatusOk = httpClient.executeMethod(getUserMethod);
-        logger.info("intStatusOk for -> "+serverURL + " -> "+intStatusOk);
+        logger.info("intStatusOk for -> " + serverURL + " -> " + intStatusOk);
         if (intStatusOk == HTTP_STATUS_OK) {
             GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
             linkedService.setUserName(gitRepositoryUser.getLogin());
@@ -721,10 +724,10 @@ public class ForceCIController {
         String accessToken = org.apache.commons.lang3.StringUtils.isNotEmpty(request.getHeader(AUTHORIZATION)) ? request.getHeader(AUTHORIZATION) : "";
         accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
         Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
-        if(byToken.isPresent()){
+        if (byToken.isPresent()) {
             Connect2DeployUser connect2DeployUser = byToken.get();
             for (LinkedServices linkedService : connect2DeployUser.getLinkedServices()) {
-                if (appName.equalsIgnoreCase(linkedService.getName())){
+                if (appName.equalsIgnoreCase(linkedService.getName())) {
                     accessToken = linkedService.getAccessToken();
                     repoUser = linkedService.getUserName();
                     gitHubURL = linkedService.getServerURL();
@@ -733,12 +736,12 @@ public class ForceCIController {
             }
         }
         FinalResult finalResult = new FinalResult();
-        String queryParam = "fork:true user:"+repoUser+" "+repoName;
-        if(appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
+        String queryParam = "fork:true user:" + repoUser + " " + repoName;
+        if (appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
             GitHub gitHub = GitHub.connectToEnterpriseWithOAuth(gitHubURL + GITHUB_GHE_API, repoUser, accessToken);
             extractItemAndConvertToFinalResult(gson, repoUser, finalResult, queryParam, gitHub);
-        } else if(appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
-            GitHub gitHub = GitHub.connectUsingOAuth( accessToken);
+        } else if (appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
+            GitHub gitHub = GitHub.connectUsingOAuth(accessToken);
             extractItemAndConvertToFinalResult(gson, repoUser, finalResult, queryParam, gitHub);
         }
 
@@ -797,7 +800,8 @@ public class ForceCIController {
         int status = 0;
 
         String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
         String accessToken = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         if (accessToken != null) {
@@ -835,7 +839,8 @@ public class ForceCIController {
         String returnResponse = null;
 
         String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Type type = new TypeToken<Map<String, String>>() {
+        }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
         String accessToken = linkedServiceAndAccessTokenMap.get(LinkedServicesUtil.GIT_HUB);
         if (accessToken != null) {
@@ -857,8 +862,8 @@ public class ForceCIController {
             createWebHook.setRequestBody(gson.toJson(createWebhookPayload));
             HttpClient httpClient = new HttpClient();
             int status = httpClient.executeMethod(createWebHook);
-            logger.info("status -> Create webhook -> "+status);
-            logger.info("status -> Create webhook response -> "+createWebHook.getResponseBodyAsString());
+            logger.info("status -> Create webhook -> " + status);
+            logger.info("status -> Create webhook response -> " + createWebHook.getResponseBodyAsString());
             if (LIST_VALID_RESPONSE_CODES.contains(status)) {
                 WebHook webHookResponse = gson.fromJson(IOUtils.toString(createWebHook.getResponseBodyAsStream(), StandardCharsets.UTF_8), WebHook.class);
                 GitHub gitHub = GitHub.connectUsingOAuth(accessToken);
@@ -900,9 +905,9 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(userEntity.getEmailId());
-        if(existingUser != null && existingUser.isBoolEmailVerified()){
+        if (existingUser != null && existingUser.isBoolEmailVerified()) {
             returnResponse = "User Already Exists";
-        } else if(existingUser != null && !existingUser.isBoolEmailVerified()){
+        } else if (existingUser != null && !existingUser.isBoolEmailVerified()) {
             connect2DeployUserMongoRepository.delete(existingUser);
             returnResponse = createNewUserAndReturnMessage(userEntity);
         } else {
@@ -937,8 +942,8 @@ public class ForceCIController {
         sendGridRequest.setEndpoint("mail/send");
         sendGridRequest.setBody(mail.build());
         Response sendGridResponse = sg.api(sendGridRequest);
-        logger.info("Email Sent -> "+sendGridResponse.getStatusCode());
-        logger.info("Email Sent for user -> "+userEntity.getEmailId());
+        logger.info("Email Sent -> " + sendGridResponse.getStatusCode());
+        logger.info("Email Sent for user -> " + userEntity.getEmailId());
         returnResponse = "Success";
         return returnResponse;
     }
@@ -1007,9 +1012,9 @@ public class ForceCIController {
         Connect2DeployToken byConfirmationToken = connect2DeployTokenMongoRepository.findByConfirmationToken(token);
         if (byConfirmationToken != null) {
             Optional<Connect2DeployUser> userFromDB = connect2DeployUserMongoRepository.findById(byConfirmationToken.getUserId());
-            if(userFromDB.isPresent()){
+            if (userFromDB.isPresent()) {
                 Connect2DeployUser connect2DeployUser = userFromDB.get();
-                if(!connect2DeployUser.isBoolEmailVerified()) {
+                if (!connect2DeployUser.isBoolEmailVerified()) {
                     connect2DeployUser.setBoolEmailVerified(true);
                     connect2DeployUserMongoRepository.save(connect2DeployUser);
                     returnResponse = "Email Verified";
@@ -1027,11 +1032,12 @@ public class ForceCIController {
     public String loginController(@RequestBody Connect2DeployUser connect2DeployUser, HttpServletResponse response, HttpServletRequest
             request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
 
+        logger.info("getClientIp(request) -> " + getClientIp(request));
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser.getEmailId());
-        if(byEmailId != null && CryptoPassword.validatePassword(connect2DeployUser.getPassword() , byEmailId.getPassword())){
-            if(!byEmailId.isBoolEmailVerified()){
+        if (byEmailId != null && CryptoPassword.validatePassword(connect2DeployUser.getPassword(), byEmailId.getPassword())) {
+            if (!byEmailId.isBoolEmailVerified()) {
                 returnResponse = "Email Not Verified";
             } else {
                 String token = UUID.randomUUID().toString();
@@ -1302,7 +1308,7 @@ public class ForceCIController {
         List<LinkedServices> linkedServices = null;
         try {
             Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(userEmail);
-            if(byEmailId != null){
+            if (byEmailId != null) {
                 linkedServices = byEmailId.getLinkedServices();
             }
             return gson.toJson(linkedServices);
@@ -1310,6 +1316,20 @@ public class ForceCIController {
             return gson.toJson("Error");
         }
 
+    }
+
+    private static String getClientIp(HttpServletRequest request) {
+
+        String remoteAddr = "";
+
+        if (request != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
+        }
+
+        return remoteAddr;
     }
 
 }
