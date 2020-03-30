@@ -797,7 +797,7 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     timeout: 5000,
                     icon: 'fa fa-chrome',
                     title: 'OK',
-                    message: 'Disconnected successfully'
+                    message: response.data
                 });
             }, function (error) {
                 iziToast.error({

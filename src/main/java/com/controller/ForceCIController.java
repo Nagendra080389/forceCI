@@ -390,11 +390,7 @@ public class ForceCIController {
                         }
                     }
 
-                    for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
-                        logger.info("byEmailId -> Github status getUserName -> " + linkedService.getUserName());
-                        logger.info("byEmailId -> Github status getAccessToken -> " + linkedService.getAccessToken());
 
-                    }
                     SwingUtilities.invokeLater(() -> connect2DeployUserMongoRepository.save(byEmailId));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -772,6 +768,7 @@ public class ForceCIController {
             GitRepositoryUser gitRepositoryUser = gson.fromJson(IOUtils.toString(getUserMethod.getResponseBodyAsStream(), StandardCharsets.UTF_8), GitRepositoryUser.class);
             linkedService.setUserName(gitRepositoryUser.getLogin());
             linkedService.setUserEmail(gitRepositoryUser.getEmail());
+            linkedServicesMongoRepository.save(linkedService);
         }
     }
 
@@ -982,7 +979,7 @@ public class ForceCIController {
         userEntity.setEnabled(true);
         userEntity.setBoolEmailVerified(false);
         userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
-        List<LinkedServices> linkedServices = LinkedServicesUtil.createLinkedServices();
+        List<LinkedServices> linkedServices = LinkedServicesUtil.createLinkedServices(linkedServicesMongoRepository);
         userEntity.setLinkedServices(linkedServices);
         userEntity = connect2DeployUserMongoRepository.save(userEntity);
         Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
