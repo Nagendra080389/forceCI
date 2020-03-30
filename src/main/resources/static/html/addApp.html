@@ -148,7 +148,7 @@
                             <td>{{eachService.userName}}</td>
                             <td>
                                 <div ng-show="eachService.connected === true" style="color: #b73b2b">
-                                    <i aria-hidden="true" class="fa fa-trash trashIcon" ng-click="disconnectGit(eachService.name, $event)" style="cursor: pointer"></i>
+                                    <i aria-hidden="true" class="fa fa-trash trashIcon" ng-click="disconnectGit(eachService.name, eachService.id)" style="cursor: pointer"></i>
                                 </div>
                                 <div ng-click="connectGit(eachService.name, $event)"
                                      ng-show="eachService.connected === false" style="color: #337ab7; cursor: pointer">

@@ -791,8 +791,22 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
         }
     };
 
-    $scope.disconnectGit = function (gitName) {
-
+    $scope.disconnectGit = function (linkedServiceName, linkedServiceId) {
+        $http.get("/api/deleteLinkedService?linkedServiceName=" + linkedServiceName + "&linkedServiceId=" + linkedServiceId).then(function (response) {
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'Disconnected successfully'
+                });
+            }, function (error) {
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Issue in disconnection ! ' + error.data.message,
+                    position: 'topRight'
+                });
+            }
+        );
     };
 
     $scope.logoutFunction = function () {

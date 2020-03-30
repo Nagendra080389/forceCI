@@ -419,6 +419,26 @@ public class ForceCIController {
         return gson.toJson(oauthUrl);
     }
 
+    @RequestMapping(value = "/api/deleteLinkedService", method = RequestMethod.GET)
+    public String deleteLinkedService(@RequestParam String linkedServiceName, @RequestParam String linkedServiceId) {
+        Gson gson = new Gson();
+        String strSuccess = "Success";
+        Optional<LinkedServices> linkedServiceFromDB = linkedServicesMongoRepository.findById(linkedServiceId);
+        if(linkedServiceFromDB.isPresent()){
+            LinkedServices linkedServices = linkedServiceFromDB.get();
+            linkedServices.setActions("+ Connect to " + linkedServiceName);
+            linkedServices.setConnected(false);
+            linkedServices.setName(linkedServiceName);
+            linkedServices.setUserName("Not Connected");
+            linkedServices.setAccessToken(org.apache.commons.lang3.StringUtils.EMPTY);
+            linkedServices.setUserEmail(org.apache.commons.lang3.StringUtils.EMPTY);
+            linkedServicesMongoRepository.save(linkedServices);
+        } else {
+            strSuccess = "No Linked Services Found.";
+        }
+        return gson.toJson(strSuccess);
+    }
+
     @RequestMapping(value = "/api/fetchAccessTokens", method = RequestMethod.GET)
     public String fetchAccessTokens(@RequestParam String userEmail) {
         Gson gson = new Gson();
