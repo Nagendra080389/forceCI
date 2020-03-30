@@ -15,7 +15,12 @@ public class LinkedServices implements Serializable {
     private String serverURL;
     private String actions;
     private String accessToken;
+    private String connect2DeployUser;
     private boolean connected;
+
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -47,6 +52,14 @@ public class LinkedServices implements Serializable {
 
     public void setServerURL(String serverURL) {
         this.serverURL = serverURL;
+    }
+
+    public String getConnect2DeployUser() {
+        return connect2DeployUser;
+    }
+
+    public void setConnect2DeployUser(String connect2DeployUser) {
+        this.connect2DeployUser = connect2DeployUser;
     }
 
     public boolean isConnected() {
@@ -85,11 +98,12 @@ public class LinkedServices implements Serializable {
                 Objects.equals(userEmail, that.userEmail) &&
                 Objects.equals(serverURL, that.serverURL) &&
                 Objects.equals(actions, that.actions) &&
-                Objects.equals(accessToken, that.accessToken);
+                Objects.equals(accessToken, that.accessToken) &&
+                Objects.equals(connect2DeployUser, that.connect2DeployUser);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, userName, userEmail, serverURL, connected, actions, accessToken);
+        return Objects.hash(id, name, userName, userEmail, serverURL, actions, accessToken, connect2DeployUser, connected);
     }
 }

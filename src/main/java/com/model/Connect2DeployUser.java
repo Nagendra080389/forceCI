@@ -2,16 +2,15 @@ package com.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class Connect2DeployUser implements Serializable {
     @Id
     private String id;
+    @Indexed
     private String emailId;
     private String password;
     private String firstName;
@@ -20,7 +19,7 @@ public class Connect2DeployUser implements Serializable {
     private Date tokenExpirationTime;
     private boolean isEnabled;
     private boolean boolEmailVerified;
-    private List<LinkedServices> linkedServices;
+    private Set<String> linkedServices;
 
     public String getToken() {
         return token;
@@ -86,11 +85,11 @@ public class Connect2DeployUser implements Serializable {
         this.boolEmailVerified = boolEmailVerified;
     }
 
-    public List<LinkedServices> getLinkedServices() {
+    public Set<String> getLinkedServices() {
         return linkedServices;
     }
 
-    public void setLinkedServices(List<LinkedServices> linkedServices) {
+    public void setLinkedServices(Set<String> linkedServices) {
         this.linkedServices = linkedServices;
     }
 

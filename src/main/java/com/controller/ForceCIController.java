@@ -138,7 +138,7 @@ public class ForceCIController {
                 " is " + jsonObject.get("deployment_status").getAsJsonObject().get("state").getAsString());
     }
 
-    private static String fetchCookies(HttpServletRequest request, Connect2DeployUserMongoRepository connect2DeployUserMongoRepository) {
+    private static String fetchCookies(HttpServletRequest request, Connect2DeployUserMongoRepository connect2DeployUserMongoRepository, LinkedServicesMongoRepository linkedServicesMongoRepository) {
         Gson gson = new Gson();
         String accessToken = org.apache.commons.lang3.StringUtils.isNotEmpty(request.getHeader(AUTHORIZATION)) ? request.getHeader(AUTHORIZATION) : "";
         accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
@@ -146,7 +146,8 @@ public class ForceCIController {
         Map<String, String> mapLinkedServiceAndAccessToken = new HashMap<>();
         if (byToken.isPresent()) {
             Connect2DeployUser connect2DeployUser = byToken.get();
-            for (LinkedServices linkedService : connect2DeployUser.getLinkedServices()) {
+            Iterable<LinkedServices> allById = linkedServicesMongoRepository.findAllById(connect2DeployUser.getLinkedServices());
+            for (LinkedServices linkedService : allById) {
                 mapLinkedServiceAndAccessToken.put(linkedService.getName(), linkedService.getAccessToken());
             }
 
@@ -379,14 +380,18 @@ public class ForceCIController {
                 JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
                 try {
                     accessToken = jsonObject.get("access_token").getAsString();
-                    for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
-                        logger.info("byEmailId -> Github status linkedService -> " + linkedService.getName());
-                        if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
-                            linkedService.setConnected(true);
-                            linkedService.setServerURL(connectionDetails.getServerURL());
-                            linkedService.setAccessToken(accessToken);
-                            fetchUserName(linkedService);
-                            break;
+                    for (String linkedServiceId : byEmailId.getLinkedServices()) {
+                        Optional<LinkedServices> linkedServicesById = linkedServicesMongoRepository.findById(linkedServiceId);
+                        if(linkedServicesById.isPresent()) {
+                            LinkedServices linkedService =  linkedServicesById.get();
+                            logger.info("byEmailId -> Github status linkedService -> " + linkedService.getName());
+                            if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
+                                linkedService.setConnected(true);
+                                linkedService.setServerURL(connectionDetails.getServerURL());
+                                linkedService.setAccessToken(accessToken);
+                                fetchUserName(linkedService);
+                                break;
+                            }
                         }
                     }
 
@@ -420,7 +425,7 @@ public class ForceCIController {
         Gson gson = new Gson();
         String strSuccess = "Success";
         Optional<LinkedServices> linkedServiceFromDB = linkedServicesMongoRepository.findById(linkedServiceId);
-        if(linkedServiceFromDB.isPresent()){
+        if (linkedServiceFromDB.isPresent()) {
             LinkedServices linkedServices = linkedServiceFromDB.get();
             linkedServices.setActions("+ Connect to " + linkedServiceName);
             linkedServices.setConnected(false);
@@ -429,6 +434,8 @@ public class ForceCIController {
             linkedServices.setAccessToken(org.apache.commons.lang3.StringUtils.EMPTY);
             linkedServices.setUserEmail(org.apache.commons.lang3.StringUtils.EMPTY);
             linkedServicesMongoRepository.save(linkedServices);
+
+
         } else {
             strSuccess = "No Linked Services Found.";
         }
@@ -441,8 +448,12 @@ public class ForceCIController {
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(userEmail);
         Map<String, String> mapAppAndAccessToken = new HashMap<>();
         if (!ObjectUtils.isEmpty(byEmailId)) {
-            for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
-                mapAppAndAccessToken.put(linkedService.getName(), linkedService.getAccessToken());
+            for (String linkedServiceId : byEmailId.getLinkedServices()) {
+                Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
+                if(linkedServices.isPresent()){
+                    LinkedServices eachLinkedServices = linkedServices.get();
+                    mapAppAndAccessToken.put(eachLinkedServices.getName(), eachLinkedServices.getAccessToken());
+                }
             }
         }
         return gson.toJson(mapAppAndAccessToken);
@@ -496,14 +507,18 @@ public class ForceCIController {
                 accessToken = jsonObject.get("access_token").getAsString();
                 Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connectionDetails.getUserName());
                 if (!ObjectUtils.isEmpty(byEmailId)) {
-                    for (LinkedServices linkedService : byEmailId.getLinkedServices()) {
-                        logger.info("Enterprise -> " + linkedService.getName());
-                        if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
-                            linkedService.setConnected(true);
-                            linkedService.setServerURL(connectionDetails.getServerURL());
-                            linkedService.setAccessToken(accessToken);
-                            fetchUserName(linkedService);
-                            break;
+                    for (String linkedServiceId : byEmailId.getLinkedServices()) {
+                        Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
+                        if(linkedServices.isPresent()) {
+                            LinkedServices linkedService = linkedServices.get();
+                            logger.info("Enterprise -> " + linkedService.getName());
+                            if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
+                                linkedService.setConnected(true);
+                                linkedService.setServerURL(connectionDetails.getServerURL());
+                                linkedService.setAccessToken(accessToken);
+                                fetchUserName(linkedService);
+                                break;
+                            }
                         }
                     }
                     SwingUtilities.invokeLater(() -> connect2DeployUserMongoRepository.save(byEmailId));
@@ -598,7 +613,7 @@ public class ForceCIController {
     public String getAllBranches(@RequestParam String strRepoId, HttpServletResponse response,
                                  HttpServletRequest request) throws IOException {
         Gson gson = new Gson();
-        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository, linkedServicesMongoRepository);
         Type type = new TypeToken<Map<String, String>>() {
         }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
@@ -618,7 +633,7 @@ public class ForceCIController {
                                HttpServletResponse response,
                                HttpServletRequest request) throws IOException {
         Gson gson = new Gson();
-        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository, linkedServicesMongoRepository);
         Type type = new TypeToken<Map<String, String>>() {
         }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
@@ -663,7 +678,7 @@ public class ForceCIController {
         }
 
         JsonObject jsonObject = gson.fromJson(payload, JsonElement.class).getAsJsonObject();
-        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository, linkedServicesMongoRepository);
         Type type = new TypeToken<Map<String, String>>() {
         }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
@@ -717,11 +732,17 @@ public class ForceCIController {
         String accessToken = org.apache.commons.lang3.StringUtils.isNotEmpty(request.getHeader(AUTHORIZATION)) ? request.getHeader(AUTHORIZATION) : "";
         accessToken = org.apache.commons.lang3.StringUtils.removeStart(accessToken, "Bearer").trim();
         Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
+        LinkedServices linkedServiceFromDB = null;
+        List<RepositoryWrapper> lstRepositoryWrapper = null;
         if (byToken.isPresent()) {
             Connect2DeployUser connect2DeployUser = byToken.get();
             List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
-            for (LinkedServices linkedServiceFromDB : connect2DeployUser.getLinkedServices()) {
-                List<RepositoryWrapper> lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(linkedServiceFromDB.getUserName());
+            for (String linkedServiceId : connect2DeployUser.getLinkedServices()) {
+                Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
+                if(linkedServices.isPresent()){
+                    linkedServiceFromDB = linkedServices.get();
+                    lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(linkedServiceFromDB.getUserName());
+                }
                 if (lstRepositoryWrapper != null && !lstRepositoryWrapper.isEmpty()) {
                     for (RepositoryWrapper repositoryWrapper : lstRepositoryWrapper) {
                         List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
@@ -783,11 +804,12 @@ public class ForceCIController {
         Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
         if (byToken.isPresent()) {
             Connect2DeployUser connect2DeployUser = byToken.get();
-            for (LinkedServices linkedService : connect2DeployUser.getLinkedServices()) {
-                if (appName.equalsIgnoreCase(linkedService.getName())) {
-                    accessToken = linkedService.getAccessToken();
-                    repoUser = linkedService.getUserName();
-                    gitHubURL = linkedService.getServerURL();
+            for (String linkedServiceId : connect2DeployUser.getLinkedServices()) {
+                Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
+                if (linkedServices.isPresent() && appName.equalsIgnoreCase(linkedServices.get().getName())) {
+                    accessToken = linkedServices.get().getAccessToken();
+                    repoUser = linkedServices.get().getUserName();
+                    gitHubURL = linkedServices.get().getServerURL();
                 }
                 break;
             }
@@ -856,7 +878,7 @@ public class ForceCIController {
         Gson gson = new Gson();
         int status = 0;
 
-        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository, linkedServicesMongoRepository);
         Type type = new TypeToken<Map<String, String>>() {
         }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
@@ -895,7 +917,7 @@ public class ForceCIController {
         Gson gson = new Gson();
         String returnResponse = null;
 
-        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository);
+        String fromCookies = fetchCookies(request, connect2DeployUserMongoRepository, linkedServicesMongoRepository);
         Type type = new TypeToken<Map<String, String>>() {
         }.getType();
         Map<String, String> linkedServiceAndAccessTokenMap = gson.fromJson(fromCookies, type);
@@ -979,7 +1001,7 @@ public class ForceCIController {
         userEntity.setEnabled(true);
         userEntity.setBoolEmailVerified(false);
         userEntity.setPassword(CryptoPassword.generateStrongPasswordHash(userEntity.getPassword()));
-        List<LinkedServices> linkedServices = LinkedServicesUtil.createLinkedServices(linkedServicesMongoRepository);
+        Set<String> linkedServices = LinkedServicesUtil.createLinkedServices(linkedServicesMongoRepository, userEntity);
         userEntity.setLinkedServices(linkedServices);
         userEntity = connect2DeployUserMongoRepository.save(userEntity);
         Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
@@ -1096,7 +1118,7 @@ public class ForceCIController {
                 returnResponse = "Email Not Verified";
             } else {
                 // This means the token has not expired
-                if(byEmailId.getTokenExpirationTime() != null && byEmailId.getTokenExpirationTime().after(new Date())){
+                if (byEmailId.getTokenExpirationTime() != null && byEmailId.getTokenExpirationTime().after(new Date())) {
                     Cookie accessTokenCookie = new Cookie("CONNECT2DEPLOY_TOKEN", byEmailId.getToken());
                     response.addCookie(accessTokenCookie);
                     accessTokenCookie.setMaxAge(-1); //cookie not persistent, destroyed on browser exit
@@ -1329,30 +1351,32 @@ public class ForceCIController {
     public String fetchAllLinkedServices(@RequestParam String userEmail, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
         Gson gson = new Gson();
-        List<LinkedServices> linkedServices = null;
+        Set<String> linkedServicesId = null;
+        List<LinkedServices> lstLinkedServices = null;
         try {
             Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(userEmail);
             if (byEmailId != null) {
-                linkedServices = byEmailId.getLinkedServices();
+                linkedServicesId = byEmailId.getLinkedServices();
+                lstLinkedServices = (List<LinkedServices>) linkedServicesMongoRepository.findAllById(linkedServicesId);
             }
-            return gson.toJson(linkedServices);
+            return gson.toJson(lstLinkedServices);
         } catch (Exception e) {
             return gson.toJson("Error");
         }
 
     }
 
-    public static Date cvtToGmt(Date date){
+    public static Date cvtToGmt(Date date) {
         TimeZone tz = TimeZone.getDefault();
-        Date ret = new Date( date.getTime() - tz.getRawOffset() );
+        Date ret = new Date(date.getTime() - tz.getRawOffset());
 
         // if we are now in DST, back off by the delta.  Note that we are checking the GMT date, this is the KEY.
-        if ( tz.inDaylightTime( ret )){
-            Date dstDate = new Date( ret.getTime() - tz.getDSTSavings() );
+        if (tz.inDaylightTime(ret)) {
+            Date dstDate = new Date(ret.getTime() - tz.getDSTSavings());
 
             // check to make sure we have not crossed back into standard time
             // this happens when we are on the cusp of DST (7pm the day before the change for PDT)
-            if ( tz.inDaylightTime( dstDate )){
+            if (tz.inDaylightTime(dstDate)) {
                 ret = dstDate;
             }
         }
