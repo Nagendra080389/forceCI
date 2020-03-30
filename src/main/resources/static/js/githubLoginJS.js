@@ -158,6 +158,8 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
 connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $location, $route, $routeParams) {
 
+    $scope.userName = localStorage.getItem('userEmail');
+    $scope.avatar_url = localStorage.avatar_url;
     $scope.appName = $routeParams.appName;
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
@@ -221,7 +223,11 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
             }
         );
     }
-})
+
+    $scope.logoutFunction = function () {
+        logoutFunctionCaller($location);
+    };
+});
 
 connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
@@ -884,6 +890,9 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
     $scope.branchName = $routeParams.branchConnectedTo;
 
+    $scope.logoutFunction = function () {
+        logoutFunctionCaller($location);
+    };
 
 });
 
