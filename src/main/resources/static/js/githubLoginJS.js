@@ -89,7 +89,7 @@ function logoutFunctionCaller($location) {
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog, $routeParams) {
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
-    let redirect_git = new URL(location.href).searchParams.get('redirect_git');
+    let redirect_git = new URL($location.absUrl()).searchParams.get('redirect_git');
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + cookie;
     if (redirect_git !== undefined && redirect_git !== null && redirect_git !== '' && redirect_git) {
         $http.get("/api/fetchAccessTokens?userEmail=" + localStorage.getItem('userEmail')).then(function (response) {
