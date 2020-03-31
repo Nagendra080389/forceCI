@@ -814,6 +814,10 @@ public class ForceCIController {
                 break;
             }
         }
+        logger.info("accessToken for -> " + accessToken);
+        logger.info("repoUser for -> " + repoUser);
+        logger.info("gitHubURL for -> " + gitHubURL);
+        logger.info("appName for -> " + appName);
         FinalResult finalResult = new FinalResult();
         String queryParam = "fork:true user:" + repoUser + " " + repoName;
         if (appName.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
