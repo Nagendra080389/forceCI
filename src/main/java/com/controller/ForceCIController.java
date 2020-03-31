@@ -402,7 +402,7 @@ public class ForceCIController {
                 }
             }
         }
-        httpResponse.sendRedirect("/index?redirect_git=true");
+        httpResponse.sendRedirect("/?redirect_git=true");
     }
 
     @RequestMapping(value = "/api/initiateGitHubEnterpriseFlow", method = RequestMethod.POST)
