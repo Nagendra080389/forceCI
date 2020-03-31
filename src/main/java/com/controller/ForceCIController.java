@@ -804,8 +804,11 @@ public class ForceCIController {
         Optional<Connect2DeployUser> byToken = connect2DeployUserMongoRepository.findByToken(accessToken);
         if (byToken.isPresent()) {
             Connect2DeployUser connect2DeployUser = byToken.get();
+            logger.info("connect2DeployUser -> "+gson.toJson(connect2DeployUser.getLinkedServices()));
             for (String linkedServiceId : connect2DeployUser.getLinkedServices()) {
+                logger.info("linkedServiceId -> "+gson.toJson(linkedServiceId));
                 Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
+                logger.info("linkedServices -> "+gson.toJson(linkedServices));
                 if (linkedServices.isPresent() && appName.equalsIgnoreCase(linkedServices.get().getName())) {
                     accessToken = linkedServices.get().getAccessToken();
                     repoUser = linkedServices.get().getUserName();
