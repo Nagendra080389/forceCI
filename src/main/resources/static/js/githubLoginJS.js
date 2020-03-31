@@ -231,9 +231,11 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
 
 connect2Deploy.controller('verifyEmailController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
+    $scope.strMessage = '';
     if ($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
         $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
             if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
+                $scope.strMessage = response.data;
                 if (response.data === 'Email Verified') {
                     iziToast.success({
                         timeout: 5000,
@@ -241,6 +243,7 @@ connect2Deploy.controller('verifyEmailController', function ($scope, $http, $loc
                         title: 'OK',
                         message: response.data
                     });
+                    $scope.boolIsSuccess = true;
                 } else if (response.data === 'Email Already Verified') {
                     iziToast.success({
                         timeout: 5000,
@@ -248,11 +251,10 @@ connect2Deploy.controller('verifyEmailController', function ($scope, $http, $loc
                         title: 'OK',
                         message: response.data
                     });
-                } else {
-                    $location.path("/index");
                 }
             }
         }, function (error) {
+            $scope.strMessage = error.data.message;
             iziToast.error({
                 title: 'Error',
                 message: error.data.message,
