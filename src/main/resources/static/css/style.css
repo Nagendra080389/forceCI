@@ -205,3 +205,10 @@ a.btn.btn-github.btn-user.btn-block {
 html {
     height: 100% !important;
 }
+
+.isHrefDisabled {
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.5;
+    text-decoration: none;
+}

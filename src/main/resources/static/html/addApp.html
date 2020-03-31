@@ -143,7 +143,7 @@
                         <tbody>
                         <tr dir-paginate="eachService in services|filter:search|itemsPerPage:10">
                             <td><a href="#!apps/dashboard/app/{{eachService.name}}" ng-show="eachService.connected === true">{{eachService.name}}</a>
-                                <a href="javascript:void(0);" ng-show="eachService.connected === false">{{eachService.name}}</a>
+                                <a href="javascript:void(0);" class="isHrefDisabled" ng-show="eachService.connected === false">{{eachService.name}}</a>
                             </td>
                             <td>{{eachService.userName}}</td>
                             <td>
