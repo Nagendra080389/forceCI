@@ -201,3 +201,7 @@ a.btn.btn-github.btn-user.btn-block {
         box-shadow: inset 0px 0px 0px 30px #7ac142;
     }
 }
+
+html {
+    height: 100% !important;
+}
