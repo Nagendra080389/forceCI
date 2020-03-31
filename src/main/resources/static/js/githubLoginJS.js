@@ -25,8 +25,8 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             templateUrl: './html/verificationEmailSent.html'
         })
         .when('/apps/dashboard/token/:token', {
-            templateUrl: './html/dashboard.html',
-            controller: 'dashBoardController',
+            templateUrl: './html/verificationEmailSuccess.html',
+            controller: 'verifyEmailController',
         })
         .when('/apps/register', {
             templateUrl: './html/register.html',
@@ -229,8 +229,41 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
     };
 });
 
-connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
+connect2Deploy.controller('verifyEmailController', function ($scope, $http, $location, $route, $routeParams) {
     $scope.connect2DeployToken = $routeParams.token;
+    if ($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
+        $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
+            if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
+                if (response.data === 'Email Verified') {
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: response.data
+                    });
+                } else if (response.data === 'Email Already Verified') {
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: response.data
+                    });
+                } else {
+                    $location.path("/index");
+                }
+            }
+        }, function (error) {
+            iziToast.error({
+                title: 'Error',
+                message: error.data.message,
+                position: 'topRight'
+            });
+        });
+    }
+});
+
+connect2Deploy.controller('dashBoardController', function ($scope, $http, $location, $route, $routeParams) {
+
     let cookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
@@ -240,36 +273,6 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
         if (!objResult) {
             $location.path("/index");
         }
-        if ($scope.connect2DeployToken !== undefined && $scope.connect2DeployToken !== null && $scope.connect2DeployToken !== '') {
-            $http.get("/validateToken?token=" + $scope.connect2DeployToken).then(function (response) {
-                if (response !== undefined && response !== null && response.data !== undefined && response.data !== null) {
-                    if (response.data === 'Email Verified') {
-                        iziToast.success({
-                            timeout: 5000,
-                            icon: 'fa fa-chrome',
-                            title: 'OK',
-                            message: response.data
-                        });
-                    } else if (response.data === 'Email Already Verified') {
-                        iziToast.success({
-                            timeout: 5000,
-                            icon: 'fa fa-chrome',
-                            title: 'OK',
-                            message: response.data
-                        });
-                    } else {
-                        $location.path("/index");
-                    }
-                }
-            }, function (error) {
-                iziToast.error({
-                    title: 'Error',
-                    message: error.data.message,
-                    position: 'topRight'
-                });
-            });
-        }
-
         $http.get("/api/fetchRepositoryInDB").then(function (response) {
             $scope.lstRepositoryData = [];
             if (response.data.length > 0) {
