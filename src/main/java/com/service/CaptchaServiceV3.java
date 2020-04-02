@@ -21,7 +21,10 @@ public class CaptchaServiceV3 extends AbstractCaptchaService {
         final URI verifyUri = URI.create(String.format(RECAPTCHA_URL_TEMPLATE, getReCaptchaSecret(), response, getClientIP()));
         try {
             final GoogleResponse googleResponse = restTemplate.getForObject(verifyUri, GoogleResponse.class);
-            LOGGER.debug("Google's response: {} ", googleResponse.toString());
+            LOGGER.info("Google's response: {}  -> " + googleResponse.toString());
+            LOGGER.info("captchaSettings's captchaSettings: {}  -> " + captchaSettings.getSecretV3());
+            LOGGER.info("captchaSettings's captchaSettings: {}  -> " + captchaSettings.getSite());
+
 
             if (!googleResponse.isSuccess() || !googleResponse.getAction().equals(action) || googleResponse.getScore() < captchaSettings.getThreshold()) {
                 if (googleResponse.hasClientError()) {
