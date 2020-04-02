@@ -1,5 +1,6 @@
 package com.model;
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -16,10 +17,20 @@ public class Connect2DeployUser implements Serializable {
     private String firstName;
     private String lastName;
     private String token;
+    @BsonIgnore
+    private String googleReCaptchaV3;
     private Date tokenExpirationTime;
     private boolean isEnabled;
     private boolean boolEmailVerified;
     private Set<String> linkedServices;
+
+    public String getGoogleReCaptchaV3() {
+        return googleReCaptchaV3;
+    }
+
+    public void setGoogleReCaptchaV3(String googleReCaptchaV3) {
+        this.googleReCaptchaV3 = googleReCaptchaV3;
+    }
 
     public String getToken() {
         return token;

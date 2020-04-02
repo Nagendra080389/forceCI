@@ -21,6 +21,8 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import com.service.CaptchaServiceV3;
+import com.service.ICaptchaService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.ApiSecurity;
@@ -113,10 +115,7 @@ public class ForceCIController {
     String hmacSecretKet;
     @Value("${salesforce.metadataEndpoint}")
     String salesforceMetaDataEndpoint;
-    @Value("${google.reCaptchaSite}")
-    String googlereCaptchaSite;
-    @Value("${google.reCaptchaSecret}")
-    String googlereCaptchaSecret;
+
     private Map<String, Map<String, RabbitMqConsumer>> consumerMap = new ConcurrentHashMap<>();
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
@@ -136,6 +135,8 @@ public class ForceCIController {
     private ConnectionDetailsMongoRepository connectionDetailsMongoRepository;
     @Autowired
     private LinkedServicesMongoRepository linkedServicesMongoRepository;
+    @Autowired
+    private ICaptchaService captchaServiceV3;
 
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
@@ -981,11 +982,11 @@ public class ForceCIController {
 
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String registerUser(@RequestBody Connect2DeployUser userEntity, @RequestParam(name="g-recaptcha-response") String recaptchaResponse,
-                               HttpServletResponse response, HttpServletRequest
-            request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public String registerUser(@RequestBody Connect2DeployUser userEntity, HttpServletResponse response, HttpServletRequest
+            request) throws Exception {
 
-        logger.info("recaptchaResponse -> "+recaptchaResponse);
+        captchaServiceV3.processResponse(userEntity.getGoogleReCaptchaV3(), CaptchaServiceV3.REGISTER_ACTION);
+        logger.info("recaptchaResponse -> "+userEntity.getGoogleReCaptchaV3());
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(userEntity.getEmailId());

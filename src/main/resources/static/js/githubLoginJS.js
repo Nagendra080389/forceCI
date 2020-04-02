@@ -920,7 +920,7 @@ connect2Deploy.controller('registerController', function ($scope, $http, $locati
         if (typeof grecaptcha !== 'undefined') {
             const siteKey = '6Lcr3uUUAAAAAPnCZdcC9qTt-GKFVl9U1fmpHHRt';
             grecaptcha.execute(siteKey).then(function (response) {
-                debugger;
+                userEntity.googleReCaptchaV3 = response;
                 if (userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
                     $http.post("/register", userEntity).then(function (response) {
                             $location.path("/apps/dashboard/success");
@@ -935,7 +935,7 @@ connect2Deploy.controller('registerController', function ($scope, $http, $locati
                 } else {
 
                 }
-            }).fail()
+            })
         }
     }
 });
