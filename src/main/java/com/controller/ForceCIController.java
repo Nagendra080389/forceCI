@@ -193,7 +193,6 @@ public class ForceCIController {
     private static String getClientIp(HttpServletRequest request) {
 
         String remoteAddr = "";
-
         if (request != null) {
             remoteAddr = request.getHeader("X-FORWARDED-FOR");
             if (remoteAddr == null || "".equals(remoteAddr)) {
@@ -979,6 +978,7 @@ public class ForceCIController {
 
         return returnResponse;
     }
+
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String registerUser(@RequestBody Connect2DeployUser userEntity, @RequestParam(name="g-recaptcha-response") String recaptchaResponse,

@@ -917,19 +917,25 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
 connect2Deploy.controller('registerController', function ($scope, $http, $location, $routeParams) {
     $scope.register = function (userEntity) {
-        if (userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
-            $http.post("/register", userEntity).then(function (response) {
-                    $location.path("/apps/dashboard/success");
-                }, function (error) {
-                    iziToast.error({
-                        title: 'Error',
-                        message: 'User Creation Failed. ' + error.data.message,
-                        position: 'topRight'
-                    });
-                }
-            );
-        } else {
+        if (typeof grecaptcha !== 'undefined') {
+            const siteKey = '6Lcr3uUUAAAAAPnCZdcC9qTt-GKFVl9U1fmpHHRt';
+            grecaptcha.execute(siteKey).then(function (response) {
+                debugger;
+                if (userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
+                    $http.post("/register", userEntity).then(function (response) {
+                            $location.path("/apps/dashboard/success");
+                        }, function (error) {
+                            iziToast.error({
+                                title: 'Error',
+                                message: 'User Creation Failed. ' + error.data.message,
+                                position: 'topRight'
+                            });
+                        }
+                    );
+                } else {
 
+                }
+            }).fail()
         }
     }
 });
