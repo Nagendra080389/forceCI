@@ -33,12 +33,12 @@ public abstract class AbstractCaptchaService implements ICaptchaService{
 
     @Override
     public String getReCaptchaSite() {
-        return captchaSettings.getSite();
+        return captchaSettings.getSiteV3();
     }
 
     @Override
     public String getReCaptchaSecret() {
-        return captchaSettings.getSecret();
+        return captchaSettings.getSecretV3();
     }
   
 
