@@ -113,6 +113,10 @@ public class ForceCIController {
     String hmacSecretKet;
     @Value("${salesforce.metadataEndpoint}")
     String salesforceMetaDataEndpoint;
+    @Value("${google.reCaptchaSite}")
+    String googlereCaptchaSite;
+    @Value("${google.reCaptchaSecret}")
+    String googlereCaptchaSecret;
     private Map<String, Map<String, RabbitMqConsumer>> consumerMap = new ConcurrentHashMap<>();
     @Autowired
     private RepositoryWrapperMongoRepository repositoryWrapperMongoRepository;
@@ -977,9 +981,11 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String registerUser(@RequestBody Connect2DeployUser userEntity, HttpServletResponse response, HttpServletRequest
+    public String registerUser(@RequestBody Connect2DeployUser userEntity, @RequestParam(name="g-recaptcha-response") String recaptchaResponse,
+                               HttpServletResponse response, HttpServletRequest
             request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
 
+        logger.info("recaptchaResponse -> "+recaptchaResponse);
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(userEntity.getEmailId());
