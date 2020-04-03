@@ -104,6 +104,27 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
             }
         }, function (error) {
             console.error(error);
+            if(error.data.message === 'Unauthorized'){
+                iziToast.show({
+                    color: 'dark',
+                    icon: 'fas fa-exclamation',
+                    title: 'Session Ended ! Logout and Login again.',
+                    position: 'center', // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter
+                    toastOnce: true,
+                    timeout: false,
+                    buttons: [
+                        [
+                            '<button>Ok</button>',
+                            function (instance, toast) {
+                                instance.hide({
+                                    transitionOut: 'fadeOutUp'
+                                }, toast);
+                                logoutFunctionCaller($location);
+                            }
+                        ]
+                    ]
+                });
+            }
         });
     } else {
         validateConnect2DeployToken(cookie, $http).then(function (objResult) {
