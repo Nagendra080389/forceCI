@@ -1115,14 +1115,15 @@ public class ForceCIController {
 
     @RequestMapping(value = "/loginConnect", method = RequestMethod.POST)
     public String loginController(@RequestBody Connect2DeployUser connect2DeployUser, HttpServletResponse response, HttpServletRequest
-            request) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+            request) throws Exception {
 
         Gson gson = new Gson();
         String returnResponse = null;
+        captchaServiceV3.processResponse(connect2DeployUser.getGoogleReCaptchaV3(), CaptchaServiceV3.REGISTER_ACTION);
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser.getEmailId());
         if (byEmailId != null && CryptoPassword.validatePassword(connect2DeployUser.getPassword(), byEmailId.getPassword())) {
             if (!byEmailId.isBoolEmailVerified()) {
-                returnResponse = "Email Not Verified";
+                throw new Exception("Email Not Verified");
             } else {
                 // This means the token has not expired
                 if (byEmailId.getTokenExpirationTime() != null && byEmailId.getTokenExpirationTime().after(new Date())) {
@@ -1145,7 +1146,7 @@ public class ForceCIController {
                 }
             }
         } else {
-            returnResponse = "No User Found";
+            throw new Exception("No User Found");
         }
         return gson.toJson(returnResponse);
     }

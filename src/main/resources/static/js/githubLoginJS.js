@@ -116,33 +116,26 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
     }
 
     $scope.login = function (userEntity) {
-        $http.post("/loginConnect", userEntity).then(function (response) {
-            if (response.data !== undefined && response.data !== null && response.data === 'No User Found') {
-                iziToast.error({
-                    title: 'Error',
-                    message: response.data,
-                    position: 'topRight'
-                });
-                $scope.user.emailId = '';
-                $scope.user.password = '';
-            } else if (response.data !== undefined && response.data !== null && response.data === 'Email Not Verified') {
-                iziToast.error({
-                    title: 'Error',
-                    message: response.data + '! Please verify your email and login try again.',
-                    position: 'topRight'
-                });
-            } else {
-                localStorage.setItem('userEmail', response.data);
-                $location.path("/apps/dashboard");
+        if (typeof grecaptcha !== 'undefined') {
+            if (userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
+                const siteKey = '6Lcr3uUUAAAAAPnCZdcC9qTt-GKFVl9U1fmpHHRt';
+                grecaptcha.execute(siteKey, {action: 'register'}).then(function (response) {
+                    userEntity.googleReCaptchaV3 = response;
+                    $http.post("/loginConnect", userEntity).then(function (response) {
+                        localStorage.setItem('userEmail', response.data);
+                        $location.path("/apps/dashboard");
+                    }, function (error) {
+                        $scope.user.emailId = '';
+                        $scope.user.password = '';
+                        iziToast.error({
+                            title: 'Error',
+                            message: 'Login Failed! ' + error.data.message,
+                            position: 'topRight'
+                        });
+                    })
+                })
             }
-        }, function (error) {
-            console.log(error);
-            iziToast.error({
-                title: 'Error',
-                message: 'SFDC connection failed, Please retry. ' + error.data.message,
-                position: 'topRight'
-            });
-        })
+        }
     };
     $scope.redirectJS = function () {
         window.open('https://github.com/login/oauth/authorize?client_id=0b5a2cb25fa55a0d2b76&redirect_uri=https://forceci.herokuapp.com/gitAuth&scope=repo,user:email&state=Mv4nodgDGEKInu6j2vYBTLoaIVNSXhb4NWuUE8V2', '_self');
