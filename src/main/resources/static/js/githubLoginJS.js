@@ -409,8 +409,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     let sfdcInstanceFromExternalPage;
     let sfdcRefreshTokenFromExternalPage;
 
-
-    window.addEventListener('message', function (objEvent) {
+    const eventListenerCallBack = function (objEvent) {
         if (objEvent !== undefined && objEvent !== null &&
             objEvent.data !== undefined && objEvent.data !== null &&
             objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null) {
@@ -445,7 +444,10 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         }
         $scope.$apply();
 
-    });
+    };
+
+    window.removeEventListener('message', eventListenerCallBack, false);
+    window.addEventListener('message', eventListenerCallBack, false);
 
 
     $http.get("/api/showSfdcConnectionDetails?gitRepoId=" + $scope.repoId).then(function (response) {
