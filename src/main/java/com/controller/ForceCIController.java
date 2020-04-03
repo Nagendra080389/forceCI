@@ -991,7 +991,7 @@ public class ForceCIController {
         String returnResponse = null;
         Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(userEntity.getEmailId());
         if (existingUser != null && existingUser.isBoolEmailVerified()) {
-            returnResponse = "User Already Exists";
+            throw new Exception("User Already Exists");
         } else if (existingUser != null && !existingUser.isBoolEmailVerified()) {
             connect2DeployUserMongoRepository.delete(existingUser);
             returnResponse = createNewUserAndReturnMessage(userEntity);
