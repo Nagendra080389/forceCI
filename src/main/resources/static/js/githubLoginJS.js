@@ -63,17 +63,6 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
 
 });
 
-function validateConnect2DeployToken(strToken, $http) {
-    return new Promise(function (resolve, reject) {
-        $http.get("/validateConnect2DeployToken?strToken=" + strToken).then(function (response) {
-            resolve(response.data);
-        }, function (error) {
-            reject(false);
-        })
-    });
-
-}
-
 function checkToken($location) {
     let accessToken = $.cookie("ACCESS_TOKEN");
     return accessToken !== undefined && accessToken !== null && accessToken !== '';
@@ -104,16 +93,9 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
             }
         }, function (error) {
             console.error(error);
-        });
-    } else {
-        validateConnect2DeployToken(cookie, $http).then(function (objResult) {
-            if (objResult) {
-                $location.path("/apps/dashboard");
-            } else {
-                $location.path("/index");
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
             }
-        }).catch(function (objError) {
-
         });
     }
 
@@ -194,7 +176,9 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
                 }
             }
         }, function (error) {
-
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
         });
     }
 
@@ -215,6 +199,9 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
                     message: 'Not able to create WebHook, Please retry.',
                     position: 'topRight'
                 });
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
             }
         );
     }
@@ -266,25 +253,17 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
-    validateConnect2DeployToken(cookie, $http).then(function (objResult) {
-        if (!objResult) {
-            $location.path("/index");
+    $http.get("/api/fetchRepositoryInDB").then(function (response) {
+        $scope.lstRepositoryData = [];
+        if (response.data.length > 0) {
+            for (let i = 0; i < response.data.length; i++) {
+                $scope.lstRepositoryData.push(response.data[i].repository);
+            }
         }
-        $http.get("/api/fetchRepositoryInDB").then(function (response) {
-            $scope.lstRepositoryData = [];
-            if (response.data.length > 0) {
-                for (let i = 0; i < response.data.length; i++) {
-                    $scope.lstRepositoryData.push(response.data[i].repository);
-                }
-            }
-        }, function (error) {
-            if(error.data.message === 'Unauthorized'){
-                $('#sessionExpiredModal').modal("show");
-            }
-        });
-
-    }).catch(function (objError) {
-
+    }, function (error) {
+        if (error.data.message === 'Unauthorized') {
+            $('#sessionExpiredModal').modal("show");
+        }
     });
     $scope.lstRepositoryData = [];
 
@@ -450,7 +429,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     };
 
-    if(!listenerAdded) {
+    if (!listenerAdded) {
         listenerAdded = true;
         window.addEventListener('message', eventListenerCallBack, false);
     }
@@ -460,12 +439,18 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         $scope.lstSFDCConnectionDetails = response.data;
     }, function (error) {
         console.log(error);
+        if (error.data.message === 'Unauthorized') {
+            $('#sessionExpiredModal').modal("show");
+        }
     });
 
     $http.get("/api/getAllBranches?strRepoId=" + $scope.repoId).then(function (response) {
         $scope.availableTags = response.data;
     }, function (error) {
         console.log(error);
+        if (error.data.message === 'Unauthorized') {
+            $('#sessionExpiredModal').modal("show");
+        }
     });
     $scope.complete = function () {
         $("#branchNamel3").autocomplete({
@@ -530,6 +515,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 }
             }, function (error) {
                 console.log(error);
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
             });
         }, function () {
             // If cancelled Do nothing
@@ -635,6 +623,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 });
 
             }, function (error) {
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
                 console.log(error);
                 iziToast.error({
                     title: 'Error',
@@ -650,6 +641,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             $scope.lstSFDCConnectionDetails = response.data;
         }, function (error) {
             console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
         });
         $scope.sfdcOrg = {
             id: '',
@@ -681,7 +675,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 message: 'SFDC connection deleted successfully'
             });
         }, function (error) {
-
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
         })
     };
 
@@ -712,6 +708,9 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
 
         }
     }, function (error) {
+        if (error.data.message === 'Unauthorized') {
+            $('#sessionExpiredModal').modal("show");
+        }
         console.error(error);
     });
 
@@ -721,6 +720,9 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
             $http.get("/api/initiateGitHubFlow?userEmail=" + localStorage.getItem('userEmail')).then(function (response) {
                 window.open(response.data, '_self');
             }, function (error) {
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
                 console.error(error);
             });
         }
@@ -741,6 +743,9 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     $http.post("/api/initiateGitHubEnterpriseFlow", githubEnterprise).then(function (response) {
                         window.open(response.data, '_self');
                     }, function (error) {
+                        if (error.data.message === 'Unauthorized') {
+                            $('#sessionExpiredModal').modal("show");
+                        }
                         console.error(error);
                     });
                 };
@@ -811,6 +816,9 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     message: 'Issue in disconnection ! ' + error.data.message,
                     position: 'topRight'
                 });
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
             }
         );
     };
@@ -837,6 +845,9 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
             console.log(response);
         }, function (error) {
             console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
         })
     };
 
