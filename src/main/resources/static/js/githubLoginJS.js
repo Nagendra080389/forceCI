@@ -279,25 +279,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
             }
         }, function (error) {
             if(error.data.message === 'Unauthorized'){
-                iziToast.show({
-                    color: 'dark',
-                    icon: 'fas fa-exclamation',
-                    title: 'Session Ended ! Logout and Login again.',
-                    position: 'center', // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter
-                    toastOnce: true,
-                    timeout: false,
-                    buttons: [
-                        [
-                            '<button>Ok</button>',
-                            function (instance, toast) {
-                                instance.hide({
-                                    transitionOut: 'fadeOutUp'
-                                }, toast);
-                                logoutFunctionCaller($location);
-                            }
-                        ]
-                    ]
-                });
+                $('#sessionExpiredModal').modal("show");
             }
         });
 
