@@ -117,7 +117,7 @@ connect2Deploy.controller('indexController', function ($scope, $http, $location,
 
     $scope.login = function (userEntity) {
         if (typeof grecaptcha !== 'undefined') {
-            if (userEntity !== undefined && userEntity !== null && userEntity.password === userEntity.RepeatPassword) {
+            if (userEntity !== undefined && userEntity !== null) {
                 const siteKey = '6Lcr3uUUAAAAAPnCZdcC9qTt-GKFVl9U1fmpHHRt';
                 grecaptcha.execute(siteKey, {action: 'register'}).then(function (response) {
                     userEntity.googleReCaptchaV3 = response;
