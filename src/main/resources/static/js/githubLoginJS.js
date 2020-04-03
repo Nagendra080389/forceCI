@@ -4,6 +4,8 @@ connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
 });
 
+let listenerAdded = false;
+
 localStorage.setItem('avatar_url', "../images/connectdevelop-brands.svg");
 
 let sse;
@@ -446,8 +448,10 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     };
 
-    window.removeEventListener('message', eventListenerCallBack, false);
-    window.addEventListener('message', eventListenerCallBack, false);
+    if(!listenerAdded) {
+        listenerAdded = true;
+        window.addEventListener('message', eventListenerCallBack, false);
+    }
 
 
     $http.get("/api/showSfdcConnectionDetails?gitRepoId=" + $scope.repoId).then(function (response) {
