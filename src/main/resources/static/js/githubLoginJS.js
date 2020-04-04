@@ -152,6 +152,12 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
         $http.get("/api/fetchRepository" + "?repoName=" + $scope.repoName + "&" + "appName=" + $scope.appName).then(function (response) {
             let gitRepositoryFromQuery = JSON.parse(response.data.gitRepositoryFromQuery);
             let repositoryWrappers = response.data.repositoryWrappers;
+            let repositoryIdsFromDB = new Set();
+            if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
+                for (let j = 0; j < repositoryWrappers.length; j++) {
+                    repositoryIdsFromDB.add(repositoryWrappers[j].repository.repositoryId);
+                }
+            }
             for (let i = 0; i < gitRepositoryFromQuery.items.length; i++) {
                 const data = {
                     active: true,
@@ -165,13 +171,7 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
                     owner: gitRepositoryFromQuery.items[i].owner.login,
                     full_name: gitRepositoryFromQuery.items[i].full_name
                 };
-                if (repositoryWrappers !== undefined && repositoryWrappers !== null && repositoryWrappers !== '' && repositoryWrappers.length > 0) {
-                    for (let j = 0; j < repositoryWrappers.length; j++) {
-                        if (repositoryWrappers[j].repository.repositoryId !== gitRepositoryFromQuery.items[i].id) {
-                            $scope.lstRepositoryFromApi.push(data);
-                        }
-                    }
-                } else {
+                if(!repositoryIdsFromDB.has(gitRepositoryFromQuery.items[i].id)){
                     $scope.lstRepositoryFromApi.push(data);
                 }
             }
