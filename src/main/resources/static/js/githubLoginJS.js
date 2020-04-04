@@ -353,7 +353,7 @@ connect2Deploy.controller('dashBoardController', function ($scope, $http, $locat
 
 });
 
-connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams, $mdDialog) {
+connect2Deploy.controller('repoController', function ($scope, $http, $location, $routeParams, $mdDialog, $window) {
     $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.repoId = $routeParams.repoId;
