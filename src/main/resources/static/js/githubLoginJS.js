@@ -424,16 +424,11 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 $scope.sfdcOrg.oauthSuccess = 'false';
                 iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
             }
+            window.removeEventListener('message', eventListenerCallBack, false);
+            $scope.$apply();
         }
-        $scope.$apply();
 
     };
-
-    if (!listenerAdded) {
-        listenerAdded = true;
-        window.addEventListener('message', eventListenerCallBack, false);
-    }
-
 
     $http.get("/api/showSfdcConnectionDetails?gitRepoId=" + $scope.repoId).then(function (response) {
         $scope.lstSFDCConnectionDetails = response.data;
@@ -544,6 +539,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                     'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + sfdcOrg.instanceURL;
             }
             const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
+            window.addEventListener('message', eventListenerCallBack, false);
             if (window.focus) {
                 newWindow.focus();
             }
