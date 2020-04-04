@@ -248,7 +248,7 @@ public class ForceCIController {
         }
     }
 
-    @GetMapping("/api/asyncDeployments")
+    @GetMapping("/asyncDeployments")
     public SseEmitter fetchData2(@RequestParam String userName, @RequestParam String repoId, @RequestParam String branchName) {
         final SseEmitter emitter = new SseEmitter();
         ExecutorService executor = Executors.newSingleThreadExecutor();
