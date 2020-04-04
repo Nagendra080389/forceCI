@@ -542,7 +542,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             }
             const newWindow = objWindow = window.open(url, 'ConnectWithOAuth' + $scope.repoId, 'height=600,width=450,left=100,top=100');
             window.addEventListener('message', eventListenerCallBack, false);
-            if (window.focus) {
+            if (newWindow !== undefined && newWindow !== null) {
                 newWindow.focus();
             }
         }
