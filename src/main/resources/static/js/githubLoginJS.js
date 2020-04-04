@@ -856,7 +856,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
     // table headers that we need to show
     $scope.tableHeaders = ['Job No.', 'PR No.', 'Source Branch', 'Validation Status', 'Generated Package', 'Deployment Status'];
 
-    sse = new EventSource('/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
+    sse = new EventSource('/api/asyncDeployments?userName=' + $scope.userName + '&repoId=' + $scope.repoId + '&branchName=' + $scope.branchName);
     sse.addEventListener("message", function (objMessageEvent) {
         if (objMessageEvent !== undefined && objMessageEvent !== null &&
             objMessageEvent.data !== undefined && objMessageEvent.data !== null) {
