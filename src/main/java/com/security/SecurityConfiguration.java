@@ -67,6 +67,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/html/**").permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/validateConnect2DeployToken").permitAll()
+                .antMatchers("/api/asyncDeployments").permitAll()
                 .requestMatchers(PROTECTED_URLS)
                 .authenticated()
                 .and()
