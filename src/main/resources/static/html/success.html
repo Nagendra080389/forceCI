@@ -16,7 +16,8 @@
                 sfdcAccessToken: sfdcAccessToken,
                 sfdcUserName: sfdcUserName,
                 sfdcInstanceURL: sfdcInstanceURL,
-                sfdcRefreshToken: sfdcRefreshToken
+                sfdcRefreshToken: sfdcRefreshToken,
+                windowName: window.name
             };
             window.opener.postMessage(objOauth, window.location.origin);
         })

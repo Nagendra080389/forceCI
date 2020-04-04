@@ -171,7 +171,7 @@ connect2Deploy.controller('dashBoardAppController', function ($scope, $http, $lo
                     owner: gitRepositoryFromQuery.items[i].owner.login,
                     full_name: gitRepositoryFromQuery.items[i].full_name
                 };
-                if(!repositoryIdsFromDB.has(gitRepositoryFromQuery.items[i].id)){
+                if (!repositoryIdsFromDB.has(gitRepositoryFromQuery.items[i].id)) {
                     $scope.lstRepositoryFromApi.push(data);
                 }
             }
@@ -393,24 +393,26 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     let sfdcRefreshTokenFromExternalPage;
 
     const eventListenerCallBack = function (objEvent) {
-        if (objEvent !== undefined && objEvent !== null &&
-            objEvent.data !== undefined && objEvent.data !== null &&
-            objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null) {
+        if (objWindow !== undefined && objWindow !== null && objEvent !== undefined && objEvent !== null &&
+            objEvent.data !== undefined && objEvent.data !== null && objEvent.data.strDestinationId !== undefined && objEvent.data.strDestinationId !== null) {
             if (objEvent.data.strDestinationId === 'OauthPayload') {
                 sfdcAccessTokenFromExternalPage = objEvent.data.sfdcAccessToken;
                 sfdcUserNameFromExternalPage = objEvent.data.sfdcUserName;
                 sfdcInstanceFromExternalPage = objEvent.data.sfdcInstanceURL;
                 sfdcRefreshTokenFromExternalPage = objEvent.data.sfdcRefreshToken;
-                if (objWindow !== undefined && objWindow !== null) {
+                let windowName = objEvent.data.windowName;
+                if(windowName === 'ConnectWithOAuth'+$scope.repoId){
                     objWindow.close();
+                    $scope.sfdcOrg.oauthSuccess = 'true';
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: 'SFDC connection successful.'
+                    });
+                    window.removeEventListener('message', eventListenerCallBack, false);
+                    $scope.$apply();
                 }
-                $scope.sfdcOrg.oauthSuccess = 'true';
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'SFDC connection successful.'
-                });
             }
 
             if (objEvent.data.strDestinationId === 'OauthPayloadFailed') {
@@ -418,14 +420,14 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 sfdcUserNameFromExternalPage = '';
                 sfdcInstanceFromExternalPage = '';
                 sfdcRefreshTokenFromExternalPage = '';
-                if (objWindow !== undefined && objWindow !== null) {
-                    objWindow.close();
+                let windowName = objEvent.data.windowName;
+                if(windowName === 'ConnectWithOAuth'+$scope.repoId) {
+                    $scope.sfdcOrg.oauthSuccess = 'false';
+                    iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
+                    window.removeEventListener('message', eventListenerCallBack, false);
+                    $scope.$apply();
                 }
-                $scope.sfdcOrg.oauthSuccess = 'false';
-                iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
             }
-            window.removeEventListener('message', eventListenerCallBack, false);
-            $scope.$apply();
         }
 
     };
@@ -538,7 +540,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 url = sfdcOrg.instanceURL + '/services/oauth2/authorize?response_type=code&client_id=3MVG9d8..z.hDcPLDlm9QqJ3hRVT2290hUCTtQVZJc4K5TAQQEi0yeXFAK' +
                     'EXd0TDKa3J8.s6XrzeFsPDL_mxt&prompt=login&redirect_uri=https://forceci.herokuapp.com/sfdcAuth&state=' + sfdcOrg.instanceURL;
             }
-            const newWindow = objWindow = window.open(url, 'ConnectWithOAuth', 'height=600,width=450,left=100,top=100');
+            const newWindow = objWindow = window.open(url, 'ConnectWithOAuth' + $scope.repoId, 'height=600,width=450,left=100,top=100');
             window.addEventListener('message', eventListenerCallBack, false);
             if (window.focus) {
                 newWindow.focus();

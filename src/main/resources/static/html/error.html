@@ -7,7 +7,8 @@
     <script>
         $(document).ready(function () {
             const objOauth = {
-                strDestinationId: 'OauthPayloadFailed'
+                strDestinationId: 'OauthPayloadFailed',
+                windowName: window.name
             };
             window.opener.postMessage(objOauth, window.location.origin);
         })
