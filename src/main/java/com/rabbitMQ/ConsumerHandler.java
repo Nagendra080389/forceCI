@@ -66,32 +66,33 @@ public class ConsumerHandler {
     }
 
     public void handleMessage(DeploymentJob deploymentJob) {
-        Gson gson = new Gson();
-        System.out.println("Deployment Job Started inside Container thread -> " + deploymentJob.getId());
-        GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.PENDING, ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.VALIDATION,
-                ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
-        int status = 0;
-        try {
-            status = ForceCIController.createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Validation Started -> " + status);
 
-        githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
-                ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.CODE_REVIEW_VALIDATION,
-                ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
-        try {
-            status = ForceCIController.createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Code Validation Pending -> " + status);
-
+        // handle messages only when deployment job is not cancelled
         Optional<DeploymentJob> optionalDeploymentJob = deploymentJobMongoRepository.findById(deploymentJob.getId());
         if (optionalDeploymentJob.isPresent()) {
             deploymentJob = optionalDeploymentJob.get();
             if (!deploymentJob.isBoolIsJobCancelled()) {
+                Gson gson = new Gson();
+                System.out.println("Deployment Job Started inside Container thread -> " + deploymentJob.getId());
+                GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.PENDING, ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.VALIDATION,
+                        ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
+                int status = 0;
+                try {
+                    status = ForceCIController.createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Validation Started -> " + status);
+
+                githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
+                        ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.CODE_REVIEW_VALIDATION,
+                        ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
+                try {
+                    status = ForceCIController.createStatusAndReturnCode(gson, deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), deploymentJob.getTargetBranch(), githubStatusObject);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Code Validation Pending -> " + status);
                 createTempDirectoryForDeployment(deploymentJob);
             }
         }
