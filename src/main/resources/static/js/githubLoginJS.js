@@ -840,7 +840,20 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 
     $scope.cancelDeployment = function (deploymentJobId) {
         $http.get("/api/cancelDeployment?deploymentJobId=" + deploymentJobId,).then(function (response) {
-            console.log(response);
+            if(response.data !== undefined && response.data !== null && response.data === 'Success'){
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: response.data
+                });
+            } else {
+                iziToast.error({
+                    title: 'Error',
+                    message: response.data,
+                    position: 'topRight'
+                });
+            }
         }, function (error) {
             console.log(error);
             if (error.data.message === 'Unauthorized') {
