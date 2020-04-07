@@ -422,6 +422,21 @@ public class ForceCIController {
         return gson.toJson(oauthUrl);
     }
 
+    @RequestMapping(value = "/api/fetchAllCommits", method = RequestMethod.POST)
+    public String fetchAllCommits(@RequestBody CommitRequest gitCommitSearch) {
+        Gson gson = new Gson();
+
+        if(!ObjectUtils.isEmpty(gitCommitSearch)){
+            String userConnect2DeployToken = gitCommitSearch.getUserConnect2DeployToken();
+            Optional<Connect2DeployUser> userByToken = connect2DeployUserMongoRepository.findByToken(userConnect2DeployToken);
+            if(userByToken.isPresent()){
+                Connect2DeployUser connect2DeployUser = userByToken.get();
+            }
+        }
+
+        return gson.toJson("oauthUrl");
+    }
+
     @RequestMapping(value = "/api/deleteLinkedService", method = RequestMethod.GET)
     public String deleteLinkedService(@RequestParam String linkedServiceName, @RequestParam String linkedServiceId) {
         Gson gson = new Gson();

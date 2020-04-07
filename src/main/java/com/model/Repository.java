@@ -19,6 +19,7 @@ public class Repository implements Serializable {
     private String ownerHtmlUrl;
     private List<String> lstBranches;
     private List<SFDCConnectionDetails> sfdcConnectionDetails;
+    private String linkedService;
 
 
     public String getFull_name() {
@@ -132,6 +133,14 @@ public class Repository implements Serializable {
 
     public void setLstBranches(List<String> lstBranches) {
         this.lstBranches = lstBranches;
+    }
+
+    public String getLinkedService() {
+        return linkedService;
+    }
+
+    public void setLinkedService(String linkedService) {
+        this.linkedService = linkedService;
     }
 
     @Override

@@ -15,7 +15,6 @@ public class RepositoryWrapper implements Serializable {
     private Repository repository;
     @Indexed
     private String ownerId;
-    private String linkedService;
 
 
     public Repository getRepository() {
@@ -34,14 +33,6 @@ public class RepositoryWrapper implements Serializable {
         this.ownerId = ownerId;
     }
 
-    public String getLinkedService() {
-        return linkedService;
-    }
-
-    public void setLinkedService(String linkedService) {
-        this.linkedService = linkedService;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,12 +40,11 @@ public class RepositoryWrapper implements Serializable {
         RepositoryWrapper that = (RepositoryWrapper) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(repository, that.repository) &&
-                Objects.equals(ownerId, that.ownerId) &&
-                Objects.equals(linkedService, that.linkedService);
+                Objects.equals(ownerId, that.ownerId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, repository, ownerId, linkedService);
+        return Objects.hash(id, repository, ownerId);
     }
 }

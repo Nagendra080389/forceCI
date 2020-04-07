@@ -26,6 +26,25 @@
     <!-- ========================================== -->
     <!-- Deployment targets                         -->
     <!-- ========================================== -->
+
+    <target name="git_multi_cherry_pick">
+        <echo message="START: MultiMerge"/>
+        <exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows" failonerror="true">
+            <arg value="${gitMultiCherryPick}"/>
+            <arg value="${gitCloneURL}"/>
+            <arg value="${gitBranchName}"/>
+            <arg value="${gitNewBranchName}"/>
+            <arg value="${cherryPickIds}"/>
+            <arg value="${gitDirectory}"/>
+        </exec>
+        <exec executable="/bin/bash" osfamily="unix" failonerror="true">
+            <arg value="${gitMultiCherryPick}"/>
+            <arg value="${gitCloneURL}"/>
+            <arg value="${cherryPickIds}"/>
+            <arg value="${gitDirectory}"/>
+        </exec>
+    </target>
+
     <target name="sf_prepare_deployment">
         <echo message="START: Create diff dir"/>
         <echo message="Checking against target: ${target}"/>

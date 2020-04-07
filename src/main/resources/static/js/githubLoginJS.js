@@ -1,4 +1,4 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial', 'ngMessages']);
 
 connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
@@ -362,6 +362,10 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     let objWindow;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
+    $scope.gitCommitSearch = {
+        fromDate : new Date(),
+        toDate : new Date()
+    };
     $scope.sfdcOrg = {
         orgName: '',
         testLevel: 'NoTestRun',
@@ -452,6 +456,22 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.complete = function () {
         $("#branchNamel3").autocomplete({
             source: $scope.availableTags
+        });
+        $("#gitHubBranch").autocomplete({
+            source: $scope.availableTags
+        });
+    };
+
+    $scope.fetchCommits = function(gitCommitSearch){
+        gitCommitSearch.userConnect2DeployToken = $scope.connect2DeployHeaderCookie;
+        gitCommitSearch.linkedServiceName = $scope.connect2DeployHeaderCookie
+        $http.post("/api/fetchAllCommits",gitCommitSearch).then(function (response) {
+            $scope.availableTags = response.data;
+        }, function (error) {
+            console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
         });
     };
 

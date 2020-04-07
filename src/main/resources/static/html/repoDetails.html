@@ -134,8 +134,7 @@
                             Connections</a>
                     </li>
                     <li class="nav-item">
-                        <a aria-controls="activity" aria-selected="true" class="nav-link" data-target="#activity" data-toggle="tab" id="activity-tab" role="tab">Recent
-                            Activity</a>
+                        <a aria-controls="activity" aria-selected="true" class="nav-link" data-target="#activity" data-toggle="tab" id="activity-tab" role="tab">Selective Deployments</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
@@ -207,7 +206,10 @@
                                         <div class="form-group row">
                                             <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="isActive">Is Active</label>
                                             <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                <label class="checkbox">
                                                 <input class="form-check-input" id="isActive" ng-model="sfdcOrg.boolActive" style="margin-left: 0 !important;" type="checkbox">
+                                                <span class="default"></span>
+                                                </label>
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -263,8 +265,49 @@
 
                     </div>
                     <div aria-labelledby="home-tab" class="tab-pane fade" id="activity" role="tabpanel">
-                        <div class="card-body">
-                            Recent Activities comes here
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Commit Ids based Deployments</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <form class="gitCommitSearch" name="gitSearch" novalidate>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="newBranchName">New Branch</label>
+                                            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+                                                <input required class="form-control form-text" id="newBranchName" name="newBranchName" ng-model="gitCommitSearch.newBranchName" placeholder="New branch" type="text">
+                                            </div>
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="gitHubBranch">Branch From Git</label>
+                                            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+                                                <md-tooltip md-direction="top">Select the branch from which commit ids needs to be extracted.</md-tooltip>
+                                                <input required class="form-control" id="gitHubBranch" ng-keyup="complete()" ng-model="gitCommitSearch.branchFromGit"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="gitHubDestinationBranch">Destination Branch</label>
+                                            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+                                                <md-tooltip md-direction="top">Select the branch to which commit ids needs to be pushed.</md-tooltip>
+                                                <input required class="form-control" id="gitHubDestinationBranch" ng-keyup="complete()" ng-model="gitCommitSearch.destinationBranch"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label">From Date</label>
+                                            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+                                                <md-content>
+                                                    <md-datepicker required ng-model="gitCommitSearch.fromDate"></md-datepicker>
+                                                </md-content>
+                                            </div>
+                                            <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label">To Date</label>
+                                            <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
+                                                <md-content>
+                                                    <md-datepicker required ng-model="gitCommitSearch.toDate"></md-datepicker>
+                                                </md-content>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary" ng-click="fetchCommits(gitCommitSearch)" ng-disabled="gitSearch.$invalid" type="submit">Search</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

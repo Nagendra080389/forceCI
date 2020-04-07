@@ -270,6 +270,7 @@ public class ConsumerHandler {
                             deploymentJob.setBoolSfdcFail(false);
                             deploymentJob.setBoolCodeReviewCompleted(false);
                         }
+                        deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
                         System.out.println("merge -> " + merge);
                         System.out.println("deploymentJob isBoolSfdcCompleted -> " + deploymentJob.isBoolSfdcCompleted());
                         System.out.println("deploymentJob isBoolSfdcPass -> " + deploymentJob.isBoolSfdcPass());
@@ -287,6 +288,7 @@ public class ConsumerHandler {
                             deploymentJob.setBoolCodeReviewCompleted(false);
                             deploymentJob.setBoolIsJobCancelled(true);
                         }
+                        deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
                         break;
                     }
                 }
@@ -302,6 +304,8 @@ public class ConsumerHandler {
                     Gson gson = new Gson();
                     GithubStatusObject githubStatusObject = null;
                     int status = 0;
+                    deploymentJob.setBoolSfdcCompleted(true);
+                    deploymentJob.setBoolSfdcRunning(false);
                     deploymentJob.setBoolCodeReviewRunning(true);
                     deploymentJob.setBoolCodeReviewNotStarted(false);
                     deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
@@ -335,7 +339,7 @@ public class ConsumerHandler {
                                 pmdStructures.add(pmdStructure);
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.error(e.getMessage());
                         } finally {
                             fileInputStream.close();
                         }
@@ -373,12 +377,12 @@ public class ConsumerHandler {
                     deploymentJobMongoRepository.save(deploymentJob);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+               logger.error(e.getMessage());
             } finally {
                 FileUtils.deleteDirectory(tempDirectory.toFile());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
     }
 
