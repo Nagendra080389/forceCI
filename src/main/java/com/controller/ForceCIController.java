@@ -446,12 +446,16 @@ public class ForceCIController {
                                 .since(gitCommitSearch.getFromDate())
                                 .until(gitCommitSearch.getToDate()).list()) {
                             CommitResponse commitResponse = new CommitResponse();
+                            System.out.println("eachCommit.getCommitShortInfo() -> "+gson.toJson(eachCommit.getCommitShortInfo()));
                             if(eachCommit.getAuthor() != null) {
                                 commitResponse.setAuthorName(eachCommit.getAuthor().getLogin());
                                 commitResponse.setAuthorUrl(eachCommit.getAuthor().getHtmlUrl().toExternalForm());
+                            } else {
+                                commitResponse.setAuthorName(eachCommit.getCommitShortInfo().getAuthor().getName());
                             }
                             commitResponse.setCommitDate(eachCommit.getCommitDate());
                             commitResponse.setCommitId(eachCommit.getSHA1());
+                            commitResponse.setCommitMessage(eachCommit.getCommitShortInfo().getMessage());
                             if(eachCommit.getCommitter() != null) {
                                 commitResponse.setCommitterName(eachCommit.getCommitter().getLogin());
                                 commitResponse.setCommitterURL(eachCommit.getCommitter().getHtmlUrl().toExternalForm());

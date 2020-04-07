@@ -11,6 +11,7 @@ public class CommitResponse implements Serializable {
     private String commitURL;
     private String committerName;
     private String committerURL;
+    private String commitMessage;
     private Date commitDate;
 
     public String getCommitId() {
@@ -35,6 +36,14 @@ public class CommitResponse implements Serializable {
 
     public void setAuthorUrl(String authorUrl) {
         this.authorUrl = authorUrl;
+    }
+
+    public String getCommitMessage() {
+        return commitMessage;
+    }
+
+    public void setCommitMessage(String commitMessage) {
+        this.commitMessage = commitMessage;
     }
 
     public String getCommitURL() {
