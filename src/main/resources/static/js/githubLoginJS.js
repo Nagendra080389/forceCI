@@ -358,6 +358,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
     $scope.repoId = $routeParams.repoId;
     $scope.repoName = $routeParams.repoName;
+    $scope.linkedService = $routeParams.linkedService;
     $scope.lstSFDCConnectionDetails = [];
     let objWindow;
     $scope.userName = localStorage.getItem('userEmail');
@@ -464,7 +465,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     $scope.fetchCommits = function(gitCommitSearch){
         gitCommitSearch.userConnect2DeployToken = $scope.connect2DeployHeaderCookie;
-        gitCommitSearch.linkedServiceName = $scope.connect2DeployHeaderCookie
+        gitCommitSearch.linkedServiceName = $scope.linkedService;
+        gitCommitSearch.repoId = $scope.repoId;
         $http.post("/api/fetchAllCommits",gitCommitSearch).then(function (response) {
             $scope.availableTags = response.data;
         }, function (error) {

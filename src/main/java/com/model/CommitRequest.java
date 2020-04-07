@@ -10,8 +10,10 @@ public class CommitRequest implements Serializable {
     private String destinationBranch;
     private Date fromDate;
     private Date toDate;
+    private String repoId;
     private String userConnect2DeployToken;
     private String linkedServiceName;
+    private String action;
 
     public String getNewBranchName() {
         return newBranchName;
@@ -19,6 +21,14 @@ public class CommitRequest implements Serializable {
 
     public void setNewBranchName(String newBranchName) {
         this.newBranchName = newBranchName;
+    }
+
+    public String getRepoId() {
+        return repoId;
+    }
+
+    public void setRepoId(String repoId) {
+        this.repoId = repoId;
     }
 
     public String getBranchFromGit() {

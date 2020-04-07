@@ -423,18 +423,43 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/api/fetchAllCommits", method = RequestMethod.POST)
-    public String fetchAllCommits(@RequestBody CommitRequest gitCommitSearch) {
+    public String fetchAllCommits(@RequestBody CommitRequest gitCommitSearch) throws Exception {
         Gson gson = new Gson();
-
+        List<CommitResponse> lstCommits = new ArrayList<>();
         if(!ObjectUtils.isEmpty(gitCommitSearch)){
             String userConnect2DeployToken = gitCommitSearch.getUserConnect2DeployToken();
             Optional<Connect2DeployUser> userByToken = connect2DeployUserMongoRepository.findByToken(userConnect2DeployToken);
             if(userByToken.isPresent()){
                 Connect2DeployUser connect2DeployUser = userByToken.get();
+                for (String linkedService : connect2DeployUser.getLinkedServices()) {
+                    Optional<LinkedServices> linkedServiceById = linkedServicesMongoRepository.findById(linkedService);
+                    if(linkedServiceById.isPresent() && linkedServiceById.get().getName().equalsIgnoreCase(gitCommitSearch.getLinkedServiceName())){
+                        GitHub gitHub = null;
+                        if(gitCommitSearch.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
+                            gitHub = GitHub.connectUsingOAuth(linkedServiceById.get().getAccessToken());
+                        }else if(gitCommitSearch.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
+                            gitHub = GitHub.connectToEnterpriseWithOAuth(linkedServiceById.get().getServerURL(),linkedServiceById.get().getUserName(), linkedServiceById.get().getAccessToken());
+                        }
+                        GHRepository repositoryById = gitHub.getRepositoryById(gitCommitSearch.getRepoId());
+                        for (GHCommit eachCommit : repositoryById.queryCommits()
+                                .from(gitCommitSearch.getBranchFromGit())
+                                .since(gitCommitSearch.getFromDate())
+                                .until(gitCommitSearch.getToDate()).list()) {
+                            CommitResponse commitResponse = new CommitResponse();
+                            commitResponse.setAuthorName(eachCommit.getAuthor().getLogin());
+                            commitResponse.setAuthorUrl(eachCommit.getAuthor().getHtmlUrl().toExternalForm());
+                            commitResponse.setCommitDate(eachCommit.getCommitDate());
+                            commitResponse.setCommitId(eachCommit.getSHA1());
+                            commitResponse.setCommitterName(eachCommit.getCommitter().getLogin());
+                            commitResponse.setCommitterURL(eachCommit.getCommitter().getHtmlUrl().toExternalForm());
+                            commitResponse.setCommitURL(eachCommit.getHtmlUrl().toExternalForm());
+                            lstCommits.add(commitResponse);
+                        }
+                    }
+                }
             }
         }
-
-        return gson.toJson("oauthUrl");
+        return gson.toJson(lstCommits);
     }
 
     @RequestMapping(value = "/api/deleteLinkedService", method = RequestMethod.GET)
