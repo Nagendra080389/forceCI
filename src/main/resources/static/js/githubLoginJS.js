@@ -360,6 +360,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.repoName = $routeParams.repoName;
     $scope.linkedService = $routeParams.linkedService;
     $scope.lstSFDCConnectionDetails = [];
+    $scope.commitResponse = [];
     let objWindow;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
@@ -461,6 +462,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         $("#gitHubBranch").autocomplete({
             source: $scope.availableTags
         });
+        $("#gitHubDestinationBranch").autocomplete({
+            source: $scope.availableTags
+        });
     };
 
     $scope.fetchCommits = function(gitCommitSearch){
@@ -468,7 +472,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         gitCommitSearch.linkedServiceName = $scope.linkedService;
         gitCommitSearch.repoId = $scope.repoId;
         $http.post("/api/fetchAllCommits",gitCommitSearch).then(function (response) {
-            $scope.availableTags = response.data;
+            $scope.commitResponse = response.data;
         }, function (error) {
             console.log(error);
             if (error.data.message === 'Unauthorized') {
