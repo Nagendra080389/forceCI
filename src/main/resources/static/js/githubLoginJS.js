@@ -69,13 +69,11 @@ function checkToken($location) {
 }
 
 function logoutFunctionCaller($location) {
+    $('#sessionExpiredModal').modal('hide');
+    $('#logoutModal').modal('hide');
     $.removeCookie("CONNECT2DEPLOY_TOKEN", {path: '/'});
     localStorage.removeItem('userEmail');
     $location.path("/index");
-    setTimeout(function () {
-        $('.modal-backdrop').removeClass('show');
-        $('.modal-backdrop').remove();
-    }, 500);
 }
 
 connect2Deploy.controller('indexController', function ($scope, $http, $location, $mdDialog, $routeParams) {
