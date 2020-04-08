@@ -40,6 +40,8 @@
         <exec executable="/bin/bash" osfamily="unix" failonerror="true">
             <arg value="${gitMultiCherryPick}"/>
             <arg value="${gitCloneURL}"/>
+            <arg value="${gitBranchName}"/>
+            <arg value="${gitNewBranchName}"/>
             <arg value="${cherryPickIds}"/>
             <arg value="${gitDirectory}"/>
         </exec>

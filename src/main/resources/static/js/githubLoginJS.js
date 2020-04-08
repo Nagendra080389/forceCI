@@ -361,12 +361,13 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.linkedService = $routeParams.linkedService;
     $scope.lstSFDCConnectionDetails = [];
     $scope.commitResponse = [];
+    $scope.cherryPickDisable = true;
     let objWindow;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
     $scope.gitCommitSearch = {
-        fromDate : new Date(),
-        toDate : new Date()
+        fromDate: new Date(),
+        toDate: new Date()
     };
     $scope.sfdcOrg = {
         orgName: '',
@@ -407,7 +408,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 sfdcInstanceFromExternalPage = objEvent.data.sfdcInstanceURL;
                 sfdcRefreshTokenFromExternalPage = objEvent.data.sfdcRefreshToken;
                 let windowName = objEvent.data.windowName;
-                if(windowName === 'ConnectWithOAuth'+$scope.repoId){
+                if (windowName === 'ConnectWithOAuth' + $scope.repoId) {
                     objWindow.close();
                     $scope.sfdcOrg.oauthSuccess = 'true';
                     iziToast.success({
@@ -427,7 +428,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 sfdcInstanceFromExternalPage = '';
                 sfdcRefreshTokenFromExternalPage = '';
                 let windowName = objEvent.data.windowName;
-                if(windowName === 'ConnectWithOAuth'+$scope.repoId) {
+                if (windowName === 'ConnectWithOAuth' + $scope.repoId) {
                     $scope.sfdcOrg.oauthSuccess = 'false';
                     iziToast.error({title: 'Error', message: 'Not able to create SFDC connection.', position: 'topRight'});
                     window.removeEventListener('message', eventListenerCallBack, false);
@@ -467,11 +468,67 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         });
     };
 
-    $scope.fetchCommits = function(gitCommitSearch){
+    $scope.tableHeaders = ['', 'Commit Id', 'Date', 'Commit Message', 'Committer Name'];
+
+    $scope.fetchCommits = function (gitCommitSearch) {
         gitCommitSearch.userConnect2DeployToken = $scope.connect2DeployHeaderCookie;
         gitCommitSearch.linkedServiceName = $scope.linkedService;
         gitCommitSearch.repoId = $scope.repoId;
-        $http.post("/api/fetchAllCommits",gitCommitSearch).then(function (response) {
+        $http.post("/api/fetchAllCommits", gitCommitSearch).then(function (response) {
+            $scope.commitResponse = response.data;
+        }, function (error) {
+            console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
+        });
+    };
+
+    $scope.enableCherryPickButton = function () {
+        let lstCommitIdsSelected = [];
+        for (let i = 0; i < $scope.commitResponse.length; i++) {
+            repoToken = $scope.commitResponse[0].repoToken;
+            repoUserName = $scope.commitResponse[0].repoUserName;
+            ghEnterpriseServerURL = $scope.commitResponse[0].ghEnterpriseServerURL;
+            if($scope.commitResponse[i].isSelected){
+                gitCloneURL = $scope.commitResponse[i].gitCloneURL;
+                lstCommitIdsSelected.push($scope.commitResponse[i].commitId);
+            }
+        }
+        if(lstCommitIdsSelected.length > 0) {
+            $scope.cherryPickDisable = false;
+        } else {
+            $scope.cherryPickDisable = true;
+        }
+    }
+
+    $scope.selectAndFireCherryPick = function(){
+        let lstCommitIdsSelected = [];
+        let gitCloneURL = '';
+        let repoToken = '';
+        let repoUserName = '';
+        let ghEnterpriseServerURL = '';
+        for (let i = 0; i < $scope.commitResponse.length; i++) {
+            repoToken = $scope.commitResponse[0].repoToken;
+            repoUserName = $scope.commitResponse[0].repoUserName;
+            ghEnterpriseServerURL = $scope.commitResponse[0].ghEnterpriseServerURL;
+            if($scope.commitResponse[i].isSelected){
+                gitCloneURL = $scope.commitResponse[i].gitCloneURL;
+                lstCommitIdsSelected.push($scope.commitResponse[i].commitId);
+            }
+        }
+        let cherryPickRequest = {
+            lstCommitIdsSelected: lstCommitIdsSelected,
+            destinationBranch : $scope.gitCommitSearch.destinationBranch,
+            newBranch : $scope.gitCommitSearch.newBranchName,
+            gitCloneURL : gitCloneURL,
+            repoToken : repoToken,
+            repoUserName : repoUserName,
+            ghEnterpriseServerURL : ghEnterpriseServerURL,
+            linkedServiceName : $scope.linkedService,
+            repoId : $scope.repoId
+        };
+        $http.post("/api/cherryPick", cherryPickRequest).then(function (response) {
             $scope.commitResponse = response.data;
         }, function (error) {
             console.log(error);
@@ -866,7 +923,7 @@ connect2Deploy.controller('deploymentController', function ($scope, $http, $loca
 
     $scope.cancelDeployment = function (deploymentJobId) {
         $http.get("/api/cancelDeployment?deploymentJobId=" + deploymentJobId,).then(function (response) {
-            if(response.data !== undefined && response.data !== null && response.data === 'Success'){
+            if (response.data !== undefined && response.data !== null && response.data === 'Success') {
                 iziToast.success({
                     timeout: 5000,
                     icon: 'fa fa-chrome',

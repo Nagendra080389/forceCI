@@ -2,6 +2,7 @@ package com.controller;
 
 import com.dao.*;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,15 +26,13 @@ import com.service.CaptchaServiceV3;
 import com.service.ICaptchaService;
 import com.sforce.soap.metadata.MetadataConnection;
 import com.sforce.ws.ConnectorConfig;
-import com.utils.ApiSecurity;
-import com.utils.LinkedServicesUtil;
-import com.utils.SFDCUtils;
-import com.utils.ValidationStatus;
+import com.utils.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.kohsuke.github.*;
@@ -60,12 +59,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.*;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.DateFormat;
@@ -454,6 +457,12 @@ public class ForceCIController {
                                     commitResponse.setAuthorName(eachCommit.getCommitShortInfo().getAuthor().getName());
                                 }
                             }
+                            commitResponse.setRepoToken(linkedServiceById.get().getAccessToken());
+                            commitResponse.setRepoUserName(linkedServiceById.get().getUserName());
+                            commitResponse.setGhEnterpriseServerURL(linkedServiceById.get().getServerURL());
+                            if(eachCommit.getOwner() != null){
+                                commitResponse.setGitCloneURL(eachCommit.getOwner().getHttpTransportUrl());
+                            }
                             commitResponse.setCommitDate(eachCommit.getCommitDate());
                             commitResponse.setCommitId(eachCommit.getSHA1());
                             if(eachCommit.getCommitShortInfo() != null) {
@@ -475,6 +484,69 @@ public class ForceCIController {
             }
         }
         return gson.toJson(lstCommits);
+    }
+
+    @RequestMapping(value = "/api/cherryPick", method = RequestMethod.POST)
+    public String cherryPick(@RequestBody CherryPickRequest cherryPickRequest) throws Exception {
+        Gson gson = new Gson();
+        List<String> newListToBeReturned = new ArrayList<>();
+        GitHub gitHub = null;
+        if(cherryPickRequest.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
+            gitHub = GitHub.connectUsingOAuth(cherryPickRequest.getRepoToken());
+        }else if(cherryPickRequest.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
+            gitHub = GitHub.connectToEnterpriseWithOAuth(cherryPickRequest.getGhEnterpriseServerURL(),cherryPickRequest.getRepoUserName(), cherryPickRequest.getRepoToken());
+        }
+        GHRepository repositoryById = gitHub.getRepositoryById(cherryPickRequest.getRepoId());
+
+        GHBranch branch = repositoryById.getBranch(cherryPickRequest.getNewBranch());
+        if(ObjectUtils.isEmpty(branch)) {
+
+            Path tempDirectory = Files.createTempDirectory(cherryPickRequest.getDestinationBranch());
+            List<String> sf_build = new ArrayList<>();
+            try {
+                Map<String, String> propertiesMap = new HashMap<>();
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                InputStream buildXml = classLoader.getResourceAsStream("build/build.xml");
+                InputStream gitCherryPick = classLoader.getResourceAsStream("build/git-multi-cherry-pick.sh");
+                File buildFile = ConsumerHandler.stream2file(buildXml, "build", ".xml");
+                File cherryPick = ConsumerHandler.stream2file(gitCherryPick, "git-multi-cherry-pick", ".sh");
+                propertiesMap.put("gitMultiCherryPick", cherryPick.getName());
+                propertiesMap.put("gitCloneURL", cherryPickRequest.getGitCloneURL());
+                propertiesMap.put("gitBranchName", cherryPickRequest.getDestinationBranch());
+                propertiesMap.put("gitNewBranchName", cherryPickRequest.getNewBranch());
+                propertiesMap.put("cherryPickIds", String.join(" ", cherryPickRequest.getLstCommitIdsSelected()));
+                propertiesMap.put("gitDirectory", tempDirectory.toFile().getPath());
+                sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "git_multi_cherry_pick", propertiesMap);
+            } catch (Exception objException) {
+                logger.error(objException.getMessage());
+            } finally {
+                FileUtils.deleteDirectory(tempDirectory.toFile());
+            }
+
+            if (!sf_build.isEmpty()) {
+                for (String eachString : Lists.reverse(sf_build)) {
+                    if (eachString.contains("**** SUCCESS ****")) {
+                        newListToBeReturned.add(eachString);
+                        for (String eachStringAgain : Lists.reverse(sf_build)) {
+                            if (eachStringAgain.contains("remote:")) {
+                                if (eachStringAgain.split("remote:").length > 1) {
+                                    eachStringAgain = eachStringAgain.split("remote:")[1].trim();
+                                    if (org.apache.commons.lang3.StringUtils.isNotEmpty(eachStringAgain) && org.apache.commons.lang3.StringUtils.isNotBlank(eachStringAgain)) {
+                                        newListToBeReturned.add(eachStringAgain);
+                                    }
+                                }
+                            }
+                        }
+                    } else if (eachString.contains("****")) {
+                        newListToBeReturned.add(eachString);
+                    }
+                }
+
+            }
+        } else {
+            newListToBeReturned.add("Branch " +cherryPickRequest.getNewBranch()+ " Already Exists ! Please try creating different branch.");
+        }
+        return gson.toJson(newListToBeReturned);
     }
 
     @RequestMapping(value = "/api/deleteLinkedService", method = RequestMethod.GET)

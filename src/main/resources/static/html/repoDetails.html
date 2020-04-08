@@ -275,7 +275,8 @@
                                         <div class="form-group row">
                                             <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="newBranchName">New Branch</label>
                                             <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                                                <input required class="form-control form-text" id="newBranchName" name="newBranchName" ng-model="gitCommitSearch.newBranchName" placeholder="New branch" type="text">
+                                                <md-tooltip md-direction="top">Type the name of the new branch you want to create.</md-tooltip>
+                                                <input required class="form-control form-text" id="newBranchName" name="newBranchName" ng-model="gitCommitSearch.newBranchName" type="text">
                                             </div>
                                             <label class="col-sm-2 col-md-2 col-lg-2 col-xl-2 col-form-label" for="gitHubBranch">Branch From Git</label>
                                             <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
@@ -307,6 +308,35 @@
                                         <button class="btn btn-primary" ng-click="fetchCommits(gitCommitSearch)" ng-disabled="gitSearch.$invalid" type="submit">Search</button>
                                     </form>
                                 </div>
+                            </div>
+                            <md-divider/>
+                            <div class="card-body">
+                                <form class="form-inline" name="initiateCherryPick">
+                                    <div class="form-group">
+                                        <input class="form-control" ng-model="search" placeholder="Search...." style="margin-bottom: 1rem;"
+                                               type="text">
+                                    </div>
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th ng-repeat="header in tableHeaders">{{header}}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr dir-paginate="eachCommitResponse in commitResponse|filter:search|itemsPerPage:20">
+                                        <td><input type="checkbox" ng-model="eachCommitResponse.isSelected" ng-change="enableCherryPickButton()"></td>
+                                        <td><a href="{{eachCommitResponse.commitURL}}" target="_blank">{{eachCommitResponse.commitId}}</a></td>
+                                        <td>{{eachCommitResponse.commitDate}}</td>
+                                        <td>{{eachCommitResponse.commitMessage}}</td>
+                                        <td>{{eachCommitResponse.committerName}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="text-center">
+                                    <dir-pagination-controls boundary-links="true" template-url="./html/dirPagination.tpl.html"></dir-pagination-controls>
+                                </div>
+                                    <button class="btn btn-primary" ng-click="selectAndFireCherryPick()" ng-disabled="cherryPickDisable === true" type="submit">Create Branch</button>
+                                </form>
                             </div>
                         </div>
                     </div>

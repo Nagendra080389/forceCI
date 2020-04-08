@@ -12,6 +12,10 @@ public class CommitResponse implements Serializable {
     private String committerName;
     private String committerURL;
     private String commitMessage;
+    private String gitCloneURL;
+    private String repoToken;
+    private String repoUserName;
+    private String ghEnterpriseServerURL;
     private Date commitDate;
 
     public String getCommitId() {
@@ -76,6 +80,38 @@ public class CommitResponse implements Serializable {
 
     public void setCommitDate(Date commitDate) {
         this.commitDate = commitDate;
+    }
+
+    public String getGitCloneURL() {
+        return gitCloneURL;
+    }
+
+    public void setGitCloneURL(String gitCloneURL) {
+        this.gitCloneURL = gitCloneURL;
+    }
+
+    public String getRepoToken() {
+        return repoToken;
+    }
+
+    public void setRepoToken(String repoToken) {
+        this.repoToken = repoToken;
+    }
+
+    public String getRepoUserName() {
+        return repoUserName;
+    }
+
+    public void setRepoUserName(String repoUserName) {
+        this.repoUserName = repoUserName;
+    }
+
+    public String getGhEnterpriseServerURL() {
+        return ghEnterpriseServerURL;
+    }
+
+    public void setGhEnterpriseServerURL(String ghEnterpriseServerURL) {
+        this.ghEnterpriseServerURL = ghEnterpriseServerURL;
     }
 
     @Override

@@ -44,7 +44,7 @@ public class ConsumerHandler {
     }
 
     public static File stream2file(InputStream in) throws IOException {
-        final File tempFile = File.createTempFile("build", ".xml");
+        final File tempFile = Files.createTempFile("build", ".xml").toFile();
         tempFile.deleteOnExit();
         try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
             IOUtils.copy(in, out);
@@ -55,7 +55,7 @@ public class ConsumerHandler {
     }
 
     public static File stream2file(InputStream in, String prefix, String suffix) throws IOException {
-        final File tempFile = File.createTempFile(prefix, suffix);
+        final File tempFile = Files.createTempFile(prefix, suffix).toFile();
         tempFile.deleteOnExit();
         try (OutputStream out = Files.newOutputStream(Paths.get(tempFile.toURI()))) {
             IOUtils.copy(in, out);
