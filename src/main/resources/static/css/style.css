@@ -224,3 +224,7 @@ html {
 .checkbox input{display:none}
 .checkbox input:checked + span:after{-webkit-animation:check .8s;-moz-animation:check .8s;-o-animation:check .8s;animation:check .8s;border-color:#555}
 .checkbox input:checked + .default:after{border-color:#444}
+
+.rowCheckBox:first-child {
+    width: 5%;
+}
