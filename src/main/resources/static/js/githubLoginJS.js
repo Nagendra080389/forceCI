@@ -360,6 +360,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.lstSFDCConnectionDetails = [];
     $scope.commitResponse = [];
     $scope.cherryPickDisable = true;
+    $scope.cherryPickSuccess = false;
+    $scope.cherryPickSuccessText = '';
     let objWindow;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
@@ -469,6 +471,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.tableHeaders = ['', 'Commit Id', 'Date', 'Commit Message', 'Committer Name'];
 
     $scope.fetchCommits = function (gitCommitSearch) {
+        $scope.cherryPickSuccess = false;
+        $scope.cherryPickSuccessText = '';
+        $scope.cherryPickDisable = true;
         gitCommitSearch.userConnect2DeployToken = $scope.connect2DeployHeaderCookie;
         gitCommitSearch.linkedServiceName = $scope.linkedService;
         gitCommitSearch.repoId = $scope.repoId;
@@ -501,6 +506,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     }
 
     $scope.selectAndFireCherryPick = function(){
+        $scope.cherryPickDisable = true;
         let lstCommitIdsSelected = [];
         let gitCloneURL = '';
         let repoToken = '';
@@ -533,6 +539,14 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             $scope.commitResponse = [];
             $scope.cherryPickDisable = true;
             console.log(response);
+            const linkExpression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+            const regex = new RegExp(linkExpression);
+            for (let i = 0; i < response.length; i++) {
+                if (response[i].match(regex)) {
+                    $scope.cherryPickSuccess = true;
+                    $scope.cherryPickSuccessText = 'Cherry Picking Successful ! '+ '<a href="'+response[i]+'" target="_blank">Click Here</a>' + ' to create Pull Request';
+                }
+            }
         }, function (error) {
             console.log(error);
             if (error.data.message === 'Unauthorized') {
