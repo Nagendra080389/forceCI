@@ -520,6 +520,7 @@ public class ForceCIController {
                 propertiesMap.put("gitNewBranchName", cherryPickRequest.getNewBranch());
                 propertiesMap.put("cherryPickIds", String.join(" ", cherryPickRequest.getLstCommitIdsSelected()));
                 propertiesMap.put("gitDirectory", tempDirectory.toFile().getPath());
+                logger.info("propertiesMap -> "+gson.toJson(propertiesMap));
                 sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "git_multi_cherry_pick", propertiesMap);
             } catch (Exception objException) {
                 logger.error(objException.getMessage());
