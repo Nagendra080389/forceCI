@@ -497,8 +497,12 @@ public class ForceCIController {
             gitHub = GitHub.connectToEnterpriseWithOAuth(cherryPickRequest.getGhEnterpriseServerURL(),cherryPickRequest.getRepoUserName(), cherryPickRequest.getRepoToken());
         }
         GHRepository repositoryById = gitHub.getRepositoryById(cherryPickRequest.getRepoId());
-
-        GHBranch branch = repositoryById.getBranch(cherryPickRequest.getNewBranch());
+        GHBranch branch = null;
+        try {
+            branch = repositoryById.getBranch(cherryPickRequest.getNewBranch());
+        } catch (Exception objException){
+            logger.error(objException.getMessage());
+        }
         if(ObjectUtils.isEmpty(branch)) {
 
             Path tempDirectory = Files.createTempDirectory(cherryPickRequest.getDestinationBranch());
