@@ -490,6 +490,7 @@ public class ForceCIController {
     public String cherryPick(@RequestBody CherryPickRequest cherryPickRequest) throws Exception {
         Gson gson = new Gson();
         List<String> newListToBeReturned = new ArrayList<>();
+        List<String> sf_build = new ArrayList<>();
         GitHub gitHub = null;
         if(cherryPickRequest.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
             gitHub = GitHub.connectUsingOAuth(cherryPickRequest.getRepoToken());
@@ -506,7 +507,6 @@ public class ForceCIController {
         if(ObjectUtils.isEmpty(branch)) {
 
             Path tempDirectory = Files.createTempDirectory(cherryPickRequest.getDestinationBranch());
-            List<String> sf_build = new ArrayList<>();
             try {
                 Map<String, String> propertiesMap = new HashMap<>();
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -550,7 +550,7 @@ public class ForceCIController {
         } else {
             newListToBeReturned.add("Branch " +cherryPickRequest.getNewBranch()+ " Already Exists ! Please try creating different branch.");
         }
-        return gson.toJson(newListToBeReturned);
+        return gson.toJson(sf_build);
     }
 
     @RequestMapping(value = "/api/deleteLinkedService", method = RequestMethod.GET)
