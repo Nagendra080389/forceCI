@@ -484,6 +484,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     $scope.enableCherryPickButton = function () {
         let lstCommitIdsSelected = [];
+        $scope.commitResponse.sort(function(a,b){
+            return new Date(a.commitDate) - new Date(b.commitDate);
+        });
         for (let i = 0; i < $scope.commitResponse.length; i++) {
             repoToken = $scope.commitResponse[0].repoToken;
             repoUserName = $scope.commitResponse[0].repoUserName;
@@ -527,7 +530,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             repoId : $scope.repoId
         };
         $http.post("/api/cherryPick", cherryPickRequest).then(function (response) {
-            $scope.commitResponse = response.data;
+            $scope.commitResponse = [];
+            $scope.cherryPickDisable = true;
+            console.log(response);
         }, function (error) {
             console.log(error);
             if (error.data.message === 'Unauthorized') {
