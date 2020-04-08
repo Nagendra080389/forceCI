@@ -512,16 +512,18 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         let repoToken = '';
         let repoUserName = '';
         let ghEnterpriseServerURL = '';
-        $scope.commitResponse.sort(function(a,b){
+        const commitResponseCopy = [];
+        Object.assign(commitResponseCopy, $scope.commitResponse);
+        commitResponseCopy.sort(function(a,b){
             return new Date(a.commitDate) - new Date(b.commitDate);
         });
-        for (let i = 0; i < $scope.commitResponse.length; i++) {
-            repoToken = $scope.commitResponse[0].repoToken;
-            repoUserName = $scope.commitResponse[0].repoUserName;
-            ghEnterpriseServerURL = $scope.commitResponse[0].ghEnterpriseServerURL;
-            if($scope.commitResponse[i].isSelected){
-                gitCloneURL = $scope.commitResponse[i].gitCloneURL;
-                lstCommitIdsSelected.push($scope.commitResponse[i].commitId);
+        for (let i = 0; i < commitResponseCopy.length; i++) {
+            repoToken = commitResponseCopy[0].repoToken;
+            repoUserName = commitResponseCopy[0].repoUserName;
+            ghEnterpriseServerURL = commitResponseCopy[0].ghEnterpriseServerURL;
+            if(commitResponseCopy[i].isSelected){
+                gitCloneURL = commitResponseCopy[i].gitCloneURL;
+                lstCommitIdsSelected.push(commitResponseCopy[i].commitId);
             }
         }
         let cherryPickRequest = {
