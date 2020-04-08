@@ -5,6 +5,8 @@ echo 'Start Cherry Pick'
 cd $5 || exit
 
 echo 'Switched to '$5
+git config --global user.email $6
+git config --global user.name $7
 git clone $1 .
 if [ "$?" -eq "0" ]; then
   git checkout -B $2 origin/$2

@@ -36,6 +36,8 @@
             <arg value="${gitNewBranchName}"/>
             <arg value="${cherryPickIds}"/>
             <arg value="${gitDirectory}"/>
+            <arg value="${userEmail}"/>
+            <arg value="${userName}"/>
         </exec>
         <exec executable="/bin/bash" osfamily="unix" failonerror="true">
             <arg value="${gitMultiCherryPick}"/>
@@ -44,6 +46,8 @@
             <arg value="${gitNewBranchName}"/>
             <arg value="${cherryPickIds}"/>
             <arg value="${gitDirectory}"/>
+            <arg value="${userEmail}"/>
+            <arg value="${userName}"/>
         </exec>
     </target>
 
