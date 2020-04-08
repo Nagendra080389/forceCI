@@ -559,7 +559,7 @@ public class ForceCIController {
         } else {
             newListToBeReturned.add("Branch " +cherryPickRequest.getNewBranch()+ " Already Exists ! Please try creating different branch.");
         }
-        return gson.toJson(sf_build);
+        return gson.toJson(newListToBeReturned);
     }
 
     @RequestMapping(value = "/api/deleteLinkedService", method = RequestMethod.GET)
