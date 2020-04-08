@@ -538,13 +538,13 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         $http.post("/api/cherryPick", cherryPickRequest).then(function (response) {
             $scope.commitResponse = [];
             $scope.cherryPickDisable = true;
-            console.log(response);
+            console.log(response.data);
             const linkExpression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
             const regex = new RegExp(linkExpression);
-            for (let i = 0; i < response.length; i++) {
-                if (response[i].match(regex)) {
+            for (let i = 0; i < response.data.length; i++) {
+                if (response.data[i].match(regex)) {
                     $scope.cherryPickSuccess = true;
-                    $scope.cherryPickSuccessText = 'Cherry Picking Successful ! '+ '<a href="'+response[i]+'" target="_blank">Click Here</a>' + ' to create Pull Request';
+                    $scope.cherryPickSuccessText = 'Cherry Picking Successful ! '+ '<a href="'+response.data[i]+'" target="_blank">Click Here</a>' + ' to create Pull Request';
                 }
             }
         }, function (error) {
