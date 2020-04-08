@@ -515,7 +515,13 @@ public class ForceCIController {
                 File buildFile = ConsumerHandler.stream2file(buildXml, "build", ".xml");
                 File cherryPick = ConsumerHandler.stream2file(gitCherryPick, "git-multi-cherry-pick", ".sh");
                 propertiesMap.put("gitMultiCherryPick", cherryPick.getName());
-                propertiesMap.put("gitCloneURL", cherryPickRequest.getGitCloneURL());
+                if(cherryPickRequest.getGhEnterpriseServerURL() != null){
+                    propertiesMap.put("gitCloneURL", "https://" + cherryPickRequest.getRepoUserName() + ":" + cherryPickRequest.getRepoToken() + "@"+cherryPickRequest.getGhEnterpriseServerURL()+"/" +
+                            cherryPickRequest.getRepoUserName()+"/"+repositoryById.getName()+".git");
+                }else {
+                    propertiesMap.put("gitCloneURL", "https://" + cherryPickRequest.getRepoUserName() + ":" + cherryPickRequest.getRepoToken() + "@github.com/" +
+                            cherryPickRequest.getRepoUserName()+"/"+repositoryById.getName()+".git");
+                }
                 propertiesMap.put("gitBranchName", cherryPickRequest.getDestinationBranch());
                 propertiesMap.put("gitNewBranchName", cherryPickRequest.getNewBranch());
                 propertiesMap.put("cherryPickIds", String.join(" ", cherryPickRequest.getLstCommitIdsSelected()));
