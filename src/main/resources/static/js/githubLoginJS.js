@@ -484,9 +484,6 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     $scope.enableCherryPickButton = function () {
         let lstCommitIdsSelected = [];
-        $scope.commitResponse.sort(function(a,b){
-            return new Date(a.commitDate) - new Date(b.commitDate);
-        });
         for (let i = 0; i < $scope.commitResponse.length; i++) {
             repoToken = $scope.commitResponse[0].repoToken;
             repoUserName = $scope.commitResponse[0].repoUserName;
@@ -509,6 +506,9 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         let repoToken = '';
         let repoUserName = '';
         let ghEnterpriseServerURL = '';
+        $scope.commitResponse.sort(function(a,b){
+            return new Date(a.commitDate) - new Date(b.commitDate);
+        });
         for (let i = 0; i < $scope.commitResponse.length; i++) {
             repoToken = $scope.commitResponse[0].repoToken;
             repoUserName = $scope.commitResponse[0].repoUserName;
