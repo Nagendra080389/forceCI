@@ -906,6 +906,7 @@ public class ForceCIController {
                     }
                 }
             }
+            logger.info("consumerMap -> "+gson.toJson(consumerMap));
             reposOnDB = gson.toJson(newLstRepositoryWrapper);
         }
         return reposOnDB;
@@ -1205,11 +1206,11 @@ public class ForceCIController {
                 rabbitMqConsumerMap = new ConcurrentHashMap<>();
                 rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
             }
+            logger.info("rabbitMqConsumerMap -> "+gson.toJson(rabbitMqConsumerMap));
         }
         sfdcConnectionDetails.setOauthSaved("true");
         SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
         returnResponse = gson.toJson(connectionSaved);
-
         return returnResponse;
     }
 
