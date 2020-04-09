@@ -362,6 +362,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.cherryPickDisable = true;
     $scope.cherryPickSuccess = false;
     $scope.cherryPickSuccessText = '';
+    $scope.cherryPickErrorText = '';
+    $scope.cherryPickError = false;
     let objWindow;
     $scope.userName = localStorage.getItem('userEmail');
     $scope.avatar_url = localStorage.avatar_url;
@@ -473,6 +475,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
     $scope.fetchCommits = function (gitCommitSearch) {
         $scope.cherryPickSuccess = false;
         $scope.cherryPickSuccessText = '';
+        $scope.cherryPickErrorText = '';
+        $scope.cherryPickError = false;
         $scope.cherryPickDisable = true;
         gitCommitSearch.userConnect2DeployToken = $scope.connect2DeployHeaderCookie;
         gitCommitSearch.linkedServiceName = $scope.linkedService;
@@ -547,6 +551,13 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
                 if (response.data[i].match(regex)) {
                     $scope.cherryPickSuccess = true;
                     $scope.cherryPickSuccessText = 'Cherry Picking Successful ! '+ '<a href="'+response.data[i]+'" target="_blank">Click Here</a>' + ' to create Pull Request';
+                } else {
+                    if(response.data[i].indexOf('**** GIT PUSH FAILED ****') > -1 || response.data[i].indexOf('**** GIT CHERRY PICK') > -1
+                    || response.data[i].indexOf('**** GIT CREATION OF NEW BRANCH') > -1 || response.data[i].indexOf('**** GIT CHECKOUT OF') > -1
+                    || response.data[i].indexOf('Already Exists ! Please try creating different branch.') > -1){
+                        $scope.cherryPickError = true;
+                        $scope.cherryPickErrorText = response.data[i];
+                    }
                 }
             }
         }, function (error) {

@@ -23,12 +23,12 @@ if [ "$?" -eq "0" ]; then
               echo "**** GIT PUSH FAILED ****"
             fi
         else
-          echo "**** GIT CHERRY PICK ****"
+          echo "**** GIT CHERRY PICK FAILED****"
         fi
       else
-        echo "**** GIT CREATION OF NEW BRANCH $3 FAIL ****"
+        echo "**** GIT CREATION OF NEW BRANCH $3 FAILED ****"
       fi
     else
-      echo "**** GIT CHECKOUT OF $2 FAIL ****"
+      echo "**** GIT CHECKOUT OF $2 FAILED ****"
     fi
 fi
