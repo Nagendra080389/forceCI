@@ -228,3 +228,11 @@ html {
 .rowCheckBox:first-child {
     width: 5%;
 }
+
+.smallRows:first-child{
+    width: 5%;
+}
+
+.smallRows:nth-child(2){
+    width: 5%;
+}
