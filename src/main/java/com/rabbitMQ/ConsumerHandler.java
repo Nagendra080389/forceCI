@@ -73,7 +73,7 @@ public class ConsumerHandler {
             deploymentJob = optionalDeploymentJob.get();
             if (!deploymentJob.isBoolIsJobCancelled()) {
                 Gson gson = new Gson();
-                System.out.println("Deployment Job Started inside Container thread -> " + deploymentJob.getId());
+                logger.info("Deployment Job Started inside Container thread -> " + deploymentJob.getId());
                 GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.PENDING, ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.VALIDATION,
                         ForceCIController.CONNECT2DEPLOY_URL + "/" + deploymentJob.getRepoName() + "/" + deploymentJob.getRepoId() + "/" + deploymentJob.getTargetBranch());
                 int status = 0;
@@ -82,7 +82,7 @@ public class ConsumerHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println("Validation Started -> " + status);
+                logger.info("Validation Started -> " + status);
 
                 githubStatusObject = new GithubStatusObject(ForceCIController.PENDING,
                         ForceCIController.BUILD_IS_PENDING, deploymentJob.getTargetBranch() + ForceCIController.CODE_REVIEW_VALIDATION,
@@ -92,7 +92,7 @@ public class ConsumerHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println("Code Validation Pending -> " + status);
+                logger.info("Code Validation Pending -> " + status);
                 createTempDirectoryForDeployment(deploymentJob);
             }
         }
@@ -100,6 +100,8 @@ public class ConsumerHandler {
 
     private void createTempDirectoryForDeployment(DeploymentJob deploymentJob) {
         boolean sfdcPass = false;
+        boolean sfdcTokenExpired = false;
+        DeploymentJob newDeploymentJob = null;
         List<String> lstFileLines = new ArrayList<>();
         try {
             SFDCConnectionDetails sfdcConnectionDetail = deploymentJob.getSfdcConnectionDetail();
@@ -190,68 +192,19 @@ public class ConsumerHandler {
                 } else {
                     deploymentJob.setLstBuildLines(lstFileLines);
                 }
-                deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
-                Optional<DeploymentJob> deploymentJobMongoRepositoryById = deploymentJobMongoRepository.findById(deploymentJob.getId());
-                if (deploymentJobMongoRepositoryById.isPresent()) {
-                    System.out.println("deploymentJob isPresent -> " + deploymentJob.getId());
-                    deploymentJob = deploymentJobMongoRepositoryById.get();
-                }
-
-                StringBuilder stringBuilder = new StringBuilder();
-                // Iterate and extract package xml formed.
-                for (int i = 0; i < sf_build.size(); i++) {
-                    if (sf_build.get(i).startsWith("====FINAL PACKAGE.XML=====")) {
-                        for (int j = i; j < sf_build.size(); j++) {
-                            if (sf_build.get(j).startsWith("Package generated.")) {
-                                break;
-                            } else {
-                                stringBuilder.append(sf_build.get(j)).append("\n");
-                            }
-                        }
-                    }
-                }
+                StringBuilder stringBuilder = iterateAndExtractPackageXML(sf_build);
                 deploymentJob.setPackageXML(stringBuilder.toString());
                 deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
 
                 for (String eachBuildLine : Lists.reverse(lstFileLines)) {
-                    System.out.println("eachBuildLine -> " + eachBuildLine);
+                    logger.info("eachBuildLine -> " + eachBuildLine);
                     if (eachBuildLine.contains("Failed to login:")) {
-                        // try to get proper access token again
-                        String refreshToken = sfdcConnectionDetail.getRefreshToken();
-                        String environment = sfdcConnectionDetail.getEnvironment();
-                        String instanceURL = sfdcConnectionDetail.getInstanceURL();
-                        String clientId = System.getenv("SFDC_CLIENTID");
-                        String clientSecret = System.getenv("SFDC_CLIENTSECRET");
-                        String url = "";
-                        if (environment.equals("0")) {
-                            url = "https://login.salesforce.com/services/oauth2/token?" +
-                                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
-                                    "&refresh_token=" + refreshToken;
-                        } else if (environment.equals("1")) {
-                            url = "https://test.salesforce.com/services/oauth2/token?" +
-                                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
-                                    "&refresh_token=" + refreshToken;
-                        } else {
-                            url = instanceURL + "/services/oauth2/token?" +
-                                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
-                                    "&refresh_token=" + refreshToken;
-                        }
-                        HttpClient httpClient = new HttpClient();
-                        PostMethod post = new PostMethod(url);
-                        httpClient.executeMethod(post);
-                        String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
-                        JsonParser parser = new JsonParser();
-                        JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
-                        String accessToken = jsonObject.get("access_token").getAsString();
-                        sfdcConnectionDetail.setOauthToken(accessToken);
-                        SFDCConnectionDetails newSfdcConnection = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetail);
-                        deploymentJob.setSfdcConnectionDetail(newSfdcConnection);
-                        DeploymentJob savedDeploymentJob = deploymentJobMongoRepository.save(deploymentJob);
-                        createTempDirectoryForDeployment(savedDeploymentJob);
+                        sfdcTokenExpired = true;
+                        newDeploymentJob = refreshTokenAndReturnNewDeploymentJon(deploymentJob, sfdcConnectionDetail);
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT SUCCEEDED ***********")) {
-                        System.out.println("deploymentJob Id inside deployment succeeded -> " + deploymentJob.getId());
-                        System.out.println("deploymentJob status url -> " + deploymentJob.getStatusesUrl());
+                        logger.info("deploymentJob Id inside deployment succeeded -> " + deploymentJob.getId());
+                        logger.info("deploymentJob status url -> " + deploymentJob.getStatusesUrl());
                         Gson gson = new Gson();
                         GithubStatusObject githubStatusObject = new GithubStatusObject(ForceCIController.SUCCESS,
                                 ForceCIController.BUILD_IS_SUCCESSFUL, targetBranch + ForceCIController.VALIDATION,
@@ -259,7 +212,7 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         int status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("status create and return -> " + status);
+                        logger.info("status create and return -> " + status);
                         if (merge) {
                             deploymentJob.setBoolSfdcDeploymentRunning(false);
                             deploymentJob.setBoolSfdcDeploymentPass(true);
@@ -271,9 +224,9 @@ public class ConsumerHandler {
                             deploymentJob.setBoolCodeReviewCompleted(false);
                         }
                         deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
-                        System.out.println("merge -> " + merge);
-                        System.out.println("deploymentJob isBoolSfdcCompleted -> " + deploymentJob.isBoolSfdcCompleted());
-                        System.out.println("deploymentJob isBoolSfdcPass -> " + deploymentJob.isBoolSfdcPass());
+                        logger.info("merge -> " + merge);
+                        logger.info("deploymentJob isBoolSfdcCompleted -> " + deploymentJob.isBoolSfdcCompleted());
+                        logger.info("deploymentJob isBoolSfdcPass -> " + deploymentJob.isBoolSfdcPass());
                         sfdcPass = true;
                         break;
                     } else if (eachBuildLine.contains("*********** DEPLOYMENT FAILED ***********")) {
@@ -292,15 +245,14 @@ public class ConsumerHandler {
                         break;
                     }
                 }
-
-                deploymentJob.setLastModifiedDate(new Date());
-                deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
-                System.out.println("deploymentJob isBoolSfdcCompleted after save -> " + deploymentJob.isBoolSfdcCompleted());
-                System.out.println("deploymentJob isBoolSfdcPass after save -> " + deploymentJob.isBoolSfdcPass());
-                System.out.println("sfdcPass -> " + sfdcPass);
-                System.out.println("merge -> " + merge);
-                System.out.println("jobCancelled -> " + jobCancelled);
                 if (sfdcPass && !merge && !jobCancelled) {
+                    deploymentJob.setLastModifiedDate(new Date());
+                    deploymentJob = deploymentJobMongoRepository.save(deploymentJob);
+                    logger.info("deploymentJob isBoolSfdcCompleted after save -> " + deploymentJob.isBoolSfdcCompleted());
+                    logger.info("deploymentJob isBoolSfdcPass after save -> " + deploymentJob.isBoolSfdcPass());
+                    logger.info("sfdcPass -> " + sfdcPass);
+                    logger.info("merge -> " + merge);
+                    logger.info("jobCancelled -> " + jobCancelled);
                     Gson gson = new Gson();
                     GithubStatusObject githubStatusObject = null;
                     int status = 0;
@@ -339,7 +291,7 @@ public class ConsumerHandler {
                                 pmdStructures.add(pmdStructure);
                             }
                         } catch (Exception e) {
-                            logger.error(e.getMessage());
+                            logger.error(" Code review failed -> "+e.getMessage());
                         } finally {
                             fileInputStream.close();
                         }
@@ -352,7 +304,7 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Code Validation Pass -> " + status);
+                        logger.info("Code Validation Pass -> " + status);
 
 
                         deploymentJob.setBoolCodeReviewRunning(false);
@@ -366,7 +318,7 @@ public class ConsumerHandler {
                                         sfdcConnectionDetail.getRepoName() + "/" + sfdcConnectionDetail.getGitRepoId() + "/" + targetBranch);
                         status = ForceCIController.createStatusAndReturnCode(gson,
                                 deploymentJob.getAccess_token(), deploymentJob.getStatusesUrl(), targetBranch, githubStatusObject);
-                        System.out.println("Code Validation Failed -> " + status);
+                        logger.info("Code Validation Failed -> " + status);
 
 
                         deploymentJob.setBoolCodeReviewRunning(false);
@@ -384,6 +336,60 @@ public class ConsumerHandler {
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
+        if(sfdcTokenExpired){
+            createTempDirectoryForDeployment(newDeploymentJob);
+        }
+    }
+
+    private DeploymentJob refreshTokenAndReturnNewDeploymentJon(DeploymentJob deploymentJob, SFDCConnectionDetails sfdcConnectionDetail) throws IOException {
+        // try to get proper access token again
+        String refreshToken = sfdcConnectionDetail.getRefreshToken();
+        String environment = sfdcConnectionDetail.getEnvironment();
+        String instanceURL = sfdcConnectionDetail.getInstanceURL();
+        String clientId = System.getenv("SFDC_CLIENTID");
+        String clientSecret = System.getenv("SFDC_CLIENTSECRET");
+        String url = "";
+        if (environment.equals("0")) {
+            url = "https://login.salesforce.com/services/oauth2/token?" +
+                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
+                    "&refresh_token=" + refreshToken;
+        } else if (environment.equals("1")) {
+            url = "https://test.salesforce.com/services/oauth2/token?" +
+                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
+                    "&refresh_token=" + refreshToken;
+        } else {
+            url = instanceURL + "/services/oauth2/token?" +
+                    "grant_type=refresh_token&client_id=" + clientId + "&client_secret=" + clientSecret +
+                    "&refresh_token=" + refreshToken;
+        }
+        HttpClient httpClient = new HttpClient();
+        PostMethod post = new PostMethod(url);
+        httpClient.executeMethod(post);
+        String responseBody = IOUtils.toString(post.getResponseBodyAsStream(), StandardCharsets.UTF_8);
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(responseBody).getAsJsonObject();
+        String accessToken = jsonObject.get("access_token").getAsString();
+        sfdcConnectionDetail.setOauthToken(accessToken);
+        SFDCConnectionDetails newSfdcConnection = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetail);
+        deploymentJob.setSfdcConnectionDetail(newSfdcConnection);
+        return deploymentJobMongoRepository.save(deploymentJob);
+    }
+
+    private StringBuilder iterateAndExtractPackageXML(List<String> sf_build) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // Iterate and extract package xml formed.
+        for (int i = 0; i < sf_build.size(); i++) {
+            if (sf_build.get(i).startsWith("====FINAL PACKAGE.XML=====")) {
+                for (int j = i; j < sf_build.size(); j++) {
+                    if (sf_build.get(j).startsWith("Package generated.")) {
+                        break;
+                    } else {
+                        stringBuilder.append(sf_build.get(j)).append("\n");
+                    }
+                }
+            }
+        }
+        return stringBuilder;
     }
 
     private void setFailedDeploymentDetails(DeploymentJob deploymentJob, SFDCConnectionDetails sfdcConnectionDetail, String targetBranch, boolean merge) throws IOException {
