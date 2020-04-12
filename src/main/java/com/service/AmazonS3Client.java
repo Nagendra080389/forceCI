@@ -19,8 +19,6 @@ public class AmazonS3Client {
 
     @Value("${amazons3.region}")
     private String region;
-    @Value("${amazons3.bucketname}")
-    private String bucketName;
     @Value("${amazons3.accessKey}")
     private String accessKey;
     @Value("${amazons3.accessSecret}")

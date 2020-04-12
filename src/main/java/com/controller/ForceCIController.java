@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.amazonaws.services.s3.model.AccessControlList;
 import com.amazonaws.services.s3.model.Bucket;
 import com.dao.*;
 import com.google.common.collect.Iterables;
@@ -120,6 +121,8 @@ public class ForceCIController {
     String hmacSecretKet;
     @Value("${salesforce.metadataEndpoint}")
     String salesforceMetaDataEndpoint;
+    @Value("${amazons3.bucketname}")
+    private String bucketName;
 
     private Map<String, Map<String, RabbitMqConsumer>> consumerMap = new ConcurrentHashMap<>();
     @Autowired
@@ -1512,9 +1515,9 @@ public class ForceCIController {
     public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException {
         logger.info("amazonS3Client -> "+ amazonS3Client);
         logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
-        for (Bucket listBucket : amazonS3Client.amazonClient().listBuckets()) {
-            logger.info("amazonS3Client.buckets() -> "+ listBucket.getName());
-        }
+        logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient().getS3AccountOwner());
+        AccessControlList bucketAcl = amazonS3Client.amazonClient().getBucketAcl(bucketName);
+        logger.info("bucketAcl -> "+bucketAcl.getOwner());
 
         return null;
     }
