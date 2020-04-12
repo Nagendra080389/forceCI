@@ -1516,13 +1516,13 @@ public class ForceCIController {
 
     }
 
-    @RequestMapping(value = "/api/connectAmazonS3", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/api/connectAmazonS3", method = RequestMethod.GET)
     public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException {
         logger.info("amazonS3Client -> "+ amazonS3Client);
         logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
         logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
         return null;
-    }
+    }*/
 
     public static Date cvtToGmt(Date date) {
         TimeZone tz = TimeZone.getDefault();
