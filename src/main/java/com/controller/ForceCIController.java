@@ -22,6 +22,7 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import com.service.AmazonS3Client;
 import com.service.CaptchaServiceV3;
 import com.service.ICaptchaService;
 import com.sforce.soap.metadata.MetadataConnection;
@@ -140,6 +141,8 @@ public class ForceCIController {
     private LinkedServicesMongoRepository linkedServicesMongoRepository;
     @Autowired
     private ICaptchaService captchaServiceV3;
+    @Autowired
+    private AmazonS3Client amazonS3Client;
 
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
@@ -1511,6 +1514,14 @@ public class ForceCIController {
             return gson.toJson("Error");
         }
 
+    }
+
+    @RequestMapping(value = "/api/connectAmazonS3", method = RequestMethod.GET)
+    public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        logger.info("amazonS3Client -> "+ amazonS3Client);
+        logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
+        logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
+        return null;
     }
 
     public static Date cvtToGmt(Date date) {
