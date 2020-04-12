@@ -1527,9 +1527,6 @@ public class ForceCIController {
         MultipleFileUpload upload = transferManager.uploadDirectory(bucketName, uniqueId, file, true);
         upload.waitForCompletion();
         logger.info("File Uploaded Successfully");
-
-
-
         return null;
     }
 
