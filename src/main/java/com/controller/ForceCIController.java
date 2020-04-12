@@ -1523,6 +1523,7 @@ public class ForceCIController {
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3Client.amazonClient()).build();
         File file = Files.createTempDirectory(uniqueId).toFile();
+        Files.createTempFile(file.toPath(), "fileName",".txt").toFile();
         MultipleFileUpload upload = transferManager.uploadDirectory(bucketName, uniqueId, file, true);
         upload.waitForCompletion();
         logger.info("File Uploaded Successfully");
