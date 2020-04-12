@@ -1537,9 +1537,14 @@ public class ForceCIController {
                 .withS3Client(amazonS3Client.amazonClient()).build();
         File destinationDirectory = Files.createTempDirectory(uniqueId).toFile();
         logger.info("destinationDirectory With -> "+ destinationDirectory.getPath());
-        logger.info("destinationDirectory With -> "+ destinationDirectory.getName());
         MultipleFileDownload multipleFileDownload = transferManager.downloadDirectory(bucketName, prefixKey, destinationDirectory);
         multipleFileDownload.waitForCompletion();
+        if(destinationDirectory.listFiles() != null && destinationDirectory.listFiles().length > 0) {
+            for (File file : destinationDirectory.listFiles()) {
+                logger.info("file name inside -> " + file.getName());
+            }
+        }
+
         logger.info("Download Successfully");
         return null;
     }
