@@ -1532,10 +1532,12 @@ public class ForceCIController {
     @RequestMapping(value = "/api/connectAmazonS3/download", method = RequestMethod.GET)
     public String downloadFromAmazonS3(@RequestParam String prefixKey, HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
         String uniqueId = UUID.randomUUID().toString();
-        logger.info("Uploaded With -> "+ uniqueId);
+        logger.info("Download With -> "+ uniqueId);
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3Client.amazonClient()).build();
         File destinationDirectory = Files.createTempDirectory(uniqueId).toFile();
+        logger.info("destinationDirectory With -> "+ destinationDirectory.getPath());
+        logger.info("destinationDirectory With -> "+ destinationDirectory.getName());
         MultipleFileDownload multipleFileDownload = transferManager.downloadDirectory(bucketName, prefixKey, destinationDirectory);
         multipleFileDownload.waitForCompletion();
         logger.info("Download Successfully");
