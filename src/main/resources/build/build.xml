@@ -136,6 +136,7 @@
             <fileset dir="../src" excludes="**/staticresources/**"/>
         </copy>
     </target>
+
     <target name="sf_build" depends="sf_prepare_deployment">
         <echo message="START: SFDC Deployment"/>
         <echo message="${diffDir}/src"/>
@@ -172,6 +173,7 @@
                    runAllTests="${sf.runAllTests}" logType="${sf.logType}"
         />
     </target>
+
     <target name="git_tag">
         <echo message="Build date is: ${BUILD_DATE}"/>
         <echo message="Build number: ${BUILD_NUMBER}"/>
@@ -183,6 +185,17 @@
             <arg value="${ENV}_${BUILD_DATE}_${BUILD_NUMBER}"/>
             <arg value="${REPO_PASS}"/>
         </exec>
+    </target>
+
+    <!-- Retrieve the information on all supported metadata type -->
+    <target name="describeMetadata">
+        <sf:describeMetadata sessionId="${sf.sessionId}" serverurl="${sf.serverurl}"/>
+    </target>
+
+
+    <!-- Retrieve metadata for all the packages specified under packageNames -->
+    <target name="retrievePkg">
+        <sf:retrieve sessionId="${sf.sessionId}" serverurl="${sf.serverurl}" maxPoll="${sf.maxPoll}" retrieveTarget="${sf.retrieveTarget}" unpackaged="${sf.unpackaged}" singlePackage="false"/>
     </target>
 
 </project>

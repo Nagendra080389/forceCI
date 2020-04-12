@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.amazonaws.services.s3.model.Bucket;
 import com.dao.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -1155,22 +1156,13 @@ public class ForceCIController {
         userEntity = connect2DeployUserMongoRepository.save(userEntity);
         Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
         confirmationToken = connect2DeployTokenMongoRepository.save(confirmationToken);
-        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
-
         Email from = new Email("no-reply@connect2deploy.com");
         String subject = "Hello " + userEntity.getFirstName() + " !";
         Email to = new Email(userEntity.getEmailId());
         Content content = new Content("text/plain", "To confirm your account, please click here : "
                 + "https://forceci.herokuapp.com/#!/apps/dashboard/token/" + confirmationToken.getConfirmationToken());
-        Mail mail = new Mail(from, subject, to, content);
-
-        Request sendGridRequest = new Request();
-        sendGridRequest.setMethod(Method.POST);
-        sendGridRequest.setEndpoint("mail/send");
-        sendGridRequest.setBody(mail.build());
-        Response sendGridResponse = sg.api(sendGridRequest);
-        logger.info("Email Sent -> " + sendGridResponse.getStatusCode());
-        logger.info("Email Sent for user -> " + userEntity.getEmailId());
+        int statusCodeEmail = SendEmailsUtil.sendEmail(subject, from, to, content);
+        logger.info("Email Sent -> " + statusCodeEmail);
         returnResponse = "Success";
         return returnResponse;
     }
@@ -1520,7 +1512,10 @@ public class ForceCIController {
     public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException {
         logger.info("amazonS3Client -> "+ amazonS3Client);
         logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
-        logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
+        for (Bucket listBucket : amazonS3Client.amazonClient().listBuckets()) {
+            logger.info("amazonS3Client.buckets() -> "+ listBucket.getName());
+        }
+
         return null;
     }
 
