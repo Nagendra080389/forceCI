@@ -2,6 +2,10 @@ package com.controller;
 
 import com.amazonaws.services.s3.model.AccessControlList;
 import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.transfer.MultipleFileDownload;
+import com.amazonaws.services.s3.transfer.MultipleFileUpload;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.dao.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -1512,12 +1516,19 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/api/connectAmazonS3", method = RequestMethod.GET)
-    public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException {
+    public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
         logger.info("amazonS3Client -> "+ amazonS3Client);
         logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
         logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient().getS3AccountOwner());
-        AccessControlList bucketAcl = amazonS3Client.amazonClient().getBucketAcl(bucketName);
-        logger.info("bucketAcl -> "+bucketAcl.getOwner());
+        String uniqueId = UUID.randomUUID().toString();
+        TransferManager transferManager = TransferManagerBuilder.standard()
+                .withS3Client(amazonS3Client.amazonClient()).build();
+        File file = Files.createTempDirectory(uniqueId).toFile();
+        MultipleFileUpload upload = transferManager.uploadDirectory(bucketName, uniqueId, file, true);
+        upload.waitForCompletion();
+        logger.info("File Uploaded Successfully");
+
+
 
         return null;
     }
