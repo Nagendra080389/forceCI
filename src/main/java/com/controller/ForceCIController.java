@@ -1519,7 +1519,6 @@ public class ForceCIController {
     public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
         logger.info("amazonS3Client -> "+ amazonS3Client);
         logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
-        logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient().getS3AccountOwner());
         String uniqueId = UUID.randomUUID().toString();
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3Client.amazonClient()).build();
