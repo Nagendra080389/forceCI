@@ -1515,11 +1515,10 @@ public class ForceCIController {
 
     }
 
-    @RequestMapping(value = "/api/connectAmazonS3", method = RequestMethod.GET)
-    public String connectAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
-        logger.info("amazonS3Client -> "+ amazonS3Client);
-        logger.info("amazonS3Client.amazonClient() -> "+ amazonS3Client.amazonClient());
+    @RequestMapping(value = "/api/connectAmazonS3/upload", method = RequestMethod.GET)
+    public String uploadToAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
         String uniqueId = UUID.randomUUID().toString();
+        logger.info("Uploaded With -> "+ uniqueId);
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3Client.amazonClient()).build();
         File file = Files.createTempDirectory(uniqueId).toFile();
@@ -1527,6 +1526,19 @@ public class ForceCIController {
         MultipleFileUpload upload = transferManager.uploadDirectory(bucketName, uniqueId, file, true);
         upload.waitForCompletion();
         logger.info("File Uploaded Successfully");
+        return null;
+    }
+
+    @RequestMapping(value = "/api/connectAmazonS3/download", method = RequestMethod.GET)
+    public String downloadFromAmazonS3(@RequestParam String prefixKey, HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
+        String uniqueId = UUID.randomUUID().toString();
+        logger.info("Uploaded With -> "+ uniqueId);
+        TransferManager transferManager = TransferManagerBuilder.standard()
+                .withS3Client(amazonS3Client.amazonClient()).build();
+        File destinationDirectory = Files.createTempDirectory(uniqueId).toFile();
+        MultipleFileDownload multipleFileDownload = transferManager.downloadDirectory(bucketName, prefixKey, destinationDirectory);
+        multipleFileDownload.waitForCompletion();
+        logger.info("Download Successfully");
         return null;
     }
 
