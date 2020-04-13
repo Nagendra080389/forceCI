@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-@Configuration
+@Service
 public class AmazonS3Client {
 
     @Value("${amazons3.region}")
