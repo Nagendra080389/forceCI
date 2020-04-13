@@ -1548,7 +1548,15 @@ public class ForceCIController {
         multipleFileDownload.waitForCompletion();
         if(destinationDirectory.listFiles() != null && destinationDirectory.listFiles().length > 0) {
             for (File file : destinationDirectory.listFiles()) {
-                logger.info("file name inside download-> " + file.getName());
+                if(file.isDirectory()){
+                    for (File listFile : file.listFiles()) {
+                        logger.info("file name inside download-> " + file.getName());
+                    }
+
+                }else{
+                    logger.info("file name inside download-> " + file.getName());
+                }
+
             }
         }
 
