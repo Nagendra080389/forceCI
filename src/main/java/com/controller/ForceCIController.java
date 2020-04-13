@@ -1550,7 +1550,7 @@ public class ForceCIController {
             for (File file : destinationDirectory.listFiles()) {
                 if(file.isDirectory()){
                     for (File listFile : file.listFiles()) {
-                        logger.info("file name inside download-> " + file.getName());
+                        logger.info("file name inside download-> " + listFile.getName());
                     }
 
                 }else{
