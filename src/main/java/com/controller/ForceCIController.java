@@ -1521,21 +1521,25 @@ public class ForceCIController {
         logger.info("Uploaded With -> "+ uniqueId);
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3Client.amazonClient()).build();
-        File file = Files.createTempDirectory(uniqueId).toFile();
-        Files.createTempFile(file.toPath(), "fileName",".txt");
-        for (File eachFile : file.listFiles()) {
-            logger.info("file name inside -> " + eachFile.getName());
+        Path directoryPath = Files.createTempDirectory(uniqueId);
+        Path fileToCreatePath = directoryPath.resolve("fileName.txt");
+        Path folderForUnmanagedPackage = directoryPath.resolve("testMe.txt");
+        Files.createFile(fileToCreatePath).toFile();
+        Files.createFile(folderForUnmanagedPackage).toFile();
+        for (File eachFile : directoryPath.toFile().listFiles()) {
+            logger.info("file name inside upload-> " + eachFile.getName());
         }
-        MultipleFileUpload upload = transferManager.uploadDirectory(bucketName, uniqueId, file, true);
+        MultipleFileUpload upload = transferManager.uploadDirectory(bucketName, uniqueId, directoryPath.toFile(), false);
         upload.waitForCompletion();
         logger.info("File Uploaded Successfully");
+        transferManager.shutdownNow();
         return null;
     }
 
     @RequestMapping(value = "/api/connectAmazonS3/download", method = RequestMethod.GET)
     public String downloadFromAmazonS3(@RequestParam String prefixKey, HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
         String uniqueId = UUID.randomUUID().toString();
-        logger.info("Download With -> "+ uniqueId);
+        logger.info("Download With -> "+ prefixKey);
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3Client.amazonClient()).build();
         File destinationDirectory = Files.createTempDirectory(uniqueId).toFile();
@@ -1544,11 +1548,12 @@ public class ForceCIController {
         multipleFileDownload.waitForCompletion();
         if(destinationDirectory.listFiles() != null && destinationDirectory.listFiles().length > 0) {
             for (File file : destinationDirectory.listFiles()) {
-                logger.info("file name inside -> " + file.getName());
+                logger.info("file name inside download-> " + file.getName());
             }
         }
 
         logger.info("Download Successfully");
+        transferManager.shutdownNow();
         return null;
     }
 
