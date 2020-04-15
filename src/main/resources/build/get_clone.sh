@@ -14,4 +14,4 @@ ls -a
 git config --global user.email $3
 git config --global user.name $4
 git clone $2 .
-git checkout -B $2 origin/$2
+git checkout -B $5 origin/$5
