@@ -6,5 +6,5 @@ echo $4
 echo $1
 
 cd $4
-git diff --name-status $1^ $1 > diff.txt
+git diff --name-status origin/$1^ origin/$1 > diff.txt
 echo 'Git diff done.'
