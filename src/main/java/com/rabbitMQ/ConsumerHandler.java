@@ -111,6 +111,7 @@ public class ConsumerHandler {
             String emailId = deploymentJob.getEmailId();
             String userName = deploymentJob.getUserName();
             String gitCloneURL = deploymentJob.getGitCloneURL();
+            String strRepoName = deploymentJob.getRepoName();
             String sourceBranch = deploymentJob.getSourceBranch();
             String targetBranch = deploymentJob.getTargetBranch();
             boolean merge = deploymentJob.isBoolMerge();
@@ -154,7 +155,9 @@ public class ConsumerHandler {
                 propertiesMap.put("gitClone", get_clone.getName());
                 propertiesMap.put("create_changes", create_changes.getName());
                 propertiesMap.put("generate_package", generate_package.getName());
-                propertiesMap.put("originURL", gitCloneURL);
+                String strCloneURL = "https://" + userName + ":" + deploymentJob.getAccess_token() + "@github.com/" + userName + "/" + strRepoName + ".git";
+                logger.info("strCloneURL -> " + strCloneURL);
+                propertiesMap.put("originURL", strCloneURL);
                 propertiesMap.put("antPath", antJar.getPath());
                 // Only run on Merge
                 if (merge) {
@@ -294,7 +297,7 @@ public class ConsumerHandler {
                                 pmdStructures.add(pmdStructure);
                             }
                         } catch (Exception e) {
-                            logger.error(" Code review failed -> "+e.getMessage());
+                            logger.error(" Code review failed -> " + e.getMessage());
                         } finally {
                             fileInputStream.close();
                         }
@@ -332,14 +335,14 @@ public class ConsumerHandler {
                     deploymentJobMongoRepository.save(deploymentJob);
                 }
             } catch (Exception e) {
-               logger.error(e.getMessage());
+                logger.error(e.getMessage());
             } finally {
                 FileUtils.deleteDirectory(tempDirectory.toFile());
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        if(sfdcTokenExpired){
+        if (sfdcTokenExpired) {
             createTempDirectoryForDeployment(newDeploymentJob);
         }
     }
