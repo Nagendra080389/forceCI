@@ -183,6 +183,7 @@ public class ConsumerHandler {
                 propertiesMap.put("sf.logType", "None");
                 propertiesMap.put("sf.testRun", sfdcConnectionDetail.getTestLevel());
                 propertiesMap.put("targetName", targetBranch);
+                propertiesMap.put("targetBranchCheckOut", targetBranch);
 
                 List<String> sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "sf_build", propertiesMap, deploymentJob, deploymentJobMongoRepository);
                 for (String eachLine : sf_build) {

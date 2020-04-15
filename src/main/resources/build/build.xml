@@ -61,6 +61,7 @@
             <arg value="${originURL}"/>
             <arg value="${userEmail}"/>
             <arg value="${userName}"/>
+            <arg value="${targetBranchCheckOut}"/>
         </exec>
         <exec executable="/bin/bash" osfamily="unix" failonerror="true">
             <arg value="${gitClone}"/>
@@ -68,6 +69,7 @@
             <arg value="${originURL}"/>
             <arg value="${userEmail}"/>
             <arg value="${userName}"/>
+            <arg value="${targetBranchCheckOut}"/>
         </exec>
 
         <mkdir dir="${diffDir}"/>
@@ -106,6 +108,20 @@
             <arg value="${diffDir}/src"/>
         </exec>
 
+        <!--<exec executable="C:\Program Files\Git\bin\bash.exe" osfamily="windows">
+            <arg value="${generate_package_des}"/>
+            <arg value="${destructiveGeneratePackage}"/>
+            <arg value="destructiveChanges"/>
+            <arg value="${diffDir}/src"/>
+        </exec>
+
+        <exec executable="/bin/bash" osfamily="unix">
+            <arg value="${generate_package_des_unix}"/>
+            <arg value="${destructiveGeneratePackage}"/>
+            <arg value="destructiveChanges"/>
+            <arg value="${diffDir}/src"/>
+        </exec>
+-->
         <exec executable="/bin/bash" osfamily="unix">
             <arg value="${generate_package_unix}"/>
             <arg value="${generatePackage}"/>
