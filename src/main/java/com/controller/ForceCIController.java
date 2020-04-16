@@ -1398,14 +1398,8 @@ public class ForceCIController {
         // Create the object detail to be passed to RabbitMQ
         DeploymentJob deploymentJob = new DeploymentJob();
         if (merge) {
-            List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByPullRequestNumberDesc(gitRepoId, baseSHA);
+            List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByJobIdDesc(gitRepoId, baseSHA);
             if (byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
-                byRepoIdAndBaseSHA.sort(new Comparator<DeploymentJob>() {
-                    @Override
-                    public int compare(DeploymentJob deploymentJob1, DeploymentJob deploymentJob2) {
-                        return deploymentJob1.getLastModifiedDate().compareTo(deploymentJob2.getLastModifiedDate());
-                    }
-                });
                 deploymentJob = byRepoIdAndBaseSHA.get(0);
             }
         }
