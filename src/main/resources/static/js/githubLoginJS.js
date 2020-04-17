@@ -497,19 +497,19 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             repoToken = $scope.commitResponse[0].repoToken;
             repoUserName = $scope.commitResponse[0].repoUserName;
             ghEnterpriseServerURL = $scope.commitResponse[0].ghEnterpriseServerURL;
-            if($scope.commitResponse[i].isSelected){
+            if ($scope.commitResponse[i].isSelected) {
                 gitCloneURL = $scope.commitResponse[i].gitCloneURL;
                 lstCommitIdsSelected.push($scope.commitResponse[i].commitId);
             }
         }
-        if(lstCommitIdsSelected.length > 0) {
+        if (lstCommitIdsSelected.length > 0) {
             $scope.cherryPickDisable = false;
         } else {
             $scope.cherryPickDisable = true;
         }
     }
 
-    $scope.selectAndFireCherryPick = function(){
+    $scope.selectAndFireCherryPick = function () {
         $scope.cherryPickDisable = true;
         let lstCommitIdsSelected = [];
         let gitCloneURL = '';
@@ -518,28 +518,28 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
         let ghEnterpriseServerURL = '';
         const commitResponseCopy = [];
         Object.assign(commitResponseCopy, $scope.commitResponse);
-        commitResponseCopy.sort(function(a,b){
+        commitResponseCopy.sort(function (a, b) {
             return new Date(a.commitDate) - new Date(b.commitDate);
         });
         for (let i = 0; i < commitResponseCopy.length; i++) {
             repoToken = commitResponseCopy[0].repoToken;
             repoUserName = commitResponseCopy[0].repoUserName;
             ghEnterpriseServerURL = commitResponseCopy[0].ghEnterpriseServerURL;
-            if(commitResponseCopy[i].isSelected){
+            if (commitResponseCopy[i].isSelected) {
                 gitCloneURL = commitResponseCopy[i].gitCloneURL;
                 lstCommitIdsSelected.push(commitResponseCopy[i].commitId);
             }
         }
         let cherryPickRequest = {
             lstCommitIdsSelected: lstCommitIdsSelected,
-            destinationBranch : $scope.gitCommitSearch.destinationBranch,
-            newBranch : $scope.gitCommitSearch.newBranchName,
-            gitCloneURL : gitCloneURL,
-            repoToken : repoToken,
-            repoUserName : repoUserName,
-            ghEnterpriseServerURL : ghEnterpriseServerURL,
-            linkedServiceName : $scope.linkedService,
-            repoId : $scope.repoId
+            destinationBranch: $scope.gitCommitSearch.destinationBranch,
+            newBranch: $scope.gitCommitSearch.newBranchName,
+            gitCloneURL: gitCloneURL,
+            repoToken: repoToken,
+            repoUserName: repoUserName,
+            ghEnterpriseServerURL: ghEnterpriseServerURL,
+            linkedServiceName: $scope.linkedService,
+            repoId: $scope.repoId
         };
         $http.post("/api/cherryPick", cherryPickRequest).then(function (response) {
             $scope.commitResponse = [];
@@ -550,11 +550,11 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             for (let i = 0; i < response.data.length; i++) {
                 if (response.data[i].match(regex)) {
                     $scope.cherryPickSuccess = true;
-                    $scope.cherryPickSuccessText = 'Cherry Picking Successful ! '+ '<a href="'+response.data[i]+'" target="_blank">Click Here</a>' + ' to create Pull Request';
+                    $scope.cherryPickSuccessText = 'Cherry Picking Successful ! ' + '<a href="' + response.data[i] + '" target="_blank">Click Here</a>' + ' to create Pull Request';
                 } else {
-                    if(response.data[i].indexOf('**** GIT PUSH FAILED ****') > -1 || response.data[i].indexOf('**** GIT CHERRY PICK') > -1
-                    || response.data[i].indexOf('**** GIT CREATION OF NEW BRANCH') > -1 || response.data[i].indexOf('**** GIT CHECKOUT OF') > -1
-                    || response.data[i].indexOf('Already Exists ! Please try creating different branch.') > -1){
+                    if (response.data[i].indexOf('**** GIT PUSH FAILED ****') > -1 || response.data[i].indexOf('**** GIT CHERRY PICK') > -1
+                        || response.data[i].indexOf('**** GIT CREATION OF NEW BRANCH') > -1 || response.data[i].indexOf('**** GIT CHECKOUT OF') > -1
+                        || response.data[i].indexOf('Already Exists ! Please try creating different branch.') > -1) {
                         $scope.cherryPickError = true;
                         $scope.cherryPickErrorText = response.data[i];
                     }
@@ -921,6 +921,21 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     title: 'OK',
                     message: response.data
                 });
+            $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName).then(function (response) {
+                let data = response.data;
+                try {
+                    for (let i = 0; i < data.length; i++) {
+                        $scope.services.push(data[i]);
+                    }
+                } catch (e) {
+
+                }
+            }, function (error) {
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
+                console.error(error);
+            });
             }, function (error) {
                 iziToast.error({
                     title: 'Error',
