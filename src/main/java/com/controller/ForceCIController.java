@@ -1054,10 +1054,12 @@ public class ForceCIController {
                     List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
                     deploymentJobMongoRepository.deleteAllByRepoId(repositoryId);
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
-                        logger.error("Delete Queue -> "+sfdcConnectionDetails.getGitRepoId());
-                        rabbitMqSenderConfig.amqpAdmin().deleteQueue(sfdcConnectionDetails.getGitRepoId() + '_'+ sfdcConnectionDetails.getBranchConnectedTo());
+                        logger.info("Delete Queue -> "+sfdcConnectionDetails.getGitRepoId());
+                        boolean b = rabbitMqSenderConfig.amqpAdmin().deleteQueue(sfdcConnectionDetails.getGitRepoId() + '_' + sfdcConnectionDetails.getBranchConnectedTo());
+                        logger.info("Queue Deleted -> "+b);
                     }
-                    rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryId);
+                    boolean b = rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryId);
+                    logger.info("Exchange Deleted -> "+b);
                     sfdcConnectionDetailsMongoRepository.deleteAll(byGitRepoId);
                 } catch (Exception e) {
                     logger.error("Error from Delete webHook -> "+e.getMessage());
