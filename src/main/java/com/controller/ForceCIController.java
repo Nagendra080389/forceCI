@@ -20,6 +20,8 @@ import com.rabbitMQ.ConsumerHandler;
 import com.rabbitMQ.DeploymentJob;
 import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
+import com.rabbitmq.client.Consumer;
+import com.rabbitmq.client.DefaultConsumer;
 import com.security.CryptoPassword;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -1050,7 +1052,17 @@ public class ForceCIController {
             status = httpClient.executeMethod(deleteWebHook);
             if (status == 204) {
                 try {
-                    consumerMap.remove(repositoryId);
+                    if(consumerMap != null && consumerMap.containsKey(repositoryId)) {
+                        Map<String, RabbitMqConsumer> stringRabbitMqConsumerMap = consumerMap.get(repositoryId);
+                        if(stringRabbitMqConsumerMap != null && !stringRabbitMqConsumerMap.isEmpty()) {
+                            for (Map.Entry<String, RabbitMqConsumer> stringRabbitMqConsumerEntry : stringRabbitMqConsumerMap.entrySet()) {
+                                stringRabbitMqConsumerEntry.getValue().stopConsumers();
+                                stringRabbitMqConsumerEntry.getValue().shutDownConsumers();
+                                logger.info("Consumer Stopped");
+                            }
+                        }
+                        consumerMap.remove(repositoryId);
+                    }
                     List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
                     deploymentJobMongoRepository.deleteAllByRepoId(repositoryId);
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
