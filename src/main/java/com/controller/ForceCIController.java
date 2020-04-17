@@ -904,28 +904,43 @@ public class ForceCIController {
                         repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                         newLstRepositoryWrapper.add(repositoryWrapper);
                         logger.info("consumerMap from /api/fetchRepositoryInDB -> "+consumerMap);
-                        if(byGitRepoId != null && !byGitRepoId.isEmpty()) {
-                            logger.info("consumerMap from byGitRepoId -> " + byGitRepoId);
-                        }
-                        if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
-                            Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
-                            for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
-                                logger.info("sfdcConnectionDetails -> " + sfdcConnectionDetails.getGitRepoId());
-                                RabbitMqConsumer container = new RabbitMqConsumer();
-                                container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-                                container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
-                                container.setConcurrentConsumers(1);
-                                container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
-                                logger.info("Started Consumer called from getRepository List");
-                                container.startConsumers();
-                                rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
+                        if(byGitRepoId != null) {
+                            if (consumerMap != null && consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())
+                                    && consumerMap.get(repositoryWrapper.getRepository().getRepositoryId()).isEmpty()) {
+                                Map<String, RabbitMqConsumer> stringRabbitMqConsumerMap = consumerMap.get(repositoryWrapper.getRepository().getRepositoryId());
+                                for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                                    logger.info("sfdcConnectionDetails if -> " + sfdcConnectionDetails.getGitRepoId());
+                                    RabbitMqConsumer container = new RabbitMqConsumer();
+                                    container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+                                    container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
+                                    container.setConcurrentConsumers(1);
+                                    container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+                                    logger.info("Started Consumer called from getRepository List");
+                                    container.startConsumers();
+                                    stringRabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
+                                }
+                            } else {
+                                if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
+                                    Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
+                                    for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                                        logger.info("sfdcConnectionDetails else -> " + sfdcConnectionDetails.getGitRepoId());
+                                        RabbitMqConsumer container = new RabbitMqConsumer();
+                                        container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+                                        container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
+                                        container.setConcurrentConsumers(1);
+                                        container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+                                        logger.info("Started Consumer called from getRepository List");
+                                        container.startConsumers();
+                                        rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
+                                    }
+                                    consumerMap.put(repositoryWrapper.getRepository().getRepositoryId(), rabbitMqConsumerMap);
+                                }
                             }
-                            consumerMap.put(repositoryWrapper.getRepository().getRepositoryId(), rabbitMqConsumerMap);
                         }
                     }
                 }
             }
-            logger.info("consumerMap -> "+gson.toJson(consumerMap.keySet()));
+            logger.info("consumerMap end -> "+consumerMap);
             reposOnDB = gson.toJson(newLstRepositoryWrapper);
         }
         return reposOnDB;
@@ -1486,6 +1501,7 @@ public class ForceCIController {
                 container.startConsumers();
                 rabbitMqConsumerMap.put(queue_name, container);
                 consumerMap.put(sfdcConnectionDetail.getGitRepoId(), rabbitMqConsumerMap);
+                logger.info("consumerMap start deployment-> "+consumerMap);
             }
         }
     }
