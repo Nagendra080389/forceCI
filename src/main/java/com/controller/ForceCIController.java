@@ -1046,18 +1046,18 @@ public class ForceCIController {
             if (status == 204) {
                 try {
                     consumerMap.remove(repositoryId);
+                    List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
+                    deploymentJobMongoRepository.deleteAllByRepoId(repositoryId);
+                    for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                        rabbitMqSenderConfig.amqpAdmin().deleteQueue(sfdcConnectionDetails.getGitRepoId() + '_'+ sfdcConnectionDetails.getBranchConnectedTo());
+                    }
                     rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryId);
+                    sfdcConnectionDetailsMongoRepository.deleteAll(byGitRepoId);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
                 RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryId(repositoryOwner, repositoryId);
                 repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
-                List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
-                sfdcConnectionDetailsMongoRepository.deleteAll(byGitRepoId);
-                for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
-                    rabbitMqSenderConfig.amqpAdmin().deleteQueue(sfdcConnectionDetails.getBranchConnectedTo());
-                }
-
             }
         }
 
@@ -1163,7 +1163,7 @@ public class ForceCIController {
         userEntity = connect2DeployUserMongoRepository.save(userEntity);
         Connect2DeployToken confirmationToken = new Connect2DeployToken(userEntity.getId());
         confirmationToken = connect2DeployTokenMongoRepository.save(confirmationToken);
-        Email from = new Email("no-reply@connect2deploy.com");
+        Email from = new Email("no-reply@connect2deploy.com", "Connect2Deploy");
         String subject = "Hello " + userEntity.getFirstName() + " !";
         Email to = new Email(userEntity.getEmailId());
         Content content = new Content("text/plain", "To confirm your account, please click here : "
@@ -1335,13 +1335,17 @@ public class ForceCIController {
         Gson gson = new Gson();
         try {
             Optional<SFDCConnectionDetails> byId = sfdcConnectionDetailsMongoRepository.findById(sfdcDetailsId);
-            rabbitMqSenderConfig.amqpAdmin().deleteQueue(byId.get().getBranchConnectedTo());
-            Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byId.get().getGitRepoId());
-            if (rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty() && rabbitMqConsumerMap.get(byId.get().getBranchConnectedTo()) != null) {
-                rabbitMqConsumerMap.remove(byId.get().getBranchConnectedTo());
+            if(byId.isPresent()) {
+                rabbitMqSenderConfig.amqpAdmin().deleteQueue(byId.get().getGitRepoId() + '_' + byId.get().getBranchConnectedTo());
+                Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byId.get().getGitRepoId());
+                if (rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty() && rabbitMqConsumerMap.get(byId.get().getBranchConnectedTo()) != null) {
+                    rabbitMqConsumerMap.remove(byId.get().getBranchConnectedTo());
+                }
+                sfdcConnectionDetailsMongoRepository.deleteById(sfdcDetailsId);
+                return gson.toJson("Success");
+            } else {
+                return gson.toJson("No Details Found");
             }
-            sfdcConnectionDetailsMongoRepository.deleteById(sfdcDetailsId);
-            return gson.toJson("Success");
         } catch (Exception e) {
             return gson.toJson("Error");
         }

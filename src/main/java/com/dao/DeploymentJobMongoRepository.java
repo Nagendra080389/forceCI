@@ -23,4 +23,6 @@ public interface DeploymentJobMongoRepository extends MongoRepository<Deployment
 
     List<DeploymentJob> findByRepoIdAndBaseSHAOrderByJobIdDesc(String repoId, String baseSHA);
 
+    void deleteAllByRepoId(String repoId);
+
 }
