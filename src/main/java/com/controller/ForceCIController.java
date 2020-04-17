@@ -916,6 +916,7 @@ public class ForceCIController {
                                 container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
                                 container.setConcurrentConsumers(1);
                                 container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+                                logger.info("Started Consumer called from getRepository List");
                                 container.startConsumers();
                                 rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
                             }
@@ -1220,6 +1221,7 @@ public class ForceCIController {
             container.setQueueNames(queue.getName());
             container.setConcurrentConsumers(1);
             container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+            logger.info("Started Consumer called from saveSfdcConnectionDetails");
             container.startConsumers();
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byRepositoryRepositoryId.getRepository().getRepositoryId());
             if (rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty()) {
@@ -1480,6 +1482,7 @@ public class ForceCIController {
                 container.setQueueNames(queue_name);
                 container.setConcurrentConsumers(1);
                 container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+                logger.info("Started Consumer called from start_deployment");
                 container.startConsumers();
                 rabbitMqConsumerMap.put(queue_name, container);
                 consumerMap.put(sfdcConnectionDetail.getGitRepoId(), rabbitMqConsumerMap);
