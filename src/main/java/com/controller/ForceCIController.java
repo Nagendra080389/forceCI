@@ -901,9 +901,14 @@ public class ForceCIController {
                         List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
                         repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                         newLstRepositoryWrapper.add(repositoryWrapper);
+                        logger.info("consumerMap from /api/fetchRepositoryInDB -> "+consumerMap);
+                        if(byGitRepoId != null && !byGitRepoId.isEmpty()) {
+                            logger.info("consumerMap from byGitRepoId -> " + byGitRepoId);
+                        }
                         if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
                             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
                             for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                                logger.info("sfdcConnectionDetails -> " + sfdcConnectionDetails.getGitRepoId());
                                 RabbitMqConsumer container = new RabbitMqConsumer();
                                 container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
                                 container.setQueueNames(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo());
@@ -1049,12 +1054,13 @@ public class ForceCIController {
                     List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
                     deploymentJobMongoRepository.deleteAllByRepoId(repositoryId);
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
+                        logger.error("Delete Queue -> "+sfdcConnectionDetails.getGitRepoId());
                         rabbitMqSenderConfig.amqpAdmin().deleteQueue(sfdcConnectionDetails.getGitRepoId() + '_'+ sfdcConnectionDetails.getBranchConnectedTo());
                     }
                     rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryId);
                     sfdcConnectionDetailsMongoRepository.deleteAll(byGitRepoId);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.error("Error from Delete webHook -> "+e.getMessage());
                 }
                 RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryId(repositoryOwner, repositoryId);
                 repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
