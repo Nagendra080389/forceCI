@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <title>Oauth Success</title>
+    <script>
+        $(document).ready(function () {
+            let sfdcAccessToken = $.cookie("SFDC_ACCESS_TOKEN");
+            let sfdcUserName = $.cookie("SFDC_USER_NAME");
+            let sfdcInstanceURL = $.cookie("SFDC_INSTANCE_URL");
+            let sfdcRefreshToken = $.cookie("SFDC_REFRESH_TOKEN");
+            const objOauth = {
+                strDestinationId: 'OauthPayload',
+                sfdcAccessToken: sfdcAccessToken,
+                sfdcUserName: sfdcUserName,
+                sfdcInstanceURL: sfdcInstanceURL,
+                sfdcRefreshToken: sfdcRefreshToken,
+                windowName: window.name
+            };
+            window.opener.postMessage(objOauth, window.location.origin);
+        })
+    </script>
+</head>
+<body>
+Success!
+</body>
+</html>

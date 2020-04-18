@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://soap.sforce.com/2006/04/metadata"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Package" type="met:PackageType" xmlns:met="http://soap.sforce.com/2006/04/metadata"/>
+  <xs:complexType name="typesType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="members" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element type="xs:string" name="name"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PackageType">
+    <xs:sequence>
+      <xs:element type="met:typesType" name="types" maxOccurs="unbounded" minOccurs="0" xmlns:met="http://soap.sforce.com/2006/04/metadata"/>
+      <xs:element type="xs:string" name="version"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

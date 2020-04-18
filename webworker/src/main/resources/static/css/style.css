@@ -1,0 +1,238 @@
+a.btn.btn-github.btn-user.btn-block {
+    background-color: black;
+    color: white;
+}
+
+
+@-moz-keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Firefox */
+@-webkit-keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Webkit */
+@-ms-keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* IE */
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Opera */
+
+.validationRunning {
+    background-color: #a9b2b5;
+    color: aliceblue;
+    padding: 15px 15px 15px 15px;
+    text-align: center;
+    margin-bottom: 4px;
+    font-size: 12px;
+    border-radius: 15px;
+    width: 10rem;
+    vertical-align: middle;
+    line-height: 0;
+    height: 1rem;
+    -moz-transition: all 0.5s ease-in-out;
+    -webkit-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    -ms-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+    -moz-animation: blink normal 1.5s infinite ease-in-out; /* Firefox */
+    -webkit-animation: blink normal 1.5s infinite ease-in-out; /* Webkit */
+    -ms-animation: blink normal 1.5s infinite ease-in-out; /* IE */
+    animation: blink normal 1.5s infinite ease-in-out; /* Opera */
+}
+
+
+.validationNotStarted {
+    background-color: #a9b2b5;
+    color: aliceblue;
+    padding: 15px 15px 15px 15px;
+    text-align: center;
+    margin-bottom: 4px;
+    font-size: 12px;
+    border-radius: 15px;
+    width: 10rem;
+    vertical-align: middle;
+    line-height: 0;
+    height: 1rem;
+}
+
+.cancelledJob {
+    background-color: #e5ba2a;
+    color: aliceblue;
+    padding: 15px 15px 15px 15px;
+    text-align: center;
+    margin-bottom: 4px;
+    font-size: 12px;
+    border-radius: 15px;
+    width: 10rem;
+    vertical-align: middle;
+    line-height: 0;
+    height: 1rem;
+}
+
+.validationPass {
+    background-color: #61da5f;
+    color: aliceblue;
+    padding: 15px 15px 15px 15px;
+    text-align: center;
+    margin-bottom: 4px;
+    font-size: 12px;
+    border-radius: 15px;
+    width: 10rem;
+    height: 1rem;
+    vertical-align: middle;
+    line-height: 0;
+    cursor: pointer;
+}
+
+.validationFail {
+    background-color: #f12929;
+    color: aliceblue;
+    padding: 15px 15px 15px 15px;
+    text-align: center;
+    margin-bottom: 4px;
+    font-size: 12px;
+    border-radius: 15px;
+    width: 10rem;
+    height: 1rem;
+    vertical-align: middle;
+    line-height: 0;
+    cursor: pointer;
+}
+
+.fa-remove:before, .fa-close:before, .fa-times:before {
+    content: "\f00d";
+}
+
+.d-cursor {
+    cursor: pointer;
+}
+
+.d-container {
+    display: grid !important;
+    grid-template-columns: auto auto; /* 2 COL LAYOUT */
+}
+
+
+.checkmark__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: #7ac142;
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: #fff;
+    stroke-miterlimit: 10;
+    margin: 10% auto;
+    box-shadow: inset 0px 0px 0px #7ac142;
+    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.checkmark__check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+@keyframes scale {
+    0%, 100% {
+        transform: none;
+    }
+    50% {
+        transform: scale3d(1.1, 1.1, 1);
+    }
+}
+@keyframes fill {
+    100% {
+        box-shadow: inset 0px 0px 0px 30px #7ac142;
+    }
+}
+
+html {
+    height: 100% !important;
+}
+
+.isHrefDisabled {
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.5;
+    text-decoration: none;
+}
+
+@keyframes check {0% {height: 0;width: 0;}
+    25% {height: 0;width: 10px;}
+    50% {height: 20px;width: 10px;}
+}
+.checkbox{background-color:#fff;display:inline-block;height:28px;margin:0 .25em;width:28px;border-radius:4px;border:1px solid #ccc;margin-top:0.5rem}
+.checkbox span{display:block;height:28px;position:relative;width:28px;padding:0}
+.checkbox span:after{-moz-transform:scaleX(-1) rotate(135deg);-ms-transform:scaleX(-1) rotate(135deg);-webkit-transform:scaleX(-1) rotate(135deg);transform:scaleX(-1) rotate(135deg);-moz-transform-origin:left top;-ms-transform-origin:left top;-webkit-transform-origin:left top;transform-origin:left top;border-right:4px solid #fff;border-top:4px solid #fff;content:'';display:block;height:20px;left:3px;position:absolute;top:15px;width:10px}
+.checkbox span:hover:after{border-color:#999}
+.checkbox input{display:none}
+.checkbox input:checked + span:after{-webkit-animation:check .8s;-moz-animation:check .8s;-o-animation:check .8s;animation:check .8s;border-color:#555}
+.checkbox input:checked + .default:after{border-color:#444}
+
+.rowCheckBox:first-child {
+    width: 5%;
+}
+
+.smallRows:first-child{
+    width: 5%;
+}
+
+.smallRows:nth-child(2){
+    width: 5%;
+}
