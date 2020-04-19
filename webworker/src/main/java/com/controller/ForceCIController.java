@@ -893,9 +893,10 @@ public class ForceCIController {
                         repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                         newLstRepositoryWrapper.add(repositoryWrapper);
                         logger.info("consumerMap from /api/fetchRepositoryInDB -> "+consumerMap);
-                        if(byGitRepoId != null) {
+                        if(byGitRepoId != null && !byGitRepoId.isEmpty()) {
                             if (consumerMap != null && consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())
                                     && consumerMap.get(repositoryWrapper.getRepository().getRepositoryId()).isEmpty()) {
+                                logger.info("sfdcConnectionDetails if Key check -> " + consumerMap);
                                 Map<String, RabbitMqConsumer> stringRabbitMqConsumerMap = consumerMap.get(repositoryWrapper.getRepository().getRepositoryId());
                                 for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
                                     logger.info("sfdcConnectionDetails if -> " + sfdcConnectionDetails.getGitRepoId());
@@ -910,7 +911,7 @@ public class ForceCIController {
                                 }
                             } else {
                                 if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
-                                    logger.info("sfdcConnectionDetails else Key -> " + consumerMap);
+                                    logger.info("sfdcConnectionDetails else Key check -> " + consumerMap);
                                     Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
                                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
                                         logger.info("sfdcConnectionDetails else -> " + sfdcConnectionDetails.getGitRepoId());
