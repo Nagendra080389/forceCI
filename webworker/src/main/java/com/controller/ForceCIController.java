@@ -22,6 +22,7 @@ import com.rabbitMQ.RabbitMqConsumer;
 import com.rabbitMQ.RabbitMqSenderConfig;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
+import com.redis.RedisEventDataRepository;
 import com.security.CryptoPassword;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -153,6 +154,8 @@ public class ForceCIController {
     private ICaptchaService captchaServiceV3;
     @Autowired
     private AmazonS3Client amazonS3Client;
+    @Autowired
+    private RedisEventDataRepository redisEventDataRepository;
 
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
@@ -1236,6 +1239,7 @@ public class ForceCIController {
             container.setMessageListener(new MessageListenerAdapter(new ConsumerHandler(deploymentJobMongoRepository, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
             logger.info("Started Consumer called from saveSfdcConnectionDetails");
             container.startConsumers();
+            redisEventDataRepository.save(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
             Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byRepositoryRepositoryId.getRepository().getRepositoryId());
             if (rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty()) {
 
@@ -1440,6 +1444,9 @@ public class ForceCIController {
             List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByJobIdDesc(gitRepoId, baseSHA);
             if (byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
                 deploymentJob = byRepoIdAndBaseSHA.get(0);
+                logger.info("deploymentJob getBaseSHA -> "+deploymentJob.getBaseSHA());
+                logger.info("deploymentJob Id -> "+deploymentJob.getJobId());
+                logger.info("deploymentJob RepoId -> "+deploymentJob.getRepoId());
             }
         }
         if (aLong != null && !merge) {
@@ -1499,6 +1506,7 @@ public class ForceCIController {
                 container.startConsumers();
                 rabbitMqConsumerMap.put(queue_name, container);
                 consumerMap.put(sfdcConnectionDetail.getGitRepoId(), rabbitMqConsumerMap);
+                redisEventDataRepository.save(sfdcConnectionDetail.getGitRepoId() + "_" + sfdcConnectionDetail.getBranchConnectedTo(), container);
                 logger.info("consumerMap start deployment-> "+consumerMap);
             }
         }
