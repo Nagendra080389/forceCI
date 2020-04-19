@@ -910,6 +910,7 @@ public class ForceCIController {
                                 }
                             } else {
                                 if (consumerMap != null && !consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())) {
+                                    logger.info("sfdcConnectionDetails else Key -> " + consumerMap);
                                     Map<String, RabbitMqConsumer> rabbitMqConsumerMap = new ConcurrentHashMap<>();
                                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
                                         logger.info("sfdcConnectionDetails else -> " + sfdcConnectionDetails.getGitRepoId());
