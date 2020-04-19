@@ -38,7 +38,11 @@ public class RedisEventDataRepository {
     }
 
     public RabbitMqConsumer findByQueueName(String queueName) {
-        return (RabbitMqConsumer) hashOperations.get(STRING_EVENT_DATA, queueName);
+        if(hashOperations.get(STRING_EVENT_DATA, queueName) != null) {
+            return (RabbitMqConsumer) hashOperations.get(STRING_EVENT_DATA, queueName);
+        } else {
+            return null;
+        }
     }
 
     public void update(String queueName, RabbitMqConsumer rabbitMqConsumer) {
