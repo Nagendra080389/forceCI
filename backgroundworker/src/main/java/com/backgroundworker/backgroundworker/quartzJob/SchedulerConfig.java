@@ -24,7 +24,7 @@ public class SchedulerConfig {
         DateTime dateTime = DateTime.now();
         Date toDate = dateTime.plusSeconds(10).toDate();
         Date fromDate = dateTime.minusSeconds(10).toDate();
-        Optional<ScheduledDeploymentJob> byStartTimeIsBetween = deploymentMongoRepository.findByStartTimeIsBetweenAndExecuted(fromDate, toDate, false);
+        Optional<ScheduledDeploymentJob> byStartTimeIsBetween = deploymentMongoRepository.findByStartTimeRunIsBetweenAndExecuted(fromDate, toDate, false);
         if(byStartTimeIsBetween.isPresent()){
             logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get().getGitRepoId());
             logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get().getSourceBranch());
