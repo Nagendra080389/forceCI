@@ -1548,7 +1548,7 @@ public class ForceCIController {
         }
 
     }
-
+/*
     @RequestMapping(value = "/api/connectAmazonS3/upload", method = RequestMethod.GET)
     public String uploadToAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
         String uniqueId = UUID.randomUUID().toString();
@@ -1597,7 +1597,7 @@ public class ForceCIController {
         logger.info("Download Successfully");
         transferManager.shutdownNow();
         return null;
-    }
+    }*/
 
     public static Date cvtToGmt(Date date) {
         TimeZone tz = TimeZone.getDefault();

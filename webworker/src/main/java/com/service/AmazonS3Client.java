@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 @Service
 public class AmazonS3Client {
 
-    @Value("${amazons3.region}")
+    /*@Value("${amazons3.region}")
     private String region;
     @Value("${amazons3.accessKey}")
     private String accessKey;
@@ -32,5 +32,5 @@ public class AmazonS3Client {
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .withRegion(region)
                 .build();
-    }
+    }*/
 }
