@@ -118,8 +118,8 @@ public class ForceCIController {
     String hmacSecretKet;
     @Value("${salesforce.metadataEndpoint}")
     String salesforceMetaDataEndpoint;
-    @Value("${amazons3.bucketname}")
-    private String bucketName;
+/*    @Value("${amazons3.bucketname}")
+    private String bucketName;*/
 
     private Map<String, Map<String, RabbitMqConsumer>> consumerMap = new ConcurrentHashMap<>();
     @Autowired
@@ -142,8 +142,8 @@ public class ForceCIController {
     private LinkedServicesMongoRepository linkedServicesMongoRepository;
     @Autowired
     private ICaptchaService captchaServiceV3;
-    @Autowired
-    private AmazonS3Client amazonS3Client;
+    /*@Autowired
+    private AmazonS3Client amazonS3Client;*/
 
     private static void update_deployment_status(JsonObject jsonObject) {
         System.out.println("Deployment status for " + jsonObject.get("deployment").getAsJsonObject().get("id").getAsString() +
