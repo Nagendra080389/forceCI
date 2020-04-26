@@ -708,6 +708,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             branchConnectedTo: sfdcOrg.branchConnectedTo,
             boolActive: sfdcOrg.boolActive,
             repoName: $scope.repoName,
+            connect2DeployUser : localStorage.getItem('userEmail'),
         };
         if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === '' ||
             sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '') {
@@ -1082,7 +1083,8 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
     function ScheduledDialogController($scope, $mdDialog) {
         $scope.scheduledJob = {};
-        $http.get("/api/showSfdcConnectionDetails?gitRepoId=" + repoId).then(function (response) {
+        let userEmail = localStorage.getItem('userEmail');
+        $http.get("/api/fetchSfdcConnectionDetailsByUser?connect2DeployUser=" + userEmail).then(function (response) {
             $scope.scheduledJob.sfdcConnections = response.data;
         }, function (error) {
             console.log(error);

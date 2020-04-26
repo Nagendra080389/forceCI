@@ -1257,6 +1257,19 @@ public class ForceCIController {
         return returnResponse;
     }
 
+    @RequestMapping(value = "/api/fetchSfdcConnectionDetailsByUser", method = RequestMethod.GET)
+    public String fetchSfdcConnectionDetailsByUser(@RequestParam String connect2DeployUser, HttpServletResponse response, HttpServletRequest
+            request) throws IOException {
+
+        Gson gson = new Gson();
+        String returnResponse = null;
+        List<SFDCConnectionDetails> gitReposById = sfdcConnectionDetailsMongoRepository.findByConnect2DeployUserAndBoolActive(connect2DeployUser, true);
+        if (gitReposById != null && !gitReposById.isEmpty()) {
+            returnResponse = gson.toJson(gitReposById);
+        }
+        return returnResponse;
+    }
+
     @RequestMapping(value = "/validateToken", method = RequestMethod.GET)
     public String validateToken(@RequestParam String token, HttpServletResponse response, HttpServletRequest
             request) throws IOException {
