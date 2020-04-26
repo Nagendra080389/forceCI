@@ -689,7 +689,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
 
     $scope.saveConnection = function (sfdcOrg) {
         const sfdcDetails = {
-            id: sfdcOrg.id,
+            id: checkIfInValid(sfdcOrg.id) ? null : sfdcOrg.id,
             orgName: sfdcOrg.orgName,
             environment: sfdcOrg.environment,
             testLevel: sfdcOrg.testLevel,
