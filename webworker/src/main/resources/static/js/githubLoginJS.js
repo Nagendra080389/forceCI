@@ -1065,22 +1065,6 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     $scope.tableHeaders = ['Owner', 'Job Name', 'Organization', 'Start Time', 'Last Run', 'Status', 'Action'];
 
 
-    $scope.createNewJob = function (event) {
-        const outerScope = $scope;
-        $mdDialog.show({
-            controller: ScheduledDialogController,
-            templateUrl: '../html/scheduleJob.tpl.html',
-            parent: angular.element(document.body),
-            targetEvent: event,
-            clickOutsideToClose: true,
-        }).then(function (scheduledJob) {
-            $scope.status = 'You said the information was "' + scheduledJob + '".';
-            outerScope.scheduledJobsList.push(scheduledJob);
-        }, function () {
-            $scope.status = 'You cancelled the dialog.';
-        });
-    }
-
     function ScheduledDialogController($scope, $mdDialog) {
         $scope.scheduledJob = {};
         let userEmail = localStorage.getItem('userEmail');
@@ -1116,6 +1100,22 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             scheduledJob.open =  true;
         };
 
+    }
+
+    $scope.createNewJob = function (event) {
+        const outerScope = $scope;
+        $mdDialog.show({
+            controller: ScheduledDialogController,
+            templateUrl: '../html/scheduleJob.tpl.html',
+            parent: angular.element(document.body),
+            targetEvent: event,
+            clickOutsideToClose: true,
+        }).then(function (scheduledJob) {
+            $scope.status = 'You said the information was "' + scheduledJob + '".';
+            outerScope.scheduledJobsList.push(scheduledJob);
+        }, function () {
+            $scope.status = 'You cancelled the dialog.';
+        });
     }
 
     $scope.onStatusChange = function(scheduleJob){
