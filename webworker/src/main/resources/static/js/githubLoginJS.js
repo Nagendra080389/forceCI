@@ -5,6 +5,12 @@ connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
 });
 
+//for DatePicker options
+connect2Deploy.config(['uibDatepickerConfig', function (uibDatepickerConfig) {
+    uibDatepickerConfig.showWeeks = false;
+}]);
+
+
 let listenerAdded = false;
 
 localStorage.setItem('avatar_url', "../images/connectdevelop-brands.svg");
