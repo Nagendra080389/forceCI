@@ -237,7 +237,3 @@ html {
     width: 5%;
 }
 
-md-dialog{
-    min-width: 500px !important;
-    overflow-y: initial !important;
-}
