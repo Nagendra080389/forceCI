@@ -1,6 +1,7 @@
 package com.backgroundworker.backgroundworker.quartzJob;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,14 +14,20 @@ public class ScheduledDeploymentJob implements Serializable {
     private String sourceBranch;
     private String targetBranch;
     private String gitRepoId;
+    private String jobName;
+    private String createdBy;
     private String connect2DeployUserEmail;
+    private String orgUserEmail;
+    private String status;
     private Date startTimeRun;
+    private Date lastTimeRun;
     private Date nextTimeRun;
     private String cronExpression;
     private Boolean executed;
+    private Boolean boolActive;
 
-    public void setId(String id) {
-        this.id = id;
+    public String getId() {
+        return id;
     }
 
     public String getSourceBranch() {
@@ -39,6 +46,22 @@ public class ScheduledDeploymentJob implements Serializable {
         this.targetBranch = targetBranch;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getLastTimeRun() {
+        return lastTimeRun;
+    }
+
+    public void setLastTimeRun(Date lastTimeRun) {
+        this.lastTimeRun = lastTimeRun;
+    }
+
     public String getGitRepoId() {
         return gitRepoId;
     }
@@ -47,8 +70,24 @@ public class ScheduledDeploymentJob implements Serializable {
         this.gitRepoId = gitRepoId;
     }
 
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
     public String getConnect2DeployUserEmail() {
         return connect2DeployUserEmail;
+    }
+
+    public String getOrgUserEmail() {
+        return orgUserEmail;
+    }
+
+    public void setOrgUserEmail(String orgUserEmail) {
+        this.orgUserEmail = orgUserEmail;
     }
 
     public void setConnect2DeployUserEmail(String connect2DeployUserEmail) {
@@ -87,6 +126,22 @@ public class ScheduledDeploymentJob implements Serializable {
         this.executed = executed;
     }
 
+    public Boolean getBoolActive() {
+        return boolActive;
+    }
+
+    public void setBoolActive(Boolean boolActive) {
+        this.boolActive = boolActive;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -96,15 +151,17 @@ public class ScheduledDeploymentJob implements Serializable {
                 Objects.equals(sourceBranch, that.sourceBranch) &&
                 Objects.equals(targetBranch, that.targetBranch) &&
                 Objects.equals(gitRepoId, that.gitRepoId) &&
+                Objects.equals(jobName, that.jobName) &&
                 Objects.equals(connect2DeployUserEmail, that.connect2DeployUserEmail) &&
                 Objects.equals(startTimeRun, that.startTimeRun) &&
                 Objects.equals(nextTimeRun, that.nextTimeRun) &&
                 Objects.equals(cronExpression, that.cronExpression) &&
-                Objects.equals(executed, that.executed);
+                Objects.equals(executed, that.executed) &&
+                Objects.equals(boolActive, that.boolActive);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, sourceBranch, targetBranch, gitRepoId, connect2DeployUserEmail, startTimeRun, nextTimeRun, cronExpression, executed);
+        return Objects.hash(id, sourceBranch, targetBranch, gitRepoId, jobName, connect2DeployUserEmail, startTimeRun, nextTimeRun, cronExpression, executed, boolActive);
     }
 }

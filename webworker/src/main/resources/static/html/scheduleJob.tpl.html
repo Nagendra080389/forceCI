@@ -1,0 +1,62 @@
+<md-dialog aria-label="Add Scheduled Job">
+    <form name="scheduledJobForm" ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Add Scheduled Job</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-src="../images/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <div layout-gt-xs="column" layout-md="column" layout-gt-md="column">
+                    <md-input-container class="md-block" flex-gt-xs>
+                        <label>Job Name</label>
+                        <input class="form-control" ng-model="scheduledJob.jobName" required>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>From Branch</label>
+                        <input ng-model="scheduledJob.sourceBranch" required>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>To Branch</label>
+                        <input ng-model="scheduledJob.targetBranch" required>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>SFDC Connection</label>
+                        <md-select ng-model="scheduledJob.sfdcConnection" required>
+                            <md-option ng-repeat="eachsfdcconnection in scheduledJob.sfdcConnections" ng-value="eachsfdcconnection.id">
+                                {{eachsfdcconnection.orgName}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>Time</label>
+                        <p class="input-group">
+                            <input type="text" class="form-control" datepicker-append-to-body="true"
+                                   datetime-picker="dd MMM yyyy HH:mm" ng-model="scheduledJob.startTimeRun"
+                                   is-open="scheduledJob.open" datepicker-options="dateOptions"
+                                   required/>
+                                <span class="input-group-btn">
+                                      <button type="button" class="btn btn-default" ng-click="openCalendar($event, scheduledJob)">
+                                          <i class="fa fa-calendar"></i></button>
+                                </span>
+                        </p>
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <span flex></span>
+            <md-button class="md-raised md-primary" ng-disabled="scheduledJobForm.$invalid" ng-click="saveScheduleJob(scheduledJob)">
+                Save
+            </md-button>
+            <md-button ng-click="cancel()">
+                Cancel
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

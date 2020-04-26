@@ -1,4 +1,5 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial', 'ngMessages']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect',
+    'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial', 'ngMessages','ui.bootstrap', 'ui.bootstrap.datetimepicker']);
 
 connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
@@ -921,21 +922,21 @@ connect2Deploy.controller('appPageRepoController', function ($scope, $http, $loc
                     title: 'OK',
                     message: response.data
                 });
-            $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName).then(function (response) {
-                let data = response.data;
-                try {
-                    for (let i = 0; i < data.length; i++) {
-                        $scope.services.push(data[i]);
-                    }
-                } catch (e) {
+                $http.get("/api/fetchAllLinkedServices?userEmail=" + $scope.userName).then(function (response) {
+                    let data = response.data;
+                    try {
+                        for (let i = 0; i < data.length; i++) {
+                            $scope.services.push(data[i]);
+                        }
+                    } catch (e) {
 
-                }
-            }, function (error) {
-                if (error.data.message === 'Unauthorized') {
-                    $('#sessionExpiredModal').modal("show");
-                }
-                console.error(error);
-            });
+                    }
+                }, function (error) {
+                    if (error.data.message === 'Unauthorized') {
+                        $('#sessionExpiredModal').modal("show");
+                    }
+                    console.error(error);
+                });
             }, function (error) {
                 iziToast.error({
                     title: 'Error',
@@ -1059,6 +1060,68 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     $scope.repoName = $routeParams.repoName;
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
     $scope.branchName = $routeParams.branchConnectedTo;
+    $scope.scheduledJobsList = [];
+    $scope.tableHeaders = ['Owner', 'Job Name', 'Organization', 'Start Time', 'Last Run', 'Status', 'Action'];
+
+
+    $scope.createNewJob = function (event) {
+        const outerScope = $scope;
+        $mdDialog.show({
+            controller: ScheduledDialogController,
+            templateUrl: '../html/scheduleJob.tpl.html',
+            parent: angular.element(document.body),
+            targetEvent: event,
+            clickOutsideToClose: true,
+        }).then(function (scheduledJob) {
+            $scope.status = 'You said the information was "' + scheduledJob + '".';
+            outerScope.scheduledJobsList.push(scheduledJob);
+        }, function () {
+            $scope.status = 'You cancelled the dialog.';
+        });
+    }
+
+    function ScheduledDialogController($scope, $mdDialog) {
+        $scope.scheduledJob = {};
+        $http.get("/api/showSfdcConnectionDetails?gitRepoId=" + repoId).then(function (response) {
+            $scope.scheduledJob.sfdcConnections = response.data;
+        }, function (error) {
+            console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
+        });
+
+        const objDateTime = new Date();
+
+        $scope.dateOptions = {
+            minDate: new Date()
+        };
+
+        $scope.scheduledJob.startTimeRun = objDateTime;
+        $scope.hide = function() {
+            $mdDialog.hide();
+        };
+
+        $scope.cancel = function() {
+            $mdDialog.cancel();
+        };
+
+        $scope.saveScheduleJob = function(answer) {
+            $mdDialog.hide(answer);
+        };
+
+        $scope.openCalendar = function(e, scheduledJob) {
+            scheduledJob.open =  true;
+        };
+
+    }
+
+    $scope.onStatusChange = function(scheduleJob){
+        debugger;
+    }
+    $scope.deleteJob = function(scheduleJob){
+        debugger;
+    }
 
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
