@@ -1174,7 +1174,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             clickOutsideToClose: true,
         }).then(function (scheduledJob) {
             $http.post("/api/saveScheduledJob", scheduledJob).then(function (returnedScheduledJob) {
-                outerScope.scheduledJobsList.push(returnedScheduledJob);
+                outerScope.scheduledJobsList.push(returnedScheduledJob.data);
                 }, function (error) {
                     console.log(error);
                     if (error.data.message === 'Unauthorized') {
