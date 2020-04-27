@@ -27,11 +27,11 @@
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-sm>
                         <label>From Branch</label>
-                        <input ng-model="scheduledJob.sourceBranch" required ng-disabled="!scheduledJob.sfdcConnection">
+                        <input id="scheduledFromBranch" ng-model="scheduledJob.sourceBranch" required ng-disabled="!scheduledJob.sfdcConnection" ng-keyup="onComplete()">
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-sm>
                         <label>To Branch</label>
-                        <input ng-model="scheduledJob.targetBranch" required ng-disabled="!scheduledJob.sfdcConnection">
+                        <input id="scheduledToBranch" ng-model="scheduledJob.targetBranch" required ng-disabled="!scheduledJob.sfdcConnection" ng-keyup="onComplete()">
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-sm>
                         <label>Time</label>

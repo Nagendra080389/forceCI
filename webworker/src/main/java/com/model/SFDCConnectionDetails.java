@@ -23,6 +23,7 @@ public class SFDCConnectionDetails implements Serializable {
     private String oauthFailed;
     private String oauthSaved;
     private String oauthToken;
+    private String linkedService;
     private String refreshToken;
     private String gitRepoId;
     private String branchConnectedTo;
@@ -37,6 +38,14 @@ public class SFDCConnectionDetails implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getLinkedService() {
+        return linkedService;
+    }
+
+    public void setLinkedService(String linkedService) {
+        this.linkedService = linkedService;
     }
 
     public String getOrgName() {

@@ -710,6 +710,7 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             boolActive: sfdcOrg.boolActive,
             repoName: $scope.repoName,
             connect2DeployUser : localStorage.getItem('userEmail'),
+            linkedService : $scope.linkedService,
         };
         if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === '' ||
             sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '') {
@@ -1068,6 +1069,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
     function ScheduledDialogController($scope, $mdDialog) {
         $scope.scheduledJob = {};
+        $scope.availableTags = [];
 
         let userEmail = localStorage.getItem('userEmail');
         $http.get("/api/fetchSfdcConnectionDetailsByUser?connect2DeployUser=" + userEmail).then(function (response) {
@@ -1102,8 +1104,25 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             scheduledJob.open =  true;
         };
 
+        $scope.onComplete = function(){
+            $("#scheduledFromBranch").autocomplete({
+                source: $scope.availableTags
+            });
+            $("#scheduledToBranch").autocomplete({
+                source: $scope.availableTags
+            });
+        }
+
+
         $scope.onSFDCConnectionChange = function(selectedConnection){
-            debugger;
+            $http.get("/api/fetchDetailsForScheduledJob?sfdcConnectionId=" + selectedConnection).then(function (response) {
+                $scope.availableTags = response.data;
+            }, function (error) {
+                console.log(error);
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
+            });
         }
 
         $scope.startDateBeforeRender = function($view, $dates, $leftDate, $upDate, $rightDate) {

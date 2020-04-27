@@ -1561,6 +1561,42 @@ public class ForceCIController {
         }
 
     }
+
+    @RequestMapping(value = "/api/fetchDetailsForScheduledJob", method = RequestMethod.GET)
+    public String fetchDetailsForScheduledJob(@RequestParam String sfdcConnectionId) throws IOException {
+        Gson gson = new Gson();
+        List<String> lstStrings = new ArrayList<>();
+        Optional<SFDCConnectionDetails> sfdcConnectionDetail = sfdcConnectionDetailsMongoRepository.findById(sfdcConnectionId);
+        if(sfdcConnectionDetail.isPresent()){
+            SFDCConnectionDetails objConnectionDetail = sfdcConnectionDetail.get();
+            String gitRepoId = objConnectionDetail.getGitRepoId();
+            String linkedService = objConnectionDetail.getLinkedService();
+            String connect2DeployUser = objConnectionDetail.getConnect2DeployUser();
+            List<LinkedServices> linkedServiceByUserName = linkedServicesMongoRepository.findByConnect2DeployUser(connect2DeployUser);
+            GitHub gitHub = null;
+            if(linkedServiceByUserName != null && !linkedServiceByUserName.isEmpty()){
+                for (LinkedServices eachService : linkedServiceByUserName) {
+                    if(linkedService.equalsIgnoreCase(eachService.getName()) && linkedService.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)){
+                        gitHub = GitHub.connectUsingOAuth(eachService.getAccessToken());
+                    } else if(linkedService.equalsIgnoreCase(eachService.getName()) && linkedService.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
+                        gitHub = GitHub.connectToEnterpriseWithOAuth(eachService.getServerURL(), eachService.getUserEmail(), eachService.getAccessToken());
+                    }
+                }
+            }
+            if(gitHub != null){
+                GHRepository repositoryById = gitHub.getRepositoryById(gitRepoId);
+                Map<String, GHBranch> branches = repositoryById.getBranches();
+                for (Map.Entry<String, GHBranch> stringGHBranchEntry : branches.entrySet()) {
+                    lstStrings.add(stringGHBranchEntry.getValue().getName());
+                }
+
+
+            }
+
+        }
+        return gson.toJson(lstStrings);
+    }
+
 /*
     @RequestMapping(value = "/api/connectAmazonS3/upload", method = RequestMethod.GET)
     public String uploadToAmazonS3(HttpServletResponse response, HttpServletRequest request) throws IOException, InterruptedException {
