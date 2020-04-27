@@ -23,8 +23,8 @@ public class SchedulerConfig {
     @Scheduled(fixedRate = 10000)
     void enableScheduledJob(){
         DateTime dateTime = DateTime.now(DateTimeZone.UTC);
-        Date toDate = dateTime.plusSeconds(10).toLocalDateTime().toDate();
-        Date fromDate = dateTime.minusSeconds(10).toLocalDateTime().toDate();
+        DateTime toDate = dateTime.plusSeconds(10);
+        DateTime fromDate = dateTime.minusSeconds(10);
         logger.info("Poll Mongo DB from "+fromDate+ " to "+ toDate);
         List<ScheduledDeploymentJob> byStartTimeIsBetween =
                 scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true);
