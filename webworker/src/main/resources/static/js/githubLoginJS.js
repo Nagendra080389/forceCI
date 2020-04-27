@@ -1,14 +1,9 @@
-var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect',
-    'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial', 'ngMessages','ui.bootstrap', 'ui.bootstrap.datetimepicker']);
+var connect2Deploy = angular.module("connect2Deploy", ['ngRoute', 'angularjs-dropdown-multiselect', 'ngSanitize', 'angularUtils.directives.dirPagination', 'ngMaterial', 'ngMessages', 'ui.bootstrap.datetimepicker']);
 
 connect2Deploy.filter('decodeURIComponent', function () {
     return window.decodeURIComponent;
 });
 
-//for DatePicker options
-connect2Deploy.config(['uibDatepickerConfig', function (uibDatepickerConfig) {
-    uibDatepickerConfig.showWeeks = false;
-}]);
 
 
 let listenerAdded = false;
@@ -1073,6 +1068,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
     function ScheduledDialogController($scope, $mdDialog) {
         $scope.scheduledJob = {};
+
         let userEmail = localStorage.getItem('userEmail');
         $http.get("/api/fetchSfdcConnectionDetailsByUser?connect2DeployUser=" + userEmail).then(function (response) {
             $scope.scheduledJob.sfdcConnections = response.data;
@@ -1104,6 +1100,25 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
         $scope.openCalendar = function(e, scheduledJob) {
             scheduledJob.open =  true;
+        };
+
+        $scope.onSFDCConnectionChange = function(selectedConnection){
+            debugger;
+        }
+
+        $scope.startDateBeforeRender = function($view, $dates, $leftDate, $upDate, $rightDate) {
+            const minDate = moment().local().startOf($view).valueOf();
+            for(let i=0; i < $dates.length; i++) {
+                if($view === 'day' || $view === 'hour') {
+                    if (minDate > $dates[i].localDateValue()) {
+                        $dates[i].selectable = false;
+                    }
+                } else {
+                    if (minDate >= $dates[i].localDateValue()) {
+                        $dates[i].selectable = false;
+                    }
+                }
+            }
         };
 
     }

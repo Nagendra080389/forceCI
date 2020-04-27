@@ -17,33 +17,37 @@
                         <input class="form-control" ng-model="scheduledJob.jobName" required>
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-sm>
-                        <label>From Branch</label>
-                        <input ng-model="scheduledJob.sourceBranch" required>
-                    </md-input-container>
-                    <md-input-container class="md-block" flex-gt-sm>
-                        <label>To Branch</label>
-                        <input ng-model="scheduledJob.targetBranch" required>
-                    </md-input-container>
-                    <md-input-container class="md-block" flex-gt-sm>
                         <label>SFDC Connection</label>
-                        <md-select ng-model="scheduledJob.sfdcConnection" required>
+                        <md-select ng-model="scheduledJob.sfdcConnection" required ng-change="onSFDCConnectionChange(scheduledJob.sfdcConnection)">
+                            <md-option ng-value="">--None--</md-option>
                             <md-option ng-repeat="eachsfdcconnection in scheduledJob.sfdcConnections" ng-value="eachsfdcconnection.id">
                                 {{eachsfdcconnection.orgName}}
                             </md-option>
                         </md-select>
                     </md-input-container>
                     <md-input-container class="md-block" flex-gt-sm>
+                        <label>From Branch</label>
+                        <input ng-model="scheduledJob.sourceBranch" required ng-disabled="!scheduledJob.sfdcConnection">
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
+                        <label>To Branch</label>
+                        <input ng-model="scheduledJob.targetBranch" required ng-disabled="!scheduledJob.sfdcConnection">
+                    </md-input-container>
+                    <md-input-container class="md-block" flex-gt-sm>
                         <label>Time</label>
-                        <p class="input-group">
-                            <input type="text" class="form-control" datepicker-append-to-body="true"
-                                   datetime-picker="dd MMM yyyy HH:mm" ng-model="scheduledJob.startTimeRun"
-                                   is-open="scheduledJob.open" datepicker-options="dateOptions"
-                                   required/>
-                                <span class="input-group-btn">
-                                      <button type="button" class="btn btn-default" ng-click="openCalendar($event, scheduledJob)">
-                                          <i class="fa fa-calendar"></i></button>
-                                </span>
-                        </p>
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="javascript:void(0);">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" datepicker-append-to-body="true" required="true" data-ng-model="scheduledJob.startTime">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <datetimepicker data-ng-model="scheduledJob.startTime"
+                                                data-before-render="startDateBeforeRender($view, $dates, $leftDate, $upDate, $rightDate)"
+                                                data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }"/>
+                            </ul>
+                        </div>
                     </md-input-container>
                 </div>
             </div>
