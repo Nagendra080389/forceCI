@@ -1097,7 +1097,6 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             minDate: new Date()
         };
 
-        $scope.scheduledJob.startTimeRun = objDateTime;
         $scope.hide = function () {
             $mdDialog.hide();
         };
