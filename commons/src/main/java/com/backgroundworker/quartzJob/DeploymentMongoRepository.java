@@ -6,5 +6,5 @@ import java.util.Date;
 import java.util.Optional;
 
 public interface DeploymentMongoRepository  extends MongoRepository<ScheduledDeploymentJob, String> {
-    Optional<ScheduledDeploymentJob> findByStartTimeRunIsBetweenAndExecuted(Date fromTime, Date toTime, Boolean executed);
+    Optional<ScheduledDeploymentJob> findByStartTimeRunIsBetweenAndExecutedAndBoolActive(Date fromTime, Date toTime, Boolean executed, Boolean boolActive);
 }

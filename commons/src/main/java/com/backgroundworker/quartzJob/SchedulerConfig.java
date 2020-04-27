@@ -18,13 +18,15 @@ public class SchedulerConfig {
     @Autowired
     private DeploymentMongoRepository deploymentMongoRepository;
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 10000)
     void enableScheduledJob(){
         logger.info("Poll Mongo DB");
         DateTime dateTime = DateTime.now();
         Date toDate = dateTime.plusSeconds(10).toDate();
         Date fromDate = dateTime.minusSeconds(10).toDate();
-        Optional<ScheduledDeploymentJob> byStartTimeIsBetween = deploymentMongoRepository.findByStartTimeRunIsBetweenAndExecuted(fromDate, toDate, false);
+        Optional<ScheduledDeploymentJob> byStartTimeIsBetween =
+                deploymentMongoRepository.
+                        findByStartTimeRunIsBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true);
         if(byStartTimeIsBetween.isPresent()){
             logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get().getGitRepoId());
             logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get().getSourceBranch());

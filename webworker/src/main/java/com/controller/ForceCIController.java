@@ -2,6 +2,7 @@ package com.controller;
 
 import com.backgroundworker.quartzJob.DeploymentMongoRepository;
 import com.backgroundworker.quartzJob.ScheduledDeploymentJob;
+import com.backgroundworker.quartzJob.Status;
 import com.dao.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -1599,9 +1600,12 @@ public class ForceCIController {
     @RequestMapping(value = "/api/saveScheduledJob", method = RequestMethod.POST)
     public String saveScheduledJob(@RequestBody ScheduledDeploymentJob scheduledDeploymentJob) throws IOException {
         Gson gson = new Gson();
-        logger.info("scheduledDeploymentJob -> "+scheduledDeploymentJob);
-        //ScheduledDeploymentJob savedScheduledDeploymentJob = deploymentMongoRepository.save(scheduledDeploymentJob);
-        return gson.toJson(scheduledDeploymentJob);
+        scheduledDeploymentJob.setBoolActive(true);
+        scheduledDeploymentJob.setCreatedBy(scheduledDeploymentJob.getConnect2DeployUserEmail());
+        scheduledDeploymentJob.setExecuted(false);
+        scheduledDeploymentJob.setStatus(Status.NOTSTARTED.getText());
+        ScheduledDeploymentJob savedScheduledDeploymentJob = deploymentMongoRepository.save(scheduledDeploymentJob);
+        return gson.toJson(savedScheduledDeploymentJob);
     }
 
 /*
