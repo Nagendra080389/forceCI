@@ -1,11 +1,7 @@
 package com.controller;
 
-import com.amazonaws.services.s3.transfer.MultipleFileDownload;
-import com.amazonaws.services.s3.transfer.MultipleFileUpload;
-import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.backgroundworker.backgroundworker.quartzJob.DeploymentMongoRepository;
-import com.backgroundworker.backgroundworker.quartzJob.ScheduledDeploymentJob;
+import com.backgroundworker.quartzJob.DeploymentMongoRepository;
+import com.backgroundworker.quartzJob.ScheduledDeploymentJob;
 import com.dao.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -23,7 +19,6 @@ import com.rabbitMQ.RabbitMqSenderConfig;
 import com.security.CryptoPassword;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
-import com.service.AmazonS3Client;
 import com.service.CaptchaServiceV3;
 import com.service.ICaptchaService;
 import com.sforce.soap.metadata.MetadataConnection;

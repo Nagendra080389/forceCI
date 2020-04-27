@@ -21,6 +21,7 @@
     <modules>
         <module>webworker</module>
         <module>backgroundworker</module>
+        <module>commons</module>
     </modules>
 
     <properties>

@@ -1,4 +1,4 @@
-package com.backgroundworker.backgroundworker.quartzJob;
+package com.backgroundworker.quartzJob;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

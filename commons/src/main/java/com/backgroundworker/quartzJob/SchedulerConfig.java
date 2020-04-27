@@ -1,4 +1,4 @@
-package com.backgroundworker.backgroundworker.quartzJob;
+package com.backgroundworker.quartzJob;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
