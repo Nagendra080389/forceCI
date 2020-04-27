@@ -1,6 +1,7 @@
 package com.backgroundworker.quartzJob;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class SchedulerConfig {
     @Scheduled(fixedRate = 10000)
     void enableScheduledJob(){
         logger.info("Poll Mongo DB");
-        DateTime dateTime = DateTime.now();
+        DateTime dateTime = DateTime.now(DateTimeZone.UTC);
         Date toDate = dateTime.plusSeconds(10).toDate();
         Date fromDate = dateTime.minusSeconds(10).toDate();
         Optional<ScheduledDeploymentJob> byStartTimeIsBetween =

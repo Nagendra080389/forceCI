@@ -1175,7 +1175,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             clickOutsideToClose: true,
         }).then(function (scheduledJob) {
             $http.post("/api/saveScheduledJob", scheduledJob).then(function (returnedScheduledJob) {
-                    debugger;
+                outerScope.scheduledJobsList.push(returnedScheduledJob);
                 }, function (error) {
                     console.log(error);
                     if (error.data.message === 'Unauthorized') {
@@ -1183,7 +1183,6 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
                     }
                 }
             );
-            outerScope.scheduledJobsList.push(scheduledJob);
         }, function () {
             $scope.status = 'You cancelled the dialog.';
         });
