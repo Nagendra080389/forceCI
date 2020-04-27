@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -17,7 +18,7 @@ public class SchedulerConfig {
     private static final Logger logger = LoggerFactory.getLogger(SchedulerConfig.class);
 
     @Autowired
-    private DeploymentMongoRepository deploymentMongoRepository;
+    private ScheduledJobRepositoryCustomImpl scheduledJobRepositoryCustom;
 
     @Scheduled(fixedRate = 10000)
     void enableScheduledJob(){
@@ -25,13 +26,12 @@ public class SchedulerConfig {
         Date toDate = dateTime.plusSeconds(10).toLocalDateTime().toDate();
         Date fromDate = dateTime.minusSeconds(10).toLocalDateTime().toDate();
         logger.info("Poll Mongo DB from "+fromDate+ " to "+ toDate);
-        Optional<ScheduledDeploymentJob> byStartTimeIsBetween =
-                deploymentMongoRepository.
-                        findByStartTimeRunIsBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true);
-        if(byStartTimeIsBetween.isPresent()){
-            logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get().getGitRepoId());
-            logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get().getSourceBranch());
-            logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get().getTargetBranch());
+        List<ScheduledDeploymentJob> byStartTimeIsBetween =
+                scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true);
+        if(byStartTimeIsBetween != null && !byStartTimeIsBetween.isEmpty()){
+            logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get(0).getGitRepoId());
+            logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get(0).getSourceBranch());
+            logger.info("Send to RabbitMQ -> "+byStartTimeIsBetween.get(0).getTargetBranch());
         }
     }
 }
