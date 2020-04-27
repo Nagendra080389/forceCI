@@ -25,7 +25,7 @@ public class ScheduledJobRepositoryCustomImpl implements ScheduledJobRepositoryC
         Query query = new Query();
         query.addCriteria(
                 new Criteria().andOperator(
-                        Criteria.where("startTimeRun").gte(new DateTime(from)).lt(new DateTime(to)),
+                        Criteria.where("startTimeRun").gte(new DateTime(from).toLocalDateTime()).lt(new DateTime(to).toLocalDateTime()),
                         Criteria.where("boolActive").is(boolActive),
                         Criteria.where("executed").is(executed)
                 )
