@@ -5,7 +5,6 @@ connect2Deploy.filter('decodeURIComponent', function () {
 });
 
 
-
 let listenerAdded = false;
 
 localStorage.setItem('avatar_url', "../images/connectdevelop-brands.svg");
@@ -709,8 +708,8 @@ connect2Deploy.controller('repoController', function ($scope, $http, $location, 
             branchConnectedTo: sfdcOrg.branchConnectedTo,
             boolActive: sfdcOrg.boolActive,
             repoName: $scope.repoName,
-            connect2DeployUser : localStorage.getItem('userEmail'),
-            linkedService : $scope.linkedService,
+            connect2DeployUser: localStorage.getItem('userEmail'),
+            linkedService: $scope.linkedService,
         };
         if (sfdcOrg.orgName === undefined || sfdcOrg.orgName === null || sfdcOrg.orgName === '' ||
             sfdcOrg.userName === undefined || sfdcOrg.userName === null || sfdcOrg.userName === '') {
@@ -1081,6 +1080,17 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             }
         });
 
+        /*        let test1=[];
+                test1.push({
+                    id : 'id1',
+                    orgName : '123124'
+                })
+
+                test1.push({
+                    id : 'id2',
+                    orgName : '1231245'
+                })
+                $scope.scheduledJob.sfdcConnections =test1;*/
         const objDateTime = new Date();
 
         $scope.dateOptions = {
@@ -1088,23 +1098,23 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         };
 
         $scope.scheduledJob.startTimeRun = objDateTime;
-        $scope.hide = function() {
+        $scope.hide = function () {
             $mdDialog.hide();
         };
 
-        $scope.cancel = function() {
+        $scope.cancel = function () {
             $mdDialog.cancel();
         };
 
-        $scope.saveScheduleJob = function(answer) {
+        $scope.saveScheduleJob = function (answer) {
             $mdDialog.hide(answer);
         };
 
-        $scope.openCalendar = function(e, scheduledJob) {
-            scheduledJob.open =  true;
+        $scope.openCalendar = function (e, scheduledJob) {
+            scheduledJob.open = true;
         };
 
-        $scope.onComplete = function(){
+        $scope.onComplete = function () {
             $("#scheduledFromBranch").autocomplete({
                 source: $scope.availableTags
             });
@@ -1114,21 +1124,34 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         }
 
 
-        $scope.onSFDCConnectionChange = function(selectedConnection){
-            $http.get("/api/fetchDetailsForScheduledJob?sfdcConnectionId=" + selectedConnection).then(function (response) {
-                $scope.availableTags = response.data;
-            }, function (error) {
-                console.log(error);
-                if (error.data.message === 'Unauthorized') {
-                    $('#sessionExpiredModal').modal("show");
+        $scope.onSFDCConnectionChange = function (selectedConnection) {
+            let objSfdcSelected = null;
+            for (let i = 0; i < $scope.scheduledJob.sfdcConnections.length; i++) {
+                if (selectedConnection === $scope.scheduledJob.sfdcConnections[i].id) {
+                    objSfdcSelected = $scope.scheduledJob.sfdcConnections[i];
+                    break;
                 }
-            });
+            }
+            if(objSfdcSelected !== null){
+                $scope.scheduledJob.orgUserEmail = objSfdcSelected.userName;
+                $scope.scheduledJob.gitRepoId = objSfdcSelected.gitRepoId;
+                $scope.scheduledJob.connect2DeployUserEmail = objSfdcSelected.connect2DeployUser;
+
+                $http.get("/api/fetchDetailsForScheduledJob?sfdcConnectionId=" + selectedConnection).then(function (response) {
+                    $scope.availableTags = response.data;
+                }, function (error) {
+                    console.log(error);
+                    if (error.data.message === 'Unauthorized') {
+                        $('#sessionExpiredModal').modal("show");
+                    }
+                });
+            }
         }
 
-        $scope.startDateBeforeRender = function($view, $dates, $leftDate, $upDate, $rightDate) {
+        $scope.startDateBeforeRender = function ($view, $dates, $leftDate, $upDate, $rightDate) {
             const minDate = moment().local().startOf($view).valueOf();
-            for(let i=0; i < $dates.length; i++) {
-                if($view === 'day' || $view === 'hour') {
+            for (let i = 0; i < $dates.length; i++) {
+                if ($view === 'day' || $view === 'hour') {
                     if (minDate > $dates[i].localDateValue()) {
                         $dates[i].selectable = false;
                     }
@@ -1151,17 +1174,25 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             targetEvent: event,
             clickOutsideToClose: true,
         }).then(function (scheduledJob) {
-            $scope.status = 'You said the information was "' + scheduledJob + '".';
+            $http.post("/api/saveScheduledJob", scheduledJob).then(function (returnedScheduledJob) {
+                    debugger;
+                }, function (error) {
+                    console.log(error);
+                    if (error.data.message === 'Unauthorized') {
+                        $('#sessionExpiredModal').modal("show");
+                    }
+                }
+            );
             outerScope.scheduledJobsList.push(scheduledJob);
         }, function () {
             $scope.status = 'You cancelled the dialog.';
         });
     }
 
-    $scope.onStatusChange = function(scheduleJob){
+    $scope.onStatusChange = function (scheduleJob) {
         debugger;
     }
-    $scope.deleteJob = function(scheduleJob){
+    $scope.deleteJob = function (scheduleJob) {
         debugger;
     }
 

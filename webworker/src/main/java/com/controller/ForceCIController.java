@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.backgroundworker.backgroundworker.quartzJob.DeploymentMongoRepository;
+import com.backgroundworker.backgroundworker.quartzJob.ScheduledDeploymentJob;
 import com.dao.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -142,6 +144,8 @@ public class ForceCIController {
     private LinkedServicesMongoRepository linkedServicesMongoRepository;
     @Autowired
     private ICaptchaService captchaServiceV3;
+    @Autowired
+    private DeploymentMongoRepository deploymentMongoRepository;
     /*@Autowired
     private AmazonS3Client amazonS3Client;*/
 
@@ -1595,6 +1599,14 @@ public class ForceCIController {
 
         }
         return gson.toJson(lstStrings);
+    }
+
+    @RequestMapping(value = "/api/saveScheduledJob", method = RequestMethod.POST)
+    public String saveScheduledJob(@RequestBody ScheduledDeploymentJob scheduledDeploymentJob) throws IOException {
+        Gson gson = new Gson();
+        logger.info("scheduledDeploymentJob -> "+scheduledDeploymentJob);
+        //ScheduledDeploymentJob savedScheduledDeploymentJob = deploymentMongoRepository.save(scheduledDeploymentJob);
+        return gson.toJson(scheduledDeploymentJob);
     }
 
 /*
