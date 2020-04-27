@@ -1,6 +1,7 @@
 package com.backgroundworker.quartzJob;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class ScheduledJobRepositoryCustomImpl implements ScheduledJobRepositoryC
         Query query = new Query();
         query.addCriteria(
                 new Criteria().andOperator(
-                        Criteria.where("startTimeRun").gte(new DateTime(from).toLocalDateTime()).lt(new DateTime(to).toLocalDateTime()),
+                        Criteria.where("startTimeRun").gte(new DateTime(from, DateTimeZone.UTC)).lt(new DateTime(to, DateTimeZone.UTC)),
                         Criteria.where("boolActive").is(boolActive),
                         Criteria.where("executed").is(executed)
                 )
