@@ -22,9 +22,7 @@ import com.utils.AntExecutor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
+import org.kohsuke.github.*;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.w3c.dom.Element;
@@ -193,22 +191,13 @@ public class TestMain {
         AntExecutor.executeAntTask(buildFile.getPath(), "git_multi_cherry_pick", propertiesMap);
         FileUtils.deleteDirectory(tempDirectory.toFile());*/
 
-        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-
-        scheduler.start();
-
-        JobDetail jobDetail = JobBuilder.newJob(HelloJob.class).usingJobData("JobId","34857394857349587").build();
-
-        Date startDate = DateTime.now().plusSeconds(5).toDate();
-        System.out.println("---------------------"+startDate);
-        Date endDate = DateUtils.addSeconds(startDate, 1);
-        System.out.println("**********************"+endDate);
-        Trigger trigger = newTrigger()
-                .startAt(startDate)
-                .endAt(endDate)
-                .build();
-
-        scheduler.scheduleJob(jobDetail, trigger);
+        String strBranch = "Test_Uni123";
+        GitHub gitHub = GitHub.connectUsingOAuth("");
+        GHRepository trailHeadGitRepo = gitHub.getRepositoryById("256012073");
+        String develop = trailHeadGitRepo.getBranch("develop").getSHA1();
+        GHRef ref = trailHeadGitRepo.createRef("refs/heads/"+strBranch, develop);
+        GHPullRequest pullRequest = trailHeadGitRepo.createPullRequest("test_Uni", strBranch, "master", "Test123");
+        System.out.println(pullRequest);
     }
 
     public static class HelloJob implements Job {
