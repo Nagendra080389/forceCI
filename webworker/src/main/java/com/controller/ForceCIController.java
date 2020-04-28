@@ -1,6 +1,6 @@
 package com.controller;
 
-import com.backgroundworker.quartzJob.DeploymentMongoRepository;
+import com.backgroundworker.quartzJob.ScheduledDeploymentMongoRepository;
 import com.backgroundworker.quartzJob.ScheduledDeploymentJob;
 import com.backgroundworker.quartzJob.Status;
 import com.dao.*;
@@ -143,7 +143,7 @@ public class ForceCIController {
     @Autowired
     private ICaptchaService captchaServiceV3;
     @Autowired
-    private DeploymentMongoRepository deploymentMongoRepository;
+    private ScheduledDeploymentMongoRepository scheduledDeploymentMongoRepository;
     /*@Autowired
     private AmazonS3Client amazonS3Client;*/
 
@@ -1605,9 +1605,8 @@ public class ForceCIController {
         scheduledDeploymentJob.setBoolActive(true);
         scheduledDeploymentJob.setCreatedBy(scheduledDeploymentJob.getConnect2DeployUserEmail());
         scheduledDeploymentJob.setExecuted(false);
-        scheduledDeploymentJob.setLastTimeRun(DateTime.now(DateTimeZone.UTC).toLocalDateTime().toDate());
         scheduledDeploymentJob.setStatus(Status.NOTSTARTED.getText());
-        ScheduledDeploymentJob savedScheduledDeploymentJob = deploymentMongoRepository.save(scheduledDeploymentJob);
+        ScheduledDeploymentJob savedScheduledDeploymentJob = scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
         return gson.toJson(savedScheduledDeploymentJob);
     }
 
@@ -1615,7 +1614,7 @@ public class ForceCIController {
     public String saveScheduledJob(@RequestParam String connect2DeployUser) throws Exception {
         Gson gson = new Gson();
         List<ScheduledDeploymentJob> scheduledDeploymentJobList = new ArrayList<>();
-        Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail = deploymentMongoRepository.findByConnect2DeployUserEmail(connect2DeployUser);
+        Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail = scheduledDeploymentMongoRepository.findByConnect2DeployUserEmail(connect2DeployUser);
         if(byConnect2DeployUserEmail.isPresent()){
             scheduledDeploymentJobList = byConnect2DeployUserEmail.get();
         }
@@ -1625,7 +1624,7 @@ public class ForceCIController {
     @RequestMapping(value = "/api/deleteScheduledJob", method = RequestMethod.DELETE)
     public String deleteScheduledJob(@RequestParam String scheduleJobId) throws Exception {
         Gson gson = new Gson();
-        deploymentMongoRepository.deleteById(scheduleJobId);
+        scheduledDeploymentMongoRepository.deleteById(scheduleJobId);
         return gson.toJson("Success");
     }
 

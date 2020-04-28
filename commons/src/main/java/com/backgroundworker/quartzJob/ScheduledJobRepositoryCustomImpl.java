@@ -18,6 +18,7 @@ import java.util.List;
 public class ScheduledJobRepositoryCustomImpl implements ScheduledJobRepositoryCustom{
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledJobRepositoryCustomImpl.class);
+
     @Autowired
     MongoTemplate mongoTemplate;
 
@@ -31,7 +32,6 @@ public class ScheduledJobRepositoryCustomImpl implements ScheduledJobRepositoryC
                         Criteria.where("executed").is(executed)
                 )
         );
-        logger.info("Query Generated -> "+query.toString());
         return mongoTemplate.find(query, ScheduledDeploymentJob.class);
     }
 }

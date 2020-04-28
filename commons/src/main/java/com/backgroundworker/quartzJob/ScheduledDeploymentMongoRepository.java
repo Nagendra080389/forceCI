@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public interface DeploymentMongoRepository  extends ScheduledJobRepositoryCustom, MongoRepository<ScheduledDeploymentJob, String> {
+public interface ScheduledDeploymentMongoRepository extends ScheduledJobRepositoryCustom, MongoRepository<ScheduledDeploymentJob, String> {
 
     Optional<List<ScheduledDeploymentJob>> findByConnect2DeployUserEmail(String connect2DeployUserEmail);
 
