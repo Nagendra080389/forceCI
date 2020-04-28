@@ -1619,14 +1619,14 @@ public class ForceCIController {
         return gson.toJson(scheduledDeploymentJobList);
     }
 
-    @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.POST)
-    public String updateScheduledJob(@RequestBody ScheduledDeploymentJob scheduledDeploymentJob) throws Exception {
+    @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.GET)
+    public String updateScheduledJob(@RequestParam String scheduledDeploymentJobId, @RequestParam Boolean boolActive) throws Exception {
         Gson gson = new Gson();
-        if(scheduledDeploymentJob != null && scheduledDeploymentJob.getId() != null) {
-            Optional<ScheduledDeploymentJob> scheduledDeploymentMongoRepositoryById = scheduledDeploymentMongoRepository.findById(scheduledDeploymentJob.getId());
+        if(!StringUtils.isEmpty(scheduledDeploymentJobId)) {
+            Optional<ScheduledDeploymentJob> scheduledDeploymentMongoRepositoryById = scheduledDeploymentMongoRepository.findById(scheduledDeploymentJobId);
             if(scheduledDeploymentMongoRepositoryById.isPresent()){
                 ScheduledDeploymentJob scheduledDeploymentJobFromDB = scheduledDeploymentMongoRepositoryById.get();
-                scheduledDeploymentJobFromDB.setBoolActive(scheduledDeploymentJob.getBoolActive());
+                scheduledDeploymentJobFromDB.setBoolActive(boolActive);
                 scheduledDeploymentMongoRepository.save(scheduledDeploymentJobFromDB);
             }
         }

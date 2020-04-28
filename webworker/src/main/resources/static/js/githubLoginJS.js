@@ -1183,7 +1183,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     }
 
     $scope.onStatusChange = function (scheduledDeploymentJob) {
-        $http.post("/api/updateScheduledJob", scheduledDeploymentJob).then(function (returnedScheduledJob) {
+        $http.get("/api/updateScheduledJob?scheduledDeploymentJobId="+scheduledDeploymentJob.id+'&boolActive='+scheduledDeploymentJob.boolActive).then(function (returnedScheduledJob) {
             if(returnedScheduledJob.data === 'Success') {
                 iziToast.success({
                     timeout: 5000,
