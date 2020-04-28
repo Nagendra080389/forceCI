@@ -1186,7 +1186,15 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         debugger;
     }
     $scope.deleteJob = function (scheduleJob) {
-        debugger;
+        $http.delete("/api/deleteScheduledJob?scheduleJobId="+scheduleJob.id).then(function (returnedScheduledJob) {
+            $scope.fetchAllJobs();
+            }, function (error) {
+                console.log(error);
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
+            }
+        );
     }
 
     $scope.logoutFunction = function () {

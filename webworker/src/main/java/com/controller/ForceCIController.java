@@ -1612,7 +1612,7 @@ public class ForceCIController {
     }
 
     @RequestMapping(value = "/api/fetchAllScheduledJobs", method = RequestMethod.GET)
-    public String saveScheduledJob(@RequestParam String connect2DeployUser) throws IOException {
+    public String saveScheduledJob(@RequestParam String connect2DeployUser) throws Exception {
         Gson gson = new Gson();
         List<ScheduledDeploymentJob> scheduledDeploymentJobList = new ArrayList<>();
         Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail = deploymentMongoRepository.findByConnect2DeployUserEmail(connect2DeployUser);
@@ -1620,6 +1620,13 @@ public class ForceCIController {
             scheduledDeploymentJobList = byConnect2DeployUserEmail.get();
         }
         return gson.toJson(scheduledDeploymentJobList);
+    }
+
+    @RequestMapping(value = "/api/deleteScheduledJob", method = RequestMethod.DELETE)
+    public String deleteScheduledJob(@RequestParam String scheduleJobId) throws Exception {
+        Gson gson = new Gson();
+        deploymentMongoRepository.deleteById(scheduleJobId);
+        return gson.toJson("Success");
     }
 
 /*
