@@ -26,6 +26,7 @@ public class SchedulerConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerConfig.class);
     public static final String SCHEDULED_QUEUE_NAME = "Connect2DeployScheduledJob";
+    public static final String SCHEDULED_JOB_BINDING = "Connect2DeployScheduledJobBinding";
     public static final String SCHEDULED_JOB_EXCHANGE = "Connect2DeployScheduledJobExchange";
 
     @Autowired
@@ -55,7 +56,8 @@ public class SchedulerConfig {
                 if(queueProperties == null) {
                     queue = new Queue(SCHEDULED_QUEUE_NAME, true);
                     rabbitMqSenderConfig.amqpAdmin().declareQueue(queue);
-                    rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(SCHEDULED_JOB_EXCHANGE)).withQueueName());
+                    rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange(SCHEDULED_JOB_EXCHANGE));
+                    rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(SCHEDULED_JOB_BINDING)).withQueueName());
                 }
                 ScheduledRabbitMQConsumer container = new ScheduledRabbitMQConsumer();
                 container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
