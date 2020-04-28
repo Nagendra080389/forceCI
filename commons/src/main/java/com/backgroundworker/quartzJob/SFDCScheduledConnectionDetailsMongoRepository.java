@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface SFDCConnectionDetailsMongoRepository extends MongoRepository<SFDCConnectionDetails, String> {
+public interface SFDCScheduledConnectionDetailsMongoRepository extends MongoRepository<SFDCConnectionDetails, String> {
 
     SFDCConnectionDetails findByUserName(String UserName);
 

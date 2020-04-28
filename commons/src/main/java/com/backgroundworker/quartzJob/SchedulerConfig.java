@@ -34,7 +34,7 @@ public class SchedulerConfig {
     @Autowired
     private AmqpTemplate rabbitTemplateCustomAdmin;
     @Autowired
-    private SFDCConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
+    private SFDCScheduledConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
 
     @Scheduled(fixedRate = 10000)
     void enableScheduledJob(){
