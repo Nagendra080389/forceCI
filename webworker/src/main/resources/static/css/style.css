@@ -237,6 +237,14 @@ html {
     width: 5%;
 }
 
+.scheduledJob:last-child{
+    width: 15%;
+}
+
+.scheduledJob:nth-child(6){
+    width: 5%;
+}
+
 
 circle.notStarted {
     fill: grey !important;
