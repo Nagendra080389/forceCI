@@ -18,6 +18,7 @@ public class ScheduledDeploymentJob implements Serializable {
     private String connect2DeployUserEmail;
     private String orgUserEmail;
     private String status;
+    private String sfdcConnection;
     private Date startTimeRun;
     private Date lastTimeRun;
     private Date nextTimeRun;
@@ -79,6 +80,14 @@ public class ScheduledDeploymentJob implements Serializable {
 
     public String getConnect2DeployUserEmail() {
         return connect2DeployUserEmail;
+    }
+
+    public String getSfdcConnection() {
+        return sfdcConnection;
+    }
+
+    public void setSfdcConnection(String sfdcConnection) {
+        this.sfdcConnection = sfdcConnection;
     }
 
     public String getOrgUserEmail() {

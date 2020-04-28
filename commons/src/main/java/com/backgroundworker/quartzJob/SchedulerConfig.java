@@ -37,6 +37,10 @@ public class SchedulerConfig {
     private AmqpTemplate rabbitTemplateCustomAdmin;
     @Autowired
     private SFDCScheduledConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
+    @Autowired
+    private ScheduledDeploymentMongoRepository scheduledDeploymentMongoRepository;
+    @Autowired
+    private ScheduledLinkedServicesMongoRepository scheduledLinkedServicesMongoRepository;
 
     @Scheduled(fixedRate = 10000)
     void enableScheduledJob(){
@@ -62,7 +66,11 @@ public class SchedulerConfig {
                     ScheduledRabbitMQConsumer container = new ScheduledRabbitMQConsumer();
                     container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
                     container.setQueueNames(SCHEDULED_QUEUE_NAME);
-                    container.setMessageListener(new MessageListenerAdapter(new ScheduledRabbitMQHandler(scheduledJobRepositoryCustom, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+                    container.setMessageListener(new MessageListenerAdapter(
+                            new ScheduledRabbitMQHandler(scheduledJobRepositoryCustom,
+                                    sfdcConnectionDetailsMongoRepository, scheduledDeploymentMongoRepository,
+                                    scheduledLinkedServicesMongoRepository),
+                            new Jackson2JsonMessageConverter()));
                     logger.info("Started Consumer called from saveSfdcConnectionDetails");
                     container.startConsumers();
                     for (ScheduledDeploymentJob scheduledDeploymentJob : byStartTimeIsBetween) {
