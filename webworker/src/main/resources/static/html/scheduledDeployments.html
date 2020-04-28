@@ -170,7 +170,18 @@
                                                     <td>{{eachData.orgUserEmail}}</td>
                                                     <td>{{eachData.startTimeRun | date:"dd/MMM/yyyy HH:mm a"}}</td>
                                                     <td>{{eachData.lastTimeRun}}</td>
-                                                    <td><div class="{{eachData.status}}"></div></td>
+                                                    <td>
+                                                        <div ng-show="eachData.status !== 'finished'" class="{{eachData.status}}">
+                                                            <svg height="50" width="50" class="blinking">
+                                                                <circle class="{{eachData.status}}" cx="25" cy="25" r="10"></circle>
+                                                            </svg>
+                                                        </div>
+                                                        <div ng-show="eachData.status === 'finished'" class="{{eachData.status}}">
+                                                            <svg height="50" width="50">
+                                                                <circle class="{{eachData.status}}" cx="25" cy="25" r="10"></circle>
+                                                            </svg>
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <div class="row">
                                                             <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">

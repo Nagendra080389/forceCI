@@ -1065,6 +1065,14 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     $scope.scheduledJobsList = [];
     $scope.tableHeaders = ['Owner', 'Job Name', 'Organization', 'Start Time', 'Last Run', 'Status', 'Action'];
 
+    $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
+        $scope.scheduledJobsList = response.data;
+    }, function (error) {
+        console.log(error);
+        if (error.data.message === 'Unauthorized') {
+            $('#sessionExpiredModal').modal("show");
+        }
+    });
 
     function ScheduledDialogController($scope, $mdDialog) {
         $scope.scheduledJob = {};
@@ -1079,23 +1087,6 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
                 $('#sessionExpiredModal').modal("show");
             }
         });
-
-        /*        let test1=[];
-                test1.push({
-                    id : 'id1',
-                    orgName : '123124'
-                })
-
-                test1.push({
-                    id : 'id2',
-                    orgName : '1231245'
-                })
-                $scope.scheduledJob.sfdcConnections =test1;*/
-        const objDateTime = new Date();
-
-        $scope.dateOptions = {
-            minDate: new Date()
-        };
 
         $scope.hide = function () {
             $mdDialog.hide();

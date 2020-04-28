@@ -33,6 +33,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.kohsuke.github.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1603,9 +1605,21 @@ public class ForceCIController {
         scheduledDeploymentJob.setBoolActive(true);
         scheduledDeploymentJob.setCreatedBy(scheduledDeploymentJob.getConnect2DeployUserEmail());
         scheduledDeploymentJob.setExecuted(false);
+        scheduledDeploymentJob.setLastTimeRun(DateTime.now(DateTimeZone.UTC).toLocalDateTime().toDate());
         scheduledDeploymentJob.setStatus(Status.NOTSTARTED.getText());
         ScheduledDeploymentJob savedScheduledDeploymentJob = deploymentMongoRepository.save(scheduledDeploymentJob);
         return gson.toJson(savedScheduledDeploymentJob);
+    }
+
+    @RequestMapping(value = "/api/fetchAllScheduledJobs", method = RequestMethod.GET)
+    public String saveScheduledJob(@RequestParam String connect2DeployUser) throws IOException {
+        Gson gson = new Gson();
+        List<ScheduledDeploymentJob> scheduledDeploymentJobList = new ArrayList<>();
+        Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail = deploymentMongoRepository.findByConnect2DeployUserEmail(connect2DeployUser);
+        if(byConnect2DeployUserEmail.isPresent()){
+            scheduledDeploymentJobList = byConnect2DeployUserEmail.get();
+        }
+        return gson.toJson(scheduledDeploymentJobList);
     }
 
 /*
