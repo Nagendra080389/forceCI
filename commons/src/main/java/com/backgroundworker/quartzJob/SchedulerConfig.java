@@ -52,22 +52,23 @@ public class SchedulerConfig {
             try {
                 Properties queueProperties = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(SCHEDULED_QUEUE_NAME);
                 logger.info("queueProperties -> "+queueProperties);
-                Queue queue = null;
                 if(queueProperties == null) {
-                    queue = new Queue(SCHEDULED_QUEUE_NAME, true);
+                    Queue queue = new Queue(SCHEDULED_QUEUE_NAME, true);
                     rabbitMqSenderConfig.amqpAdmin().declareQueue(queue);
                     rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange(SCHEDULED_JOB_EXCHANGE));
-                    rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(SCHEDULED_JOB_BINDING)).withQueueName());
+                    rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(SCHEDULED_JOB_EXCHANGE)).withQueueName());
                 }
-                ScheduledRabbitMQConsumer container = new ScheduledRabbitMQConsumer();
-                container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-                container.setQueueNames(SCHEDULED_QUEUE_NAME);
-                container.setMessageListener(new MessageListenerAdapter(new ScheduledRabbitMQHandler(scheduledJobRepositoryCustom, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
-                logger.info("Started Consumer called from saveSfdcConnectionDetails");
-                container.startConsumers();
-                for (ScheduledDeploymentJob scheduledDeploymentJob : byStartTimeIsBetween) {
-                    logger.info("Send to RabbitMQ -> "+scheduledDeploymentJob.getGitRepoId());
-                    rabbitTemplateCustomAdmin.convertAndSend(SCHEDULED_JOB_EXCHANGE, SCHEDULED_QUEUE_NAME, scheduledDeploymentJob);
+                if(queueProperties != null) {
+                    ScheduledRabbitMQConsumer container = new ScheduledRabbitMQConsumer();
+                    container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
+                    container.setQueueNames(SCHEDULED_QUEUE_NAME);
+                    container.setMessageListener(new MessageListenerAdapter(new ScheduledRabbitMQHandler(scheduledJobRepositoryCustom, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
+                    logger.info("Started Consumer called from saveSfdcConnectionDetails");
+                    container.startConsumers();
+                    for (ScheduledDeploymentJob scheduledDeploymentJob : byStartTimeIsBetween) {
+                        logger.info("Send to RabbitMQ -> " + scheduledDeploymentJob.getGitRepoId());
+                        rabbitTemplateCustomAdmin.convertAndSend(SCHEDULED_JOB_EXCHANGE, SCHEDULED_QUEUE_NAME, scheduledDeploymentJob);
+                    }
                 }
 
             } catch (Exception e) {
