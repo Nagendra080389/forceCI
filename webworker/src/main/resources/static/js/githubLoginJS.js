@@ -1183,10 +1183,34 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     }
 
     $scope.onStatusChange = function (scheduleJob) {
-        debugger;
+        $http.post("/api/updateScheduledJob", scheduleJob).then(function (returnedScheduledJob) {
+            if(returnedScheduledJob.data === 'Success') {
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'Job updated successfully'
+                });
+                $scope.fetchAllJobs();
+            }
+            }, function (error) {
+                console.log(error);
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
+            }
+        );
     }
     $scope.deleteJob = function (scheduleJob) {
         $http.delete("/api/deleteScheduledJob?scheduleJobId="+scheduleJob.id).then(function (returnedScheduledJob) {
+            if(returnedScheduledJob.data === 'Success'){
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'Job deleted successfully'
+                });
+            }
             $scope.fetchAllJobs();
             }, function (error) {
                 console.log(error);

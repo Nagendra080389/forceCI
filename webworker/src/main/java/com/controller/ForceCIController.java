@@ -1619,6 +1619,21 @@ public class ForceCIController {
         return gson.toJson(scheduledDeploymentJobList);
     }
 
+    @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.POST)
+    public String updateScheduledJob(@RequestBody ScheduledDeploymentJob scheduledDeploymentJob) throws Exception {
+        Gson gson = new Gson();
+        if(scheduledDeploymentJob != null && scheduledDeploymentJob.getId() != null) {
+            Optional<ScheduledDeploymentJob> scheduledDeploymentMongoRepositoryById = scheduledDeploymentMongoRepository.findById(scheduledDeploymentJob.getId());
+            if(scheduledDeploymentMongoRepositoryById.isPresent()){
+                ScheduledDeploymentJob scheduledDeploymentJobFromDB = scheduledDeploymentMongoRepositoryById.get();
+                scheduledDeploymentJobFromDB.setBoolActive(scheduledDeploymentJob.getBoolActive());
+                scheduledDeploymentMongoRepository.save(scheduledDeploymentJobFromDB);
+            }
+        }
+
+        return gson.toJson("Success");
+    }
+
     @RequestMapping(value = "/api/deleteScheduledJob", method = RequestMethod.DELETE)
     public String deleteScheduledJob(@RequestParam String scheduleJobId) throws Exception {
         Gson gson = new Gson();
