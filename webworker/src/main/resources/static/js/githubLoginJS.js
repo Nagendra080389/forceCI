@@ -1065,14 +1065,18 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     $scope.scheduledJobsList = [];
     $scope.tableHeaders = ['Owner', 'Job Name', 'Organization', 'Start Time', 'Last Run', 'Status', 'Action'];
 
-    $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
-        $scope.scheduledJobsList = response.data;
-    }, function (error) {
-        console.log(error);
-        if (error.data.message === 'Unauthorized') {
-            $('#sessionExpiredModal').modal("show");
-        }
-    });
+    $scope.fetchAllJobs = function () {
+        $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
+            $scope.scheduledJobsList = response.data;
+        }, function (error) {
+            console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
+        });
+    }
+
+    $scope.fetchAllJobs();
 
     function ScheduledDialogController($scope, $mdDialog) {
         $scope.scheduledJob = {};
@@ -1162,7 +1166,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             templateUrl: '../html/scheduleJob.tpl.html',
             parent: angular.element(document.body),
             targetEvent: event,
-            clickOutsideToClose: true,
+            clickOutsideToClose: false,
         }).then(function (scheduledJob) {
             $http.post("/api/saveScheduledJob", scheduledJob).then(function (returnedScheduledJob) {
                 outerScope.scheduledJobsList.push(returnedScheduledJob.data);
