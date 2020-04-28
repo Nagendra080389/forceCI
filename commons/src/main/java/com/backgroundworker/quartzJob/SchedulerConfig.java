@@ -1,6 +1,6 @@
 package com.backgroundworker.quartzJob;
 
-import com.rabbitMQ.RabbitMqSenderConfig;
+import com.commonsRabbitMQ.RabbitMqSenderConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class SchedulerConfig {

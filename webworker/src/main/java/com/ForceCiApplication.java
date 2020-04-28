@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication
-@EnableMongoRepositories(basePackages = {"com.dao", "com.backgroundworker.quartzJob"})
+@EnableMongoRepositories(basePackages = {"com.dao", "com.backgroundworker.quartzJob", "com.commonsrabbitMQ"})
 public class ForceCiApplication {
 
     public static void main(String[] args) {

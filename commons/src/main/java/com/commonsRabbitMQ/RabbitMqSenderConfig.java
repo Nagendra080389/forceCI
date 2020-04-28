@@ -1,4 +1,4 @@
-package com.rabbitMQ;
+package com.commonsRabbitMQ;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class RabbitMqSenderConfig {
     }
 
     /**
-     * Required for executing adminstration functions against an AMQP Broker
+     * Required for executing administration functions against an AMQP Broker
      */
     @Bean
     public AmqpAdmin amqpAdmin() throws URISyntaxException {
