@@ -58,7 +58,7 @@ public class SchedulerConfig {
             }
             ScheduledRabbitMQConsumer container = new ScheduledRabbitMQConsumer();
             container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-            container.setQueueNames(queue.getName());
+            container.setQueueNames(CONNECT_2_DEPLOY_SCHEDULED_JOB);
             container.setMessageListener(new MessageListenerAdapter(new ScheduledRabbitMQHandler(scheduledJobRepositoryCustom, sfdcConnectionDetailsMongoRepository), new Jackson2JsonMessageConverter()));
             logger.info("Started Consumer called from saveSfdcConnectionDetails");
             container.startConsumers();
