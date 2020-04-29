@@ -29,7 +29,8 @@ public class ScheduledJobRepositoryCustomImpl implements ScheduledJobRepositoryC
                 new Criteria().andOperator(
                         Criteria.where("startTimeRun").gte(from).lt(to),
                         Criteria.where("boolActive").is(boolActive),
-                        Criteria.where("executed").is(executed)
+                        Criteria.where("executed").is(executed),
+                        Criteria.where("type").is("DeploymentJob")
                 )
         );
         return mongoTemplate.find(query, ScheduledDeploymentJob.class);
