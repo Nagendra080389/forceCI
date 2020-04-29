@@ -207,6 +207,83 @@
                             </md-tab-body>
                         </md-tab>
 
+                        <md-tab>
+                            <md-tab-label>
+                                <h6>Unit Testing Jobs</h6>
+                            </md-tab-label>
+                            <md-tab-body>
+                                <md-content class="md-padding">
+                                    <div class="card shadow mb-4">
+                                        <div class="card-header py-3">
+                                            <div class="row">
+                                                <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                    <h6 class="m-0 font-weight-bold text-primary text-lg">Unit Testing Schedule Dashboard</h6>
+                                                </div>
+                                                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                                    <button class="btn btn-primary" ng-click="createNewJobTesting($event)" type="button">Create New Job...</button>
+                                                    <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-click="fetchAllJobs()">
+                                                        <md-icon md-svg-src="../images/refresh-24px.svg"></md-icon>
+                                                    </md-button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div ng-show="!scheduledJobsUnitTestList.length" style="font-weight: 900;">No Scheduled Testing Jobs added, click 'Create New Job to add one...</div>
+
+                                            <table class="table table-striped table-bordered table-hover" ng-show="scheduledJobsUnitTestList.length > 0">
+                                                <thead>
+                                                <tr>
+                                                    <th ng-repeat="header in tableHeaders" class="scheduledJob">{{header}}</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr dir-paginate="eachData in scheduledJobsUnitTestList|filter:search|itemsPerPage:20">
+                                                    <td hidden>{{eachData.id}}</td>
+                                                    <td>{{eachData.createdBy}}</td>
+                                                    <td>{{eachData.jobName}}</td>
+                                                    <td>{{eachData.orgUserEmail}}</td>
+                                                    <td>{{eachData.startTimeRun | date:"dd/MMM/yyyy HH:mm a"}}</td>
+                                                    <td>{{eachData.lastTimeRun}}</td>
+                                                    <td>
+                                                        <div ng-show="eachData.status === 'running'" class="{{eachData.status}}">
+                                                            <svg height="50" width="50" class="blinking">
+                                                                <circle class="{{eachData.status}}" cx="25" cy="25" r="10"></circle>
+                                                            </svg>
+                                                        </div>
+                                                        <div ng-show="eachData.status === 'finished' || eachData.status === 'notStarted'" class="{{eachData.status}}">
+                                                            <svg height="50" width="50">
+                                                                <circle class="{{eachData.status}}" cx="25" cy="25" r="10"></circle>
+                                                            </svg>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="row">
+                                                            <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
+                                                                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2 float-left">
+                                                                    <md-switch ng-disabled="{{eachData.executed}}" class="md-primary" ng-change="onStatusChange(eachData)" ng-model="eachData.boolActive"></md-switch>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                                            <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-click="runUnitTest(eachData)">
+                                                                <md-icon md-svg-src="../images/play_arrow-24px.svg"></md-icon>
+                                                            </md-button>
+                                                            </div>
+                                                            <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2 mt-4">
+                                                                <i aria-hidden="true" class="fa fa-trash trashIcon" ng-click="deleteJob(eachData)" style="cursor: pointer;color: #af3232"></i>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </md-content>
+                            </md-tab-body>
+                        </md-tab>
+
                     </md-tabs>
                 </md-content>
 

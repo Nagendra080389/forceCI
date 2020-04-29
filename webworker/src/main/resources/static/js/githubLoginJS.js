@@ -1063,10 +1063,12 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     $scope.branchConnectedTo = $routeParams.branchConnectedTo;
     $scope.branchName = $routeParams.branchConnectedTo;
     $scope.scheduledJobsList = [];
+    $scope.scheduledJobsUnitTestList = [];
     $scope.tableHeaders = ['Owner', 'Job Name', 'Organization', 'Start Time', 'Last Run', 'Status', 'Action'];
 
     $scope.fetchAllJobs = function () {
         $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
+            debugger;
             $scope.scheduledJobsList = response.data;
         }, function (error) {
             console.log(error);
@@ -1077,7 +1079,46 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     }
 
     $scope.fetchAllJobs();
+    $scope.onStatusChange = function (scheduledDeploymentJob) {
+        $http.get("/api/updateScheduledJob?scheduledDeploymentJobId="+scheduledDeploymentJob.id+'&boolActive='+scheduledDeploymentJob.boolActive).then(function (returnedScheduledJob) {
+            if(returnedScheduledJob.data === 'Success') {
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'Job updated successfully'
+                });
+                $scope.fetchAllJobs();
+            }
+            }, function (error) {
+                console.log(error);
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
+            }
+        );
+    }
+    $scope.deleteJob = function (scheduleJob) {
+        $http.delete("/api/deleteScheduledJob?scheduleJobId="+scheduleJob.id).then(function (returnedScheduledJob) {
+            if(returnedScheduledJob.data === 'Success'){
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: 'Job deleted successfully'
+                });
+            }
+            $scope.fetchAllJobs();
+            }, function (error) {
+                console.log(error);
+                if (error.data.message === 'Unauthorized') {
+                    $('#sessionExpiredModal').modal("show");
+                }
+            }
+        );
+    }
 
+    /*Code for Scheduled deployment job started*/
     function ScheduledDialogController($scope, $mdDialog) {
         $scope.scheduledJob = {};
         $scope.availableTags = [];
@@ -1130,6 +1171,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
                 $scope.scheduledJob.orgUserEmail = objSfdcSelected.userName;
                 $scope.scheduledJob.gitRepoId = objSfdcSelected.gitRepoId;
                 $scope.scheduledJob.connect2DeployUserEmail = objSfdcSelected.connect2DeployUser;
+                $scope.scheduledJob.type = 'DeploymentJob';
 
                 $http.get("/api/fetchDetailsForScheduledJob?sfdcConnectionId=" + selectedConnection).then(function (response) {
                     $scope.availableTags = response.data;
@@ -1158,7 +1200,6 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         };
 
     }
-
     $scope.createNewJob = function (event) {
         const outerScope = $scope;
         $mdDialog.show({
@@ -1169,7 +1210,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             clickOutsideToClose: false,
         }).then(function (scheduledJob) {
             $http.post("/api/saveScheduledJob", scheduledJob).then(function (returnedScheduledJob) {
-                outerScope.scheduledJobsList.push(returnedScheduledJob.data);
+                    outerScope.scheduledJobsList.push(returnedScheduledJob.data);
                 }, function (error) {
                     console.log(error);
                     if (error.data.message === 'Unauthorized') {
@@ -1181,44 +1222,96 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             $scope.status = 'You cancelled the dialog.';
         });
     }
+    /*Code for Scheduled deployment job ended*/
 
-    $scope.onStatusChange = function (scheduledDeploymentJob) {
-        $http.get("/api/updateScheduledJob?scheduledDeploymentJobId="+scheduledDeploymentJob.id+'&boolActive='+scheduledDeploymentJob.boolActive).then(function (returnedScheduledJob) {
-            if(returnedScheduledJob.data === 'Success') {
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'Job updated successfully'
-                });
-                $scope.fetchAllJobs();
+    /*Code for Scheduled Unit Testing job started*/
+    function ScheduledDialogUnitTestingController($scope, $mdDialog) {
+        $scope.scheduledTestingJob = {};
+
+        let userEmail = localStorage.getItem('userEmail');
+        $http.get("/api/fetchSfdcConnectionDetailsByUser?connect2DeployUser=" + userEmail).then(function (response) {
+            $scope.scheduledTestingJob.sfdcConnections = response.data;
+        }, function (error) {
+            console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
             }
-            }, function (error) {
-                console.log(error);
-                if (error.data.message === 'Unauthorized') {
-                    $('#sessionExpiredModal').modal("show");
+        });
+
+        $scope.hide = function () {
+            $mdDialog.hide();
+        };
+
+        $scope.cancel = function () {
+            $mdDialog.cancel();
+        };
+
+        $scope.saveScheduleJob = function (answer) {
+            $mdDialog.hide(answer);
+        };
+
+        $scope.openCalendar = function (e, scheduledTestingJob) {
+            scheduledTestingJob.open = true;
+        };
+
+        $scope.onSFDCConnectionChange = function (selectedConnection) {
+            let objSfdcSelected = null;
+            for (let i = 0; i < $scope.scheduledTestingJob.sfdcConnections.length; i++) {
+                if (selectedConnection === $scope.scheduledTestingJob.sfdcConnections[i].id) {
+                    objSfdcSelected = $scope.scheduledTestingJob.sfdcConnections[i];
+                    break;
                 }
             }
-        );
+            if(objSfdcSelected !== null){
+                $scope.scheduledTestingJob.orgUserEmail = objSfdcSelected.userName;
+                $scope.scheduledTestingJob.gitRepoId = objSfdcSelected.gitRepoId;
+                $scope.scheduledTestingJob.connect2DeployUserEmail = objSfdcSelected.connect2DeployUser;
+                $scope.scheduledTestingJob.type = 'TestingJob';
+            }
+        }
+
+        $scope.startDateBeforeRender = function ($view, $dates, $leftDate, $upDate, $rightDate) {
+            const minDate = moment().local().startOf($view).valueOf();
+            for (let i = 0; i < $dates.length; i++) {
+                if ($view === 'day' || $view === 'hour') {
+                    if (minDate > $dates[i].localDateValue()) {
+                        $dates[i].selectable = false;
+                    }
+                } else {
+                    if (minDate >= $dates[i].localDateValue()) {
+                        $dates[i].selectable = false;
+                    }
+                }
+            }
+        };
+
     }
-    $scope.deleteJob = function (scheduleJob) {
-        $http.delete("/api/deleteScheduledJob?scheduleJobId="+scheduleJob.id).then(function (returnedScheduledJob) {
-            if(returnedScheduledJob.data === 'Success'){
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'Job deleted successfully'
-                });
-            }
-            $scope.fetchAllJobs();
-            }, function (error) {
-                console.log(error);
-                if (error.data.message === 'Unauthorized') {
-                    $('#sessionExpiredModal').modal("show");
+    $scope.createNewJobTesting = function (event) {
+        const outerScope = $scope;
+        $mdDialog.show({
+            controller: ScheduledDialogUnitTestingController,
+            templateUrl: '../html/scheduleJobUnitTest.tpl.html',
+            parent: angular.element(document.body),
+            targetEvent: event,
+            clickOutsideToClose: false,
+        }).then(function (scheduledTestingJob) {
+            $http.post("/api/saveScheduledJob", scheduledTestingJob).then(function (returnedScheduledJob) {
+                    outerScope.scheduledJobsUnitTestList.push(returnedScheduledJob.data);
+                }, function (error) {
+                    console.log(error);
+                    if (error.data.message === 'Unauthorized') {
+                        $('#sessionExpiredModal').modal("show");
+                    }
                 }
-            }
-        );
+            );
+        }, function () {
+            $scope.status = 'You cancelled the dialog.';
+        });
+    }
+    /*Code for Scheduled Unit Testing job ended*/
+
+    $scope.runUnitTest = function(eachData){
+
     }
 
     $scope.logoutFunction = function () {

@@ -23,6 +23,7 @@ public class ScheduledDeploymentJob implements Serializable {
     private Date lastTimeRun;
     private Date nextTimeRun;
     private String cronExpression;
+    private String type;
     private Boolean executed;
     private Boolean boolActive;
 
@@ -146,6 +147,14 @@ public class ScheduledDeploymentJob implements Serializable {
         return createdBy;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
@@ -160,16 +169,22 @@ public class ScheduledDeploymentJob implements Serializable {
                 Objects.equals(targetBranch, that.targetBranch) &&
                 Objects.equals(gitRepoId, that.gitRepoId) &&
                 Objects.equals(jobName, that.jobName) &&
+                Objects.equals(createdBy, that.createdBy) &&
                 Objects.equals(connect2DeployUserEmail, that.connect2DeployUserEmail) &&
+                Objects.equals(orgUserEmail, that.orgUserEmail) &&
+                Objects.equals(status, that.status) &&
+                Objects.equals(sfdcConnection, that.sfdcConnection) &&
                 Objects.equals(startTimeRun, that.startTimeRun) &&
+                Objects.equals(lastTimeRun, that.lastTimeRun) &&
                 Objects.equals(nextTimeRun, that.nextTimeRun) &&
                 Objects.equals(cronExpression, that.cronExpression) &&
+                Objects.equals(type, that.type) &&
                 Objects.equals(executed, that.executed) &&
                 Objects.equals(boolActive, that.boolActive);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, sourceBranch, targetBranch, gitRepoId, jobName, connect2DeployUserEmail, startTimeRun, nextTimeRun, cronExpression, executed, boolActive);
+        return Objects.hash(id, sourceBranch, targetBranch, gitRepoId, jobName, createdBy, connect2DeployUserEmail, orgUserEmail, status, sfdcConnection, startTimeRun, lastTimeRun, nextTimeRun, cronExpression, type, executed, boolActive);
     }
 }

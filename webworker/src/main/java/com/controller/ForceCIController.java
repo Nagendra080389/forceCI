@@ -1612,11 +1612,24 @@ public class ForceCIController {
     public String saveScheduledJob(@RequestParam String connect2DeployUser) throws Exception {
         Gson gson = new Gson();
         List<ScheduledDeploymentJob> scheduledDeploymentJobList = new ArrayList<>();
-        Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail = scheduledDeploymentMongoRepository.findByConnect2DeployUserEmail(connect2DeployUser);
+        Map<String, List<ScheduledDeploymentJob>> mapJobTypeAndJobs = new HashMap<>();
+        Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail =
+                scheduledDeploymentMongoRepository.findByConnect2DeployUserEmail(connect2DeployUser);
         if(byConnect2DeployUserEmail.isPresent()){
             scheduledDeploymentJobList = byConnect2DeployUserEmail.get();
         }
-        return gson.toJson(scheduledDeploymentJobList);
+        for (ScheduledDeploymentJob scheduledDeploymentJob : scheduledDeploymentJobList) {
+            if(mapJobTypeAndJobs.containsKey(scheduledDeploymentJob.getType())){
+                List<ScheduledDeploymentJob> scheduledDeploymentJobList1 = mapJobTypeAndJobs.get(scheduledDeploymentJob.getType());
+                scheduledDeploymentJobList1.add(scheduledDeploymentJob);
+            } else {
+                List<ScheduledDeploymentJob> listForMap = new ArrayList<>();
+                listForMap.add(scheduledDeploymentJob);
+                mapJobTypeAndJobs.put(scheduledDeploymentJob.getType(), listForMap);
+            }
+        }
+
+        return gson.toJson(mapJobTypeAndJobs);
     }
 
     @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.GET)
