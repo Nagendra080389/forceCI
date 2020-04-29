@@ -1068,8 +1068,8 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
     $scope.fetchAllJobs = function () {
         $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
-            debugger;
-            $scope.scheduledJobsList = response.data;
+            $scope.scheduledJobsList = response.data.DeploymentJob;
+            $scope.scheduledJobsUnitTestList = response.data.TestingJob;
         }, function (error) {
             console.log(error);
             if (error.data.message === 'Unauthorized') {
