@@ -335,6 +335,27 @@ public class ConsumerHandler {
                     }
                     deploymentJobMongoRepository.save(deploymentJob);
                 }
+
+                Email from = new Email("no-reply@connect2deploy.com", "Connect2Deploy");
+                Email to = new Email(deploymentJob.getEmailId());
+                String subject = "Validation Status";
+                if(merge){
+                    subject = "Deployment Status";
+                }
+                Content content = null;
+                if(deploymentJob.isBoolSfdcPass() && deploymentJob.isBoolCodeReviewPass()){
+                    content = new Content("text/plain", "Salesforce validation and codeReview validation success.");
+                    SendEmailsUtil.sendEmail(subject, from, to, content);
+                } else if(deploymentJob.isBoolSfdcPass() && !deploymentJob.isBoolCodeReviewPass()){
+                    content = new Content("text/plain", "Salesforce validation success but codeReview validation failed.");
+                    SendEmailsUtil.sendEmail(subject, from, to, content);
+                } else if(!deploymentJob.isBoolSfdcPass() && deploymentJob.isBoolCodeReviewPass()){
+                    content = new Content("text/plain", "Salesforce validation failed and codeReview validation success.");
+                    SendEmailsUtil.sendEmail(subject, from, to, content);
+                } else if(!deploymentJob.isBoolSfdcPass() && !deploymentJob.isBoolCodeReviewPass()){
+                    content = new Content("text/plain", "Salesforce validation and codeReview validation failed.");
+                    SendEmailsUtil.sendEmail(subject, from, to, content);
+                }
             } catch (Exception e) {
                 logger.error(e.getMessage());
             } finally {
