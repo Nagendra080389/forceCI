@@ -144,10 +144,10 @@
                                     <div class="card shadow mb-4">
                                         <div class="card-header py-3">
                                             <div class="row">
-                                                <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
                                                     <h6 class="m-0 font-weight-bold text-primary text-lg">Deployment Schedule Dashboard</h6>
                                                 </div>
-                                                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                                <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 text-right">
                                                     <button class="btn btn-primary" ng-click="createNewJob($event)" type="button">Create New Job...</button>
                                                     <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-click="fetchAllJobs()">
                                                         <md-icon md-svg-src="../images/refresh-24px.svg"></md-icon>
@@ -216,10 +216,10 @@
                                     <div class="card shadow mb-4">
                                         <div class="card-header py-3">
                                             <div class="row">
-                                                <div class="col-sm-10 col-md-10 col-lg-10 col-xl-10">
+                                                <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8">
                                                     <h6 class="m-0 font-weight-bold text-primary text-lg">Unit Testing Schedule Dashboard</h6>
                                                 </div>
-                                                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                                <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 text-right">
                                                     <button class="btn btn-primary" ng-click="createNewJobTesting($event)" type="button">Create New Job...</button>
                                                     <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-click="fetchAllJobs()">
                                                         <md-icon md-svg-src="../images/refresh-24px.svg"></md-icon>
@@ -246,12 +246,12 @@
                                                     <td>{{eachData.startTimeRun | date:"dd/MMM/yyyy HH:mm a"}}</td>
                                                     <td>{{eachData.lastTimeRun}}</td>
                                                     <td>
-                                                        <div ng-show="eachData.status === 'running'" class="{{eachData.status}}">
+                                                        <div ng-show="eachData.status === 'running'" class="{{eachData.status}} mt-1">
                                                             <svg height="50" width="50" class="blinking">
                                                                 <circle class="{{eachData.status}}" cx="25" cy="25" r="10"></circle>
                                                             </svg>
                                                         </div>
-                                                        <div ng-show="eachData.status === 'finished' || eachData.status === 'notStarted'" class="{{eachData.status}}">
+                                                        <div ng-show="eachData.status === 'finished' || eachData.status === 'notStarted'" class="{{eachData.status}} mt-1">
                                                             <svg height="50" width="50">
                                                                 <circle class="{{eachData.status}}" cx="25" cy="25" r="10"></circle>
                                                             </svg>
@@ -259,10 +259,13 @@
                                                     </td>
                                                     <td>
                                                         <div class="row">
-                                                            <div class="col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                                                                <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2 float-left">
-                                                                    <md-switch ng-disabled="{{eachData.executed}}" class="md-primary" ng-change="onStatusChange(eachData)" ng-model="eachData.boolActive"></md-switch>
-                                                                </div>
+                                                            <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                                                                <md-switch ng-disabled="{{eachData.executed}}" class="md-primary" ng-change="onStatusChange(eachData)" ng-model="eachData.boolActive"></md-switch>
+                                                            </div>
+                                                            <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                                                                <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-disabled="eachData.executed === false" ng-click="viewReport(eachData)">
+                                                                    <md-icon md-svg-src="../images/description-24px.svg"></md-icon>
+                                                                </md-button>
                                                             </div>
                                                             <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
                                                             <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-click="runUnitTest(eachData)">
