@@ -343,17 +343,18 @@ public class ConsumerHandler {
                     subject = "Deployment Status";
                 }
                 Content content = null;
+                String formHref = "<a href='"+deploymentJob.getPullRequestHtmlUrl()+"'>"+deploymentJob.getPullRequestNumber()+"</a>";
                 if(deploymentJob.isBoolSfdcPass() && deploymentJob.isBoolCodeReviewPass()){
-                    content = new Content("text/plain", "Salesforce validation and codeReview validation success.");
+                    content = new Content("text/html", "Salesforce validation and codeReview validation success for PR Number "+ formHref+".");
                     SendEmailsUtil.sendEmail(subject, from, to, content);
                 } else if(deploymentJob.isBoolSfdcPass() && !deploymentJob.isBoolCodeReviewPass()){
-                    content = new Content("text/plain", "Salesforce validation success but codeReview validation failed.");
+                    content = new Content("text/plain", "Salesforce validation success but codeReview validation failed for PR Number "+ formHref+".");
                     SendEmailsUtil.sendEmail(subject, from, to, content);
                 } else if(!deploymentJob.isBoolSfdcPass() && deploymentJob.isBoolCodeReviewPass()){
-                    content = new Content("text/plain", "Salesforce validation failed and codeReview validation success.");
+                    content = new Content("text/plain", "Salesforce validation failed and codeReview validation success for PR Number "+ formHref+".");
                     SendEmailsUtil.sendEmail(subject, from, to, content);
                 } else if(!deploymentJob.isBoolSfdcPass() && !deploymentJob.isBoolCodeReviewPass()){
-                    content = new Content("text/plain", "Salesforce validation and codeReview validation failed.");
+                    content = new Content("text/plain", "Salesforce validation and codeReview validation failed for PR Number "+ formHref+".");
                     SendEmailsUtil.sendEmail(subject, from, to, content);
                 }
             } catch (Exception e) {
