@@ -22,12 +22,9 @@ import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.service.CaptchaServiceV3;
 import com.service.ICaptchaService;
+import com.sforce.soap.apex.RunTestsRequest;
+import com.sforce.soap.apex.RunTestsResult;
 import com.sforce.soap.metadata.MetadataConnection;
-import com.sforce.soap.tooling.RunTestsRequest;
-import com.sforce.soap.tooling.RunTestsResult;
-import com.sforce.soap.tooling.ToolingConnection;
-import com.sforce.soap.tooling.fault.ExceptionCode;
-import com.sforce.soap.tooling.fault.UnexpectedErrorFault;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.*;
 import org.apache.commons.httpclient.HttpClient;
@@ -1663,7 +1660,7 @@ public class ForceCIController {
                 ConnectorConfig connectorConfig = new ConnectorConfig();
                 connectorConfig.setServiceEndpoint(sfdcConnectionDetails.getInstanceURL() + salesforceToolingEndpoint);
                 connectorConfig.setSessionId(sfdcConnectionDetails.getOauthToken());
-                ToolingConnection toolingConnection = new ToolingConnection(connectorConfig);
+                /*ToolingConnection toolingConnection = new ToolingConnection(connectorConfig);
                 RunTestsRequest runTestsRequest = new RunTestsRequest();
                 runTestsRequest.setAllTests(true);
                 try {
@@ -1680,12 +1677,12 @@ public class ForceCIController {
                     } else {
                         logger.error("runJob error : "+e.getMessage());
                     }
-                }
+                }*/
 
             }
         }
 
-        return gson.toJson(runTestsResult);
+        return gson.toJson("runTestsResult");
     }
 
     @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.GET)
