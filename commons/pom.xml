@@ -12,14 +12,6 @@
     <artifactId>commons</artifactId>
     <packaging>jar</packaging>
 
-    <repositories>
-        <repository>
-            <id>project.local</id>
-            <name>project</name>
-            <url>file:${project.basedir}/repo</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -48,11 +40,15 @@
             <artifactId>github-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.toolingc2d</groupId>
             <artifactId>toolingc2d</artifactId>
             <version>0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/repo/com/toolingc2d/toolingc2d/0.1/force-tooling-api.jar</systemPath>
         </dependency>
+
     </dependencies>
 
 
