@@ -23,6 +23,11 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.service.CaptchaServiceV3;
 import com.service.ICaptchaService;
 import com.sforce.soap.metadata.MetadataConnection;
+import com.sforce.soap.tooling.RunTestsRequest;
+import com.sforce.soap.tooling.RunTestsResult;
+import com.sforce.soap.tooling.ToolingConnection;
+import com.sforce.soap.tooling.fault.ExceptionCode;
+import com.sforce.soap.tooling.fault.UnexpectedErrorFault;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.*;
 import org.apache.commons.httpclient.HttpClient;
@@ -33,6 +38,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.kohsuke.github.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +123,8 @@ public class ForceCIController {
     String hmacSecretKet;
     @Value("${salesforce.metadataEndpoint}")
     String salesforceMetaDataEndpoint;
+    @Value("${salesforce.toolingEndpoint}")
+    String salesforceToolingEndpoint;
 /*    @Value("${amazons3.bucketname}")
     private String bucketName;*/
 
@@ -628,6 +637,11 @@ public class ForceCIController {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (byUui.isPresent()) {
             ConnectionDetails connectionDetails = byUui.get();
+            logger.info("connectionDetails getServerURL -> "+connectionDetails.getServerURL());
+            logger.info("connectionDetails getRequestFrom -> "+connectionDetails.getRequestFrom());
+            logger.info("connectionDetails getUserName -> "+connectionDetails.getUserName());
+            logger.info("connectionDetails -> getClientId "+connectionDetails.getClientId());
+            logger.info("connectionDetails -> getClientSecret "+connectionDetails.getClientSecret());
             connectionDetailsMongoRepository.delete(connectionDetails);
             String environment = connectionDetails.getServerURL() + "/login/oauth/access_token";
             HttpClient httpClient = new HttpClient();
@@ -1631,6 +1645,47 @@ public class ForceCIController {
         }
 
         return gson.toJson(mapJobTypeAndJobs);
+    }
+
+    @RequestMapping(value = "/api/runJob", method = RequestMethod.GET)
+    public String runJobWithToolingAPI(@RequestParam String scheduledJobId) throws Exception {
+        Gson gson = new Gson();
+        RunTestsResult runTestsResult = null;
+        Optional<ScheduledDeploymentJob> scheduledDeploymentJobFromDB = scheduledDeploymentMongoRepository.findById(scheduledJobId);
+        if(scheduledDeploymentJobFromDB.isPresent()){
+            ScheduledDeploymentJob scheduledDeploymentJob = scheduledDeploymentJobFromDB.get();
+            scheduledDeploymentJob.setStatus(Status.RUNNING.getText());
+            scheduledDeploymentJob.setLastTimeRun(DateTime.now().toDate());
+            ScheduledDeploymentJob savedJob = scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
+            Optional<SFDCConnectionDetails> sfdcConnectionDetailsDB = sfdcConnectionDetailsMongoRepository.findById(savedJob.getSfdcConnection());
+            if(sfdcConnectionDetailsDB.isPresent()){
+                SFDCConnectionDetails sfdcConnectionDetails = sfdcConnectionDetailsDB.get();
+                ConnectorConfig connectorConfig = new ConnectorConfig();
+                connectorConfig.setServiceEndpoint(sfdcConnectionDetails.getInstanceURL() + salesforceToolingEndpoint);
+                connectorConfig.setSessionId(sfdcConnectionDetails.getOauthToken());
+                ToolingConnection toolingConnection = new ToolingConnection(connectorConfig);
+                RunTestsRequest runTestsRequest = new RunTestsRequest();
+                runTestsRequest.setAllTests(true);
+                try {
+                    runTestsResult = toolingConnection.runTests(runTestsRequest);
+                } catch (Exception e){
+                    if (e instanceof UnexpectedErrorFault && ((UnexpectedErrorFault) e).getExceptionCode().equals(ExceptionCode.INVALID_SESSION_ID)) {
+                        String sfdcToken = SFDCUtils.refreshSFDCToken(sfdcConnectionDetails);
+                        sfdcConnectionDetails = sfdcConnectionDetailsDB.get();
+                        connectorConfig = new ConnectorConfig();
+                        connectorConfig.setServiceEndpoint(sfdcConnectionDetails.getInstanceURL() + salesforceToolingEndpoint);
+                        connectorConfig.setSessionId(sfdcToken);
+                        toolingConnection = new ToolingConnection(connectorConfig);
+                        runTestsResult = toolingConnection.runTests(runTestsRequest);
+                    } else {
+                        logger.error("runJob error : "+e.getMessage());
+                    }
+                }
+
+            }
+        }
+
+        return gson.toJson(runTestsResult);
     }
 
     @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.GET)
