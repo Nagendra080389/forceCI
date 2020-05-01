@@ -623,6 +623,7 @@ public class ForceCIController {
     @RequestMapping(value = "/github-enterprise/callback", method = RequestMethod.GET, params = {"code", "state", "connectionId"})
     public void gitHubEnterprise(@RequestParam String code, @RequestParam String state, @RequestParam String connectionId, ServletResponse response, ServletRequest
             request) throws Exception {
+        logger.info("code -> "+code);
         Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (byUui.isPresent()) {
