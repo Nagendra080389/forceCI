@@ -1315,7 +1315,14 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     /*Code for Scheduled Unit Testing job ended*/
 
     $scope.runUnitTest = function(eachData){
-
+        $http.get("/api/runJob?scheduledJobId=" + eachData.id).then(function (response) {
+            debugger;
+        }, function (error) {
+            console.log(error);
+            if (error.data.message === 'Unauthorized') {
+                $('#sessionExpiredModal').modal("show");
+            }
+        });
     }
 
     $scope.viewReport = function(eachData){

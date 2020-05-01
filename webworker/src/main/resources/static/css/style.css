@@ -267,7 +267,7 @@ circle.running {
 
 }
 
-@keyframes "blink" {
+@keyframes blink {
     from, to {
         opacity: 0;
     }
@@ -285,7 +285,7 @@ circle.running {
     }
 }
 
-@-webkit-keyframes "blink" {
+@-webkit-keyframes blink {
     from, to {
         opacity: 0;
     }
@@ -294,7 +294,7 @@ circle.running {
     }
 }
 
-@-ms-keyframes "blink" {
+@-ms-keyframes blink {
     from, to {
         opacity: 0;
     }
@@ -303,7 +303,7 @@ circle.running {
     }
 }
 
-@-o-keyframes "blink" {
+@-o-keyframes blink {
     from, to {
         opacity: 0;
     }
