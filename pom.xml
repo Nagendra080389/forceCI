@@ -24,14 +24,6 @@
         <module>commons</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>project.local</id>
-            <name>project</name>
-            <url>file:${project.basedir}/repo</url>
-        </repository>
-    </repositories>
-
     <properties>
         <docker.image.prefix>springio</docker.image.prefix>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -170,11 +162,6 @@
                 <groupId>net.sourceforge.pmd</groupId>
                 <artifactId>pmd-core</artifactId>
                 <version>6.20.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.force.toolingAPI</groupId>
-                <artifactId>toolingAPI</artifactId>
-                <version>1.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
