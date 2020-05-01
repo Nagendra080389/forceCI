@@ -12,14 +12,6 @@
     <artifactId>commons</artifactId>
     <packaging>jar</packaging>
 
-    <repositories>
-        <repository>
-            <id>project.local</id>
-            <name>project</name>
-            <url>file:${project.basedir}/repo</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -47,19 +39,6 @@
             <groupId>org.kohsuke</groupId>
             <artifactId>github-api</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.force.toolingAPI</groupId>
-            <artifactId>toolingAPI</artifactId>
-            <version>1.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
