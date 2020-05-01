@@ -9,6 +9,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <repositories>
+        <!--other repositories if any-->
+        <repository>
+            <id>project.local</id>
+            <name>project</name>
+            <url>file://${project.basedir}/../repo</url>
+        </repository>
+    </repositories>
+
     <artifactId>commons</artifactId>
     <packaging>jar</packaging>
 
@@ -42,14 +51,10 @@
         </dependency>
 
         <dependency>
-            <groupId>com.toolingc2d</groupId>
-            <artifactId>toolingc2d</artifactId>
-            <version>0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/repo/com/toolingc2d/toolingc2d/0.1/force-tooling-api.jar</systemPath>
+            <groupId>com.toolingapi</groupId>
+            <artifactId>forcetoolingapi</artifactId>
+            <version>1.0</version>
         </dependency>
 
     </dependencies>
-
-
 </project>

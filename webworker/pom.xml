@@ -11,6 +11,14 @@
     <name>webworker</name>
     <description>Web thread for forceCI</description>
 
+    <repositories>
+        <repository>
+            <id>project.local</id>
+            <name>project</name>
+            <url>file:${project.basedir}/../repo</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -146,6 +154,11 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.toolingapi</groupId>
+            <artifactId>forcetoolingapi</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 

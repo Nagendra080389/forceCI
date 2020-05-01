@@ -17,6 +17,13 @@
         <version>2.0.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+    <repositories>
+        <repository>
+            <id>project.local</id>
+            <name>project</name>
+            <url>file:${project.basedir}/repo</url>
+        </repository>
+    </repositories>
 
     <modules>
         <module>webworker</module>
@@ -162,6 +169,12 @@
                 <groupId>net.sourceforge.pmd</groupId>
                 <artifactId>pmd-core</artifactId>
                 <version>6.20.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.toolingapi</groupId>
+                <artifactId>forcetoolingapi</artifactId>
+                <version>1.0</version>
             </dependency>
 
         </dependencies>
