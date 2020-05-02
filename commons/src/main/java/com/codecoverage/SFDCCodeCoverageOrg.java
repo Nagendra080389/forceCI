@@ -17,6 +17,8 @@ public class SFDCCodeCoverageOrg implements Serializable {
     private List<SFDCCodeCoverageDetails> lstSfdcCodeCoverageDetailsTests;
     private List<SFDCCodeCoverageDetails> lstSfdcCodeCoverageDetails;
     private Double orgCoverage;
+    private Boolean boolFail;
+    private String errorMessage;
 
     public String getId() {
         return id;
@@ -58,6 +60,22 @@ public class SFDCCodeCoverageOrg implements Serializable {
         this.lstSfdcCodeCoverageDetailsTests = lstSfdcCodeCoverageDetailsTests;
     }
 
+    public Boolean getBoolFail() {
+        return boolFail;
+    }
+
+    public void setBoolFail(Boolean boolFail) {
+        this.boolFail = boolFail;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,11 +85,13 @@ public class SFDCCodeCoverageOrg implements Serializable {
                 Objects.equals(scheduledJobId, that.scheduledJobId) &&
                 Objects.equals(lstSfdcCodeCoverageDetailsTests, that.lstSfdcCodeCoverageDetailsTests) &&
                 Objects.equals(lstSfdcCodeCoverageDetails, that.lstSfdcCodeCoverageDetails) &&
-                Objects.equals(orgCoverage, that.orgCoverage);
+                Objects.equals(orgCoverage, that.orgCoverage) &&
+                Objects.equals(boolFail, that.boolFail) &&
+                Objects.equals(errorMessage, that.errorMessage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, scheduledJobId, lstSfdcCodeCoverageDetailsTests, lstSfdcCodeCoverageDetails, orgCoverage);
+        return Objects.hash(id, scheduledJobId, lstSfdcCodeCoverageDetailsTests, lstSfdcCodeCoverageDetails, orgCoverage, boolFail, errorMessage);
     }
 }

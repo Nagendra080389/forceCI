@@ -68,8 +68,6 @@
             <artifactId>force-wsc</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
-
         <!-- https://mvnrepository.com/artifact/com.force.api/force-apex-api -->
         <dependency>
             <groupId>com.force.api</groupId>

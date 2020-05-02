@@ -28,6 +28,7 @@ import com.sforce.soap.tooling.RunTestsResult;
 import com.sforce.soap.tooling.ToolingConnection;
 import com.sforce.soap.tooling.fault.ExceptionCode;
 import com.sforce.soap.tooling.fault.UnexpectedErrorFault;
+import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import com.utils.*;
 import org.apache.commons.httpclient.HttpClient;
@@ -83,6 +84,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.backgroundworker.quartzJob.SchedulerConfig.SCHEDULED_JOB_EXCHANGE;
+import static com.backgroundworker.quartzJob.SchedulerConfig.SCHEDULED_QUEUE_NAME;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
@@ -400,8 +403,8 @@ public class ForceCIController {
                     accessToken = jsonObject.get("access_token").getAsString();
                     for (String linkedServiceId : byEmailId.getLinkedServices()) {
                         Optional<LinkedServices> linkedServicesById = linkedServicesMongoRepository.findById(linkedServiceId);
-                        if(linkedServicesById.isPresent()) {
-                            LinkedServices linkedService =  linkedServicesById.get();
+                        if (linkedServicesById.isPresent()) {
+                            LinkedServices linkedService = linkedServicesById.get();
                             logger.info("byEmailId -> Github status linkedService -> " + linkedService.getName());
                             if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
                                 linkedService.setConnected(true);
@@ -442,19 +445,19 @@ public class ForceCIController {
     public String fetchAllCommits(@RequestBody CommitRequest gitCommitSearch) throws Exception {
         Gson gson = new Gson();
         List<CommitResponse> lstCommits = new ArrayList<>();
-        if(!ObjectUtils.isEmpty(gitCommitSearch)){
+        if (!ObjectUtils.isEmpty(gitCommitSearch)) {
             String userConnect2DeployToken = gitCommitSearch.getUserConnect2DeployToken();
             Optional<Connect2DeployUser> userByToken = connect2DeployUserMongoRepository.findByToken(userConnect2DeployToken);
-            if(userByToken.isPresent()){
+            if (userByToken.isPresent()) {
                 Connect2DeployUser connect2DeployUser = userByToken.get();
                 for (String linkedService : connect2DeployUser.getLinkedServices()) {
                     Optional<LinkedServices> linkedServiceById = linkedServicesMongoRepository.findById(linkedService);
-                    if(linkedServiceById.isPresent() && linkedServiceById.get().getName().equalsIgnoreCase(gitCommitSearch.getLinkedServiceName())){
+                    if (linkedServiceById.isPresent() && linkedServiceById.get().getName().equalsIgnoreCase(gitCommitSearch.getLinkedServiceName())) {
                         GitHub gitHub = null;
-                        if(gitCommitSearch.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
+                        if (gitCommitSearch.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
                             gitHub = GitHub.connectUsingOAuth(linkedServiceById.get().getAccessToken());
-                        }else if(gitCommitSearch.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
-                            gitHub = GitHub.connectToEnterpriseWithOAuth(linkedServiceById.get().getServerURL(),linkedServiceById.get().getUserName(), linkedServiceById.get().getAccessToken());
+                        } else if (gitCommitSearch.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
+                            gitHub = GitHub.connectToEnterpriseWithOAuth(linkedServiceById.get().getServerURL(), linkedServiceById.get().getUserName(), linkedServiceById.get().getAccessToken());
                         }
                         GHRepository repositoryById = gitHub.getRepositoryById(gitCommitSearch.getRepoId());
                         for (GHCommit eachCommit : repositoryById.queryCommits()
@@ -462,30 +465,30 @@ public class ForceCIController {
                                 .since(gitCommitSearch.getFromDate())
                                 .until(gitCommitSearch.getToDate()).list()) {
                             CommitResponse commitResponse = new CommitResponse();
-                            if(eachCommit.getAuthor() != null) {
+                            if (eachCommit.getAuthor() != null) {
                                 commitResponse.setAuthorName(eachCommit.getAuthor().getLogin());
                                 commitResponse.setAuthorUrl(eachCommit.getAuthor().getHtmlUrl().toExternalForm());
                             } else {
-                                if(eachCommit.getCommitShortInfo() != null && eachCommit.getCommitShortInfo().getAuthor() != null) {
+                                if (eachCommit.getCommitShortInfo() != null && eachCommit.getCommitShortInfo().getAuthor() != null) {
                                     commitResponse.setAuthorName(eachCommit.getCommitShortInfo().getAuthor().getName());
                                 }
                             }
                             commitResponse.setRepoToken(linkedServiceById.get().getAccessToken());
                             commitResponse.setRepoUserName(linkedServiceById.get().getUserName());
                             commitResponse.setGhEnterpriseServerURL(linkedServiceById.get().getServerURL());
-                            if(eachCommit.getOwner() != null){
+                            if (eachCommit.getOwner() != null) {
                                 commitResponse.setGitCloneURL(eachCommit.getOwner().getHttpTransportUrl());
                             }
                             commitResponse.setCommitDate(eachCommit.getCommitDate());
                             commitResponse.setCommitId(eachCommit.getSHA1());
-                            if(eachCommit.getCommitShortInfo() != null) {
+                            if (eachCommit.getCommitShortInfo() != null) {
                                 commitResponse.setCommitMessage(eachCommit.getCommitShortInfo().getMessage());
                             }
-                            if(eachCommit.getCommitter() != null) {
+                            if (eachCommit.getCommitter() != null) {
                                 commitResponse.setCommitterName(eachCommit.getCommitter().getLogin());
                                 commitResponse.setCommitterURL(eachCommit.getCommitter().getHtmlUrl().toExternalForm());
                             } else {
-                                if(eachCommit.getCommitShortInfo() != null && eachCommit.getCommitShortInfo().getCommitter() != null) {
+                                if (eachCommit.getCommitShortInfo() != null && eachCommit.getCommitShortInfo().getCommitter() != null) {
                                     commitResponse.setCommitterName(eachCommit.getCommitShortInfo().getCommitter().getName());
                                 }
                             }
@@ -505,19 +508,19 @@ public class ForceCIController {
         List<String> newListToBeReturned = new ArrayList<>();
         List<String> sf_build = new ArrayList<>();
         GitHub gitHub = null;
-        if(cherryPickRequest.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
+        if (cherryPickRequest.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
             gitHub = GitHub.connectUsingOAuth(cherryPickRequest.getRepoToken());
-        }else if(cherryPickRequest.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
-            gitHub = GitHub.connectToEnterpriseWithOAuth(cherryPickRequest.getGhEnterpriseServerURL(),cherryPickRequest.getRepoUserName(), cherryPickRequest.getRepoToken());
+        } else if (cherryPickRequest.getLinkedServiceName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
+            gitHub = GitHub.connectToEnterpriseWithOAuth(cherryPickRequest.getGhEnterpriseServerURL(), cherryPickRequest.getRepoUserName(), cherryPickRequest.getRepoToken());
         }
         GHRepository repositoryById = gitHub.getRepositoryById(cherryPickRequest.getRepoId());
         GHBranch branch = null;
         try {
             branch = repositoryById.getBranch(cherryPickRequest.getNewBranch());
-        } catch (Exception objException){
+        } catch (Exception objException) {
             logger.error(objException.getMessage());
         }
-        if(ObjectUtils.isEmpty(branch)) {
+        if (ObjectUtils.isEmpty(branch)) {
 
             Path tempDirectory = Files.createTempDirectory(cherryPickRequest.getDestinationBranch());
             try {
@@ -528,12 +531,12 @@ public class ForceCIController {
                 File buildFile = ConsumerHandler.stream2file(buildXml, "build", ".xml");
                 File cherryPick = ConsumerHandler.stream2file(gitCherryPick, "git-multi-cherry-pick", ".sh");
                 propertiesMap.put("gitMultiCherryPick", cherryPick.getName());
-                if(cherryPickRequest.getGhEnterpriseServerURL() != null){
-                    propertiesMap.put("gitCloneURL", "https://" + cherryPickRequest.getRepoUserName() + ":" + cherryPickRequest.getRepoToken() + "@"+cherryPickRequest.getGhEnterpriseServerURL()+"/" +
-                            cherryPickRequest.getRepoUserName()+"/"+repositoryById.getName()+".git");
-                }else {
+                if (cherryPickRequest.getGhEnterpriseServerURL() != null) {
+                    propertiesMap.put("gitCloneURL", "https://" + cherryPickRequest.getRepoUserName() + ":" + cherryPickRequest.getRepoToken() + "@" + cherryPickRequest.getGhEnterpriseServerURL() + "/" +
+                            cherryPickRequest.getRepoUserName() + "/" + repositoryById.getName() + ".git");
+                } else {
                     propertiesMap.put("gitCloneURL", "https://" + cherryPickRequest.getRepoUserName() + ":" + cherryPickRequest.getRepoToken() + "@github.com/" +
-                            cherryPickRequest.getRepoUserName()+"/"+repositoryById.getName()+".git");
+                            cherryPickRequest.getRepoUserName() + "/" + repositoryById.getName() + ".git");
                 }
                 propertiesMap.put("gitBranchName", cherryPickRequest.getDestinationBranch());
                 propertiesMap.put("gitNewBranchName", cherryPickRequest.getNewBranch());
@@ -541,7 +544,7 @@ public class ForceCIController {
                 propertiesMap.put("gitDirectory", tempDirectory.toFile().getPath());
                 propertiesMap.put("userEmail", gitHub.getUser(cherryPickRequest.getRepoUserName()).getEmail());
                 propertiesMap.put("userName", gitHub.getUser(cherryPickRequest.getRepoUserName()).getLogin());
-                logger.info("propertiesMap -> "+gson.toJson(propertiesMap));
+                logger.info("propertiesMap -> " + gson.toJson(propertiesMap));
                 sf_build = AntExecutor.executeAntTask(buildFile.getPath(), "git_multi_cherry_pick", propertiesMap);
             } catch (Exception objException) {
                 logger.error(objException.getMessage());
@@ -570,7 +573,7 @@ public class ForceCIController {
 
             }
         } else {
-            newListToBeReturned.add("Branch " +cherryPickRequest.getNewBranch()+ " Already Exists ! Please try creating different branch.");
+            newListToBeReturned.add("Branch " + cherryPickRequest.getNewBranch() + " Already Exists ! Please try creating different branch.");
         }
         return gson.toJson(newListToBeReturned);
     }
@@ -603,7 +606,7 @@ public class ForceCIController {
         if (!ObjectUtils.isEmpty(byEmailId)) {
             for (String linkedServiceId : byEmailId.getLinkedServices()) {
                 Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
-                if(linkedServices.isPresent()){
+                if (linkedServices.isPresent()) {
                     LinkedServices eachLinkedServices = linkedServices.get();
                     mapAppAndAccessToken.put(eachLinkedServices.getName(), eachLinkedServices.getAccessToken());
                 }
@@ -632,16 +635,16 @@ public class ForceCIController {
     @RequestMapping(value = "/github-enterprise/callback", method = RequestMethod.GET, params = {"code", "state", "connectionId"})
     public void gitHubEnterprise(@RequestParam String code, @RequestParam String state, @RequestParam String connectionId, ServletResponse response, ServletRequest
             request) throws Exception {
-        logger.info("code -> "+code);
+        logger.info("code -> " + code);
         Optional<ConnectionDetails> byUui = connectionDetailsMongoRepository.findByUui(connectionId);
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (byUui.isPresent()) {
             ConnectionDetails connectionDetails = byUui.get();
-            logger.info("connectionDetails getServerURL -> "+connectionDetails.getServerURL());
-            logger.info("connectionDetails getRequestFrom -> "+connectionDetails.getRequestFrom());
-            logger.info("connectionDetails getUserName -> "+connectionDetails.getUserName());
-            logger.info("connectionDetails -> getClientId "+connectionDetails.getClientId());
-            logger.info("connectionDetails -> getClientSecret "+connectionDetails.getClientSecret());
+            logger.info("connectionDetails getServerURL -> " + connectionDetails.getServerURL());
+            logger.info("connectionDetails getRequestFrom -> " + connectionDetails.getRequestFrom());
+            logger.info("connectionDetails getUserName -> " + connectionDetails.getUserName());
+            logger.info("connectionDetails -> getClientId " + connectionDetails.getClientId());
+            logger.info("connectionDetails -> getClientSecret " + connectionDetails.getClientSecret());
             connectionDetailsMongoRepository.delete(connectionDetails);
             String environment = connectionDetails.getServerURL() + "/login/oauth/access_token";
             HttpClient httpClient = new HttpClient();
@@ -668,7 +671,7 @@ public class ForceCIController {
                 if (!ObjectUtils.isEmpty(byEmailId)) {
                     for (String linkedServiceId : byEmailId.getLinkedServices()) {
                         Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
-                        if(linkedServices.isPresent()) {
+                        if (linkedServices.isPresent()) {
                             LinkedServices linkedService = linkedServices.get();
                             logger.info("Enterprise -> " + linkedService.getName());
                             if (linkedService.getName().equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
@@ -898,7 +901,7 @@ public class ForceCIController {
             List<RepositoryWrapper> newLstRepositoryWrapper = new ArrayList<>();
             for (String linkedServiceId : connect2DeployUser.getLinkedServices()) {
                 Optional<LinkedServices> linkedServices = linkedServicesMongoRepository.findById(linkedServiceId);
-                if(linkedServices.isPresent()){
+                if (linkedServices.isPresent()) {
                     linkedServiceFromDB = linkedServices.get();
                     lstRepositoryWrapper = repositoryWrapperMongoRepository.findByOwnerId(linkedServiceFromDB.getUserName());
                 }
@@ -907,8 +910,8 @@ public class ForceCIController {
                         List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryWrapper.getRepository().getRepositoryId());
                         repositoryWrapper.getRepository().setSfdcConnectionDetails(byGitRepoId);
                         newLstRepositoryWrapper.add(repositoryWrapper);
-                        logger.info("consumerMap from /api/fetchRepositoryInDB -> "+consumerMap);
-                        if(byGitRepoId != null && !byGitRepoId.isEmpty()) {
+                        logger.info("consumerMap from /api/fetchRepositoryInDB -> " + consumerMap);
+                        if (byGitRepoId != null && !byGitRepoId.isEmpty()) {
                             if (consumerMap != null && consumerMap.containsKey(repositoryWrapper.getRepository().getRepositoryId())
                                     && consumerMap.get(repositoryWrapper.getRepository().getRepositoryId()).isEmpty()) {
                                 logger.info("sfdcConnectionDetails if Key check -> " + consumerMap);
@@ -946,7 +949,7 @@ public class ForceCIController {
                     }
                 }
             }
-            logger.info("consumerMap end -> "+consumerMap);
+            logger.info("consumerMap end -> " + consumerMap);
             reposOnDB = gson.toJson(newLstRepositoryWrapper);
         }
         return reposOnDB;
@@ -1074,9 +1077,9 @@ public class ForceCIController {
             status = httpClient.executeMethod(deleteWebHook);
             if (status == 204) {
                 try {
-                    if(consumerMap != null && consumerMap.containsKey(repositoryId)) {
+                    if (consumerMap != null && consumerMap.containsKey(repositoryId)) {
                         Map<String, RabbitMqConsumer> stringRabbitMqConsumerMap = consumerMap.get(repositoryId);
-                        if(stringRabbitMqConsumerMap != null && !stringRabbitMqConsumerMap.isEmpty()) {
+                        if (stringRabbitMqConsumerMap != null && !stringRabbitMqConsumerMap.isEmpty()) {
                             for (Map.Entry<String, RabbitMqConsumer> stringRabbitMqConsumerEntry : stringRabbitMqConsumerMap.entrySet()) {
                                 stringRabbitMqConsumerEntry.getValue().stopConsumers();
                                 stringRabbitMqConsumerEntry.getValue().shutDownConsumers();
@@ -1088,15 +1091,15 @@ public class ForceCIController {
                     List<SFDCConnectionDetails> byGitRepoId = sfdcConnectionDetailsMongoRepository.findByGitRepoId(repositoryId);
                     deploymentJobMongoRepository.deleteAllByRepoId(repositoryId);
                     for (SFDCConnectionDetails sfdcConnectionDetails : byGitRepoId) {
-                        logger.info("Delete Queue -> "+sfdcConnectionDetails.getGitRepoId());
+                        logger.info("Delete Queue -> " + sfdcConnectionDetails.getGitRepoId());
                         boolean b = rabbitMqSenderConfig.amqpAdmin().deleteQueue(sfdcConnectionDetails.getGitRepoId() + '_' + sfdcConnectionDetails.getBranchConnectedTo());
-                        logger.info("Queue Deleted -> "+b);
+                        logger.info("Queue Deleted -> " + b);
                     }
                     boolean b = rabbitMqSenderConfig.amqpAdmin().deleteExchange(repositoryId);
-                    logger.info("Exchange Deleted -> "+b);
+                    logger.info("Exchange Deleted -> " + b);
                     sfdcConnectionDetailsMongoRepository.deleteAll(byGitRepoId);
                 } catch (Exception e) {
-                    logger.error("Error from Delete webHook -> "+e.getMessage());
+                    logger.error("Error from Delete webHook -> " + e.getMessage());
                 }
                 RepositoryWrapper byRepositoryRepositoryName = repositoryWrapperMongoRepository.findByOwnerIdAndRepositoryRepositoryId(repositoryOwner, repositoryId);
                 repositoryWrapperMongoRepository.delete(byRepositoryRepositoryName);
@@ -1178,7 +1181,7 @@ public class ForceCIController {
             request) throws Exception {
 
         captchaServiceV3.processResponse(userEntity.getGoogleReCaptchaV3(), CaptchaServiceV3.REGISTER_ACTION);
-        logger.info("recaptchaResponse -> "+userEntity.getGoogleReCaptchaV3());
+        logger.info("recaptchaResponse -> " + userEntity.getGoogleReCaptchaV3());
         Gson gson = new Gson();
         String returnResponse = null;
         Connect2DeployUser existingUser = connect2DeployUserMongoRepository.findByEmailId(userEntity.getEmailId());
@@ -1251,11 +1254,11 @@ public class ForceCIController {
                 rabbitMqConsumerMap = new ConcurrentHashMap<>();
                 rabbitMqConsumerMap.put(sfdcConnectionDetails.getGitRepoId() + "_" + sfdcConnectionDetails.getBranchConnectedTo(), container);
             }
-            logger.info("rabbitMqConsumerMap -> "+gson.toJson(rabbitMqConsumerMap.keySet()));
+            logger.info("rabbitMqConsumerMap -> " + gson.toJson(rabbitMqConsumerMap.keySet()));
         }
         sfdcConnectionDetails.setOauthSaved("true");
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(sfdcConnectionDetails.getConnect2DeployUser());
-        if(byEmailId != null) {
+        if (byEmailId != null) {
             sfdcConnectionDetails.setConnect2DeployUserId(byEmailId.getId());
         }
         SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
@@ -1395,7 +1398,7 @@ public class ForceCIController {
         Gson gson = new Gson();
         try {
             Optional<SFDCConnectionDetails> byId = sfdcConnectionDetailsMongoRepository.findById(sfdcDetailsId);
-            if(byId.isPresent()) {
+            if (byId.isPresent()) {
                 rabbitMqSenderConfig.amqpAdmin().deleteQueue(byId.get().getGitRepoId() + '_' + byId.get().getBranchConnectedTo());
                 Map<String, RabbitMqConsumer> rabbitMqConsumerMap = consumerMap.get(byId.get().getGitRepoId());
                 if (rabbitMqConsumerMap != null && !rabbitMqConsumerMap.isEmpty() && rabbitMqConsumerMap.get(byId.get().getBranchConnectedTo()) != null) {
@@ -1465,9 +1468,9 @@ public class ForceCIController {
             List<DeploymentJob> byRepoIdAndBaseSHA = deploymentJobMongoRepository.findByRepoIdAndBaseSHAOrderByJobIdDesc(gitRepoId, baseSHA);
             if (byRepoIdAndBaseSHA != null && !byRepoIdAndBaseSHA.isEmpty()) {
                 deploymentJob = byRepoIdAndBaseSHA.get(0);
-                logger.info("deploymentJob getBaseSHA -> "+deploymentJob.getBaseSHA());
-                logger.info("deploymentJob Id -> "+deploymentJob.getJobId());
-                logger.info("deploymentJob RepoId -> "+deploymentJob.getRepoId());
+                logger.info("deploymentJob getBaseSHA -> " + deploymentJob.getBaseSHA());
+                logger.info("deploymentJob Id -> " + deploymentJob.getJobId());
+                logger.info("deploymentJob RepoId -> " + deploymentJob.getRepoId());
             }
         }
         if (aLong != null && !merge) {
@@ -1530,7 +1533,7 @@ public class ForceCIController {
                 container.startConsumers();
                 rabbitMqConsumerMap.put(queue_name, container);
                 consumerMap.put(sfdcConnectionDetail.getGitRepoId(), rabbitMqConsumerMap);
-                logger.info("consumerMap start deployment-> "+consumerMap);
+                logger.info("consumerMap start deployment-> " + consumerMap);
             }
         }
     }
@@ -1586,23 +1589,23 @@ public class ForceCIController {
         Gson gson = new Gson();
         List<String> lstStrings = new ArrayList<>();
         Optional<SFDCConnectionDetails> sfdcConnectionDetail = sfdcConnectionDetailsMongoRepository.findById(sfdcConnectionId);
-        if(sfdcConnectionDetail.isPresent()){
+        if (sfdcConnectionDetail.isPresent()) {
             SFDCConnectionDetails objConnectionDetail = sfdcConnectionDetail.get();
             String gitRepoId = objConnectionDetail.getGitRepoId();
             String linkedService = objConnectionDetail.getLinkedService();
             String connect2DeployUser = objConnectionDetail.getConnect2DeployUser();
             List<LinkedServices> linkedServiceByUserName = linkedServicesMongoRepository.findByConnect2DeployUser(connect2DeployUser);
             GitHub gitHub = null;
-            if(linkedServiceByUserName != null && !linkedServiceByUserName.isEmpty()){
+            if (linkedServiceByUserName != null && !linkedServiceByUserName.isEmpty()) {
                 for (LinkedServices eachService : linkedServiceByUserName) {
-                    if(linkedService.equalsIgnoreCase(eachService.getName()) && linkedService.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)){
+                    if (linkedService.equalsIgnoreCase(eachService.getName()) && linkedService.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB)) {
                         gitHub = GitHub.connectUsingOAuth(eachService.getAccessToken());
-                    } else if(linkedService.equalsIgnoreCase(eachService.getName()) && linkedService.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)){
+                    } else if (linkedService.equalsIgnoreCase(eachService.getName()) && linkedService.equalsIgnoreCase(LinkedServicesUtil.GIT_HUB_ENTERPRISE)) {
                         gitHub = GitHub.connectToEnterpriseWithOAuth(eachService.getServerURL(), eachService.getUserEmail(), eachService.getAccessToken());
                     }
                 }
             }
-            if(gitHub != null){
+            if (gitHub != null) {
                 GHRepository repositoryById = gitHub.getRepositoryById(gitRepoId);
                 Map<String, GHBranch> branches = repositoryById.getBranches();
                 for (Map.Entry<String, GHBranch> stringGHBranchEntry : branches.entrySet()) {
@@ -1633,14 +1636,14 @@ public class ForceCIController {
         List<ScheduledDeploymentJob> scheduledDeploymentJobList = new ArrayList<>();
         Map<String, List<ScheduledDeploymentJob>> mapJobTypeAndJobs = new HashMap<>();
         Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser);
-        if(byEmailId != null){
+        if (byEmailId != null) {
             Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail =
                     scheduledDeploymentMongoRepository.findByConnect2DeployUserId(byEmailId.getId());
-            if(byConnect2DeployUserEmail.isPresent()){
+            if (byConnect2DeployUserEmail.isPresent()) {
                 scheduledDeploymentJobList = byConnect2DeployUserEmail.get();
             }
             for (ScheduledDeploymentJob scheduledDeploymentJob : scheduledDeploymentJobList) {
-                if(mapJobTypeAndJobs.containsKey(scheduledDeploymentJob.getType())){
+                if (mapJobTypeAndJobs.containsKey(scheduledDeploymentJob.getType())) {
                     List<ScheduledDeploymentJob> scheduledDeploymentJobList1 = mapJobTypeAndJobs.get(scheduledDeploymentJob.getType());
                     scheduledDeploymentJobList1.add(scheduledDeploymentJob);
                 } else {
@@ -1658,52 +1661,24 @@ public class ForceCIController {
     @RequestMapping(value = "/api/runJob", method = RequestMethod.GET)
     public String runJobWithToolingAPI(@RequestParam String scheduledJobId) throws Exception {
         Gson gson = new Gson();
-        RunTestsResult runTestsResult = null;
         Optional<ScheduledDeploymentJob> scheduledDeploymentJobFromDB = scheduledDeploymentMongoRepository.findById(scheduledJobId);
-        if(scheduledDeploymentJobFromDB.isPresent()){
+        if (scheduledDeploymentJobFromDB.isPresent()) {
             ScheduledDeploymentJob scheduledDeploymentJob = scheduledDeploymentJobFromDB.get();
             scheduledDeploymentJob.setStatus(Status.RUNNING.getText());
             scheduledDeploymentJob.setLastTimeRun(DateTime.now().toDate());
             ScheduledDeploymentJob savedJob = scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
-            Optional<SFDCConnectionDetails> sfdcConnectionDetailsDB = sfdcConnectionDetailsMongoRepository.findById(savedJob.getSfdcConnection());
-            if(sfdcConnectionDetailsDB.isPresent()){
-                SFDCConnectionDetails sfdcConnectionDetails = sfdcConnectionDetailsDB.get();
-                ConnectorConfig connectorConfig = new ConnectorConfig();
-                connectorConfig.setServiceEndpoint(sfdcConnectionDetails.getInstanceURL() + salesforceToolingEndpoint);
-                connectorConfig.setSessionId(sfdcConnectionDetails.getOauthToken());
-                ToolingConnection toolingConnection = new ToolingConnection(connectorConfig);
-                RunTestsRequest runTestsRequest = new RunTestsRequest();
-                runTestsRequest.setAllTests(true);
-                try {
-                    runTestsResult = toolingConnection.runTests(runTestsRequest);
-                } catch (Exception e){
-                    if (e instanceof UnexpectedErrorFault && ((UnexpectedErrorFault) e).getExceptionCode().equals(ExceptionCode.INVALID_SESSION_ID)) {
-                        String sfdcToken = SFDCUtils.refreshSFDCToken(sfdcConnectionDetails);
-                        sfdcConnectionDetails = sfdcConnectionDetailsDB.get();
-                        connectorConfig = new ConnectorConfig();
-                        connectorConfig.setServiceEndpoint(sfdcConnectionDetails.getInstanceURL() + salesforceToolingEndpoint);
-                        connectorConfig.setSessionId(sfdcToken);
-                        toolingConnection = new ToolingConnection(connectorConfig);
-                        runTestsResult = toolingConnection.runTests(runTestsRequest);
-                        scheduledDeploymentJob.setStatus(Status.FINISHED.getText());
-                        scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
-                    } else {
-                        logger.error("runJob error : "+e.getMessage());
-                    }
-                }
-
-            }
+            rabbitTemplateCustomAdmin.convertAndSend(SCHEDULED_JOB_EXCHANGE, SCHEDULED_QUEUE_NAME, savedJob);
         }
 
-        return gson.toJson(runTestsResult);
+        return gson.toJson("Success");
     }
 
     @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.GET)
     public String updateScheduledJob(@RequestParam String scheduledDeploymentJobId, @RequestParam Boolean boolActive) throws Exception {
         Gson gson = new Gson();
-        if(!StringUtils.isEmpty(scheduledDeploymentJobId)) {
+        if (!StringUtils.isEmpty(scheduledDeploymentJobId)) {
             Optional<ScheduledDeploymentJob> scheduledDeploymentMongoRepositoryById = scheduledDeploymentMongoRepository.findById(scheduledDeploymentJobId);
-            if(scheduledDeploymentMongoRepositoryById.isPresent()){
+            if (scheduledDeploymentMongoRepositoryById.isPresent()) {
                 ScheduledDeploymentJob scheduledDeploymentJobFromDB = scheduledDeploymentMongoRepositoryById.get();
                 scheduledDeploymentJobFromDB.setBoolActive(boolActive);
                 scheduledDeploymentMongoRepository.save(scheduledDeploymentJobFromDB);

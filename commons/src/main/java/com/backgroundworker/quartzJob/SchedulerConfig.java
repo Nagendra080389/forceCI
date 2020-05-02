@@ -40,8 +40,7 @@ public class SchedulerConfig {
         DateTime dateTime = DateTime.now(DateTimeZone.UTC);
         DateTime toDate = dateTime.plusSeconds(10);
         DateTime fromDate = dateTime.minusSeconds(10);
-        List<ScheduledDeploymentJob> deploymentJobs = scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true, DEPLOYMENT_JOB);
-        List<ScheduledDeploymentJob> testingJobs = scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true, TESTING_JOB);
+        List<ScheduledDeploymentJob> deploymentJobs = scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true);
 
 
         if(deploymentJobs != null && !deploymentJobs.isEmpty()){

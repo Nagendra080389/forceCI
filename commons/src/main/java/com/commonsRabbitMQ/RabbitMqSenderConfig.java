@@ -31,13 +31,6 @@ import static com.backgroundworker.quartzJob.SchedulerConfig.SCHEDULED_QUEUE_NAM
 public class RabbitMqSenderConfig {
     private static final Logger logger = LoggerFactory.getLogger(RabbitMqSenderConfig.class);
 
-    @Autowired
-    private SFDCScheduledConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
-    @Autowired
-    private ScheduledDeploymentMongoRepository scheduledDeploymentMongoRepository;
-    @Autowired
-    private ScheduledLinkedServicesMongoRepository scheduledLinkedServicesMongoRepository;
-
     @Value("${spring.rabbitmq.addresses}")
     private String addressURL;
 

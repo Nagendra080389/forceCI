@@ -56,5 +56,27 @@
             <version>1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.force.api</groupId>
+            <artifactId>force-wsc</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.force.api/force-metadata-api -->
+        <dependency>
+            <groupId>com.force.api</groupId>
+            <artifactId>force-metadata-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+
     </dependencies>
 </project>
