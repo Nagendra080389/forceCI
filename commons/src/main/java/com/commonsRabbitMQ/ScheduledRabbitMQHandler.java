@@ -137,6 +137,7 @@ public class ScheduledRabbitMQHandler {
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
+            exception.printStackTrace();
         }
     }
 
