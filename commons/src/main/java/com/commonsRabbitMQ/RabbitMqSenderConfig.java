@@ -31,18 +31,10 @@ public class RabbitMqSenderConfig {
     @Value("${spring.rabbitmq.addresses}")
     private String addressURL;
 
-    private RabbitAdmin rabbitAdmin;
-    private ConnectionFactory connectionFactory;
-
 
     @Bean
     public ConnectionFactory connectionFactory() throws URISyntaxException {
-        if (connectionFactory == null){
-            connectionFactory = new CachingConnectionFactory(new URI(addressURL));
-            return connectionFactory;
-        } else {
-            return connectionFactory;
-        }
+        return new CachingConnectionFactory(new URI(addressURL));
     }
 
     /**
@@ -50,12 +42,7 @@ public class RabbitMqSenderConfig {
      */
     @Bean
     public AmqpAdmin amqpAdmin() throws URISyntaxException {
-        if (rabbitAdmin == null){
-            rabbitAdmin = new RabbitAdmin(connectionFactory());
-            return rabbitAdmin;
-        } else {
-            return rabbitAdmin;
-        }
+        return new RabbitAdmin(connectionFactory());
     }
 
     @Bean
