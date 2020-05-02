@@ -1179,6 +1179,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
                 $scope.scheduledJob.orgUserEmail = objSfdcSelected.userName;
                 $scope.scheduledJob.gitRepoId = objSfdcSelected.gitRepoId;
                 $scope.scheduledJob.connect2DeployUserEmail = objSfdcSelected.connect2DeployUser;
+                $scope.scheduledJob.connect2DeployUserId = objSfdcSelected.connect2DeployUser;
                 $scope.scheduledJob.type = 'DeploymentJob';
 
                 $http.get("/api/fetchDetailsForScheduledJob?sfdcConnectionId=" + selectedConnection).then(function (response) {

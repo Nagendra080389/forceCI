@@ -9,34 +9,32 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import static com.backgroundworker.quartzJob.SchedulerConfig.SCHEDULED_QUEUE_NAME;
+
+@Component
 public class ScheduledRabbitMQHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledRabbitMQHandler.class);
     public static final String GIT_HUB = "GitHub";
     public static final String GIT_HUB_ENTERPRISE = "GitHub Enterprise";
 
-    private ScheduledJobRepositoryCustomImpl scheduledJobRepositoryCustom;
+    @Autowired
     private SFDCScheduledConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
+    @Autowired
     private ScheduledDeploymentMongoRepository scheduledDeploymentMongoRepository;
+    @Autowired
     private ScheduledLinkedServicesMongoRepository scheduledLinkedServicesMongoRepository;
 
-    public ScheduledRabbitMQHandler(ScheduledJobRepositoryCustomImpl scheduledJobRepositoryCustom,
-                                    SFDCScheduledConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository,
-                                    ScheduledDeploymentMongoRepository scheduledDeploymentMongoRepository,
-                                    ScheduledLinkedServicesMongoRepository scheduledLinkedServicesMongoRepository) {
-        this.scheduledJobRepositoryCustom = scheduledJobRepositoryCustom;
-        this.sfdcConnectionDetailsMongoRepository = sfdcConnectionDetailsMongoRepository;
-        this.scheduledDeploymentMongoRepository = scheduledDeploymentMongoRepository;
-        this.scheduledLinkedServicesMongoRepository = scheduledLinkedServicesMongoRepository;
-
-    }
-
-    public void handleMessage(ScheduledDeploymentJob scheduledDeploymentJob) {
+    @RabbitListener(queues=SCHEDULED_QUEUE_NAME)
+    public void receivedMessage(ScheduledDeploymentJob scheduledDeploymentJob) {
         try {
             logger.info("scheduledDeploymentJob -> " + scheduledDeploymentJob.getGitRepoId());
             scheduledDeploymentJob.setExecuted(true);

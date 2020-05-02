@@ -10,4 +10,6 @@ public interface ScheduledDeploymentMongoRepository extends ScheduledJobReposito
 
     Optional<List<ScheduledDeploymentJob>> findByConnect2DeployUserEmail(String connect2DeployUserEmail);
 
+    Optional<List<ScheduledDeploymentJob>> findByConnect2DeployUserId(String connect2DeployUserId);
+
 }

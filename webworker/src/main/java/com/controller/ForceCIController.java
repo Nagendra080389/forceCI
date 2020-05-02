@@ -1254,6 +1254,10 @@ public class ForceCIController {
             logger.info("rabbitMqConsumerMap -> "+gson.toJson(rabbitMqConsumerMap.keySet()));
         }
         sfdcConnectionDetails.setOauthSaved("true");
+        Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(sfdcConnectionDetails.getConnect2DeployUser());
+        if(byEmailId != null) {
+            sfdcConnectionDetails.setConnect2DeployUserId(byEmailId.getId());
+        }
         SFDCConnectionDetails connectionSaved = sfdcConnectionDetailsMongoRepository.save(sfdcConnectionDetails);
         returnResponse = gson.toJson(connectionSaved);
         return returnResponse;
@@ -1628,21 +1632,25 @@ public class ForceCIController {
         Gson gson = new Gson();
         List<ScheduledDeploymentJob> scheduledDeploymentJobList = new ArrayList<>();
         Map<String, List<ScheduledDeploymentJob>> mapJobTypeAndJobs = new HashMap<>();
-        Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail =
-                scheduledDeploymentMongoRepository.findByConnect2DeployUserEmail(connect2DeployUser);
-        if(byConnect2DeployUserEmail.isPresent()){
-            scheduledDeploymentJobList = byConnect2DeployUserEmail.get();
-        }
-        for (ScheduledDeploymentJob scheduledDeploymentJob : scheduledDeploymentJobList) {
-            if(mapJobTypeAndJobs.containsKey(scheduledDeploymentJob.getType())){
-                List<ScheduledDeploymentJob> scheduledDeploymentJobList1 = mapJobTypeAndJobs.get(scheduledDeploymentJob.getType());
-                scheduledDeploymentJobList1.add(scheduledDeploymentJob);
-            } else {
-                List<ScheduledDeploymentJob> listForMap = new ArrayList<>();
-                listForMap.add(scheduledDeploymentJob);
-                mapJobTypeAndJobs.put(scheduledDeploymentJob.getType(), listForMap);
+        Connect2DeployUser byEmailId = connect2DeployUserMongoRepository.findByEmailId(connect2DeployUser);
+        if(byEmailId != null){
+            Optional<List<ScheduledDeploymentJob>> byConnect2DeployUserEmail =
+                    scheduledDeploymentMongoRepository.findByConnect2DeployUserId(byEmailId.getId());
+            if(byConnect2DeployUserEmail.isPresent()){
+                scheduledDeploymentJobList = byConnect2DeployUserEmail.get();
+            }
+            for (ScheduledDeploymentJob scheduledDeploymentJob : scheduledDeploymentJobList) {
+                if(mapJobTypeAndJobs.containsKey(scheduledDeploymentJob.getType())){
+                    List<ScheduledDeploymentJob> scheduledDeploymentJobList1 = mapJobTypeAndJobs.get(scheduledDeploymentJob.getType());
+                    scheduledDeploymentJobList1.add(scheduledDeploymentJob);
+                } else {
+                    List<ScheduledDeploymentJob> listForMap = new ArrayList<>();
+                    listForMap.add(scheduledDeploymentJob);
+                    mapJobTypeAndJobs.put(scheduledDeploymentJob.getType(), listForMap);
+                }
             }
         }
+
 
         return gson.toJson(mapJobTypeAndJobs);
     }

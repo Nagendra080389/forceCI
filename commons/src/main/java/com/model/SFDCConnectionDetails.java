@@ -30,6 +30,7 @@ public class SFDCConnectionDetails implements Serializable {
     private String testLevel;
     private String repoName;
     private String connect2DeployUser;
+    private String connect2DeployUserId;
     private boolean boolActive;
 
     public String getId() {
@@ -200,6 +201,14 @@ public class SFDCConnectionDetails implements Serializable {
         this.connect2DeployUser = connect2DeployUser;
     }
 
+    public String getConnect2DeployUserId() {
+        return connect2DeployUserId;
+    }
+
+    public void setConnect2DeployUserId(String connect2DeployUserId) {
+        this.connect2DeployUserId = connect2DeployUserId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -219,16 +228,18 @@ public class SFDCConnectionDetails implements Serializable {
                 Objects.equals(oauthFailed, that.oauthFailed) &&
                 Objects.equals(oauthSaved, that.oauthSaved) &&
                 Objects.equals(oauthToken, that.oauthToken) &&
+                Objects.equals(linkedService, that.linkedService) &&
                 Objects.equals(refreshToken, that.refreshToken) &&
                 Objects.equals(gitRepoId, that.gitRepoId) &&
                 Objects.equals(branchConnectedTo, that.branchConnectedTo) &&
                 Objects.equals(testLevel, that.testLevel) &&
                 Objects.equals(repoName, that.repoName) &&
-                Objects.equals(connect2DeployUser, that.connect2DeployUser);
+                Objects.equals(connect2DeployUser, that.connect2DeployUser) &&
+                Objects.equals(connect2DeployUserId, that.connect2DeployUserId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, orgName, environment, userName, instanceURL, authorize, save, testConnection, delete, oauthSuccess, oauthFailed, oauthSaved, oauthToken, refreshToken, gitRepoId, branchConnectedTo, testLevel, repoName, connect2DeployUser, boolActive);
+        return Objects.hash(id, orgName, environment, userName, instanceURL, authorize, save, testConnection, delete, oauthSuccess, oauthFailed, oauthSaved, oauthToken, linkedService, refreshToken, gitRepoId, branchConnectedTo, testLevel, repoName, connect2DeployUser, connect2DeployUserId, boolActive);
     }
 }

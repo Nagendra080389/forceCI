@@ -16,6 +16,7 @@ public class ScheduledDeploymentJob implements Serializable {
     private String jobName;
     private String createdBy;
     private String connect2DeployUserEmail;
+    private String connect2DeployUserId;
     private String orgUserEmail;
     private String status;
     private String sfdcConnection;
@@ -159,6 +160,14 @@ public class ScheduledDeploymentJob implements Serializable {
         this.createdBy = createdBy;
     }
 
+    public String getConnect2DeployUserId() {
+        return connect2DeployUserId;
+    }
+
+    public void setConnect2DeployUserId(String connect2DeployUserId) {
+        this.connect2DeployUserId = connect2DeployUserId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -171,6 +180,7 @@ public class ScheduledDeploymentJob implements Serializable {
                 Objects.equals(jobName, that.jobName) &&
                 Objects.equals(createdBy, that.createdBy) &&
                 Objects.equals(connect2DeployUserEmail, that.connect2DeployUserEmail) &&
+                Objects.equals(connect2DeployUserId, that.connect2DeployUserId) &&
                 Objects.equals(orgUserEmail, that.orgUserEmail) &&
                 Objects.equals(status, that.status) &&
                 Objects.equals(sfdcConnection, that.sfdcConnection) &&
@@ -185,6 +195,6 @@ public class ScheduledDeploymentJob implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, sourceBranch, targetBranch, gitRepoId, jobName, createdBy, connect2DeployUserEmail, orgUserEmail, status, sfdcConnection, startTimeRun, lastTimeRun, nextTimeRun, cronExpression, type, executed, boolActive);
+        return Objects.hash(id, sourceBranch, targetBranch, gitRepoId, jobName, createdBy, connect2DeployUserEmail, connect2DeployUserId, orgUserEmail, status, sfdcConnection, startTimeRun, lastTimeRun, nextTimeRun, cronExpression, type, executed, boolActive);
     }
 }

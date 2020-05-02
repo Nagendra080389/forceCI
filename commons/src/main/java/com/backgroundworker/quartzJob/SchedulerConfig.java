@@ -33,18 +33,10 @@ public class SchedulerConfig {
     @Autowired
     private ScheduledJobRepositoryCustomImpl scheduledJobRepositoryCustom;
     @Autowired
-    private RabbitMqSenderConfig rabbitMqSenderConfig;
-    @Autowired
     private AmqpTemplate rabbitTemplateCustomAdmin;
-    @Autowired
-    private SFDCScheduledConnectionDetailsMongoRepository sfdcConnectionDetailsMongoRepository;
-    @Autowired
-    private ScheduledDeploymentMongoRepository scheduledDeploymentMongoRepository;
-    @Autowired
-    private ScheduledLinkedServicesMongoRepository scheduledLinkedServicesMongoRepository;
 
     @Scheduled(fixedRate = 10000)
-    void enableScheduledJob() throws URISyntaxException {
+    void enableScheduledJob(){
         DateTime dateTime = DateTime.now(DateTimeZone.UTC);
         DateTime toDate = dateTime.plusSeconds(10);
         DateTime fromDate = dateTime.minusSeconds(10);
@@ -52,39 +44,10 @@ public class SchedulerConfig {
         List<ScheduledDeploymentJob> testingJobs = scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true, TESTING_JOB);
 
 
-        Properties queueProperties = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(SCHEDULED_QUEUE_NAME);
-        logger.info("queueProperties -> "+queueProperties);
-
         if(deploymentJobs != null && !deploymentJobs.isEmpty()){
-
-            try {
-
-                if(queueProperties == null) {
-                    Queue queue = new Queue(SCHEDULED_QUEUE_NAME, true);
-                    rabbitMqSenderConfig.amqpAdmin().declareQueue(queue);
-                    rabbitMqSenderConfig.amqpAdmin().declareExchange(new DirectExchange(SCHEDULED_JOB_EXCHANGE));
-                    rabbitMqSenderConfig.amqpAdmin().declareBinding(BindingBuilder.bind(queue).to(new DirectExchange(SCHEDULED_JOB_EXCHANGE)).withQueueName());
-                }
-                if(queueProperties != null) {
-                    ScheduledRabbitMQConsumer container = new ScheduledRabbitMQConsumer();
-                    container.setConnectionFactory(rabbitMqSenderConfig.connectionFactory());
-                    container.setQueueNames(SCHEDULED_QUEUE_NAME);
-                    container.setMessageListener(new MessageListenerAdapter(
-                            new ScheduledRabbitMQHandler(scheduledJobRepositoryCustom,
-                                    sfdcConnectionDetailsMongoRepository, scheduledDeploymentMongoRepository,
-                                    scheduledLinkedServicesMongoRepository),
-                            new Jackson2JsonMessageConverter()));
-                    logger.info("Started Consumer called from saveSfdcConnectionDetails");
-                    container.startConsumers();
-                    for (ScheduledDeploymentJob scheduledDeploymentJob : deploymentJobs) {
-                        logger.info("Send to RabbitMQ -> " + scheduledDeploymentJob.getGitRepoId());
-                        rabbitTemplateCustomAdmin.convertAndSend(SCHEDULED_JOB_EXCHANGE, SCHEDULED_QUEUE_NAME, scheduledDeploymentJob);
-                    }
-                }else if (testingJobs != null && !testingJobs.isEmpty()){
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            for (ScheduledDeploymentJob scheduledDeploymentJob : deploymentJobs) {
+                logger.info("Send to RabbitMQ -> " + scheduledDeploymentJob.getGitRepoId());
+                rabbitTemplateCustomAdmin.convertAndSend(SCHEDULED_JOB_EXCHANGE, SCHEDULED_QUEUE_NAME, scheduledDeploymentJob);
             }
 
         }
