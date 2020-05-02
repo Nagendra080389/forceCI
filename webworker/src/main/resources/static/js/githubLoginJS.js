@@ -1070,9 +1070,13 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
             if(response.data.DeploymentJob !== undefined && response.data.DeploymentJob !== null) {
                 $scope.scheduledJobsList = response.data.DeploymentJob;
+            } else {
+                $scope.scheduledJobsList = [];
             }
             if(response.data.TestingJob !== undefined && response.data.TestingJob !== null) {
                 $scope.scheduledJobsUnitTestList = response.data.TestingJob;
+            } else {
+                $scope.scheduledJobsUnitTestList = [];
             }
         }, function (error) {
             console.log(error);
