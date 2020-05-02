@@ -1275,7 +1275,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
                 $scope.scheduledTestingJob.orgUserEmail = objSfdcSelected.userName;
                 $scope.scheduledTestingJob.gitRepoId = objSfdcSelected.gitRepoId;
                 $scope.scheduledTestingJob.connect2DeployUserEmail = objSfdcSelected.connect2DeployUser;
-                $scope.scheduledJob.connect2DeployUserId = objSfdcSelected.connect2DeployUserId;
+                $scope.scheduledTestingJob.connect2DeployUserId = objSfdcSelected.connect2DeployUserId;
                 $scope.scheduledTestingJob.type = 'TestingJob';
             }
         }
