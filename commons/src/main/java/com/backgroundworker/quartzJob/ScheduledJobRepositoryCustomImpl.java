@@ -23,14 +23,14 @@ public class ScheduledJobRepositoryCustomImpl implements ScheduledJobRepositoryC
     MongoTemplate mongoTemplate;
 
     @Override
-    public List<ScheduledDeploymentJob> findByStartTimeRunBetweenAndExecutedAndBoolActive(DateTime from, DateTime to, Boolean executed, Boolean boolActive) {
+    public List<ScheduledDeploymentJob> findByStartTimeRunBetweenAndExecutedAndBoolActive(DateTime from, DateTime to, Boolean executed, Boolean boolActive, String jobType) {
         Query query = new Query();
         query.addCriteria(
                 new Criteria().andOperator(
                         Criteria.where("startTimeRun").gte(from).lt(to),
                         Criteria.where("boolActive").is(boolActive),
                         Criteria.where("executed").is(executed),
-                        Criteria.where("type").is("DeploymentJob")
+                        Criteria.where("type").is(jobType)
                 )
         );
         return mongoTemplate.find(query, ScheduledDeploymentJob.class);

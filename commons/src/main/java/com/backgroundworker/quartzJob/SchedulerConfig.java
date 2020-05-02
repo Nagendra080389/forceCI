@@ -26,8 +26,9 @@ public class SchedulerConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerConfig.class);
     public static final String SCHEDULED_QUEUE_NAME = "Connect2DeployScheduledJob";
-    public static final String SCHEDULED_JOB_BINDING = "Connect2DeployScheduledJobBinding";
     public static final String SCHEDULED_JOB_EXCHANGE = "Connect2DeployScheduledJobExchange";
+    public static final String TESTING_JOB = "TestingJob";
+    public static final String DEPLOYMENT_JOB = "DeploymentJob";
 
     @Autowired
     private ScheduledJobRepositoryCustomImpl scheduledJobRepositoryCustom;
@@ -43,19 +44,21 @@ public class SchedulerConfig {
     private ScheduledLinkedServicesMongoRepository scheduledLinkedServicesMongoRepository;
 
     @Scheduled(fixedRate = 10000)
-    void enableScheduledJob(){
+    void enableScheduledJob() throws URISyntaxException {
         DateTime dateTime = DateTime.now(DateTimeZone.UTC);
         DateTime toDate = dateTime.plusSeconds(10);
         DateTime fromDate = dateTime.minusSeconds(10);
-        List<ScheduledDeploymentJob> byStartTimeIsBetween =
-                scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true);
+        List<ScheduledDeploymentJob> deploymentJobs = scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true, DEPLOYMENT_JOB);
+        List<ScheduledDeploymentJob> testingJobs = scheduledJobRepositoryCustom.findByStartTimeRunBetweenAndExecutedAndBoolActive(fromDate, toDate, false, true, TESTING_JOB);
 
 
-        if(byStartTimeIsBetween != null && !byStartTimeIsBetween.isEmpty()){
+        Properties queueProperties = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(SCHEDULED_QUEUE_NAME);
+        logger.info("queueProperties -> "+queueProperties);
+
+        if(deploymentJobs != null && !deploymentJobs.isEmpty()){
 
             try {
-                Properties queueProperties = rabbitMqSenderConfig.amqpAdmin().getQueueProperties(SCHEDULED_QUEUE_NAME);
-                logger.info("queueProperties -> "+queueProperties);
+
                 if(queueProperties == null) {
                     Queue queue = new Queue(SCHEDULED_QUEUE_NAME, true);
                     rabbitMqSenderConfig.amqpAdmin().declareQueue(queue);
@@ -73,12 +76,13 @@ public class SchedulerConfig {
                             new Jackson2JsonMessageConverter()));
                     logger.info("Started Consumer called from saveSfdcConnectionDetails");
                     container.startConsumers();
-                    for (ScheduledDeploymentJob scheduledDeploymentJob : byStartTimeIsBetween) {
+                    for (ScheduledDeploymentJob scheduledDeploymentJob : deploymentJobs) {
                         logger.info("Send to RabbitMQ -> " + scheduledDeploymentJob.getGitRepoId());
                         rabbitTemplateCustomAdmin.convertAndSend(SCHEDULED_JOB_EXCHANGE, SCHEDULED_QUEUE_NAME, scheduledDeploymentJob);
                     }
-                }
+                }else if (testingJobs != null && !testingJobs.isEmpty()){
 
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

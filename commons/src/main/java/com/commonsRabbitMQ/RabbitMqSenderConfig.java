@@ -4,11 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +21,8 @@ import org.springframework.context.annotation.Configuration;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static com.backgroundworker.quartzJob.SchedulerConfig.SCHEDULED_QUEUE_NAME;
+
 @EnableRabbit
 @Configuration
 public class RabbitMqSenderConfig {
@@ -26,10 +31,18 @@ public class RabbitMqSenderConfig {
     @Value("${spring.rabbitmq.addresses}")
     private String addressURL;
 
+    private RabbitAdmin rabbitAdmin;
+    private ConnectionFactory connectionFactory;
+
 
     @Bean
     public ConnectionFactory connectionFactory() throws URISyntaxException {
-        return new CachingConnectionFactory(new URI(addressURL));
+        if (connectionFactory == null){
+            connectionFactory = new CachingConnectionFactory(new URI(addressURL));
+            return connectionFactory;
+        } else {
+            return connectionFactory;
+        }
     }
 
     /**
@@ -37,7 +50,12 @@ public class RabbitMqSenderConfig {
      */
     @Bean
     public AmqpAdmin amqpAdmin() throws URISyntaxException {
-        return new RabbitAdmin(connectionFactory());
+        if (rabbitAdmin == null){
+            rabbitAdmin = new RabbitAdmin(connectionFactory());
+            return rabbitAdmin;
+        } else {
+            return rabbitAdmin;
+        }
     }
 
     @Bean
