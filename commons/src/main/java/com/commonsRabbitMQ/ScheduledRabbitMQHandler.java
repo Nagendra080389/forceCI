@@ -59,9 +59,9 @@ public class ScheduledRabbitMQHandler {
             scheduledDeploymentJob.setExecuted(true);
             scheduledDeploymentJob.setStatus(Status.RUNNING.getText());
             scheduledDeploymentJob.setLastTimeRun(scheduledDeploymentJob.getStartTimeRun());
-            scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
-            Optional<SFDCConnectionDetails> objSfdcConnectionDetails = sfdcConnectionDetailsMongoRepository.findById(scheduledDeploymentJob.getSfdcConnection());
-            if (scheduledDeploymentJob.getType().equalsIgnoreCase(DEPLOYMENT_JOB)) {
+            ScheduledDeploymentJob savedScheduledJob = scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
+            Optional<SFDCConnectionDetails> objSfdcConnectionDetails = sfdcConnectionDetailsMongoRepository.findById(savedScheduledJob.getSfdcConnection());
+            if (savedScheduledJob.getType().equalsIgnoreCase(DEPLOYMENT_JOB)) {
                 if (objSfdcConnectionDetails.isPresent()) {
                     SFDCConnectionDetails sfdcConnectionDetails = objSfdcConnectionDetails.get();
                     String gitRepoId = sfdcConnectionDetails.getGitRepoId();
@@ -80,14 +80,14 @@ public class ScheduledRabbitMQHandler {
                     }
 
                     GHRepository trailHeadGitRepo = gitHub.getRepositoryById(gitRepoId);
-                    String sourceBranch = trailHeadGitRepo.getBranch(scheduledDeploymentJob.getSourceBranch()).getSHA1();
-                    GHRef ref = trailHeadGitRepo.createRef("refs/heads/" + scheduledDeploymentJob.getJobName(), sourceBranch);
-                    trailHeadGitRepo.createPullRequest(scheduledDeploymentJob.getJobName(), ref.getRef(), scheduledDeploymentJob.getTargetBranch(), scheduledDeploymentJob.getJobName());
-                    scheduledDeploymentJob.setStatus(Status.FINISHED.getText());
-                    scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
+                    String sourceBranch = trailHeadGitRepo.getBranch(savedScheduledJob.getSourceBranch()).getSHA1();
+                    GHRef ref = trailHeadGitRepo.createRef("refs/heads/" + savedScheduledJob.getJobName(), sourceBranch);
+                    trailHeadGitRepo.createPullRequest(savedScheduledJob.getJobName(), ref.getRef(), savedScheduledJob.getTargetBranch(), savedScheduledJob.getJobName());
+                    savedScheduledJob.setStatus(Status.FINISHED.getText());
+                    scheduledDeploymentMongoRepository.save(savedScheduledJob);
                     logger.info("Pull Request Successfully created");
                 }
-            } else if (scheduledDeploymentJob.getType().equalsIgnoreCase(TESTING_JOB) && objSfdcConnectionDetails.isPresent()) {
+            } else if (savedScheduledJob.getType().equalsIgnoreCase(TESTING_JOB) && objSfdcConnectionDetails.isPresent()) {
                 SFDCConnectionDetails sfdcConnectionDetails = objSfdcConnectionDetails.get();
                 ConnectorConfig connectorConfig = new ConnectorConfig();
                 connectorConfig.setServiceEndpoint(sfdcConnectionDetails.getInstanceURL() + toolingAPIEndpoint);
@@ -96,6 +96,7 @@ public class ScheduledRabbitMQHandler {
                 RunTestsRequest runTestsRequest = new RunTestsRequest();
                 runTestsRequest.setAllTests(true);
                 SFDCCodeCoverageOrg sfdcCodeCoverageOrg = new SFDCCodeCoverageOrg();
+                sfdcCodeCoverageOrg.setScheduledJobId(savedScheduledJob.getId());
                 List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsTests = new ArrayList<>();
                 List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsWithoutTests = new ArrayList<>();
                 Map<String, List<SFDCCodeCoverage>> stringSFDCCodeCoverageMap = new HashMap<>();
@@ -109,7 +110,6 @@ public class ScheduledRabbitMQHandler {
                             sfdcCodeCoverageDetailsWithoutTests,
                             stringSFDCCodeCoverageMap,
                             runTestsResult);
-                    scheduledDeploymentJob.setStatus(Status.FINISHED.getText());
                 } catch (Exception exception) {
                     if (exception instanceof UnexpectedErrorFault && ((UnexpectedErrorFault) exception).getExceptionCode().equals(ExceptionCode.INVALID_SESSION_ID)) {
                         String sfdcToken = SFDCUtilsCommons.refreshSFDCToken(sfdcConnectionDetails);
@@ -126,18 +126,25 @@ public class ScheduledRabbitMQHandler {
                         if (exception instanceof UnexpectedErrorFault) {
                             sfdcCodeCoverageOrg.setBoolFail(true);
                             sfdcCodeCoverageOrg.setErrorMessage(((UnexpectedErrorFault) exception).getExceptionMessage());
+                        } else {
+                            logger.error(exception.getMessage());
+                            exception.printStackTrace();
                         }
                     }
-                    scheduledDeploymentJob.setStatus(Status.FINISHED.getText());
-                    scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
                 }
+                savedScheduledJob.setStatus(Status.FINISHED.getText());
+                scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
             }
         } catch (Exception exception) {
             logger.error(exception.getMessage());
         }
     }
 
-    private void fetchCodeCoverageResult(ToolingConnection toolingConnection, SFDCCodeCoverageOrg sfdcCodeCoverageOrg, List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsTests, List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsWithoutTests, Map<String, List<SFDCCodeCoverage>> stringSFDCCodeCoverageMap, RunTestsResult runTestsResult) throws ConnectionException {
+    private void fetchCodeCoverageResult(ToolingConnection toolingConnection, SFDCCodeCoverageOrg sfdcCodeCoverageOrg,
+                                         List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsTests,
+                                         List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsWithoutTests,
+                                         Map<String, List<SFDCCodeCoverage>> stringSFDCCodeCoverageMap,
+                                         RunTestsResult runTestsResult) throws ConnectionException {
         RunTestSuccess[] successes = runTestsResult.getSuccesses();
         RunTestFailure[] failures = runTestsResult.getFailures();
 
