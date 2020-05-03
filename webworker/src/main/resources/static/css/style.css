@@ -245,6 +245,18 @@ html {
     width: 5%;
 }
 
+.scheduledJobUnitTest:last-child{
+    width: 15%;
+}
+
+.scheduledJobUnitTest:nth-child(7){
+    width: 5%;
+}
+
+.scheduledJobUnitTest:nth-child(4){
+    width: 5%;
+}
+
 
 circle.notStarted {
     fill: grey !important;
