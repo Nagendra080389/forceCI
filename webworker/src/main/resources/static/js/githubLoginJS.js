@@ -55,6 +55,10 @@ connect2Deploy.config(function ($routeProvider, $locationProvider) {
             templateUrl: './html/scheduledDeployments.html',
             controller: 'scheduledDeploymentController',
         })
+        .when('/apps/dashboard/scheduledDeploymentsDetails/:scheduledJobId', {
+            templateUrl: './html/scheduledDeploymentsDetails.html',
+            controller: 'scheduledDeploymentDetailsController',
+        })
         .when('/apps/error', {
             templateUrl: './html/error.html'
         })
@@ -1087,7 +1091,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         });
     }
 
-    $scope.scheduledJobsUnitTestList.push({
+    /*$scope.scheduledJobsUnitTestList.push({
         "_id": {
             "$oid": "5eadd82a4ca4870004acd2a6"
         },
@@ -1108,7 +1112,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         "type": "TestingJob",
         "executed": true,
         "boolActive": true,
-    });
+    });*/
 
     $scope.fetchAllJobs();
     $scope.onStatusChange = function (scheduledDeploymentJob) {
@@ -1369,7 +1373,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     }
 
     $scope.viewReport = function(eachData){
-
+        $location.path('/apps/dashboard/scheduledDeploymentsDetails/'+eachData.id)
     }
 
     $scope.logoutFunction = function () {
@@ -1377,6 +1381,31 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     };
 
 });
+
+connect2Deploy.controller('scheduledDeploymentDetailsController', function ($scope, $http, $location, $routeParams, $mdDialog, $mdSidenav) {
+    $scope.toggleRight = buildToggler('right');
+
+    function buildToggler(navID) {
+        return function() {
+            // Component lookup should always be available since we are not using `ng-if`
+            $mdSidenav(navID)
+                .toggle()
+                .then(function () {
+                    console.log("toggle " + navID + " is done");
+                });
+        };
+    }
+})
+
+connect2Deploy.controller('RightCtrl', function ($scope, $timeout, $mdSidenav){
+    $scope.close = function () {
+        // Component lookup should always be available since we are not using `ng-if`
+        $mdSidenav('right').close()
+            .then(function () {
+                $log.debug("close RIGHT is done");
+            });
+    };
+})
 
 connect2Deploy.controller('registerController', function ($scope, $http, $location, $routeParams) {
     $scope.register = function (userEntity) {
