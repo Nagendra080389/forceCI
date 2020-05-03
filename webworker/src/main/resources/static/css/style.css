@@ -258,6 +258,10 @@ circle.running {
     fill: lawngreen !important;
 }
 
+circle.failed{
+    fill: #f12929 !important;
+}
+
 .blinking {
     -webkit-animation: 1s blink ease infinite;
     -moz-animation: 1s blink ease infinite;

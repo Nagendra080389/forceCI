@@ -1065,6 +1065,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     $scope.scheduledJobsList = [];
     $scope.scheduledJobsUnitTestList = [];
     $scope.tableHeaders = ['Owner', 'Job Name', 'Organization', 'Start Time', 'Last Run', 'Status', 'Action'];
+    $scope.tableHeadersForTests = ['Owner', 'Job Name', 'Organization', 'Threshold', 'Start Time', 'Last Run', 'Status', 'Action'];
 
     $scope.fetchAllJobs = function () {
         $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
@@ -1085,6 +1086,29 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
             }
         });
     }
+
+    $scope.scheduledJobsUnitTestList.push({
+        "_id": {
+            "$oid": "5eadd82a4ca4870004acd2a6"
+        },
+        "gitRepoId": "256012073",
+        "jobName": "TestUnit",
+        "createdBy": "nagendra080389@gmail.com",
+        "connect2DeployUserEmail": "nagendra080389@gmail.com",
+        "connect2DeployUserId": "5eaa6e95b0a6400004de2ea1",
+        "orgUserEmail": "nagendra@deloitte.com",
+        "status": "finished",
+        "sfdcConnection": "5ead8fff78ad7c0004dd56cd",
+        "startTimeRun": {
+            "$date": "2020-05-02T20:30:00.000Z"
+        },
+        "lastTimeRun": {
+            "$date": "2020-05-02T20:30:00.000Z"
+        },
+        "type": "TestingJob",
+        "executed": true,
+        "boolActive": true,
+    });
 
     $scope.fetchAllJobs();
     $scope.onStatusChange = function (scheduledDeploymentJob) {
@@ -1322,7 +1346,20 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
     $scope.runUnitTest = function(eachData){
         $http.get("/api/runJob?scheduledJobId=" + eachData.id).then(function (response) {
-            debugger;
+            if(response.data === 'Error') {
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Error running Job.',
+                    position: 'topRight'
+                });
+            } else {
+                iziToast.success({
+                    timeout: 5000,
+                    icon: 'fa fa-chrome',
+                    title: 'OK',
+                    message: response.data
+                });
+            }
         }, function (error) {
             console.log(error);
             if (error.data.message === 'Unauthorized') {

@@ -4,7 +4,8 @@ public enum Status {
 
     RUNNING("running"),
     FINISHED("finished"),
-    NOTSTARTED("notStarted");
+    NOTSTARTED("notStarted"),
+    FAILED("failed");
 
     private String text;
 

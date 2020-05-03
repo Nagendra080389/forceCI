@@ -20,11 +20,12 @@ public class ScheduledDeploymentJob implements Serializable {
     private String orgUserEmail;
     private String status;
     private String sfdcConnection;
+    private String cronExpression;
+    private String type;
+    private Double threshold;
     private Date startTimeRun;
     private Date lastTimeRun;
     private Date nextTimeRun;
-    private String cronExpression;
-    private String type;
     private Boolean executed;
     private Boolean boolActive;
 
@@ -166,6 +167,14 @@ public class ScheduledDeploymentJob implements Serializable {
 
     public void setConnect2DeployUserId(String connect2DeployUserId) {
         this.connect2DeployUserId = connect2DeployUserId;
+    }
+
+    public Double getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(Double threshold) {
+        this.threshold = threshold;
     }
 
     @Override

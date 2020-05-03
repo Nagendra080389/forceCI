@@ -1662,15 +1662,18 @@ public class ForceCIController {
     public String runJobWithToolingAPI(@RequestParam String scheduledJobId) throws Exception {
         Gson gson = new Gson();
         Optional<ScheduledDeploymentJob> scheduledDeploymentJobFromDB = scheduledDeploymentMongoRepository.findById(scheduledJobId);
-        if (scheduledDeploymentJobFromDB.isPresent()) {
+        if (scheduledDeploymentJobFromDB.isPresent() && scheduledDeploymentJobFromDB.get().getStatus().equalsIgnoreCase(Status.NOTSTARTED.getText())) {
             ScheduledDeploymentJob scheduledDeploymentJob = scheduledDeploymentJobFromDB.get();
             scheduledDeploymentJob.setStatus(Status.RUNNING.getText());
             scheduledDeploymentJob.setLastTimeRun(DateTime.now().toDate());
             ScheduledDeploymentJob savedJob = scheduledDeploymentMongoRepository.save(scheduledDeploymentJob);
             rabbitTemplateCustomAdmin.convertAndSend(SCHEDULED_JOB_EXCHANGE, SCHEDULED_QUEUE_NAME, savedJob);
+            return gson.toJson("Job submitted successfully.");
+        } else if(scheduledDeploymentJobFromDB.isPresent() && !scheduledDeploymentJobFromDB.get().getStatus().equalsIgnoreCase(Status.NOTSTARTED.getText())){
+            return gson.toJson("Job already finished or in queue.");
+        } else {
+            return gson.toJson("Error");
         }
-
-        return gson.toJson("Success");
     }
 
     @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.GET)
