@@ -1,8 +1,10 @@
 package com.controller;
 
+import com.backgroundworker.quartzJob.SFDCCodeCoverageOrgMongoRepository;
 import com.backgroundworker.quartzJob.ScheduledDeploymentMongoRepository;
 import com.backgroundworker.quartzJob.ScheduledDeploymentJob;
 import com.backgroundworker.quartzJob.Status;
+import com.codecoverage.SFDCCodeCoverageOrg;
 import com.dao.*;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -39,6 +41,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.kohsuke.github.*;
@@ -154,6 +157,8 @@ public class ForceCIController {
     private ICaptchaService captchaServiceV3;
     @Autowired
     private ScheduledDeploymentMongoRepository scheduledDeploymentMongoRepository;
+    @Autowired
+    private SFDCCodeCoverageOrgMongoRepository sfdcCodeCoverageOrgMongoRepository;
     /*@Autowired
     private AmazonS3Client amazonS3Client;*/
 
@@ -1674,6 +1679,17 @@ public class ForceCIController {
         } else {
             return gson.toJson("Error");
         }
+    }
+
+    @RequestMapping(value = "/api/fetchDetailsForScheduledJobId", method = RequestMethod.GET)
+    public String fetchDetailsForScheduledJobId(@RequestParam String scheduledJobId) throws Exception {
+        Gson gson = new Gson();
+        String sfdcCodeCoverageOrg = Strings.EMPTY;
+        Optional<SFDCCodeCoverageOrg> byScheduledJobId = sfdcCodeCoverageOrgMongoRepository.findByScheduledJobId(scheduledJobId);
+        if(byScheduledJobId.isPresent()){
+            sfdcCodeCoverageOrg = gson.toJson(byScheduledJobId.get());
+        }
+        return sfdcCodeCoverageOrg;
     }
 
     @RequestMapping(value = "/api/updateScheduledJob", method = RequestMethod.GET)

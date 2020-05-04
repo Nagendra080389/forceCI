@@ -1073,12 +1073,12 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 
     $scope.fetchAllJobs = function () {
         $http.get("/api/fetchAllScheduledJobs?connect2DeployUser=" + $scope.userName).then(function (response) {
-            if(response.data.DeploymentJob !== undefined && response.data.DeploymentJob !== null) {
+            if (response.data.DeploymentJob !== undefined && response.data.DeploymentJob !== null) {
                 $scope.scheduledJobsList = response.data.DeploymentJob;
             } else {
                 $scope.scheduledJobsList = [];
             }
-            if(response.data.TestingJob !== undefined && response.data.TestingJob !== null) {
+            if (response.data.TestingJob !== undefined && response.data.TestingJob !== null) {
                 $scope.scheduledJobsUnitTestList = response.data.TestingJob;
             } else {
                 $scope.scheduledJobsUnitTestList = [];
@@ -1091,41 +1091,18 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         });
     }
 
-    /*$scope.scheduledJobsUnitTestList.push({
-        "_id": {
-            "$oid": "5eadd82a4ca4870004acd2a6"
-        },
-        "gitRepoId": "256012073",
-        "jobName": "TestUnit",
-        "createdBy": "nagendra080389@gmail.com",
-        "connect2DeployUserEmail": "nagendra080389@gmail.com",
-        "connect2DeployUserId": "5eaa6e95b0a6400004de2ea1",
-        "orgUserEmail": "nagendra@deloitte.com",
-        "status": "finished",
-        "sfdcConnection": "5ead8fff78ad7c0004dd56cd",
-        "startTimeRun": {
-            "$date": "2020-05-02T20:30:00.000Z"
-        },
-        "lastTimeRun": {
-            "$date": "2020-05-02T20:30:00.000Z"
-        },
-        "type": "TestingJob",
-        "executed": true,
-        "boolActive": true,
-    });*/
-
     $scope.fetchAllJobs();
     $scope.onStatusChange = function (scheduledDeploymentJob) {
-        $http.get("/api/updateScheduledJob?scheduledDeploymentJobId="+scheduledDeploymentJob.id+'&boolActive='+scheduledDeploymentJob.boolActive).then(function (returnedScheduledJob) {
-            if(returnedScheduledJob.data === 'Success') {
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'Job updated successfully'
-                });
-                $scope.fetchAllJobs();
-            }
+        $http.get("/api/updateScheduledJob?scheduledDeploymentJobId=" + scheduledDeploymentJob.id + '&boolActive=' + scheduledDeploymentJob.boolActive).then(function (returnedScheduledJob) {
+                if (returnedScheduledJob.data === 'Success') {
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: 'Job updated successfully'
+                    });
+                    $scope.fetchAllJobs();
+                }
             }, function (error) {
                 console.log(error);
                 if (error.data.message === 'Unauthorized') {
@@ -1135,16 +1112,16 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         );
     }
     $scope.deleteJob = function (scheduleJob) {
-        $http.delete("/api/deleteScheduledJob?scheduleJobId="+scheduleJob.id).then(function (returnedScheduledJob) {
-            if(returnedScheduledJob.data === 'Success'){
-                iziToast.success({
-                    timeout: 5000,
-                    icon: 'fa fa-chrome',
-                    title: 'OK',
-                    message: 'Job deleted successfully'
-                });
-            }
-            $scope.fetchAllJobs();
+        $http.delete("/api/deleteScheduledJob?scheduleJobId=" + scheduleJob.id).then(function (returnedScheduledJob) {
+                if (returnedScheduledJob.data === 'Success') {
+                    iziToast.success({
+                        timeout: 5000,
+                        icon: 'fa fa-chrome',
+                        title: 'OK',
+                        message: 'Job deleted successfully'
+                    });
+                }
+                $scope.fetchAllJobs();
             }, function (error) {
                 console.log(error);
                 if (error.data.message === 'Unauthorized') {
@@ -1203,7 +1180,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
                     break;
                 }
             }
-            if(objSfdcSelected !== null){
+            if (objSfdcSelected !== null) {
                 $scope.scheduledJob.orgUserEmail = objSfdcSelected.userName;
                 $scope.scheduledJob.gitRepoId = objSfdcSelected.gitRepoId;
                 $scope.scheduledJob.connect2DeployUserEmail = objSfdcSelected.connect2DeployUser;
@@ -1237,6 +1214,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         };
 
     }
+
     $scope.createNewJob = function (event) {
         const outerScope = $scope;
         $mdDialog.show({
@@ -1299,7 +1277,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
                     break;
                 }
             }
-            if(objSfdcSelected !== null){
+            if (objSfdcSelected !== null) {
                 $scope.scheduledTestingJob.orgUserEmail = objSfdcSelected.userName;
                 $scope.scheduledTestingJob.gitRepoId = objSfdcSelected.gitRepoId;
                 $scope.scheduledTestingJob.connect2DeployUserEmail = objSfdcSelected.connect2DeployUser;
@@ -1324,6 +1302,7 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         };
 
     }
+
     $scope.createNewJobTesting = function (event) {
         const outerScope = $scope;
         $mdDialog.show({
@@ -1348,9 +1327,9 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
     }
     /*Code for Scheduled Unit Testing job ended*/
 
-    $scope.runUnitTest = function(eachData){
+    $scope.runUnitTest = function (eachData) {
         $http.get("/api/runJob?scheduledJobId=" + eachData.id).then(function (response) {
-            if(response.data === 'Error') {
+            if (response.data === 'Error') {
                 iziToast.error({
                     title: 'Error',
                     message: 'Error running Job.',
@@ -1372,8 +1351,8 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
         });
     }
 
-    $scope.viewReport = function(eachData){
-        $location.path('/apps/dashboard/scheduledDeploymentsDetails/'+eachData.id)
+    $scope.viewReport = function (eachData) {
+        $location.path('/apps/dashboard/scheduledDeploymentsDetails/' + eachData.id)
     }
 
     $scope.logoutFunction = function () {
@@ -1383,27 +1362,78 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 });
 
 connect2Deploy.controller('scheduledDeploymentDetailsController', function ($scope, $http, $location, $routeParams, $mdDialog, $mdSidenav) {
-    $scope.toggleRight = buildToggler('right');
 
-    function buildToggler(navID) {
-        return function() {
-            // Component lookup should always be available since we are not using `ng-if`
-            $mdSidenav(navID)
-                .toggle()
-                .then(function () {
-                    console.log("toggle " + navID + " is done");
-                });
-        };
+    $scope.scheduledJobId = $routeParams.scheduledJobId;
+    $scope.sfdcCodeCoverageOrg = null;
+    $scope.scheduledTestJobDetailsAllClasses = [];
+    $scope.orgCoverage = null;
+    $scope.tableHeaders = ['Class', 'Method name', 'Result', 'Run time (sec)'];
+    $scope.scheduledTestJobDetailsTableData = [];
+    $scope.errorDetails = [];
+
+    function millisToMinutesAndSeconds(millis) {
+        var minutes = Math.floor(millis / 60000);
+        var seconds = ((millis % 60000) / 1000).toFixed(0);
+        return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+    }
+
+    $http.get("/api/fetchDetailsForScheduledJobId?scheduledJobId=" + $scope.scheduledJobId).then(function (response) {
+        if (response.data !== undefined && response.data !== null && response.data !== '') {
+            $scope.sfdcCodeCoverageOrg = response.data;
+            for (const lstSfdcCodeCoverageDetailsTest of $scope.sfdcCodeCoverageOrg.lstSfdcCodeCoverageDetailsTests) {
+                for (const sfdcCodeCoverageListElement of lstSfdcCodeCoverageDetailsTest.sfdcCodeCoverageList) {
+                    const tData = {
+                        colSpanData: lstSfdcCodeCoverageDetailsTest.sfdcCodeCoverageList.length,
+                        classOrTriggerName: lstSfdcCodeCoverageDetailsTest.nameOfClassOrTrigger,
+                        methodName: sfdcCodeCoverageListElement.methodName,
+                        result: sfdcCodeCoverageListElement.boolPassed,
+                        runTime: millisToMinutesAndSeconds(sfdcCodeCoverageListElement.runTime),
+                        error: sfdcCodeCoverageListElement.errorMessage === undefined ||
+                        sfdcCodeCoverageListElement.errorMessage === null ? '-' : sfdcCodeCoverageListElement.errorMessage,
+                        stacktrace: sfdcCodeCoverageListElement.stacktrace === undefined ||
+                        sfdcCodeCoverageListElement.stacktrace === null ? '-' : sfdcCodeCoverageListElement.stacktrace,
+                    }
+                    $scope.scheduledTestJobDetailsTableData.push(tData);
+
+                }
+            }
+            $scope.scheduledTestJobDetailsAllClasses = $scope.sfdcCodeCoverageOrg.lstSfdcCodeCoverageDetails;
+            $scope.orgCoverage = $scope.sfdcCodeCoverageOrg.orgCoverage;
+        } else {
+            $scope.sfdcCodeCoverageOrg = null;
+            $scope.scheduledTestJobDetailsTableData = [];
+            $scope.scheduledTestJobDetailsAllClasses = [];
+            $scope.orgCoverage = null;
+        }
+    }, function (error) {
+        console.log(error);
+        if (error.data.message === 'Unauthorized') {
+            $('#sessionExpiredModal').modal("show");
+        }
+    });
+
+
+    $scope.toggleRight = function callBuildToggler(eachData , right){
+        $scope.errorDetails = [];
+        if (eachData !== undefined && eachData !== null && eachData.result === false) {
+            for (let intCount = 0; intCount < $scope.scheduledTestJobDetailsTableData.length; intCount++) {
+                if ($scope.scheduledTestJobDetailsTableData[intCount].classOrTriggerName === eachData.classOrTriggerName
+                    && $scope.scheduledTestJobDetailsTableData[intCount].methodName === eachData.methodName) {
+                    $scope.errorDetails.push($scope.scheduledTestJobDetailsTableData[intCount].error);
+                    $scope.errorDetails.push($scope.scheduledTestJobDetailsTableData[intCount].stacktrace);
+                }
+            }
+            return $mdSidenav(right).toggle();
+        } else {
+            return null;
+        }
     }
 })
 
-connect2Deploy.controller('RightCtrl', function ($scope, $timeout, $mdSidenav){
+connect2Deploy.controller('RightCtrl', function ($scope, $timeout, $mdSidenav) {
     $scope.close = function () {
         // Component lookup should always be available since we are not using `ng-if`
-        $mdSidenav('right').close()
-            .then(function () {
-                $log.debug("close RIGHT is done");
-            });
+        $mdSidenav('right').close();
     };
 })
 
