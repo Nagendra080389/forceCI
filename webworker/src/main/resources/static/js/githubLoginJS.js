@@ -1362,7 +1362,10 @@ connect2Deploy.controller('scheduledDeploymentController', function ($scope, $ht
 });
 
 connect2Deploy.controller('scheduledDeploymentDetailsController', function ($scope, $http, $location, $routeParams, $mdDialog, $mdSidenav) {
-
+    $scope.connect2DeployHeaderCookie = $.cookie("CONNECT2DEPLOY_TOKEN");
+    $http.defaults.headers.common['Authorization'] = 'Bearer ' + $scope.connect2DeployHeaderCookie;
+    $scope.userName = localStorage.getItem('userEmail');
+    $scope.avatar_url = localStorage.avatar_url;
     $scope.scheduledJobId = $routeParams.scheduledJobId;
     $scope.sfdcCodeCoverageOrg = null;
     $scope.scheduledTestJobDetailsAllClasses = [];
