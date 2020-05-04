@@ -327,5 +327,7 @@ circle.failed{
         opacity: 1;
     }
 }
+md-sidenav { position:fixed }
+md-backdrop.md-opaque { position:fixed }
 
 

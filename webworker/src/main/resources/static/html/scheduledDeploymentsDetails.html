@@ -1,11 +1,5 @@
-<style>
-    md-dialog{
-        min-width: 40rem;
-    }
-</style>
-
 <!-- Page Wrapper -->
-<div id="wrapper" ng-app="connect2Deploy" ng-controller="scheduledDeploymentController">
+<div id="wrapper">
 
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -134,7 +128,13 @@
             <div class="container-fluid">
 
                 <md-content>
-
+                    <md-card>
+                        <md-card-title>
+                            <md-card-title-text>
+                                <span class="md-headline">Org Wide Coverage : {{orgCoverage}} %</span>
+                            </md-card-title-text>
+                        </md-card-title>
+                    </md-card>
                     <div class="form-group">
                         <input class="form-control" ng-model="search" placeholder="Search...." style="margin-bottom: 1rem;"
                                type="text">
@@ -142,7 +142,7 @@
                     <table class="table table-striped table-bordered table-hover" ng-show="scheduledTestJobDetailsTableData.length > 0">
                         <thead>
                         <tr>
-                            <th ng-repeat="header in tableHeaders" class="scheduledJob">{{header}}</th>
+                            <th ng-repeat="header in tableHeadersForTestDetails" class="scheduledJob">{{header}}</th>
                         </tr>
                         </thead>
                         <tbody>

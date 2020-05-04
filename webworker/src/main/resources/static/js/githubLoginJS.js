@@ -1367,7 +1367,7 @@ connect2Deploy.controller('scheduledDeploymentDetailsController', function ($sco
     $scope.sfdcCodeCoverageOrg = null;
     $scope.scheduledTestJobDetailsAllClasses = [];
     $scope.orgCoverage = null;
-    $scope.tableHeaders = ['Class', 'Method name', 'Result', 'Run time (sec)'];
+    $scope.tableHeadersForTestDetails = ['Class', 'Method name', 'Result', 'Run time (sec)'];
     $scope.scheduledTestJobDetailsTableData = [];
     $scope.errorDetails = [];
 
