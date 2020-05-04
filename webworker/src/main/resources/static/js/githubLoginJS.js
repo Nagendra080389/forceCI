@@ -1431,6 +1431,10 @@ connect2Deploy.controller('scheduledDeploymentDetailsController', function ($sco
             return null;
         }
     }
+
+    $scope.logoutFunction = function () {
+        logoutFunctionCaller($location);
+    };
 })
 
 connect2Deploy.controller('RightCtrl', function ($scope, $timeout, $mdSidenav) {
