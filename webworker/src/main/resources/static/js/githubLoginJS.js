@@ -1370,6 +1370,7 @@ connect2Deploy.controller('scheduledDeploymentDetailsController', function ($sco
     $scope.sfdcCodeCoverageOrg = null;
     $scope.scheduledTestJobDetailsAllClasses = [];
     $scope.orgCoverage = null;
+    $scope.orgName = null;
     $scope.tableHeadersForTestDetails = ['Class', 'Method name', 'Result', 'Run time (sec)'];
     $scope.scheduledTestJobDetailsTableData = [];
     $scope.errorDetails = [];
@@ -1405,11 +1406,13 @@ connect2Deploy.controller('scheduledDeploymentDetailsController', function ($sco
             });
             $scope.scheduledTestJobDetailsAllClasses = $scope.sfdcCodeCoverageOrg.lstSfdcCodeCoverageDetails;
             $scope.orgCoverage = $scope.sfdcCodeCoverageOrg.orgCoverage;
+            $scope.orgName = $scope.sfdcCodeCoverageOrg.orgName;
         } else {
             $scope.sfdcCodeCoverageOrg = null;
             $scope.scheduledTestJobDetailsTableData = [];
             $scope.scheduledTestJobDetailsAllClasses = [];
             $scope.orgCoverage = null;
+            $scope.orgName = null;
         }
     }, function (error) {
         console.log(error);

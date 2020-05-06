@@ -21,6 +21,7 @@ public class SFDCCodeCoverageOrg implements Serializable {
     private Boolean boolFail;
     private String errorMessage;
     private Date createdDate;
+    private String orgName;
 
     public String getId() {
         return id;
@@ -86,6 +87,14 @@ public class SFDCCodeCoverageOrg implements Serializable {
         this.createdDate = createdDate;
     }
 
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -98,11 +107,12 @@ public class SFDCCodeCoverageOrg implements Serializable {
                 Objects.equals(orgCoverage, that.orgCoverage) &&
                 Objects.equals(boolFail, that.boolFail) &&
                 Objects.equals(errorMessage, that.errorMessage) &&
-                Objects.equals(createdDate, that.createdDate);
+                Objects.equals(createdDate, that.createdDate) &&
+                Objects.equals(orgName, that.orgName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, scheduledJobId, lstSfdcCodeCoverageDetailsTests, lstSfdcCodeCoverageDetails, orgCoverage, boolFail, errorMessage, createdDate);
+        return Objects.hash(id, scheduledJobId, lstSfdcCodeCoverageDetailsTests, lstSfdcCodeCoverageDetails, orgCoverage, boolFail, errorMessage, createdDate, orgName);
     }
 }

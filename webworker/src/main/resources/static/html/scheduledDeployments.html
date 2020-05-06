@@ -271,14 +271,14 @@
                                                                 <md-switch ng-disabled="{{eachData.executed}}" class="md-primary" ng-change="onStatusChange(eachData)" ng-model="eachData.boolActive"></md-switch>
                                                             </div>
                                                             <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                                                                <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-disabled="eachData.executed === false" ng-click="viewReport(eachData)">
+                                                                <md-button class="md-fab md-primary md-mini" aria-label="View Report" ng-disabled="eachData.executed === false" ng-click="viewReport(eachData)">
                                                                     <md-tooltip md-direction="bottom">View Report</md-tooltip>
                                                                     <md-icon md-svg-src="../images/description-24px.svg"></md-icon>
                                                                 </md-button>
                                                             </div>
                                                             <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4">
-                                                            <md-button class="md-fab md-primary md-mini" aria-label="Refresh" ng-disabled="eachData.executed === true" ng-click="runUnitTest(eachData)">
-                                                                <md-tooltip md-direction="bottom">Refresh</md-tooltip>
+                                                            <md-button class="md-fab md-primary md-mini" aria-label="Run Job Now" ng-disabled="eachData.executed === true" ng-click="runUnitTest(eachData)">
+                                                                <md-tooltip md-direction="bottom">Run Job Now</md-tooltip>
                                                                 <md-icon md-svg-src="../images/play_arrow-24px.svg"></md-icon>
                                                             </md-button>
                                                             </div>

@@ -96,6 +96,7 @@ public class ScheduledRabbitMQHandler {
                 RunTestsRequest runTestsRequest = new RunTestsRequest();
                 runTestsRequest.setAllTests(true);
                 SFDCCodeCoverageOrg sfdcCodeCoverageOrg = new SFDCCodeCoverageOrg();
+                sfdcCodeCoverageOrg.setOrgName(sfdcConnectionDetails.getOrgName());
                 sfdcCodeCoverageOrg.setScheduledJobId(savedScheduledJob.getId());
                 List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsTests = new ArrayList<>();
                 List<SFDCCodeCoverageDetails> sfdcCodeCoverageDetailsWithoutTests = new ArrayList<>();
