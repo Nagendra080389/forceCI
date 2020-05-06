@@ -126,15 +126,26 @@
 
             <!-- Begin Page Content -->
             <div class="container-fluid">
-
-                <md-content>
-                    <md-card>
+                <div class="row no-gutters d-flex justify-content-between">
+                    <div class="p-2">
                         <md-card-title>
                             <md-card-title-text>
                                 <span class="md-headline">Org Wide Coverage : {{orgCoverage}} %</span>
                             </md-card-title-text>
                         </md-card-title>
-                    </md-card>
+                    </div>
+                    <div class="p-2">
+                        <md-card-title>
+                            <md-button class="md-fab md-primary" aria-label="Failed" ng-click="tableToExcel(scheduledTestJobDetailsTableData, $event)">
+                                <md-tooltip md-direction="bottom">Download Report</md-tooltip>
+                                <md-icon md-svg-src="../images/description-24px.svg"></md-icon>
+                            </md-button>
+                        </md-card-title>
+                    </div>
+                </div>
+
+
+                <md-content>
                     <div class="form-group">
                         <input class="form-control" ng-model="search" placeholder="Search...." style="margin-bottom: 1rem;"
                                type="text">

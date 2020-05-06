@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,6 +20,7 @@ public class SFDCCodeCoverageOrg implements Serializable {
     private Double orgCoverage;
     private Boolean boolFail;
     private String errorMessage;
+    private Date createdDate;
 
     public String getId() {
         return id;
@@ -76,6 +78,14 @@ public class SFDCCodeCoverageOrg implements Serializable {
         this.errorMessage = errorMessage;
     }
 
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,11 +97,12 @@ public class SFDCCodeCoverageOrg implements Serializable {
                 Objects.equals(lstSfdcCodeCoverageDetails, that.lstSfdcCodeCoverageDetails) &&
                 Objects.equals(orgCoverage, that.orgCoverage) &&
                 Objects.equals(boolFail, that.boolFail) &&
-                Objects.equals(errorMessage, that.errorMessage);
+                Objects.equals(errorMessage, that.errorMessage) &&
+                Objects.equals(createdDate, that.createdDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, scheduledJobId, lstSfdcCodeCoverageDetailsTests, lstSfdcCodeCoverageDetails, orgCoverage, boolFail, errorMessage);
+        return Objects.hash(id, scheduledJobId, lstSfdcCodeCoverageDetailsTests, lstSfdcCodeCoverageDetails, orgCoverage, boolFail, errorMessage, createdDate);
     }
 }

@@ -1386,7 +1386,6 @@ connect2Deploy.controller('scheduledDeploymentDetailsController', function ($sco
             for (const lstSfdcCodeCoverageDetailsTest of $scope.sfdcCodeCoverageOrg.lstSfdcCodeCoverageDetailsTests) {
                 for (const sfdcCodeCoverageListElement of lstSfdcCodeCoverageDetailsTest.sfdcCodeCoverageList) {
                     const tData = {
-                        colSpanData: lstSfdcCodeCoverageDetailsTest.sfdcCodeCoverageList.length,
                         classOrTriggerName: lstSfdcCodeCoverageDetailsTest.nameOfClassOrTrigger,
                         methodName: sfdcCodeCoverageListElement.methodName,
                         result: sfdcCodeCoverageListElement.boolPassed,
@@ -1400,6 +1399,10 @@ connect2Deploy.controller('scheduledDeploymentDetailsController', function ($sco
 
                 }
             }
+
+            $scope.scheduledTestJobDetailsTableData.sort(function (a, b) {
+                return a.classOrTriggerName.localeCompare(b.classOrTriggerName);
+            });
             $scope.scheduledTestJobDetailsAllClasses = $scope.sfdcCodeCoverageOrg.lstSfdcCodeCoverageDetails;
             $scope.orgCoverage = $scope.sfdcCodeCoverageOrg.orgCoverage;
         } else {
@@ -1432,9 +1435,42 @@ connect2Deploy.controller('scheduledDeploymentDetailsController', function ($sco
         }
     }
 
+    $scope.tableToExcel = function(scheduledTestJobDetailsTableData, $event) {
+        if(scheduledTestJobDetailsTableData !== undefined && scheduledTestJobDetailsTableData !== null){
+            var confirm = $mdDialog.prompt()
+                .title('Name of the File?')
+                .placeholder('FileName')
+                .ariaLabel('FileName')
+                .targetEvent($event)
+                .required(true)
+                .ok('Download')
+                .cancel('Cancel');
+
+            $mdDialog.show(confirm).then(function(result) {
+                const shallowCopyTestData = [...scheduledTestJobDetailsTableData];
+                let toJson = angular.toJson(shallowCopyTestData);
+                try {
+                    /* generate a worksheet */
+                    var ws = XLSX.utils.json_to_sheet(JSON.parse(toJson));
+                    /* add to workbook */
+                    var wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, result);
+
+                    /* write workbook and force a download */
+                    XLSX.writeFile(wb, result+".xlsx");
+                }catch (e) {
+                    console.log(e);
+                }
+            }, function() {
+                console.log('You cancelled dialog');
+            });
+        }
+    };
+
     $scope.logoutFunction = function () {
         logoutFunctionCaller($location);
     };
+
 })
 
 connect2Deploy.controller('RightCtrl', function ($scope, $timeout, $mdSidenav) {

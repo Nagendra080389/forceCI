@@ -110,6 +110,7 @@ public class ScheduledRabbitMQHandler {
                             sfdcCodeCoverageDetailsWithoutTests,
                             stringSFDCCodeCoverageMap,
                             runTestsResult);
+                    sfdcCodeCoverageOrg.setCreatedDate(new Date());
                     sfdcCodeCoverageOrg = sfdcCodeCoverageOrgMongoRepository.save(sfdcCodeCoverageOrg);
                 } catch (Exception exception) {
                     if (exception instanceof UnexpectedErrorFault && ((UnexpectedErrorFault) exception).getExceptionCode().equals(ExceptionCode.INVALID_SESSION_ID)) {
@@ -123,11 +124,13 @@ public class ScheduledRabbitMQHandler {
                                 sfdcCodeCoverageDetailsWithoutTests,
                                 stringSFDCCodeCoverageMap,
                                 runTestsResult);
+                        sfdcCodeCoverageOrg.setCreatedDate(new Date());
                         sfdcCodeCoverageOrg = sfdcCodeCoverageOrgMongoRepository.save(sfdcCodeCoverageOrg);
                     } else {
                         if (exception instanceof UnexpectedErrorFault) {
                             sfdcCodeCoverageOrg.setBoolFail(true);
                             sfdcCodeCoverageOrg.setErrorMessage(((UnexpectedErrorFault) exception).getExceptionMessage());
+                            sfdcCodeCoverageOrg.setCreatedDate(new Date());
                             sfdcCodeCoverageOrg = sfdcCodeCoverageOrgMongoRepository.save(sfdcCodeCoverageOrg);
                         } else {
                             logger.error(exception.getMessage());
@@ -257,7 +260,6 @@ public class ScheduledRabbitMQHandler {
         sfdcCodeCoverageOrg.setLstSfdcCodeCoverageDetails(sfdcCodeCoverageDetailsWithoutTests);
         sfdcCodeCoverageOrg.setLstSfdcCodeCoverageDetailsTests(sfdcCodeCoverageDetailsTests);
         sfdcCodeCoverageOrg.setBoolFail(false);
-
         return sfdcCodeCoverageOrg;
     }
 }
